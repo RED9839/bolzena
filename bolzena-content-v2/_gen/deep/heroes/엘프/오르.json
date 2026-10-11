@@ -1,0 +1,854 @@
+{
+  "heroes": [
+    {
+      "id": "오르",
+      "name": "오르",
+      "nature": "우울",
+      "race": "엘프",
+      "role": "서포터",
+      "style": "예약형",
+      "star": 3,
+      "hp": 630,
+      "atk": 75,
+      "def": 58,
+      "crit": 5,
+      "blurb": "자재난 속에서도 우주선을 띄운 노력파 발명가. 적에게 붙인 기상 드론은 두 차례 뒤 요란하게 터지고, 사라진 카드에서 주운 고물이 셋 모이면 발명품을 뚝딱 만듭니다.",
+      "keyword": {
+        "name": "응원",
+        "desc": "녹음기에 담긴 엘리아스의 응원",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.06,
+            "who": "allies"
+          }
+        ],
+        "rules": [
+          {
+            "name": "응원의 녹음기",
+            "when": {
+              "on": "play"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "응원",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "포기 없는 발명",
+            "when": {
+              "on": "reserveFire"
+            },
+            "fx": [
+              {
+                "k": "dealtMod",
+                "v": 0.15,
+                "target": "allAllies"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "휴대용 돔 전개기",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.31,
+            "target": "randomEnemy",
+            "hits": 4
+          },
+          {
+            "k": "shield",
+            "ratio": 2.08
+          },
+          {
+            "k": "stack",
+            "id": "응원",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "오르_s1",
+        "오르_s2",
+        "오르_s3",
+        "오르_u2"
+      ],
+      "keywords": [
+        {
+          "name": "기상 드론",
+          "desc": "적에게 붙어 울리다 터지는 자명종 드론",
+          "carrier": "enemy",
+          "cap": 3,
+          "reserve": true,
+          "decay": 1,
+          "rules": [
+            {
+              "name": "강제 기상",
+              "when": {
+                "on": "stackGone",
+                "id": "기상 드론",
+                "decay": true
+              },
+              "fx": [
+                {
+                  "k": "dmg",
+                  "ratio": 1.46,
+                  "base": "def",
+                  "target": "oneEnemy"
+                },
+                {
+                  "k": "status",
+                  "id": "약화",
+                  "v": 1,
+                  "target": "oneEnemy"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "오르_s1",
+      "name": "렌치 휘두르기",
+      "hero": "오르",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "오르_s2",
+      "name": "응급 수리",
+      "hero": "오르",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "오르_u1",
+      "name": "강제 기상 장치",
+      "hero": "오르",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "기상 드론",
+          "v": 3,
+          "target": "topEnemy"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "topEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "오르_u2",
+      "name": "2인용 로켓",
+      "hero": "오르",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "later",
+          "n": 1,
+          "then": [
+            {
+              "k": "perStack",
+              "id": "응원",
+              "n": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.44
+            },
+            {
+              "k": "spend",
+              "id": "응원",
+              "all": true
+            }
+          ]
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "perStack",
+                  "id": "응원",
+                  "n": 1
+                },
+                {
+                  "k": "shield",
+                  "ratio": 2.16
+                },
+                {
+                  "k": "spend",
+                  "id": "응원",
+                  "all": true
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "응원",
+              "n": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "empower",
+              "ratio": 0.46,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "perStack",
+                  "id": "응원"
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.6,
+                  "base": "def",
+                  "target": "topEnemy"
+                }
+              ]
+            },
+            {
+              "k": "spend",
+              "id": "응원",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "empower",
+                      "ratio": 0.41,
+                      "who": "any"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "응원"
+            },
+            {
+              "k": "shield",
+              "ratio": 5.68
+            },
+            {
+              "k": "empower",
+              "ratio": 0.49,
+              "who": "any"
+            },
+            {
+              "k": "spend",
+              "id": "응원",
+              "all": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "오르_u3",
+      "name": "한발 늦은 발명",
+      "hero": "오르",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "ripen",
+          "id": "기상 드론",
+          "v": 0.25,
+          "target": "topEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "응원",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "기상 드론",
+              "v": 0.25,
+              "target": "topEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "기상 드론",
+              "v": 0.2,
+              "target": "topEnemy"
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "topEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "dmg",
+                  "ratio": 1.52,
+                  "base": "def",
+                  "target": "allEnemies"
+                }
+              ]
+            },
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "기상 드론",
+              "v": 0.25,
+              "target": "topEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 3.16
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "기상 드론",
+              "v": 0.25,
+              "target": "topEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 4
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "오르_u4",
+      "name": "휴대용 돔",
+      "hero": "오르",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2.48
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "hurt",
+                "guarded": true
+              },
+              "fx": [
+                {
+                  "k": "heal",
+                  "ratio": 0.48
+                },
+                {
+                  "k": "stack",
+                  "id": "응원",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.76
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.76
+                    },
+                    {
+                      "k": "stack",
+                      "id": "응원",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 4.32
+            },
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.27,
+                      "base": "def",
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.56
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "later",
+                      "n": 1,
+                      "then": [
+                        {
+                          "k": "dmg",
+                          "ratio": 0.52,
+                          "base": "def",
+                          "target": "allEnemies"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.8
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "응원",
+                      "v": 1
+                    },
+                    {
+                      "k": "empower",
+                      "ratio": 0.15,
+                      "who": "any"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 1.24
+                    },
+                    {
+                      "k": "stack",
+                      "id": "응원",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "오르_s3",
+      "name": "렌치 내려치기",
+      "hero": "오르",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "오르_s4",
+      "name": "응원 녹음",
+      "hero": "오르",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 3.76
+        },
+        {
+          "k": "stack",
+          "id": "응원",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 5.6
+            },
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.76
+            },
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.76
+            },
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.76
+            },
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 4.88
+            },
+            {
+              "k": "stack",
+              "id": "응원",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

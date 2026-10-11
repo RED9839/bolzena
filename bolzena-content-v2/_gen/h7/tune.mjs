@@ -1,3 +1,4 @@
+if (!process.env.BZ_OLD_GEN) { console.error("[중단] 옛 생성기입니다(2026-10-11 엘다인 리뉴얼). heroes/** 는 _gen/eldain 이 씁니다. 꼭 돌려야 하면 BZ_OLD_GEN=1 — 엘다인 파일을 덮어쓰니 주의."); process.exit(1); }
 // 검사기의 신탁 값어치 주의를 읽어 그 신탁의 수치를 올린다(마녀 폴더만)
 import fs from 'fs';
 import { execSync } from 'child_process';

@@ -9,9 +9,11 @@ namespace Bolzena.Core
     {
         public string Hero, Actor, Type, By, Id, Owner, Kind;
         public int Nth, Cost, Seq, N, V;
+        /// <summary>play — 낼 때의 비용(줄어든 값 · 할인 반영, 엘다인 4차). 없으면 -1.</summary>
+        public int CostNow = -1;
         /// <summary>keepAp — 쥐고 넘긴 보존 카드 수.</summary>
         public int Kept;
-        public bool Sig, Decay, On, Repeat, Fresh, Weak;
+        public bool Sig, Decay, On, Repeat, Fresh, Weak, Chain, SameHero;
         public Unit Target, Who, From;
         public double Before, After;
         /// <summary>play — 낸 카드의 태그.</summary>
@@ -30,10 +32,11 @@ namespace Bolzena.Core
                 var h = Data.Hero(u.Key);
                 var rules = new List<RuleRt>();
                 rules.AddRange(h.Passives.Select(r => new RuleRt { R = r, Own = true }));
+                foreach (var kd in h.AllKeywords) if (kd.Start is int st0 && st0 > 0 && (kd.Carrier ?? "self") == "self") { if (!Stacks.TryGetValue(u.Key, out var sb)) Stacks[u.Key] = sb = new Dictionary<string, int>(); sb[kd.Name] = kd.Cap is int cp0 ? Math.Min(cp0, st0) : st0; }   // 시작 값(규칙 아님 — 엘다인 3차)
                 foreach (var kd in h.AllKeywords)
                 {
                     Kw[kd.Name] = new KwRt { Def = kd, Owner = u.Key };
-                    rules.AddRange(kd.Rules.Select(r => new RuleRt { R = r, KwOf = kd.Carrier ?? "self" }));
+                    rules.AddRange(kd.Rules.Select(r => new RuleRt { R = r, KwOf = r.Self ? "self" : kd.Carrier ?? "self" }));
                     var car = kd.Carrier ?? "self";
                     if ((car == "self" || car == "hero") && kd.CapOrMode != null)
                         foreach (var holder in car == "hero" ? Party : new List<Unit> { u })
@@ -86,11 +89,12 @@ namespace Bolzena.Core
                         var owner = HeroUnit(kw.Owner);
                         int n = StackOf(kw.Owner, kw.Id);
                         if (n == 0 || owner == null) continue;
-                        if (p.Who == "allies" ? u.Side == Side.Party : u == owner) v += n * p.V;
+                        if (p.Who == "marked" ? u.Side == Side.Party && p.Mark != null && StackOf(u.Key, p.Mark) > 0   // 그 아군 표시가 붙은 아군만(엘다인 4차 ▶E81)
+                            : p.Who == "allies" ? u.Side == Side.Party : u == owner) v += n * p.V;
                     }
                     else
                     {
-                        if (p.From == "owner") continue;   // 건 사도가 칠 때만 — Hurt 의 OwnerMarkMod
+                        if (p.From == "owner" || p.From == "marked") continue;   // 건 사도 · 표시 붙은 아군이 칠 때만 — Hurt 의 OwnerMarkMod
                         int n = St(u, kw.Id);
                         if (n != 0) v += n * p.V;
                     }
@@ -207,23 +211,30 @@ namespace Bolzena.Core
                     else if (w.Who == "other") { if (info.Hero == null || info.Hero == owner.Key) return false; }
                     else if (w.Who != "any" && kwOf != "ally" && info.Hero != owner.Key) return false;
                     if (w.Type != null && info.Type != w.Type) return false;
+                    if (w.Token != null && w.Token.Value != (Data.Card(GameData.BaseId(info.Id))?.Token ?? false)) return false;   // token false — 생성 카드를 빼고(엘다인 ▶E25)
                     if (w.Nth > 0 && info.Nth != w.Nth) return false;
                     int minCost = w.MinCost ?? (w.Every > 0 ? 1 : 0);
                     if (minCost > 0 && info.Cost < minCost) return false;
                     if (w.Sig && !info.Sig) return false;
                     if (w.Repeat && !info.Repeat) return false;
-                    if (w.Tag != null && !(info.Tags != null && info.Tags.Any(t => Tag.Parse(t).id == w.Tag))) return false;
+                    if (w.Chain && !info.Chain) return false;
+                    if (w.SameHero && !info.SameHero) return false;
+                    if (w.Tag != null && !(info.Tags != null && info.Tags.Any(t => Tag.Parse(t).id == w.Tag)) && GameData.BaseId(info.Id ?? "") != w.Tag) return false;   // 카드 id 도 태그로(생성 카드 — 엘다인)
                     if (w.MaxCost != null && info.Cost > w.MaxCost.Value) return false;
+                    if (w.PaidMax != null && (info.CostNow < 0 ? info.Cost : info.CostNow) > w.PaidMax.Value) return false;   // 낼 때의 비용(리뉴아 정각)
                     if (w.CardSt != null && CardStOf(info.Id, w.CardSt) <= 0) return false;
                     if (w.Basic) { var pc = Data.Card(GameData.BaseId(info.Id)); if (pc == null || pc.Hero == null || pc.Unique || pc.Token || GameData.IsCopy(info.Id) || GameData.IsPlain(info.Id)) return false; }   // 시작 카드만(2026-10-08)
                     return true;
                 case "guard": return info.Who != null && info.Who.Side == Side.Party && (w.Kind == null || info.Kind == w.Kind);
                 case "kill":
-                case "break": return !w.Mine || info.By == owner.Key;
+                case "break":
+                    // who other(엘다인) — 다른 아군이 쓰러뜨림 · 격파 / any — 누구든
+                    if (w.Who == "other") return info.By != null && info.By != owner.Key && Party.Any(u => u.Key == info.By);
+                    return !w.Mine || info.By == owner.Key;
                 case "hurt": return info.Who != null && info.Who.Side == Side.Party && (w.Pct <= 0 || info.N >= info.Who.MaxHp * w.Pct);
                 case "lowHp": return info.Who != null && info.Who.Side == Side.Party && info.Before > w.Pct && info.After <= w.Pct;
                 case "ult": return w.Who == "any" || info.Hero == owner.Key;
-                case "debuff": return (w.Who == "any" || info.By == owner.Key) && (!w.Fresh || info.Fresh);
+                case "debuff": return (w.Who == "any" || (w.Who == "other" ? info.By != null && info.By != owner.Key && Party.Any(u => u.Key == info.By) : info.By == owner.Key)) && (!w.Fresh || info.Fresh) && (w.Id == null || w.Id == info.Id);   // id — 그 디버프만(2026-10-10)
                 // 넘친 회복 — pct 가 있으면 「회복 뒤 HP 가 최대 HP × pct 이상, 선을 넘은 몫이 있으면」(파티 HP 하나 — 1단계 다시 정의)
                 case "overheal": return (w.Who == "any" || info.By == owner.Key) && OverOf(w, info) > 0;
                 case "guardSum": return info.V >= Math.Max(1, w.N);
@@ -236,9 +247,12 @@ namespace Bolzena.Core
                 // 운영 방식 공용 계기 — 「카드가 버려지면」 · 「HP를 치르면」 · 「카드가 소멸하면」: 기본은 그 사도(제 카드 · 제 효과), who any 면 파티 누구든
                 case "discard":
                 case "exhaust":
+                    if (w.Tag != null && !(info.Id != null && HasTagB(info.Id, w.Tag))) return false;
                     if (w.Basic) { var bc = Data.Card(info.Id); if (bc == null || bc.Hero == null || bc.Unique || bc.Token || GameData.IsCopy(info.Id) || GameData.IsPlain(info.Id)) return false; }
                     // type — 그 카드의 종류만(상태 · 저주 · 공격 · 스킬 …) · who other — 다른 아군의 카드 · 다른 아군이 지운 것만
                     if (w.Type != null && CardOf(info.Id)?.Type != w.Type) return false;
+                    // (엘다인 ▶E7) by — 버리게 한(지운) 사도만 본다(카드 주인은 상관없음). 교주 카드 · 적의 효과(By 없음)는 아군이 아니다
+                    if (w.By != null) return info.By != null && Party.Any(u => u.Key == info.By) && (w.By == "other" ? info.By != owner.Key : info.By == owner.Key);
                     if (w.Who == "other") return (info.Hero ?? info.By) != null && info.Hero != owner.Key && info.By != owner.Key;
                     return w.Who == "any" || info.Hero == owner.Key || info.By == owner.Key;
                 // 18갈래 공용 계기(2026-10-08) — 셈이 맞으면 · AP 를 남기고 턴 끝 · 예약이 터지면 · 카드가 자라면 · 전투 끝
@@ -248,11 +262,19 @@ namespace Bolzena.Core
                 case "reserveFire": return Whose(w, owner, info.Owner);
                 case "grow": return Whose(w, owner, info.Hero) && (w.CardSt == null || w.CardSt == info.Kind);
                 case "fightEnd": return true;
+                // 엘다인 3차 — 반격이 터지면 · 적 예고를 깎으면(기본 그 사도, who any · other)
+                case "counter":
+                case "cutHit": return Whose(w, owner, info.By);
+                // (엘다인) 변신에 새로 들면 — 기본 그 사도, who any 면 아군 누구든
+                case "formOn": return Whose(w, owner, info.Hero) && (w.Id == null || w.Id == info.Id);
+                case "formLap": return Whose(w, owner, info.Hero);   // 번갈아 드는 태세가 시작 태세로 돌아옴(한 바퀴 — 엘다인 4차 우로스)
                 case "pay": return w.Who == "any" || info.By == owner.Key;
                 // 「찍은 적이 쓰러지면」 — 그 사도의 찍기 키워드, who any 면 아군 누구의 찍기든
                 case "huntDown": return (w.Who == "any" || info.Owner == owner.Key) && (w.Id == null || w.Id == info.Id);
                 case "blocked": return info.Who != null && info.Who.Side == Side.Party;
                 // 사도 고유 효과 틀 — 뽑힘 · 적의 행동(직전/직후, type 공격이면 치는 수만) · 아군이 적을 침 · 실드 깨짐 · 적 실드
+                // 손으로 끌어옴(pull · 2026-10-10) — 기본은 그 사도의 카드
+                case "pulled": return Whose(w, owner, info.Hero) && (w.Type == null || info.Type == w.Type);
                 case "drawn":
                     if (w.Unique && !(Data.Card(info.Id)?.Unique ?? false)) return false;
                     if (w.Marked != null) return info.Hero != null && StackOf(info.Hero, w.Marked) > 0;
@@ -261,12 +283,16 @@ namespace Bolzena.Core
                     return Whose(w, owner, info.Hero);
                 case "foeAct":
                 case "foeActBefore": return w.Type == null || info.Type == w.Type;
-                case "hit": return Whose(w, owner, info.By) && (!w.Weak || info.Weak);
+                case "hit":
+                    if (w.FoeStack != null && !(info.Target != null && St(info.Target, w.FoeStack) > 0)) return false;   // 맞은 적에 그 표식(▶E64)
+                    if (w.Marked != null) return info.By != null && StackOf(info.By, w.Marked) > 0 && (!w.Weak || info.Weak);   // 표시된 아군(손님)의 카드
+                    return Whose(w, owner, info.By) && (!w.Weak || info.Weak);
                 case "shieldBreak": return !w.Mine || info.By == owner.Key;
                 case "endure": return true;
                 case "unwound": return Whose(w, owner, info.By);
                 case "foeShieldBreak": return !w.Mine || info.By == owner.Key;
-                case "stackReach": return w.Id == info.Id && info.Before < w.N && info.After >= w.N && (info.Owner == null || info.Owner == owner.Key);
+                // 순환(wrap) 고유 효과는 그 단계에 꼭 닿을 때만(엘다인 — 「보름으로」 가 초승 · 반달을 거쳐 가지 않는다)
+                case "stackReach": return w.Id == info.Id && (Kw.TryGetValue(w.Id, out var rk) && rk.Def.Wrap ? info.Before != w.N && info.After == w.N : info.Before < w.N && info.After >= w.N) && (info.Owner == null || info.Owner == owner.Key);
                 case "stackGone": return w.Id == info.Id && (!w.Decay || info.Decay) && (info.Owner == null || info.Owner == owner.Key);
                 case "stackOver": return w.Id == info.Id && (info.Owner == null || info.Owner == owner.Key);
                 // 소환물이 행동하면(시범 16) — kind atk(따라 침) · guard(대신 맞음) · lost(하나가 사라짐), 기본은 그 사도의 소환물
@@ -285,11 +311,17 @@ namespace Bolzena.Core
         /// <summary>일이 났다 — 맞는 규칙을 모두 돌린다. 패시브가 패시브를 부르는 고리는 다섯 겹에서 끊는다.</summary>
         void Emit(string ev, EmitInfo info)
         {
+            // 셈(perPile broken · drawn · discards — 패시브가 없어도 센다)
+            if (ev == "break") Counts[N_BROKEN] = (Counts.TryGetValue(N_BROKEN, out var nb) ? nb : 0) + 1;
+            else if (ev == "drawn") Counts[N_DRAWN] = (Counts.TryGetValue(N_DRAWN, out var nd) ? nd : 0) + 1;
+            else if (ev == "discard") Counts[N_DISCARD] = (Counts.TryGetValue(N_DISCARD, out var nx) ? nx : 0) + 1;
             if (ev == "exhaust")
             {
                 GoneN++;   // 이번 전투 소멸 장수 — 패시브가 없어도 센다(조건 goneMin)
+                CountGoneTurn(info.Id);   // 이번 턴 소멸 장수 · 그 카드(엘다인 ▶E34)
                 if (info.Hero != null) Counts["gone|" + info.Hero] = GoneOf(info.Hero) + 1;   // 그 사도의 카드 — perGone who self(시범 16 니콜)
             }
+            if ((ev == "play" || ev == "discard") && Over == null) TallyAdd(ev, info);   // 엔진이 세는 수(키워드 tally — 규칙 아님, 엘다인 3차)
             if (Passives.Count == 0 || Over != null) return;
             if (depth > 4) return;
             // 연쇄 상한(1단계) — 예약 계기 안에서 난 예약 계기는 패시브를 깨우지 않는다(재촉 ↔ reserveFire 순환 · 깊이 1)
@@ -338,7 +370,7 @@ namespace Bolzena.Core
             if (!Matches(owner, r.When, ev, info, rt.KwOf)) return;
             if (firing.Contains(id)) return;
             // 「적에게 디버프를 걸면」 — 한 번의 일에 한 번
-            if (ONCE_PER_ACT.Contains(ev) && info.Seq != 0) { string dk = id + "|" + ev; if (Counts.TryGetValue(dk, out var dv) && dv == info.Seq) return; Counts[dk] = info.Seq; }
+            if ((ONCE_PER_ACT.Contains(ev) || r.When.Once) && info.Seq != 0) { string dk = id + "|" + ev; if (Counts.TryGetValue(dk, out var dv) && dv == info.Seq) return; Counts[dk] = info.Seq; }
             // 「N장 낼 때마다」 — 장수는 조건과 상관없이 세고, N장째에 조건을 본다
             if (r.When.Every > 0)
             {
@@ -363,12 +395,7 @@ namespace Bolzena.Core
                 if ((Fired.TryGetValue(key, out var fv) ? fv : 0) >= r.Limit.N) return;
                 Fired[key] = (Fired.TryGetValue(key, out var fv2) ? fv2 : 0) + 1;
             }
-            else if (ev == "lowHp")
-            {
-                string key = $"{id}|f";
-                if (Fired.ContainsKey(key)) return;
-                Fired[key] = 1;
-            }
+            // (2026-10-10 사용자 「전투당 n회 제한을 모두 없앤다」 — 옛 「lowHp 는 전투당 한 번」 기본도 없앴다. lowHp 는 HP 가 선을 위에서 아래로 넘을 때만 돈다)
             if (r.Fx.Count == 0) return;
             // 멈춤 방지 상한(게임 규칙 아님 · 카드 글에 안 나옴) — 같은 규칙은 한 턴에 SAFETY_CAP 번까지만 돈다. 2026-10-09 턴당 제한(limit per turn)을 전부 없앤 뒤 계기끼리 끝없이 도는 것을 막는다.
             if (capTurn != Turn) { capN.Clear(); capTurn = Turn; }
@@ -459,6 +486,7 @@ namespace Bolzena.Core
                             if (n == 0 || u.Dead) continue;
                             int v = Math.Max(1, Num.Round(owner.Def * (1 + StatMod(owner, "def")) * p.Ratio * n));
                             int h0 = u.Hp; u.Hp = Math.Min(u.MaxHp, u.Hp + v); HealCue(u, h0);
+                            if (u.Side == Side.Party) TallyHeal(owner, u.Hp - h0);
                         }
                     }
                     if (Over != null) return;

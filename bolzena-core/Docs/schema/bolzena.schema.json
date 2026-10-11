@@ -122,7 +122,33 @@
       "perGone",
       "ifGained",
       "ripen",
-      "summon"
+      "summon",
+      "spendShield",
+      "perShield",
+      "ifForm",
+      "formExtend",
+      "noForget",
+      "counterHits",
+      "counterAll",
+      "counterMod",
+      "gaugeLock",
+      "record",
+      "replay",
+      "ifEvent",
+      "taunt",
+      "critNext",
+      "execute",
+      "stackLock",
+      "nthNext",
+      "ultCostMod",
+      "swiftTurn",
+      "critDmg",
+      "ifHitTaken",
+      "formKeep",
+      "ifCost",
+      "noToggle",
+      "moveMark",
+      "learn"
      ],
      "description": "효과 조각 종류 — Docs/데이터.md §2"
     },
@@ -155,7 +181,9 @@
         "nextEnemy",
         "slowestEnemy",
         "markedEnemy",
-        "strongestAlly"
+        "strongestAlly",
+        "farEnemy",
+        "bigHitEnemy"
        ]
       },
       {
@@ -216,7 +244,9 @@
       "discard",
       "handEnd",
       "burn",
-      "passion"
+      "passion",
+      "handHurtBig",
+      "shieldLeft"
      ]
     },
     "random": {
@@ -292,11 +322,119 @@
     },
     "owner": {
      "type": "string",
-     "description": "make — 만든 카드의 주인: self(기본) · other(파티 차례로 다음 아군) · 사도 id(데이터.md §19)"
+     "description": "make — 만든 카드의 주인: self(기본) · other(파티 차례로 다음 아군) · strongestAlly(공격력이 가장 높은 아군 — ▶E23) · 사도 id(데이터.md §19 · §22)"
     },
     "pick": {
      "type": "boolean",
-     "description": "spend — 낼 때 소모량을 고른다(1 · 절반 · 전부). 소모한 양이 일의 값(perEvent)"
+     "description": "spend — 낼 때 소모량을 고른다(1 · 절반 · 전부) · spendShield — 파티 실드를 고른 만큼(절반 · 전부). 쓴 양이 일의 값(perEvent · ofEvent)"
+    },
+    "half": {
+     "type": "boolean",
+     "description": "spendShield — 파티 실드 절반 · cardStatus — 카드 값을 절반으로(▶E1 · E17, 데이터.md §22)"
+    },
+    "ofShield": {
+     "type": "boolean",
+     "description": "dmg · shield — 일의 값 = 지금 파티 실드(ofEvent 와 같이, ▶E1)"
+    },
+    "token": {
+     "type": "boolean",
+     "description": "카드 거르개 — 생성 카드(token)만(▶E11)"
+    },
+    "hitFx": {
+     "$ref": "#/$defs/fxList",
+     "description": "dmg — 한 대마다 맞은 그 적에게 도는 효과(▶E3)"
+    },
+    "carry": {
+     "type": "boolean",
+     "description": "stack — v 대신 일을 겪은(쓰러진) 적의 그 표식 겹(▶E4)"
+    },
+    "set": {
+     "type": "number",
+     "description": "stack · cardStatus — 더하기 대신 그 값으로 정한다(▶E17 · E28)"
+    },
+    "hitsPer": {
+     "type": "string",
+     "description": "dmg — 친 횟수 = 이 고유 효과의 겹 + hitsAdd(▶E24)"
+    },
+    "hitsAdd": {
+     "type": "integer",
+     "description": "dmg — hitsPer 에 더하는 횟수(▶E24)"
+    },
+    "loop": {
+     "type": "boolean",
+     "description": "spend pick — 치는 동안 새로 얻은 겹을 이어 쓴다(max 대까지, 기본 12 — ▶E19)"
+    },
+    "hpBelow": {
+     "type": "number",
+     "description": "ifFoe — 고른 적 HP 비율이 이 값 이하면(id hp 와 같다 — ▶E20)"
+    },
+    "turn": {
+     "type": "boolean",
+     "description": "perGone — 이번 턴에 사라진 것만(id 면 그 카드만 — ▶E34)"
+    },
+    "choose": {
+     "enum": [
+      "priciest"
+     ],
+     "description": "costMod · cardStatus — 손의 가장 비싼 카드 한 장(▶E45)"
+    },
+    "keep": {
+     "type": "boolean",
+     "description": "cardStatus — 붙은 동안 보존(▶E43) · replay — 쪽을 지우지 않음(▶E57)"
+    },
+    "hitsBy": {
+     "enum": [
+      "self"
+     ],
+     "description": "ifFoe — 이번 전투에 이 사도가 그 적을 친 횟수 n 이상(▶E71)"
+    },
+    "bossRatio": {
+     "type": "number",
+     "description": "execute — 보스 · 클론에게는 대신 이 비율의 피해(▶E72)"
+    },
+    "lock": {
+     "type": "boolean",
+     "description": "stack(set · pick) — 정한 뒤 turns 턴 고정(▶E74)"
+    },
+    "ofForm": {
+     "type": "number",
+     "description": "dmg — 이번 변신 중 그 사도가 준 피해 × 이 비율 고정 피해(▶E76)"
+    },
+    "after": {
+     "type": "boolean",
+     "description": "ifNth — n번째 이후면(▶E77 정각) · id 가 글 이름"
+    },
+    "killMore": {
+     "type": "boolean",
+     "description": "dmg — 치는 동안 처치하면 한 대 더(max 대까지, 기본 12 — ▶E79)"
+    },
+    "off": {
+     "$ref": "#/$defs/fxList",
+     "description": "critDmg — 끝날 때 효과(▶E83)"
+    },
+    "now": {
+     "type": "boolean",
+     "description": "critNext — 이 카드에 치명 확정(foeStack 이면 그 표식 적을 치는 대만)"
+    },
+    "foeStack": {
+     "type": "string",
+     "description": "critNext now — 이 표식이 있는 적을 치는 대만 치명 확정"
+    },
+    "minCost": {
+     "type": "integer",
+     "minimum": 0,
+     "description": "카드 거르개 · empower(who other) — 비용 이 값 이상인 카드만"
+    },
+    "knownHits": {
+     "type": "integer",
+     "minimum": 2,
+     "description": "dmg — 아는 수(만년설의 앎)를 하는 적에게는 이 횟수"
+    },
+    "once": {
+     "enum": [
+      "foeTurn"
+     ],
+     "description": "ifFoe known · knownHits — 같은 적에게 그 적 차례마다 한 번만"
     }
    },
    "required": [
@@ -353,6 +491,13 @@
          "빙벽",
          "절대 무적",
          "열정 약점",
+         "순수 약점",
+         "광기 약점",
+         "냉정 약점",
+         "활발 약점",
+         "우울 약점",
+         "공명 약점",
+         "약점 노출",
          "구속",
          "초재생",
          "정신 붕괴",
@@ -363,7 +508,8 @@
          "끈기",
          "잔불",
          "리듬",
-         "기절"
+         "기절",
+         "은방울"
         ]
        }
       },
@@ -425,6 +571,23 @@
     },
     "power": {
      "type": "boolean"
+    },
+    "countAs": {
+     "type": "integer",
+     "minimum": 0,
+     "description": "천상 계기에서만 이 카드를 비용 N 으로 센다(▶E2)"
+    },
+    "type": {
+     "enum": [
+      "공격",
+      "스킬",
+      "강화"
+     ],
+     "description": "「스킬로」 · 「공격으로」 신탁 — 고르면 카드 종류가 이것으로"
+    },
+    "needForm": {
+     "type": "string",
+     "description": "이 신탁을 얹으면 그 변신 · 태세 중에만 사용 가능"
     }
    },
    "required": [
@@ -558,6 +721,10 @@
       "into"
      ]
     },
+    "complete": {
+     "type": "boolean",
+     "description": "완성형 — 신탁 없이 처음부터 완성된 고유 카드(2026-10-10)"
+    },
     "bondCard": {
      "type": "string",
      "description": "결속 — 겹친 수 3 이상의 강해진 카드 id"
@@ -588,6 +755,15 @@
     },
     "payMix": {
      "type": "boolean"
+    },
+    "countAs": {
+     "type": "integer",
+     "minimum": 0,
+     "description": "천상 계기에서만 이 카드를 비용 N 으로 센다(▶E2)"
+    },
+    "needForm": {
+     "type": "string",
+     "description": "그 변신 · 태세 중에만 사용 가능(변신 id · *)"
     }
    },
    "required": [
@@ -601,6 +777,10 @@
    "type": "object",
    "additionalProperties": false,
    "properties": {
+    "token": {
+     "type": "boolean",
+     "description": "play — true: 생성 카드(token)를 낼 때만 · false: 생성 카드를 빼고(▶E25)"
+    },
     "on": {
      "enum": [
       "fightStart",
@@ -649,7 +829,12 @@
       "grow",
       "fightEnd",
       "guardSum",
-      "summonAct"
+      "summonAct",
+      "pulled",
+      "formOn",
+      "counter",
+      "cutHit",
+      "formLap"
      ]
     },
     "type": {
@@ -709,6 +894,12 @@
     "fresh": {
      "type": "boolean"
     },
+    "chain": {
+     "type": "boolean"
+    },
+    "sameHero": {
+     "type": "boolean"
+    },
     "repeat": {
      "type": "boolean"
     },
@@ -749,6 +940,26 @@
     },
     "cardSt": {
      "type": "string"
+    },
+    "by": {
+     "enum": [
+      "self",
+      "other"
+     ],
+     "description": "discard · exhaust — 버리게 한(지운) 사도: other 다른 아군의 효과 · self 자신의 효과(카드 주인은 상관없음 — ▶E7)"
+    },
+    "once": {
+     "type": "boolean",
+     "description": "한 번의 일(카드 한 장 · 패시브 한 번)에 한 번만(▶E10)"
+    },
+    "foeStack": {
+     "type": "string",
+     "description": "hit — 맞은 적에게 이 적 표식이 있을 때만(▶E64)"
+    },
+    "paidMax": {
+     "type": "integer",
+     "minimum": 0,
+     "description": "play — 낼 때의 비용(줄어든 값)이 이 값 이하"
     }
    },
    "required": [
@@ -835,6 +1046,10 @@
    "properties": {
     "name": {
      "type": "string"
+    },
+    "self": {
+     "type": "boolean",
+     "description": "고유 능력(keyword) 규칙이어도 그 사도 자신의 계기로(패시브처럼) — 2026-10-10 패시브를 고유 능력으로 합칠 때"
     },
     "when": {
      "$ref": "#/$defs/when"
@@ -932,7 +1147,9 @@
          "guard",
          "dot",
          "hot",
-         "tough"
+         "tough",
+         "counter",
+         "ultCost"
         ]
        },
        "v": {
@@ -944,7 +1161,8 @@
        "who": {
         "enum": [
          "holder",
-         "allies"
+         "allies",
+         "marked"
         ]
        },
        "from": {
@@ -954,6 +1172,10 @@
        },
        "else": {
         "type": "number"
+       },
+       "mark": {
+        "type": "string",
+        "description": "who marked — 이 아군 표시(carrier hero)가 붙은 아군만(▶E81)"
        }
       },
       "required": [
@@ -1012,8 +1234,156 @@
     "onMax": {
      "type": "object",
      "additionalProperties": false,
-     "properties": { "form": { "type": "string" }, "consume": { "type": "boolean" }, "make": { "type": "string" }, "n": { "type": "integer" }, "empower": { "enum": [ "next", "any" ] }, "ratio": { "type": "number" } },
+     "properties": {
+      "form": {
+       "type": "string"
+      },
+      "consume": {
+       "type": "boolean"
+      },
+      "make": {
+       "type": "string"
+      },
+      "n": {
+       "type": "integer"
+      },
+      "empower": {
+       "enum": [
+        "next",
+        "any"
+       ]
+      },
+      "ratio": {
+       "type": "number"
+      }
+     },
      "description": "최대(cap)에 닿으면 — form(변신, 데이터.md §16) · make(그 카드 n 장을 손에) · empower(next 그 사도 · any 파티의 다음 카드 +ratio) 가운데 하나(데이터.md §19)"
+    },
+    "tally": {
+     "type": "array",
+     "items": {
+      "enum": [
+       "play",
+       "discardBy"
+      ]
+     },
+     "description": "엔진이 세는 수(규칙 아님) — play · discardBy(엘다인 3차)"
+    },
+    "share": {
+     "type": "number",
+     "description": "아군 표시(carrier hero) — 붙은 아군을 노린 적 공격 -share, 깎인 만큼 파티 실드(▶E69)"
+    },
+    "onStage": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/fxList"
+     },
+     "description": "순환 칸에 닿을 때 그 칸 효과(1번째 칸부터, ▶E73)"
+    },
+    "stageBonus": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "stage": {
+        "type": "integer",
+        "minimum": 1
+       },
+       "card": {
+        "type": "string"
+       },
+       "type": {
+        "enum": [
+         "공격",
+         "스킬",
+         "강화"
+        ]
+       },
+       "tag": {
+        "type": "string"
+       },
+       "unique": {
+        "type": "boolean"
+       },
+       "ratio": {
+        "type": "number"
+       },
+       "fx": {
+        "$ref": "#/$defs/fxList"
+       },
+       "tags": {
+        "$ref": "#/$defs/tags"
+       }
+      },
+      "required": []
+     },
+     "description": "단계마다 그 사도 카드 덤(▶E75)"
+    },
+    "start": {
+     "type": "integer",
+     "minimum": 0,
+     "description": "전투 시작 값(규칙 아님)"
+    },
+    "cardValue": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "grow": {
+       "enum": [
+        "handEnd",
+        "allyPlay"
+       ]
+      },
+      "reset": {
+       "enum": [
+        "play"
+       ]
+      },
+      "who": {
+       "enum": [
+        "any",
+        "other"
+       ],
+       "description": "allyPlay 의 아군 — any(자신 포함) · other"
+      },
+      "cost": {
+       "type": "integer",
+       "description": "값 1당 그 카드 비용 증감(-1)"
+      },
+      "max": {
+       "type": "integer",
+       "minimum": 0,
+       "description": "값의 최대"
+      }
+     },
+     "description": "이 이름의 카드 값 — 고유 카드가 턴 끝 손에 있으면 +1 · 낸 뒤 0(규칙 아님)"
+    },
+    "huntCarry": {
+     "enum": [
+      "lowEnemy"
+     ],
+     "description": "사냥감(hunt)이 쓰러지면 겹 그대로 가장 약한 적에게"
+    },
+    "burn": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "on": {
+       "enum": [
+        "play"
+       ]
+      },
+      "shield": {
+       "type": "number",
+       "minimum": 0
+      }
+     },
+     "description": "아군 표시가 붙은 동료가 자기 카드를 낼 때마다 1 타며 키워드 주인 방어력 × shield 실드(벨라 촛불)"
+    },
+    "known": {
+     "type": "boolean",
+     "description": "적의 수 종류를 적어 두는 칸(아야 만년설의 앎)"
     }
    },
    "required": [
@@ -1118,6 +1488,10 @@
       "$ref": "#/$defs/form"
      },
      "description": "변신 — 효과 { k: form, id } 로 든다(Docs/데이터.md 변신)"
+    },
+    "startForm": {
+     "type": "string",
+     "description": "전투 시작 때 든 변신 · 태세 id"
     }
    },
    "required": [
@@ -1133,40 +1507,163 @@
    "type": "object",
    "additionalProperties": false,
    "properties": {
-    "id": { "type": "string" },
-    "name": { "type": "string" },
-    "desc": { "type": "string" },
-    "turns": { "type": "integer", "minimum": 0, "description": "내 턴 N 번 — 0 이면 전투 끝까지" },
-    "until": { "$ref": "#/$defs/when" },
+    "id": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    },
+    "desc": {
+     "type": "string"
+    },
+    "turns": {
+     "type": "integer",
+     "minimum": 0,
+     "description": "내 턴 N 번 — 0 이면 전투 끝까지"
+    },
+    "until": {
+     "$ref": "#/$defs/when"
+    },
     "mods": {
      "type": "object",
-     "propertyNames": { "enum": [ "dealt", "taken", "atk", "def", "crit", "guard", "heal" ] },
-     "additionalProperties": { "type": "number" }
+     "propertyNames": {
+      "enum": [
+       "dealt",
+       "taken",
+       "atk",
+       "def",
+       "crit",
+       "guard",
+       "heal"
+      ]
+     },
+     "additionalProperties": {
+      "type": "number"
+     }
     },
-    "cards": { "type": "object", "additionalProperties": { "type": "string" }, "description": "카드 id → 변신판 카드 id(token)" },
+    "cards": {
+     "type": "object",
+     "additionalProperties": {
+      "type": "string"
+     },
+     "description": "카드 id → 변신판 카드 id(token)"
+    },
     "bonus": {
      "type": "array",
      "items": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-       "card": { "type": "string" },
-       "type": { "enum": [ "공격", "스킬", "강화" ] },
-       "tag": { "type": "string" },
-       "unique": { "type": "boolean" },
-       "ratio": { "type": "number" },
-       "fx": { "$ref": "#/$defs/fxList" },
-       "tags": { "$ref": "#/$defs/tags" }
+       "card": {
+        "type": "string"
+       },
+       "type": {
+        "enum": [
+         "공격",
+         "스킬",
+         "강화"
+        ]
+       },
+       "tag": {
+        "type": "string"
+       },
+       "unique": {
+        "type": "boolean"
+       },
+       "ratio": {
+        "type": "number"
+       },
+       "fx": {
+        "$ref": "#/$defs/fxList"
+       },
+       "tags": {
+        "$ref": "#/$defs/tags"
+       }
       }
      }
     },
-    "passives": { "type": "array", "items": { "$ref": "#/$defs/rule" } },
-    "replace": { "type": "boolean" },
-    "off": { "$ref": "#/$defs/fxList" },
-    "skin": { "type": "string", "description": "모습 키 — 스파인 스킨(화면이 읽는다)" },
-    "anim": { "type": "string", "description": "애니 접두어(화면이 읽는다)" }
+    "passives": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/rule"
+     }
+    },
+    "replace": {
+     "type": "boolean"
+    },
+    "off": {
+     "$ref": "#/$defs/fxList"
+    },
+    "skin": {
+     "type": "string",
+     "description": "모습 키 — 스파인 스킨(화면이 읽는다)"
+    },
+    "anim": {
+     "type": "string",
+     "description": "애니 접두어(화면이 읽는다)"
+    },
+    "turnMake": {
+     "type": "array",
+     "description": "변신에 드는 순간 + 변신 중 내 턴 시작마다 손에 만드는 변신 카드(token · 증발 · 소멸 — ▶E6). when 이 있으면 그 고유 효과가 n 이상이 되는 순간 그 턴 한 장",
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "n": {
+        "type": "integer",
+        "minimum": 1
+       },
+       "when": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+         "stack": {
+          "type": "string"
+         },
+         "n": {
+          "type": "integer",
+          "minimum": 1
+         }
+        },
+        "required": [
+         "stack",
+         "n"
+        ]
+       }
+      },
+      "required": [
+       "id"
+      ]
+     }
+    },
+    "offExpire": {
+     "$ref": "#/$defs/fxList",
+     "description": "지속이 다 돼 풀릴 때만(반동 — ▶E22)"
+    },
+    "offEnd": {
+     "$ref": "#/$defs/fxList",
+     "description": "formEnd 카드로 풀 때만(보상 — ▶E22)"
+    },
+    "onEnter": {
+     "$ref": "#/$defs/fxList",
+     "description": "새로 드는 순간 효과(규칙 아님)"
+    },
+    "stance": {
+     "type": "boolean",
+     "description": "태세(엘다인 4차 — 카제나 린 흑운태세 꼴) — 글 「획득 · 해제」, turnMake 없어도 됨"
+    },
+    "toggle": {
+     "type": "string",
+     "description": "자기 카드를 내면 이 짝 태세로(우로스 선 · 악)"
+    }
    },
-   "required": [ "id", "name" ]
+   "required": [
+    "id",
+    "name"
+   ]
   },
   "intent": {
    "type": "object",

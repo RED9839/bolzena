@@ -1,0 +1,792 @@
+{
+  "heroes": [
+    {
+      "id": "힐데",
+      "name": "힐데",
+      "nature": "우울",
+      "race": "엘프",
+      "role": "서포터",
+      "style": "회복형",
+      "star": 3,
+      "hp": 630,
+      "atk": 75,
+      "def": 60,
+      "crit": 5,
+      "blurb": "「더 센 병이 돌아야 내가 필요해진다」는 의사. 파티가 부상일 때 처방이 두 배로 들고, 부상 속에서 낸 처방마다 기운을 북돋웁니다.",
+      "keyword": {
+        "name": "진료 차트",
+        "desc": "진찰할 때마다 채우는 차트",
+        "carrier": "self",
+        "cap": 3,
+        "onMax": {
+          "make": "힐데_note",
+          "consume": true
+        },
+        "rules": [
+          {
+            "name": "진찰",
+            "when": {
+              "on": "play",
+              "type": "스킬"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "진료 차트",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "더 센 병이 돌아야",
+            "when": {
+              "on": "lowHp",
+              "pct": 0.5
+            },
+            "fx": [
+              {
+                "k": "heal",
+                "ratio": 0.44
+              },
+              {
+                "k": "status",
+                "id": "초재생",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "과잉진료",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.7,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "사기",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "힐데_s1",
+        "힐데_s2",
+        "힐데_s3",
+        "힐데_u2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "힐데_s1",
+      "name": "청진기 톡",
+      "hero": "힐데",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "힐데_s2",
+      "name": "처방전",
+      "hero": "힐데",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "힐데_note",
+      "name": "진료 소견서",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 0.16
+        }
+      ],
+      "hero": "힐데",
+      "token": true
+    },
+    {
+      "id": "힐데_u2",
+      "name": "정밀 회진",
+      "hero": "힐데",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "진료 차트",
+          "v": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 1.24
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 1.84
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 3
+            },
+            {
+              "k": "heal",
+              "ratio": 1.48
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.24
+            },
+            {
+              "k": "status",
+              "id": "초재생",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 0.74
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 1.56
+            },
+            {
+              "k": "shield",
+              "ratio": 1.24
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "힐데_u1",
+      "name": "피톤치드 파동",
+      "hero": "힐데",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "later",
+          "n": 1,
+          "then": [
+            {
+              "k": "heal",
+              "ratio": 3.08
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "heal",
+                  "ratio": 4.64
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "heal",
+                  "ratio": 2.48
+                }
+              ]
+            },
+            {
+              "k": "status",
+              "id": "초재생",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "heal",
+                  "ratio": 3.08
+                }
+              ]
+            },
+            {
+              "k": "perOverheal",
+              "per": 25,
+              "pct": 0.8
+            },
+            {
+              "k": "shield",
+              "ratio": 0.28
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "shield",
+                  "ratio": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "heal",
+                  "ratio": 3.32
+                }
+              ]
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "힐데_u3",
+      "name": "의료인 보호법",
+      "hero": "힐데",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.24
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "overheal"
+              },
+              "fx": [
+                {
+                  "k": "shield",
+                  "ratio": 1.4
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.84
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 2.12
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 1.04
+                    },
+                    {
+                      "k": "stack",
+                      "id": "진료 차트",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.76
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.6
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.32
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal",
+                    "pct": 0.8
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.3,
+                      "base": "def",
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "power": true
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 2.48
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "힐데_u5",
+      "name": "판을 뒤집는 수",
+      "hero": "힐데",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.38,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifWounded"
+        },
+        {
+          "k": "status",
+          "id": "초재생",
+          "v": 1
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "힐데_s3",
+      "name": "청진기 내려치기",
+      "hero": "힐데",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "힐데_s4",
+      "name": "차트 작성",
+      "hero": "힐데",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.6
+        },
+        {
+          "k": "stack",
+          "id": "진료 차트",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.36
+            },
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.6
+            },
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.6
+            },
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.6
+            },
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.04
+            },
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_hildeuniform",
+      "name": "힐데의 간호복",
+      "grade": "전설",
+      "slot": "방어구",
+      "stats": {
+        "hp": 129,
+        "def": 16
+      },
+      "effect": [
+        {
+          "name": "회복 확인",
+          "when": {
+            "on": "unwound"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "응급 처치",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.4
+          },
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1
+            }
+          ]
+        }
+      ],
+      "affinity": "힐데",
+      "affinityStats": {
+        "hp": 40,
+        "def": 5
+      },
+      "affinityEffect": [
+        {
+          "name": "처방 기록",
+          "when": {
+            "on": "unwound"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진료 차트",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blurb": "빳빳하게 다린 간호복. 환자가 일어나면 모두 힘이 납니다."
+    }
+  ]
+}

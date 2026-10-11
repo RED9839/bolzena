@@ -14,6 +14,11 @@ namespace Bolzena.Core
     public sealed class GameData
     {
         public readonly Dictionary<string, HeroDef> Heroes = new();
+        /// <summary>
+        /// 클론 보스로만 나오는 사도(2026-10-11 엘다인 20명 전환) — 플레이어 사도 목록(Heroes)에는 없고, 보스 클론(EnemyDef.Clone)의 이름 · 종족 · 성격 · 성급 · 고학년만 댄다.
+        /// 묶음 키 「cloneHeroes」(content world/clones). 찾기는 CloneHero(id) — 플레이어 사도가 먼저.
+        /// </summary>
+        public readonly Dictionary<string, HeroDef> CloneHeroes = new();
         public readonly Dictionary<string, CardDef> Cards = new();
         public readonly Dictionary<string, EnemyDef> Enemies = new();
         public readonly Dictionary<string, VillageDef> Villages = new();
@@ -34,9 +39,9 @@ namespace Bolzena.Core
             Formatting = Formatting.Indented,
         };
 
-        public static readonly string[] FILES = { "heroes", "cards", "enemies", "villages", "events", "equips" };
+        public static readonly string[] FILES = { "heroes", "cards", "enemies", "villages", "events", "equips", "cloneHeroes" };
 
-        /// <summary>id → 그 id 가 든 파일(폴더에서 읽었을 때). 키는 "hero:id" · "card:id" · "enemy:id" · "village:id" · "event:id" · "equip:id".</summary>
+        /// <summary>id → 그 id 가 든 파일(폴더에서 읽었을 때). 키는 "hero:id" · "card:id" · "enemy:id" · "village:id" · "event:id" · "equip:id" · "cloneHero:id".</summary>
         public readonly Dictionary<string, string> Sources = new();
         public string SourceOf(string kind, string id) => id != null && Sources.TryGetValue(kind + ":" + id, out var f) ? f : null;
 
@@ -107,7 +112,7 @@ namespace Bolzena.Core
             return f != null ? $" ({f})" : "";
         }
 
-        static readonly Dictionary<string, string> KIND1 = new() { ["heroes"] = "hero", ["cards"] = "card", ["enemies"] = "enemy", ["villages"] = "village", ["events"] = "event", ["equips"] = "equip" };
+        static readonly Dictionary<string, string> KIND1 = new() { ["heroes"] = "hero", ["cards"] = "card", ["enemies"] = "enemy", ["villages"] = "village", ["events"] = "event", ["equips"] = "equip", ["cloneHeroes"] = "cloneHero" };
 
         void AddFrom(string kind, string json, string file, List<string> errs)
         {
@@ -129,6 +134,7 @@ namespace Bolzena.Core
                     case "villages": foreach (var x in Parse<VillageDef>(json, file)) Put(Villages, x, x.Id); break;
                     case "events": foreach (var x in Parse<EventDef>(json, file)) { int n = Sources.Count; Put<EventDef>(null, x, x.Id); if (Sources.Count > n) Events.Add(x); } break;
                     case "equips": foreach (var x in Parse<EquipDef>(json, file)) Put(Equips, x, x.Id); break;
+                    case "cloneHeroes": foreach (var x in Parse<HeroDef>(json, file)) Put(CloneHeroes, x, x.Id); break;
                 }
             }
             catch (FormatException e) { errs.Add(e.Message); }
@@ -237,6 +243,8 @@ namespace Bolzena.Core
 
         public CardDef Card(string id) => id != null && Cards.TryGetValue(BaseId(id), out var c) ? c : null;
         public HeroDef Hero(string id) => id != null && Heroes.TryGetValue(id, out var h) ? h : null;
+        /// <summary>보스 클론의 사도 — 플레이어 사도(Heroes)에 있으면 그것, 없으면 클론 전용 사도(CloneHeroes).</summary>
+        public HeroDef CloneHero(string id) => Hero(id) ?? (id != null && CloneHeroes.TryGetValue(id, out var h) ? h : null);
         public EnemyDef Enemy(string id) => id == null ? null : Enemies.TryGetValue(id, out var e) ? e : id.StartsWith(CLONE_MARK, StringComparison.Ordinal) ? made.GetOrAdd(id, MakeClone) : null;
 
         // ── 빌린 몸 클론 ───────────────────────────────────────────────
@@ -254,7 +262,7 @@ namespace Bolzena.Core
         {
             var p = id.Substring(CLONE_MARK.Length).Split('~');
             if (p.Length != 2) return null;
-            var h = Hero(p[0]);
+            var h = CloneHero(p[0]);
             if (h == null || !Enemies.TryGetValue(p[1], out var body)) return null;
             var own = Enemies.Values.Where(x => x.Clone == h.Id && x.Id != body.Id && x.Hp > 0).OrderBy(x => x.Id, StringComparer.Ordinal).FirstOrDefault();
             if (own != null)
@@ -342,7 +350,20 @@ namespace Bolzena.Core
         // ── 카드의 실제 모습(신탁을 얹은 것) ─────────────────────────────
         // id 하나에 (신탁 번호 · 주인) 갈래 몇 개. 열쇠는 string 하나(튜플 열쇠는 문자열 둘을 매번 해시한다),
         // 읽기는 잠금 없이(시뮬 스레드끼리 잠금 다툼) — 갈래 배열은 새로 만들어 바꿔 끼우기만 한다
-        readonly System.Collections.Concurrent.ConcurrentDictionary<string, (int flash, string owner, CardView v)[]> views = new();
+        readonly System.Collections.Concurrent.ConcurrentDictionary<string, ViewSlot> views = new();
+        /// <summary>
+        /// 한 id 의 모습들. owner 인자는 교주 카드(Neutral)만 쓴다 — 사도 카드 · 상태 · 저주는 owner 가 달라도 같은 모습이라(주인은 id 의 「@」 만 본다) owner 를 null 로 모아 한 칸에 둔다.
+        /// 옛 셈은 첫 사도마다 칸을 따로 만들어(사도 135명) id 하나에 칸이 100개 넘게 쌓였고, 찾을 때마다 그것을 다 훑었다(2026-10-09 — 내용은 같고 찾기만 빨라진다).
+        /// </summary>
+        sealed class ViewSlot { public bool Neutral; public (int flash, string owner, CardView v)[] Arr; }
+
+        /// <summary>적에게 피해를 주는 조각이 있나 — dmg(자신 · 아군 대상 빼고) · extra, later · trap 의 안까지.</summary>
+        public static bool HitsFoe(List<Fx> fx) => fx != null && fx.Any(f =>
+            (f.K == FxK.Dmg && f.Target != "self" && f.Target != "oneAlly" && f.Target != "allAllies" && f.Target != "party") || f.K == FxK.Extra || HitsFoe(f.Then) || HitsFoe(f.Else));
+        /// <summary>덧붙는 효과(축복 · 신탁)로 공격 카드가 되나 — 스킬인데 제 효과에 적 피해가 없고 덧붙는 쪽에 있으면. 강화 · 상태 · 저주는 그대로.</summary>
+        public static bool TurnsAttack(string type, List<Fx> own, List<Fx> add) => type == "스킬" && !HitsFoe(own) && HitsFoe(add);
+        /// <summary>그 카드만의 축복까지 얹은 모습 — 축복이 피해를 더해 스킬이 공격이 되면 종류만 「공격」 으로(배율형 공용 축복은 BlessDef 가 없어 그대로).</summary>
+        public static CardView WithBless(CardView v, BlessDef b) => v != null && b != null && TurnsAttack(v.Type, v.Fx, b.Fx) ? new CardView(v, "공격") : v;
 
         /// <summary>
         /// 그 카드 id 의 지금 모습 — flash 는 신탁 번호(1~5, 0 이면 기본).
@@ -352,21 +373,26 @@ namespace Bolzena.Core
         {
             if (id == null) return null;
             if (IsPlain(id)) flash = 0;
-            if (views.TryGetValue(id, out var arr))
-                foreach (var e in arr) if (e.flash == flash && e.owner == owner) return e.v;
+            if (views.TryGetValue(id, out var slot))
+            {
+                var o = slot.Neutral ? owner : null;
+                foreach (var e in slot.Arr) if (e.flash == flash && e.owner == o) return e.v;
+            }
             lock (views)   // 시뮬은 여러 스레드가 같은 데이터를 본다 — 만들기만 잠근다(같은 열쇠는 늘 같은 CardView)
             {
-                if (views.TryGetValue(id, out arr))
-                    foreach (var e in arr) if (e.flash == flash && e.owner == owner) return e.v;
                 var c = Card(id);
                 if (c == null) return null;
+                if (!c.Neutral) owner = null;
+                if (views.TryGetValue(id, out slot))
+                    foreach (var e in slot.Arr) if (e.flash == flash && e.owner == owner) return e.v;
                 var v = new CardView(id, c, flash > 0 && flash <= c.Oracles.Count ? c.Oracles[flash - 1] : null, flash,
                     c.Neutral ? OwnerOf(id) ?? owner : c.Hero != null ? OwnerOf(id) : null);   // 사도 카드도 id 에 주인을 적었으면(만든 카드의 주인 지정 — make owner) 그 사도의 카드로
                 v.Target = TargetOf(v.Fx);
+                var arr = slot?.Arr;
                 var na = new (int, string, CardView)[(arr?.Length ?? 0) + 1];
                 arr?.CopyTo(na, 0);
                 na[na.Length - 1] = (flash, owner, v);
-                views[id] = na;
+                views[id] = new ViewSlot { Neutral = c.Neutral, Arr = na };
                 return v;
             }
         }
@@ -397,11 +423,18 @@ namespace Bolzena.Core
             Tags = tags; Fx = fx;
         }
 
+        /// <summary>종류만 바꾼 모습(축복이 피해를 더해 공격 카드가 된 스킬 — GameData.WithBless).</summary>
+        internal CardView(CardView b, string type)
+        {
+            Id = b.Id; Def = b.Def; Oracle = b.Oracle; FlashN = b.FlashN; Owner = b.Owner; Cost = b.Cost; Type = type;
+            Tags = b.Tags; Fx = b.Fx; Target = b.Target;
+        }
+
         public CardView(string id, CardDef def, OracleDef oracle, int flashN, string owner = null)
         {
             Id = id; Def = def; Oracle = oracle; FlashN = oracle != null ? flashN : 0; Owner = owner;
             Cost = oracle?.Cost ?? def.Cost;
-            Type = oracle != null && oracle.Power ? "강화" : def.Type;
+            Type = oracle != null && oracle.Power ? "강화" : oracle?.Type != null ? oracle.Type : oracle != null && GameData.TurnsAttack(def.Type, def.Fx, oracle.Fx) ? "공격" : def.Type;   // 기본형에 없던 피해가 신탁으로 생긴 스킬은 공격 카드
             var tags = oracle != null ? oracle.Tags.ToList() : def.Tags.ToList();
             if (oracle != null && def.Tags.Contains(Tag.Unique) && !tags.Contains(Tag.Unique)) tags.Insert(0, Tag.Unique);
             Tags = tags;
@@ -411,6 +444,10 @@ namespace Bolzena.Core
         /// <summary>화면이 대상을 물어야 하나 — "적" · "아군" · "없음"(GameData.TargetOf).</summary>
         public string Target { get; internal set; }
         public string Name => Def.Name;
+        /// <summary>(엘다인 ▶E2) 천상 계기에서 셀 비용 — 신탁의 countAs · 카드의 countAs · 없으면 0(적힌 비용).</summary>
+        public int CountAs => Oracle?.CountAs ?? Def.CountAs;
+        /// <summary>(엘다인 4차 태세) 그 변신 · 태세 중에만 낼 수 있다 — 신탁의 needForm · 카드의 needForm · 없으면 null.</summary>
+        public string NeedForm => Oracle?.NeedForm ?? Def.NeedForm;
         /// <summary>이 카드를 내는 사도 — 사도 카드면 그 사도, 교주 카드면 주인(Owner). 피해 · 실드 · 연계 · 「다른 사도 카드」 가 이것을 본다.</summary>
         public string Hero => Owner ?? Def.Hero;
         /// <summary>교주 카드인가(주인이 있어도).</summary>
@@ -427,9 +464,17 @@ namespace Bolzena.Core
         /// <summary>그 태그의 수(「소멸 2」 → 2, 「보존」 → 0). 없으면 -1.</summary>
         public int TagN(string t)
         {
-            foreach (var s in Tags) { var (id, n) = Tag.Parse(s); if (id == t) return n; }
+            var p = parsed;
+            if (p == null)
+            {   // 태그 글 풀이(Tag.Parse)를 한 번만 — 모습(CardView)의 태그는 바뀌지 않는다. 여러 스레드가 함께 봐도 같은 값을 만든다(2026-10-09)
+                p = new (string id, int n)[Tags.Count];
+                for (int i = 0; i < p.Length; i++) p[i] = Tag.Parse(Tags[i]);
+                System.Threading.Volatile.Write(ref parsed, p);
+            }
+            foreach (var (id, n) in p) if (id == t) return n;
             return -1;
         }
+        (string id, int n)[] parsed;
 
         /// <summary>사도의 강화 카드 — 내면 이 전투에서 사라진다 · 덱에 한 장(유일).</summary>
         public bool IsPower => Def.Unique && Def.Hero != null && Type == "강화";

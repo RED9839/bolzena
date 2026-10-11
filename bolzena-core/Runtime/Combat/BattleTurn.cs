@@ -44,6 +44,13 @@ namespace Bolzena.Core
             return true;
         }
 
+        /// <summary>지속 피해의 약점 배율 — 그 상태를 마지막에 건 사도(Body.Giver)의 성격이 그 적의 약점이면 ×(1 + WEAK_DMG). 강인도는 깎지 않는다(카제나 표에 없음).</summary>
+        double DotWeak(Unit u, string id)
+        {
+            if (u.Side != Side.Enemy || !u.Body.Giver.TryGetValue(id, out var gi)) return 1;
+            var g = Party.FirstOrDefault(x => x.Idx == gi);
+            return g != null && IsWeakHit(g, u, null) ? 1 + R.WEAK_DMG : 1;
+        }
         int DotUnit(Unit u, string id) => u.Body.DotU.TryGetValue(id, out var v) ? v : R.FOE_DOT;
         void SetUnit(Unit u, string id, double unit)
         {
@@ -94,7 +101,7 @@ namespace Bolzena.Core
             NextCheaper = 0; Ending = false; PrevNat = null;
             LastHero = null; PlayTags.Clear(); DebtNow = 0;
             PlayedPrev = new Dictionary<string, int>(PlayedBy);
-            PlayLog.Clear(); PlayIds.Clear(); PlayedThisTurn = 0; PlayedBy.Clear(); RushedThisTurn = false;
+            PlayLog.Clear(); PlayIds.Clear(); Counts.Remove(N_DRAWN); PlayedThisTurn = 0; PlayedBy.Clear(); RushedThisTurn = false;
             ApSpent = 0; PaidHp = 0; DiscardedTurn = 0; TakenPrev = TakenNow; TakenNow = 0;
             GuardedPrev = GuardedNow; GuardedNow = 0; HealLog.Clear();
             HurtPrev = HurtNow; HurtNow = new HashSet<string>();
@@ -136,6 +143,7 @@ namespace Bolzena.Core
             DrawCards(R.DRAW_PER_TURN + (Turn == 1 ? Opening : 0), false);
             AfterTurnDraw();
             if (Over == null) LaterTurn();
+            if (Over == null) FormTurnStart();   // (엘다인 ▶E6) 변신 중 — 매 턴 변신 카드
             if (Over == null) FoePassives("afterDraw", null);
             // 주도 — 턴 시작에 손에 든 주도 카드는 반반으로 이번 턴 코스트 -1
             FinaleLock = false;
@@ -169,6 +177,8 @@ namespace Bolzena.Core
         {
             FreeTurn.Clear();
             if (Over != null) return this;
+            TraceTurnEnd();   // (▶E30) 결정 지점 측정
+            if (St(Pool, "은방울") > 0 && Pool.Block + Pool.Shield > 0) SilverBell("턴 끝에 실드가 남음");   // (▶E65)
             ApLeft = Ap;
             Ending = true;
             Emit("turnEnd", new EmitInfo());
@@ -180,6 +190,7 @@ namespace Bolzena.Core
             CheckOver(); if (Over != null) return this;
             StatusTurnEnd();
             CheckOver(); if (Over != null) return this;
+            CardValueTurnEnd();   // 카드 값 키워드 grow handEnd(엘다인 3차)
             // 「턴 끝에 손에 있으면: …」
             foreach (var id in Hand.ToList())
                 if (CardOf(id) is CardView cv && cv.Fx.Any(f => f.K == FxK.When && f.On == "handEnd")) { CardWhen(id, "handEnd"); if (Over != null) return this; }
@@ -192,6 +203,7 @@ namespace Bolzena.Core
             foreach (var id in gone) { Exile(id, "hand", "evaporate"); Emit("exhaust", new EmitInfo { Hero = CardOf(id)?.Hero, Id = id }); if (Over != null) return this; }
             foreach (var id in toss) CardCue(id, "hand", "discard", "turnEnd");
             Discard.AddRange(toss);
+            Used.Clear();   // 이번 턴에 낸 카드 — 이제 여느 버린 카드(다음 섞기로 돌아간다)
             foreach (var id in toss) BlessDrop(id);
             MergePile(Discard, "discard");
             foreach (var id in Held.Keys.ToList()) if (!keep.Contains(id)) Held.Remove(id);
@@ -201,12 +213,14 @@ namespace Bolzena.Core
             if (St(Pool, R.RHYTHM) > 0) { Say($"리듬 {St(Pool, R.RHYTHM)} — 턴이 끝나 사라진다"); Pool.Status.Remove(R.RHYTHM); }
 
             FoeTurn = true;
+            HitTakenReset();   // 맞은 대 수(▶E85) — 이 적 차례 + 다음 내 턴
             Cue("foeTurn", PartyRep(), new Cue { V = Turn });
             FoePassives("turnEnd", null);
             foreach (var e in AliveEnemies()) CounterEvent(e, "turnEnd");
             CheckOver(); if (Over != null) { FoeTurn = false; return this; }
             EnemyPhase();
             FoeTurn = false;
+            if (Over == null) ShieldLeftFire();   // 낸 카드의 「적 차례가 끝날 때 실드가 남았으면」(엘다인 4차 벨라)
             CheckOver(); if (Over != null) return this;
             foreach (var e in Enemies) { if (e.StunGuard > 0) e.StunGuard--; e.Confused = false; }
             BeginTurn();
@@ -232,29 +246,33 @@ namespace Bolzena.Core
                 {
                     int v = Math.Max(1, Num.Round(DefOf() * R.StackEff("결정화", St(u, "결정화"))));
                     u.Shield += v; GainCue(u, "shield", v);
+                    if (u.Side == Side.Party) TallyShield(TallyBy(u, "결정화"), v);
                     Say($"{who}: 결정화 {St(u, "결정화")} — 고정 실드 +{v}");
                 }
                 if (u.Side == Side.Party && St(u, "고동") > 0)
                 {
                     int v = Math.Max(1, Num.Round(DotUnit(u, "고동") * R.StackEff("고동", St(u, "고동"))));
                     Say($"파티: 고동 {St(u, "고동")} — 적 전체 고정 피해 {v}");
-                    foreach (var e in AliveEnemies()) { Hurt(e, v, new HurtOpts { Pure = true, Dot = true }); if (Over != null) return; }
+                    var by = TallyBy(u, "고동");
+                    foreach (var e in AliveEnemies()) { Hurt(e, v, new HurtOpts { Pure = true, Dot = true, Credit = by }); if (Over != null) return; }
                 }
                 if (St(u, "고통") > 0)
                 {
-                    int n = St(u, "고통"), v = Math.Max(1, Num.Round(n * R.SV("고통") * DotUnit(u, "고통")));
+                    int n = St(u, "고통"), v = Math.Max(1, Num.Round(n * R.SV("고통") * DotUnit(u, "고통") * DotWeak(u, "고통")));
                     Say($"{who}: 고통 {n} — 고정 피해 {v}");
+                    var by = TallyBy(u, "고통");
                     AddSt(u, "고통", -(n - n / 2));
-                    Hurt(u, v, new HurtOpts { Pure = true, Dot = true });
+                    Hurt(u, v, new HurtOpts { Pure = true, Dot = true, Credit = by });
                     if (Over != null) return;
                     if (u.Dead) continue;
                 }
                 if (St(u, "균열") > 0)
                 {
-                    int n = St(u, "균열"), v = Math.Max(1, Num.Round(n * R.SV("균열") * DotUnit(u, "균열")));
+                    int n = St(u, "균열"), v = Math.Max(1, Num.Round(n * R.SV("균열") * DotUnit(u, "균열") * DotWeak(u, "균열")));
                     Say($"{who}: 균열 {n} — 지속 피해 {v}");
+                    var by = TallyBy(u, "균열");
                     AddSt(u, "균열", -(n - n / 2));
-                    Hurt(u, v, new HurtOpts { Dot = true });
+                    Hurt(u, v, new HurtOpts { Dot = true, Credit = by });
                     if (Over != null) return;
                     if (u.Dead) continue;
                 }
@@ -305,7 +323,19 @@ namespace Bolzena.Core
             if (Acting != null && dil > 0 && dilN < dil && !Counts.ContainsKey($"근면@{ActSeq}") && AliveEnemies().Count > 0)
             { Counts[$"근면|{Turn}"] = dilN + 1; Counts[$"근면@{ActSeq}"] = 1; GainAp(1); Say($"근면 — AP +1 · 드로우 1 ({dilN + 1}/{dil})"); StatusCue(PartyRep(HeroUnit(Acting)), "근면!", true); DrawCards(1); }
             foreach (var kw in Kw.Values.Where(k => k.Def.Hunt).ToList())
-                if (St(u, kw.Id) > 0) Emit("huntDown", new EmitInfo { Id = kw.Id, Owner = kw.Owner, Target = u, N = St(u, kw.Id), By = Acting });
+                if (St(u, kw.Id) > 0)
+                {
+                    Emit("huntDown", new EmitInfo { Id = kw.Id, Owner = kw.Owner, Target = u, N = St(u, kw.Id), By = Acting });
+                    // 사냥감 옮기기(엘다인 4차 — 란) — 쓰러진 적의 겹 그대로 가장 약한(HP 비율이 가장 낮은) 산 적에게
+                    var to = kw.Def.HuntCarry == "lowEnemy" ? AliveEnemies().Where(e => e.MaxHp > 0).OrderBy(e => (double)e.Hp / e.MaxHp).ThenBy(e => e.Idx).FirstOrDefault() : null;
+                    if (to != null && Over == null)
+                    {
+                        int n = St(u, kw.Id);
+                        foreach (var o in Enemies) if (o != to && !o.Dead && St(o, kw.Id) > 0) SetStRaw(o, kw.Id, 0);
+                        SetStRaw(to, kw.Id, kw.Def.CapOrMode is int cp ? Math.Min(cp, n) : n);
+                        Say($"「{kw.Id}」 {n} — {u.Name}에게서 {to.Name}에게로 옮겨 감"); StatusCue(to, $"「{kw.Id}」 옮김");
+                    }
+                }
             Say($"{u.Name} 쓰러짐");
             if (R.KILL_AP > 0 && AliveEnemies().Count > 0) { GainAp(R.KILL_AP); Say($"처치 — AP +{R.KILL_AP}"); }
             if (Acting != null) KillNow[Acting] = (KillNow.TryGetValue(Acting, out var k) ? k : 0) + 1;

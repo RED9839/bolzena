@@ -1,0 +1,713 @@
+{
+  "heroes": [
+    {
+      "id": "마카샤",
+      "name": "마카샤",
+      "nature": "활발",
+      "race": "마녀",
+      "role": "딜러",
+      "style": "예약형",
+      "star": 3,
+      "hp": 570,
+      "atk": 86,
+      "def": 60,
+      "crit": 5,
+      "blurb": "수다쟁이 책략관 마녀. 흘린 말 속에 적의 결말이 이미 적혀 있고, 맞아떨어진 예언은 다음 결말의 재료가 됩니다.",
+      "keyword": {
+        "name": "운명의 시계",
+        "desc": "두 칸 뒤에 결말이 오는 시곗바늘",
+        "carrier": "enemy",
+        "cap": 3,
+        "reserve": true,
+        "decay": 1,
+        "rules": [
+          {
+            "name": "정해진 결말",
+            "when": {
+              "on": "stackGone",
+              "id": "운명의 시계",
+              "decay": true
+            },
+            "fx": [
+              {
+                "k": "dmg",
+                "ratio": 2.42,
+                "base": "def",
+                "target": "oneEnemy"
+              },
+              {
+                "k": "status",
+                "id": "취약",
+                "v": 1,
+                "target": "oneEnemy"
+              }
+            ]
+          },
+          {
+            "name": "되감은 시계",
+            "when": {
+              "on": "break",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "운명의 시계",
+                "v": 1,
+                "target": "topEnemy"
+              }
+            ]
+          },
+          {
+            "name": "번지는 결말",
+            "when": {
+              "on": "kill"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "운명의 시계",
+                "v": 1,
+                "target": "topEnemy"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "마녀의 움직이는 집",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.32,
+            "target": "allEnemies",
+            "base": "def"
+          },
+          {
+            "k": "status",
+            "id": "취약",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "운명의 시계",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "마카샤_s1",
+        "마카샤_s2",
+        "마카샤_s3",
+        "마카샤_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "마카샤_s1",
+      "name": "절굿공이 톡",
+      "hero": "마카샤",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "마카샤_s2",
+      "name": "방어 자세",
+      "hero": "마카샤",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "마카샤_u1",
+      "name": "언젠가 일어날 일",
+      "hero": "마카샤",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "운명의 시계",
+          "v": 3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.59,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.86,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 3,
+              "target": "topEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.42,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마카샤_u2",
+      "name": "예언 떠벌리기",
+      "hero": "마카샤",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.77,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "hasten",
+          "v": 1
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "마카샤_u3",
+      "name": "비상하는 절구통",
+      "hero": "마카샤",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "ripen",
+          "id": "운명의 시계",
+          "v": 0.25
+        },
+        {
+          "k": "status",
+          "id": "기절",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "운명의 시계",
+              "v": 0.15
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "운명의 시계",
+              "v": 0.15
+            },
+            {
+              "k": "draw",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "운명의 시계",
+              "v": 0.25,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.24,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "운명의 시계"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.92,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마카샤_u4",
+      "name": "바바의 발자국",
+      "hero": "마카샤",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "hasten",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "hasten",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "hasten",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "power": true,
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "취약",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.25,
+              "target": "otherAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마카샤_s3",
+      "name": "절굿공이 내려찍기",
+      "hero": "마카샤",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "마카샤_s4",
+      "name": "시계태엽 감기",
+      "hero": "마카샤",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "운명의 시계",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "empower",
+          "ratio": 0.3
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.45
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "운명의 시계",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.35
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

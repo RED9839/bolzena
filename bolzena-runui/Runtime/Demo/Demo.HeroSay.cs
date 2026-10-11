@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Bolzena.RunUI
 {
-    // 사도 한마디 시범(-demo-herosay, 2026-10-09) — 판 중 말풍선은 보스 시작 · 승리 두 갈래만(사용자 결정): 그 둘은 뜨고, 휴식 · 상점 · 이벤트 · 위기 · 보상에는 안 뜨는지 단언한다.
+    // 사도 한마디 시범(-demo-herosay, 2026-10-09) — 사도 말풍선 글은 전투 중 내 턴에 한참 가만있을 때(공백)만 뜬다(사용자 결정 2026-10-09): 로비 · 편성 · 휴식 · 상점 · 이벤트 · 보스 시작 · 승리 · 보상에는 안 뜨고, 공백 8초 뒤 뜨고 입력하면 닫히는지 단언한다.
     //   로비 말풍선 · 편성 화면 · 낀 아티팩트 창 · 상점 진열(「아티팩트」 칸) · 승리 띠(「승리!」) · 보상 줄(「아티팩트」)도 같이 찍는다. 싸움은 보스 자리로 열고 파티 HP 를 30% 바로 위로 내린다.
     public partial class Demo
     {
@@ -33,6 +33,8 @@ namespace Bolzena.RunUI
             f.Lobby();
             yield return Screen_("lobby", 1.4f);
             yield return Shot("lobby_bubble");   // 로비 말풍선도 같은 진입점(HeroBubble.Show)
+            Expect(!HeroBubble.AllKinds, "사도 말풍선 스위치 꺼짐(공백 한마디만)");
+            Expect(Resources.FindObjectsOfTypeAll<RectTransform>().All(r => !(r && r.gameObject.scene.IsValid() && r.gameObject.activeInHierarchy && r.name == "bubble")), "로비 — 말풍선 없음");
             yield return Press("start");
             yield return Screen_("village", 0.4f);
             yield return Wait(1.4f);
@@ -79,24 +81,26 @@ namespace Bolzena.RunUI
             var node = f.P.Enter(pick);
             f.P.S.Node = 3;   // 보스 싸움(Run.IsBoss)
             f.P.S.PartyHp = Mathf.CeilToInt(f.P.S.PartyMaxHp * 0.3f) + 2;
-            FightMode = "pass1";   // 첫 턴을 넘겨 적의 공격을 받는다
+            FightMode = "idle";   // 첫 턴에 입력 없이 기다린다 — 공백 말풍선(8초) → 커서를 움직이면 닫힘(RunFightBot)
             f.EnterNode(node);
-            bool start = false, low = false, win = false, reward = false;
+            bool start = false, low = false, win = false, reward = false, idleSeen = false;
             float t = 0;
             while (t < 300)
             {
-                if (!start && SayObj("bossStart") != null) { yield return Wait(0.3f); yield return SayShot("bossStart", 1, v => start = v); }
+                if (!start && SayObj("bossStart") != null) start = true;
                 if (!low && SayObj("lowhp") != null) low = true;
-                if (!win && SayObj("victory") != null) { yield return Wait(0.45f); yield return SayShot("victory", 1, v => win = v); }
+                if (!idleSeen && SayObj("idle") != null) { yield return Wait(0.4f); yield return SayShot("idle", 1, v => idleSeen = v); }
+                if (!win && SayObj("victory") != null) win = true;
                 if (!f.Fighting && f.Stage.Current == "reward") break;
                 t += Time.unscaledDeltaTime;
                 yield return null;
             }
             FightMode = "win";
             yield return SayShot("reward", 3, v => reward = v);
-            Expect(start, "보스 시작 — 사도 말풍선");
-            Expect(win, "보스 승리 직후 — 사도 말풍선");
+            Expect(!start, "보스 시작 — 말풍선 없음");
+            Expect(!win, "보스 승리 직후 — 말풍선 없음");
             Expect(!low, "위기 — 말풍선 없음");
+            Expect(idleSeen && (IdleResult ?? "").Contains("shown=True") && (IdleResult ?? "").Contains("closed=True"), $"전투 공백 — 말풍선 뜸 · 입력하면 닫힘({IdleResult})");
             Expect(!reward, "보상 화면 — 말풍선 없음");
             yield return Wait(0.5f);
             yield return Shot("term_reward");

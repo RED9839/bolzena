@@ -1,0 +1,808 @@
+{
+  "heroes": [
+    {
+      "id": "아멜리아_R41",
+      "name": "아멜리아(R41)",
+      "nature": "우울",
+      "race": "엘프",
+      "role": "서포터",
+      "style": "소멸형",
+      "star": 3,
+      "hp": 550,
+      "atk": 75,
+      "def": 58,
+      "crit": 5,
+      "blurb": "제 손으로 만든 병기가 통제를 벗어난 「이 몸」. 시제품을 쏘고 지우며 시험 가동이 셋 쌓이면 완성품이 나오고, 지운 것 가운데 하나는 끝내 되찾아 옵니다.",
+      "keyword": {
+        "name": "시험 가동",
+        "desc": "시제품을 쏴 본 횟수",
+        "carrier": "self",
+        "cap": 3,
+        "onMax": {
+          "make": "아멜리아_R41_t2",
+          "consume": true
+        },
+        "rules": [
+          {
+            "name": "이 몸의 시제품",
+            "when": {
+              "on": "play",
+              "minCost": 1
+            },
+            "fx": [
+              {
+                "k": "make",
+                "id": "아멜리아_R41_t1",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "폐기 처분",
+            "when": {
+              "on": "exhaust"
+            },
+            "fx": [
+              {
+                "k": "draw",
+                "v": 1
+              },
+              {
+                "k": "shield",
+                "ratio": 0.03
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "초고출력 전자포",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "cleanse",
+            "v": 2
+          },
+          {
+            "k": "dmg",
+            "ratio": 1.03,
+            "target": "allEnemies"
+          },
+          {
+            "k": "ifFoe",
+            "id": "충격"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "oneEnemy"
+          }
+        ]
+      },
+      "starter": [
+        "아멜리아_R41_s1",
+        "아멜리아_R41_s2",
+        "아멜리아_R41_s3",
+        "아멜리아_R41_u3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "아멜리아_R41_s1",
+      "name": "전기 충격기",
+      "hero": "아멜리아_R41",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "아멜리아_R41_s2",
+      "name": "응급 수리 드론",
+      "hero": "아멜리아_R41",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "아멜리아_R41_t1",
+      "name": "시제품",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.86,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "시험 가동",
+          "v": 1
+        }
+      ],
+      "hero": "아멜리아_R41",
+      "token": true
+    },
+    {
+      "id": "아멜리아_R41_t2",
+      "name": "완성품",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.64,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.28
+        }
+      ],
+      "hero": "아멜리아_R41",
+      "token": true
+    },
+    {
+      "id": "아멜리아_R41_u3",
+      "name": "영광인 줄 알거라",
+      "hero": "아멜리아_R41",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "결정화",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "make",
+                  "id": "아멜리아_R41_t1",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "k": "stack",
+          "id": "시험 가동",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "아멜리아_R41_t1",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "아멜리아_R41_t1",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            },
+            {
+              "k": "make",
+              "id": "아멜리아_R41_t1",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.52
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "아멜리아_R41_t1",
+                      "v": 1
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.68
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결정화",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "아멜리아_R41_t1",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아멜리아_R41_u1",
+      "name": "엘렌-A 오버차지",
+      "hero": "아멜리아_R41",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.04
+        },
+        {
+          "k": "perOverheal",
+          "per": 25,
+          "pct": 0.8
+        },
+        {
+          "k": "shield",
+          "ratio": 0.44
+        },
+        {
+          "k": "stack",
+          "id": "시험 가동",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.08
+            },
+            {
+              "k": "perOverheal",
+              "per": 25,
+              "pct": 0.8
+            },
+            {
+              "k": "shield",
+              "ratio": 0.68
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.88
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.56
+            },
+            {
+              "k": "make",
+              "id": "아멜리아_R41_t1",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.88
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.04
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아멜리아_R41_u4",
+      "name": "소형 전자포",
+      "hero": "아멜리아_R41",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.36,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perGone"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.04,
+          "target": "allEnemies"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "아멜리아_R41_u5",
+      "name": "나의 엘레나",
+      "hero": "아멜리아_R41",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "pull",
+          "from": "gone",
+          "n": 1,
+          "unique": true
+        },
+        {
+          "k": "heal",
+          "ratio": 1.36
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "pull",
+              "from": "gone",
+              "n": 1,
+              "unique": true
+            },
+            {
+              "k": "heal",
+              "ratio": 1.6
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "pull",
+              "from": "gone",
+              "n": 1,
+              "unique": true
+            },
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "heal",
+              "ratio": 0.82
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "pull",
+              "from": "gone",
+              "n": 1,
+              "unique": true
+            },
+            {
+              "k": "shield",
+              "ratio": 1.76
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "소멸"
+          ],
+          "cost": 2,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.56
+            },
+            {
+              "k": "make",
+              "id": "아멜리아_R41_t2",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "pull",
+              "from": "gone",
+              "n": 1,
+              "unique": true
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.82
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아멜리아_R41_s3",
+      "name": "고압 충격기",
+      "hero": "아멜리아_R41",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "아멜리아_R41_s4",
+      "name": "시제품 조립",
+      "hero": "아멜리아_R41",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.04
+        },
+        {
+          "k": "stack",
+          "id": "시험 가동",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.08
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.04
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.04
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.04
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.68
+            },
+            {
+              "k": "stack",
+              "id": "시험 가동",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

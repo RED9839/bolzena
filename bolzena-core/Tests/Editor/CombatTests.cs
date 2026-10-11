@@ -84,13 +84,14 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(3, K.E(b).Tough);
         }
 
-        [Test] public void 상성에서_밀리면_받는_피해가_5퍼센트_준다()
+        // 2026-10-10 사용자 「카제나식」 — 상성 불리 페널티 없음: 적이 사도를 이기는 성격이어도 더 세게 치지 않는다(옛 +10%)
+        [Test] public void 상성에서_밀려도_받는_피해는_그대로()
         {
             var d = K.Data(heroes: "[{id:'cool', name:'냉정이', role:'탱커', row:'front', hp:1000, atk:100, def:20, crit:0, nature:'냉정'}]",
                 enemies: "[{id:'pure', name:'순수 적', hp:1000, nature:'순수', intents:[{t:'attack', v:100, rush:0}]}]");
             var b = K.Fight(d, new[] { "cool" }, new[] { "pure" });
             b.EndTurn();
-            Assert.AreEqual(1000 - 110, b.Pool.Hp, "순수가 냉정을 이긴다 — 적이 +10%");
+            Assert.AreEqual(1000 - 100, b.Pool.Hp, "순수가 냉정을 이겨도 적은 그대로(2026-10-10 — 옛 +10%)");
         }
 
         [Test] public void 모으는_수는_격파하면_끊긴다()
@@ -361,7 +362,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(700, K.Hp(b));
             Assert.AreEqual(0, b.Gauge);
             Assert.AreEqual(3, b.Ap);
-            Assert.AreEqual(4 - 2.0 / 3, K.E(b).Tough, 1e-9, "고학년도 카드처럼 강인도를 깎는다(AP 2 로 친다)");
+            Assert.AreEqual(4 - R.ToughUnitUlt(150) / 3, K.E(b).Tough, 1e-9, "고학년도 강인도를 깎는다 — 게이지 100% 당 1칸(150% = 1.5칸, 비약점 1/3)(2026-10-10 카제나 EP 환산)");
         }
 
         [Test] public void 미리보기는_실제와_같다()
@@ -455,18 +456,18 @@ namespace Bolzena.Core.Tests
             K.Play(b, "h_cool2");
             Assert.AreEqual(4, K.E(b, 0).Tough, 1e-9, "2코 약점 = 2");
             K.Play(b, "h_coolA");
-            Assert.AreEqual(3, K.E(b, 0).Tough, 1e-9, "광역 1코 약점 = 적마다 1(2026-10-08 — 옛 1/2)");
-            Assert.AreEqual(5, K.E(b, 1).Tough, 1e-9);
+            Assert.AreEqual(4 - R.TOUGH.Area, K.E(b, 0).Tough, 1e-9, "광역 1코 약점 = 적마다 1/2(2026-10-10 카제나식 — 2026-10-08 의 1 에서 되돌림)");
+            Assert.AreEqual(6 - R.TOUGH.Area, K.E(b, 1).Tough, 1e-9);
             K.Play(b, "h_pure0", 1);
-            Assert.AreEqual(5 - 1.0 / 3, K.E(b, 1).Tough, 1e-9, "0코 비약점 = 1코처럼 1/3(옛 1/6)");
+            Assert.AreEqual(6 - R.TOUGH.Area - R.TOUGH.Zero / 3, K.E(b, 1).Tough, 1e-9, "0코 비약점 = 0.5 의 1/3(2026-10-10 카제나 표 — 옛 1코처럼)");
         }
 
-        // 2026-10-08 사용자 — 「1코 광역이 강인도 1칸을 못 깎는다」 · 0코도 1코처럼
-        [Test] public void 광역_1코_약점은_적_둘셋_모두_1칸씩([Values(2, 3)] int n)
+        // 2026-10-08 사용자 — 「1코 광역이 강인도 1칸을 못 깎는다」 · 0코도 1코처럼 → 2026-10-10 카제나식으로 광역은 적마다 1/2(R.TOUGH.Area)
+        [Test] public void 광역_1코_약점은_적_둘셋_모두_같은_몫([Values(2, 3)] int n)
         {
             var b = F(Enumerable.Repeat("mad", n).ToArray()); K.Hand(b, "h_coolA");
             K.Play(b, "h_coolA");
-            for (int i = 0; i < n; i++) Assert.AreEqual(5, K.E(b, i).Tough, 1e-9, $"적 {i}: 앞 적에 쓴 몫이 줄지 않는다");
+            for (int i = 0; i < n; i++) Assert.AreEqual(6 - R.TOUGH.Area, K.E(b, i).Tough, 1e-9, $"적 {i}: 앞 적에 쓴 몫이 줄지 않는다(적마다 1/2)");
             Assert.AreEqual(n, b.ToughWeakHits);
         }
 
@@ -474,17 +475,17 @@ namespace Bolzena.Core.Tests
         {
             var b = F(Enumerable.Repeat("mad", n).ToArray()); K.Hand(b, "h_pureA");
             K.Play(b, "h_pureA");
-            for (int i = 0; i < n; i++) Assert.AreEqual(6 - 1.0 / 3, K.E(b, i).Tough, 1e-9, $"적 {i}");
+            for (int i = 0; i < n; i++) Assert.AreEqual(6 - R.TOUGH.Area / 3, K.E(b, i).Tough, 1e-9, $"적 {i} — 비약점 1/3 × 광역 1/2");
             Assert.AreEqual(0, b.ToughWeakHits);
         }
 
-        [Test] public void 영코_단일은_1코와_같다_약점_1_비약점_3분의1()
+        [Test] public void 영코_단일은_약점_반칸_비약점_6분의1()
         {
             var b = F("mad"); K.Hand(b, "h_cool0", "h_pure0");
             K.Play(b, "h_cool0");
-            Assert.AreEqual(5, K.E(b).Tough, 1e-9, "0코 약점 = 1");
+            Assert.AreEqual(6 - R.TOUGH.Zero, K.E(b).Tough, 1e-9, "0코 약점 = 0.5(2026-10-10 카제나 표)");
             K.Play(b, "h_pure0");
-            Assert.AreEqual(5 - 1.0 / 3, K.E(b).Tough, 1e-9, "0코 비약점 = 1/3");
+            Assert.AreEqual(6 - R.TOUGH.Zero - R.TOUGH.Zero / 3, K.E(b).Tough, 1e-9, "0코 비약점 = 0.5 의 1/3");
             Assert.AreEqual(3, b.Ap, "0코 둘 — AP 그대로");
         }
 
@@ -497,7 +498,7 @@ namespace Bolzena.Core.Tests
             K.E(b, 0).Broken = false; K.E(b, 0).Sealed = false; K.E(b, 0).Tough = 0.5;
             K.Play(b, "h_coolA");
             Assert.IsTrue(K.E(b, 0).Broken, "남은 1/2 칸 적은 격파");
-            Assert.AreEqual(5, K.E(b, 1).Tough, 1e-9, "옆 적은 남은 칸과 상관없이 1칸");
+            Assert.AreEqual(6 - R.TOUGH.Area, K.E(b, 1).Tough, 1e-9, "옆 적은 남은 칸과 상관없이 제 몫(광역 1/2)");
             Assert.AreEqual(2, b.Breaks);
         }
 
@@ -561,7 +562,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(6, K.E(b, 2).ToughMax, "엘리트 몸(6)은 그대로");
             Assert.AreEqual(R.TOUGH.Fight, F("nodata").Enemies[0].ToughMax);
             Assert.AreEqual(R.TOUGH.Min, F("weakling").Enemies[0].ToughMax, "최소치 3 — 데이터가 2 여도 3 으로 선다");
-            Assert.IsTrue(Validator.Check(D()).Errors.Any(x => x.Contains("weakling") && x.Contains("tough")), "검사기: 3 미만이면 오류");
+            Assert.IsTrue(Validator.Check(D()).Warnings.Any(x => x.Contains("weakling") && x.Contains("tough")), "검사기: 3 미만이면 주의(2026-10-10 — 엔진이 최소로 올리니 오류 아님)");
         }
 
         [Test] public void 강인도_없는_소환물은_격파되지_않고_막대가_없다()
@@ -865,7 +866,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(1, b2.Enemies.Count(e => e.Key == "imp" && !e.Dead), "엘리트가 세운 적은 남는다");
         }
 
-        [Test] public void 검사기_보스는_하나_강인도_엘리트_5_보스_7()
+        [Test] public void 검사기_보스는_하나_강인도_엘리트_5_보스도_5()
         {
             string Foes(int bossT, int eliteT) => @"[
  {id:'mob', name:'잔챙이', hp:300, tough:3, intents:[{t:'attack', v:10, rush:0}]},
@@ -878,9 +879,9 @@ namespace Bolzena.Core.Tests
             Assert.IsEmpty(Errs(7, 5, "'bs'", "'el','mob'").Where(x => x.Contains("보스") || x.Contains("엘리트")).ToList(), "기준을 지키면 오류 없음");
             Assert.IsTrue(Errs(7, 5, "'bs','mob'", "'el'").Any(x => x.Contains("보스 칸은 하나")), "보스 칸에 졸개");
             Assert.IsTrue(Errs(7, 4, "'bs'", "'el','mob'").Any(x => x.Contains("엘리트") && x.Contains("5")), "엘리트 싸움에 강인도 5 이상이 없다");
-            Assert.IsTrue(Errs(6, 5, "'bs'", "'el'").Any(x => x.Contains("보스 tough")), "보스 강인도 7 미만");
+            Assert.IsFalse(Errs(6, 5, "'bs'", "'el'").Any(x => x.Contains("보스 tough")), "보스 강인도 6 — 2026-10-10 사용자 기준(최소 5)이라 오류 아님(옛 7 규칙 없앰)");
             var b = K.Fight(K.Data(enemies: "[{id:'lo', name:'낮은 보스', hp:100, boss:true, tough:3, intents:[{t:'attack', v:1, rush:0}]}]"), new[] { "a" }, new[] { "lo" });
-            Assert.GreaterOrEqual(b.Enemies[0].ToughMax, 7, "엔진도 보스를 7 아래로 세우지 않는다");
+            Assert.AreEqual(R.MIN_TOUGH_BIG, b.Enemies[0].ToughMax, 1e-9, "엔진은 보스를 최소 5 로 세운다(2026-10-10 — 옛 7)");
         }
     }
 

@@ -122,7 +122,7 @@ namespace Bolzena.RunUI
         // ═════════════ 무작위 편성 ═════════════
         void PartyRandom(PartyState st, RectTransform root)
         {
-            var pool = Roster.All.Where(h => h.Playable).ToList();
+            var pool = Roster.Players.ToList();
             if (pool.Count < 3) { Toast.Show("고를 수 있는 사도가 셋보다 적습니다"); return; }
             var pick = new List<HeroInfo>();
             while (pick.Count < 3) { var h = pool[UnityEngine.Random.Range(0, pool.Count)]; if (!pick.Contains(h)) pick.Add(h); }

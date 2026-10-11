@@ -244,7 +244,7 @@ namespace Bolzena.Core.Tests
                 Assert.AreEqual(3, opts.Count); Assert.IsTrue(opts.All(x => x.Text.Length > 0));
                 Assert.AreEqual(o.Shins.Count(x => x != null), opts.Count(x => x.Blessed));
             }
-            Assert.AreEqual(0.15, (double)blessed / offers, 0.05, "축복 15% 쯤");
+            Assert.AreEqual(R.ORACLE_BLESS, (double)blessed / offers, 0.05, "축복 확률 쯤");
             var sw = Run.New(d, new List<string> { "rico", "carrot", "sion" }, 9); sw.S.Deck.Add("rico_u1"); sw.S.Flash["rico_u1"] = 2;
             CollectionAssert.DoesNotContain(sw.OfferOf("rico_u1", 2, true).Picks, 2, "바꾸기는 지금 신탁을 빼고 셋");
         }
@@ -288,21 +288,22 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("2턴간 자신의 공격 카드 비용 -1, 적의 다음 공격 한 대 피해 -30%", new CardText(d).Card(d.Card("ok")));
         }
 
-        [Test] public void 콘텐츠_하이디_고학년이_특종감을_처치하면_잠복_2와_cue()
+        [Test] public void 콘텐츠_하이디_고학년이_특종감을_처치하면_다음_특종()
         {
-            string dir = new[] { "../bolzena-content-v2", "../../bolzena-content-v2", "C:/projects/bolzena-content-v2" }.FirstOrDefault(Directory.Exists);
-            if (dir == null) Assert.Ignore("bolzena-content-v2 가 없다");
-            var d = GameData.FromFolder(dir);
+            var d = K.ContentWithBenched("하이디");   // 2026-10-11 엘다인 전환으로 빠진 사도 — 백업 원본을 얹어 본다
             var cues = new List<Cue>();
             var en = d.Enemies.Keys.First();
             var b = Battle.Start(d, new BattleSetup { Party = new List<string> { "하이디" }, Enemies = new List<string> { en, en }, Deck = d.Hero("하이디").Starter.ToList(), Gauge = 300, Seed = 3, EnemyHp = 50 }, cues);
             b.Enemies[0].Hp = b.Enemies[0].MaxHp;
             b.Enemies[1].Hp = 1;
-            Assert.AreEqual(0, b.StackOf("하이디", "잠복"));
+            int s0 = b.StackOf("하이디", "잠복");   // 새 패시브 「목표 포착!」(턴 시작 잠복 1, 2026-10-10)이 먼저 쌓아 둘 수 있다
             Assert.IsTrue(b.UseUlt("하이디").Ok);
+            // 깊이 리뉴얼 묶음 2(2026-10-10) — 고학년 「현장 중계 중!」: HP 가장 낮은 적에 특종감 · 초 집중 취재 · 잠복 2,
+            // 특종감이 쓰러지면 「다음 특종」(남은 적 중 HP 가장 낮은 적에 특종감 · 잠복 +1)
             Assert.IsTrue(b.Enemies[1].Dead, "고학년이 HP 가 가장 낮은 특종감을 처치");
-            Assert.AreEqual(2, b.StackOf("하이디", "잠복"), "초 집중 취재 — 특종감이 쓰러지면 잠복 +2");
-            Assert.IsTrue(cues.Any(c => c.K == "fx" && c.Id == "heidi_next_scoop"));
+            Assert.AreEqual(System.Math.Min(4, s0 + 3), b.StackOf("하이디", "잠복"), "고학년 잠복 2 + 다음 특종 1(최대 4)");
+            Assert.Greater(b.St(b.Enemies[0], "특종감"), 0, "특종감이 남은 적에게 옮겨 간다");
+            Assert.IsTrue(b.InForm("하이디"), "초 집중 취재");
         }
     }
 }

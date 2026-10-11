@@ -62,6 +62,10 @@ namespace Bolzena.Core
         public int? Choice;
         /// <summary>소모량을 고르는 카드(spend pick) — 소모할 수(없으면 전부). Battle.SpendChoices 가 후보를 준다.</summary>
         public int? Spend;
+        /// <summary>(엘다인 3차 ▶E42) 고른 만큼 나눠 입힐 손의 카드(같은 카드 여러 번 가능) — 없으면 가장 비싼 카드부터. Battle.SpreadCount 가 몇 번 고를지 준다.</summary>
+        public List<string> Spread;
+        /// <summary>(▶E74) 단계를 고르는 쌓기(stack pick) — 고른 단계(1부터). 없으면 다음 단계. Battle.StageChoices 가 후보를 준다.</summary>
+        public int? Stage;
         internal double? Scale;
         internal bool Auto, OpeningPlay;
     }
@@ -92,6 +96,8 @@ namespace Bolzena.Core
         public int Gauge;
         public string LastUlt;
         public List<string> Draw = new(), Hand = new(), Discard = new(), Gone = new();
+        /// <summary>이번 턴에 낸 카드(카제나 「이번 턴에 사용한 카드」) — 버린 더미 안에 있지만 이 턴의 섞기 · 「버린 카드에서」 로는 돌아가지 않는다. 턴 끝에 비운다(Docs/카드이동.md).</summary>
+        public List<string> Used = new();
         public int NextCheaper;
         public string Over;
         public bool NoNature, Preview;
@@ -183,6 +189,8 @@ namespace Bolzena.Core
         public bool FightEndDone;
         /// <summary>파티 방어 · 실드가 적의 공격을 막아 낸 양 — 이번 판(내 턴 + 적의 차례) · 지난 판(1단계 — 버티형 변환).</summary>
         public int GuardedNow, GuardedPrev;
+        /// <summary>전투 누계(계측 — weaksim 생존 몫): 적 공격이 파티에 든 양(막힌 몫 포함) · 방어 · 실드가 막은 양 · 실제로 채운 회복량.</summary>
+        public int SumIncoming, SumGuarded, SumHealed;
         /// <summary>이번 판 파티 회복 기록 — (회복 뒤 넘치기 전 HP, 회복량, 최대 HP) 셋씩 잇는다(1단계 — 넘친 회복 · 선 넘은 회복의 합).</summary>
         public List<int> HealLog = new();
         /// <summary>예약 계기(reserveFire · reserveGone)를 돌리는 중 — 그 안에서 난 예약 계기는 패시브를 깨우지 않는다(연쇄 상한, 1단계).</summary>
@@ -252,6 +260,7 @@ namespace Bolzena.Core
                 var u = new Unit { Side = Side.Enemy, Key = e.Id, Name = e.Name, Idx = i, Row = e.Row ?? "front", Nature = FoeNature(e), Boss = e.Boss, Dmgx = dmgx, Tough = tm, ToughMax = tm };
                 u.MaxHp = ehp; u.Hp = ehp;
                 Enemies.Add(u);
+                if (R.OPEN_EXPOSE > 0) u.Status[R.EXPOSED] = R.OPEN_EXPOSE;   // 첫 수 — 모든 적 약점 노출(2026-10-10 「딜러 1명만 약점이어도」)
                 InitCounters(u);
             }
 
@@ -290,19 +299,23 @@ namespace Bolzena.Core
             if (opener != null) Talk(opener, "start");
             Emit("fightStart", new EmitInfo());
             FoePassives("fightStart", null);
+            StartForms();   // 전투 시작 태세(엘다인 4차 — 우로스 startForm)
             BeginTurn();
             OpeningPlays();
         }
 
         /// <summary>적의 성격 — 사도 클론은 그 사도의 성격 그대로, 나머지는 판의 적 속성(있으면) · 없으면 데이터.</summary>
-        public string FoeNature(EnemyDef e) => e.Clone != null ? (Data.Hero(e.Clone)?.Nature ?? e.Nature) : EnemyNature ?? e.Nature;
+        public string FoeNature(EnemyDef e) => e.Clone != null ? (Data.CloneHero(e.Clone)?.Nature ?? e.Nature) : EnemyNature ?? e.Nature;
 
-        /// <summary>적의 강인도 칸 — 데이터 tough(없으면 일반 · 엘리트 · 보스 기본). 엘리트 싸움에 선 여린 적(엘리트 몸보다 작은 칸)은 +EliteMinion. 최소 R.TOUGH.Min(3).</summary>
-        public double ToughOf(EnemyDef e, bool elite)
+        /// <summary>적의 강인도 칸 — 데이터 tough(없으면 일반 · 엘리트 · 보스 기본). 엘리트 싸움에 선 여린 적(엘리트 몸보다 작은 칸)은 +EliteMinion.</summary>
+        /// 최소 강인도(2026-10-10): 일반 · 소환물 R.MIN_TOUGH_FIGHT, 엘리트(…_elite) · 보스 · 클론 R.MIN_TOUGH_BIG. 도감도 이 함수를 쓴다.
+        public static double ToughOf(EnemyDef e, bool elite, bool summon = false)
         {
             double t = e.Tough > 0 ? e.Tough : e.Boss ? R.TOUGH.Boss : elite ? R.TOUGH.Elite : R.TOUGH.Fight;
             if (elite && !e.Boss && t < R.TOUGH.Elite) t += R.TOUGH.EliteMinion;
-            return Math.Max(e.Boss ? R.TOUGH.MinBoss : R.TOUGH.Min, t);
+            bool big = !summon && (e.Boss || e.Clone != null || e.Id != null && e.Id.EndsWith("_elite", StringComparison.Ordinal));
+            double min = big ? R.MIN_TOUGH_BIG : R.MIN_TOUGH_FIGHT;   // 2026-10-10 사용자 — 보스도 5(옛 TOUGH.MinBoss 7 은 쓰지 않는다)
+            return Math.Max(min, t);
         }
 
         /// <summary>
@@ -337,47 +350,82 @@ namespace Bolzena.Core
 
         // ── 복사(봇 · 미리보기) ──────────────────────────────────────
         /// <summary>판을 통째로 복사한다 — 기록 · 연출 쪽지 · 구독은 빼고. 난수는 rng(없으면 지금 것을 베낀다).</summary>
-        public Battle Clone(Rng rng = null)
+        public Battle Clone(Rng rng = null) => Clone(rng, false);
+
+        /// <summary>
+        /// bot — 봇이 수를 읽으려고 뜨는 판(Bots.CloneFor). 상태를 건 쪽 기록(Unit.Src — 화면 칩 풀이에만 쓴다)은 베끼지 않고 빈 것으로 시작한다.
+        /// 판의 흐름 · 점수는 Src 를 읽지 않으니 결과가 같다(2026-10-09 — 복사가 시뮬 시간의 3할).
+        /// </summary>
+        internal Battle Clone(Rng rng, bool bot)
         {
             var s = (Battle)MemberwiseClone();
             s.OnCue = null; s.OnLog = null; s.Cues = null; s.Meter = null; s.Tape = null;
             s.Log = new List<string>();
             s.Rng = rng ?? Rng.Clone();
-            s.Pool = Pool.Clone();
-            s.Party = Party.ConvertAll(u => { var c = u.Clone(); c.BodyRef = s.Pool; return c; });
-            s.Enemies = Enemies.ConvertAll(u => u.Clone());
-            s.Draw = Draw.ToList(); s.Hand = Hand.ToList(); s.Discard = Discard.ToList(); s.Gone = Gone.ToList();
+            s.Pool = Pool.Clone(!bot);
+            // 아래는 LINQ(ToList · ToDictionary · 람다) 없이 그대로 베낀다 — 봇이 수마다 판을 복사해서 가장 뜨거운 길이다(2026-10-09). 담는 차례 · 나눠 쓰는 것은 옛 것과 같다.
+            s.Party = new List<Unit>(Party.Count);
+            foreach (var u in Party) { var c = u.Clone(!bot); c.BodyRef = s.Pool; s.Party.Add(c); }
+            s.Enemies = new List<Unit>(Enemies.Count);
+            foreach (var u in Enemies) s.Enemies.Add(u.Clone(!bot));
+            s.Draw = new List<string>(Draw); s.Hand = new List<string>(Hand); s.Discard = new List<string>(Discard); s.Gone = new List<string>(Gone); s.Used = new List<string>(Used);
             s.Flash = new(Flash); s.Shin = new(Shin);
-            s.Glow = Glow.ToDictionary(kv => kv.Key, kv => kv.Value.Copy());
-            s.GainedCards = GainedCards.ToList(); s.GainedFlash = GainedFlash.ToList();
+            s.Glow = new Dictionary<string, Glow>(Glow.Count);
+            foreach (var kv in Glow) s.Glow.Add(kv.Key, kv.Value.Copy());
+            s.GainedCards = new List<string>(GainedCards); s.GainedFlash = new List<(string cardId, int n, string shin)>(GainedFlash);
             s.FreeOnce = new(FreeOnce); s.FreeTurn = new(FreeTurn);
             s.Kw = new(Kw); s.Passives = Passives;   // 규칙은 전투 내내 그대로 — 나눠 쓴다
-            s.Stacks = Stacks.ToDictionary(kv => kv.Key, kv => new Dictionary<string, int>(kv.Value));
-            s.StackCap = StackCap.ToDictionary(kv => kv.Key, kv => new Dictionary<string, int>(kv.Value));
+            s.Stacks = Deep(Stacks);
+            s.StackCap = Deep(StackCap);
             s.Fired = new(Fired); s.Counts = new(Counts);
             s.Always = Always;
             s.firing = new HashSet<string>();
-            s.PlayLog = PlayLog.ToList(); s.PlayedBy = new(PlayedBy); s.PlayIds = PlayIds.ToList(); s.Held = new(Held);
+            s.PlayLog = new List<(string hero, string type)>(PlayLog); s.PlayedBy = new(PlayedBy); s.PlayIds = new List<string>(PlayIds); s.Held = new(Held);
             s.HurtPrev = new(HurtPrev); s.HurtNow = new(HurtNow); s.KillPrev = new(KillPrev); s.KillNow = new(KillNow);
-            s.LeadOn = new(LeadOn); s.Echo = Echo.ToList(); s.Unsealed = new(Unsealed);
+            s.LeadOn = new(LeadOn); s.Echo = new List<(string id, int target)>(Echo); s.Unsealed = new(Unsealed);
             s.UseCount = new(UseCount); s.Recalled = new(Recalled);
-            s.discardPick = discardPick?.ToList();
-            s.CardSt = CardSt.ToDictionary(kv => kv.Key, kv => new Dictionary<string, int>(kv.Value));
-            s.Frozen = new(Frozen); s.Bond = new(Bond); s.Removed = Removed.ToList();
-            s.PlayTags = PlayTags.Select(x => x.ToList()).ToList();
-            s.CostMods = CostMods.Select(x => x.Copy()).ToList(); s.PlayedPrev = new(PlayedPrev); s.BattleVals = new(BattleVals);
-            s.Later = Later.Select(x => x.Copy()).ToList();
-            s.HealLog = HealLog.ToList(); s.sharedOnce = null; s.reserveIn = 0; s.capN = new(capN); s.capMeter = false;
-            s.GrowthGain = GrowthGain.ToDictionary(kv => kv.Key, kv => kv.Value + new Stats());
-            s.Forms = Forms.ToDictionary(kv => kv.Key, kv => kv.Value.Copy());
-            s.Powers = Powers.Select(p => p.Copy()).ToList();   // 규칙 캐시(powerRules)는 나눠 쓴다 — 같은 강화면 규칙이 같다   // 모습 캐시(formViews · formRules)는 나눠 쓴다 — 바뀌지 않는다
+            s.discardPick = discardPick != null ? new List<string>(discardPick) : null;
+            s.CardSt = Deep(CardSt);
+            s.Frozen = new(Frozen); s.Bond = new(Bond); s.Removed = new List<string>(Removed);
+            s.PlayTags = new List<List<string>>(PlayTags.Count);
+            foreach (var x in PlayTags) s.PlayTags.Add(new List<string>(x));
+            s.CostMods = new List<CostModRec>(CostMods.Count);
+            foreach (var x in CostMods) s.CostMods.Add(x.Copy());
+            s.Records = new Dictionary<string, List<string>>(Records.Count);
+            foreach (var kv in Records) s.Records.Add(kv.Key, new List<string>(kv.Value));
+            s.RecentPlays = new List<string>(RecentPlays); s.RecentTurns = new List<int>(RecentTurns); s.spreadPick = spreadPick != null ? new List<string>(spreadPick) : null;
+            s.PlayedPrev = new(PlayedPrev); s.BattleVals = new(BattleVals);
+            s.Later = new List<LaterRec>(Later.Count);
+            foreach (var x in Later) s.Later.Add(x.Copy());
+            s.Tally = CopyTally(Tally);   // 전투 기록(BattleTally) — 미리보기 판이 진짜 판의 몫을 건드리지 않게
+            s.HealLog = new List<int>(HealLog); s.sharedOnce = null; s.reserveIn = 0; s.capN = new(capN); s.capMeter = false;
+            s.GrowthGain = new Dictionary<string, Stats>(GrowthGain.Count);
+            foreach (var kv in GrowthGain) s.GrowthGain.Add(kv.Key, kv.Value + new Stats());
+            s.Forms = new Dictionary<string, FormRt>(Forms.Count);
+            foreach (var kv in Forms) s.Forms.Add(kv.Key, kv.Value.Copy());
+            s.Powers = new List<PowerRt>(Powers.Count);
+            foreach (var p in Powers) s.Powers.Add(p.Copy());   // 규칙 캐시(powerRules)는 나눠 쓴다 — 같은 강화면 규칙이 같다   // 모습 캐시(formViews · formRules)는 나눠 쓴다 — 바뀌지 않는다
             return s;
         }
 
+        /// <summary>겹 표(열쇠 → 이름 → 수)를 속까지 베낀다 — 담는 차례 그대로.</summary>
+        internal static Dictionary<string, Dictionary<string, int>> Deep(Dictionary<string, Dictionary<string, int>> d)
+        {
+            var o = new Dictionary<string, Dictionary<string, int>>(d.Count);
+            foreach (var kv in d) o.Add(kv.Key, new Dictionary<string, int>(kv.Value));
+            return o;
+        }
+
         // ── 작은 손잡이 ───────────────────────────────────────────────
-        public IEnumerable<Unit> AliveParty() => Pool.Dead ? Enumerable.Empty<Unit>() : Party;
-        public List<Unit> AliveEnemies() => Enemies.Where(e => !e.Dead).ToList();
-        public Unit HeroUnit(string key) => key == null ? null : Party.FirstOrDefault(u => u.Key == key);
+        /// <summary>살아 있는 파티(사도 셋) — 파티 몸이 쓰러졌으면 빈 줄. List 로 돌려준다(foreach 가 상자를 만들지 않게 — 2026-10-09).</summary>
+        public List<Unit> AliveParty() => Pool.Dead ? new List<Unit>() : Party;
+        public List<Unit> AliveEnemies() { var o = new List<Unit>(Enemies.Count); foreach (var e in Enemies) if (!e.Dead) o.Add(e); return o; }
+        public Unit HeroUnit(string key)
+        {
+            if (key == null) return null;
+            foreach (var u in Party) if (u.Key == key) return u;   // LINQ 없이 — 봇 점수 · 패시브가 아주 자주 부른다(2026-10-09)
+            return null;
+        }
         /// <summary>파티의 대표 — 파티에 거는 것(방어 · 실드 · 회복 · 상태)의 연출 자리.</summary>
         public Unit PartyRep(Unit prefer = null) => prefer != null && prefer.Side == Side.Party && !prefer.Dead ? prefer : AliveParty().FirstOrDefault() ?? Party.FirstOrDefault();
 

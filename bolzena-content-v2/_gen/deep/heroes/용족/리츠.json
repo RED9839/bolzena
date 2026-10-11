@@ -1,0 +1,873 @@
+{
+  "heroes": [
+    {
+      "id": "리츠",
+      "name": "리츠",
+      "nature": "광기",
+      "race": "용족",
+      "role": "딜러",
+      "style": "두 얼굴형",
+      "star": 3,
+      "hp": 880,
+      "atk": 119,
+      "def": 40,
+      "crit": 10,
+      "blurb": "소심하고 공손한 은둔 고수 용족. 먼저 맞기 전까진 몸을 사리며 파티를 감싸지만, 정당방위가 서면 버튼이 눌려 반말로 박살을 내고 — 다 털고 나면 간신히 이겼다며 돌아옵니다.",
+      "keyword": {
+        "name": "정당방위",
+        "desc": "먼저 맞아서 생긴 정당한 이유",
+        "carrier": "self",
+        "cap": 4,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.04
+          }
+        ],
+        "rules": [
+          {
+            "name": "먼저 손대셨죠?",
+            "when": {
+              "on": "hurt"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "정당방위",
+                "v": 1
+              },
+              {
+                "k": "ifStack",
+                "id": "정당방위",
+                "n": 3
+              },
+              {
+                "k": "form",
+                "id": "리츠_광전"
+              }
+            ]
+          },
+          {
+            "name": "참는 자세",
+            "when": {
+              "on": "always"
+            },
+            "fx": [
+              {
+                "k": "dealtMod",
+                "v": 0.05,
+                "target": "self"
+              }
+            ]
+          },
+          {
+            "name": "든든한 등",
+            "when": {
+              "on": "blocked"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "정당방위",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "벼리기",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.56,
+            "target": "allEnemies",
+            "hits": 3
+          },
+          {
+            "k": "stack",
+            "id": "정당방위",
+            "v": 2
+          },
+          {
+            "k": "formEnd"
+          }
+        ]
+      },
+      "starter": [
+        "리츠_s1",
+        "리츠_s2",
+        "리츠_s3",
+        "리츠_u2"
+      ],
+      "forms": [
+        {
+          "id": "리츠_광전",
+          "name": "광전",
+          "desc": "버튼이 눌린 리츠 — 대검을 휘두르고 주는 피해가 오름",
+          "turns": 2,
+          "mods": {
+            "dealt": 0.1,
+            "taken": 0.1
+          },
+          "cards": {
+            "리츠_s1": "리츠_f1"
+          },
+          "skin": null,
+          "anim": null
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "리츠_s1",
+      "name": "칼등 치기",
+      "hero": "리츠",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리츠_s2",
+      "name": "방어 자세",
+      "hero": "리츠",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "리츠_f1",
+      "name": "대검 내려치기",
+      "hero": "리츠",
+      "token": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.86,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "정당방위",
+          "v": 1
+        }
+      ],
+      "blurb": "버튼이 눌린 리츠의 대검입니다"
+    },
+    {
+      "id": "리츠_u2",
+      "name": "담금질",
+      "hero": "리츠",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "정당방위",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.75
+        },
+        {
+          "k": "when",
+          "on": "passion"
+        },
+        {
+          "k": "stack",
+          "id": "정당방위",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 1.13
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "power": true,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "정당방위",
+                      "v": 1
+                    },
+                    {
+                      "k": "empower",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "empower",
+              "ratio": 0.32
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "dmg",
+                  "ratio": 2.04,
+                  "target": "allEnemies"
+                }
+              ]
+            },
+            {
+              "k": "empower",
+              "ratio": 0.66
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "form",
+              "id": "리츠_광전"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리츠_u5",
+      "name": "통곡의 벽",
+      "hero": "리츠",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "정당방위",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "empower",
+              "ratio": 1.95
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.86
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "power": true,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "empower",
+                      "ratio": 0.32
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리츠_u1",
+      "name": "박살내주겠어!",
+      "hero": "리츠",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "정당방위"
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.26,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "정당방위",
+          "all": true
+        },
+        {
+          "k": "formEnd"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "정당방위"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.89,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "정당방위",
+              "all": true
+            },
+            {
+              "k": "formEnd"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "정당방위",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "정당방위",
+              "all": true
+            },
+            {
+              "k": "formEnd"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "정당방위",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "formEnd"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "정당방위",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.49,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "정당방위",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "정당방위",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.23,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "정당방위",
+              "all": true
+            },
+            {
+              "k": "tough",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리츠_u4",
+      "name": "한 놈만 패기",
+      "hero": "리츠",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.73,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 8.08,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.05,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 1.26,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.24,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "form",
+              "id": "리츠_광전"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "tags": [
+        "열정"
+      ]
+    },
+    {
+      "id": "리츠_s3",
+      "name": "칼등 내려치기",
+      "hero": "리츠",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리츠_s4",
+      "name": "버티는 자세",
+      "hero": "리츠",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "정당방위",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_reetsmash",
+      "name": "리츠의 대지 뽀개기",
+      "grade": "전설",
+      "slot": "무기",
+      "stats": {
+        "hp": 136,
+        "atk": 25
+      },
+      "effect": [
+        {
+          "name": "뒤에 숨어",
+          "when": {
+            "on": "turnStart"
+          },
+          "conds": [
+            {
+              "c": "hurtLast"
+            }
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "affinity": "리츠",
+      "affinityStats": {
+        "hp": 40,
+        "atk": 6
+      },
+      "affinityEffect": [
+        {
+          "name": "먼저 치셨으니까",
+          "when": {
+            "on": "hurt",
+            "guarded": true
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "정당방위",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "땅을 쪼개는 큰 망치. 휘두르는 쪽 뒤가 가장 안전합니다."
+    }
+  ]
+}

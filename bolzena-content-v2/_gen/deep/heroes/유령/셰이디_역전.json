@@ -1,0 +1,797 @@
+{
+  "heroes": [
+    {
+      "id": "셰이디_역전",
+      "name": "셰이디(역전)",
+      "nature": "활발",
+      "race": "유령",
+      "role": "서포터",
+      "style": "쌓고 고르기",
+      "star": 3,
+      "hp": 580,
+      "atk": 86,
+      "def": 58,
+      "crit": 5,
+      "blurb": "나약함을 인정하고 유령 늪의 파수꾼이 된 장난꾼. 착한 척 스킬을 쓰거나 맞을 때마다 「울분」 을 꾹 삼키고, 모은 울분을 인형 샌드백에 고른 만큼 풀지 파티를 쓰다듬는 데 나눌지 고릅니다. 셋이 다 차면 참다 터진 기세가 파티의 다음 한 수에 실립니다.",
+      "keyword": {
+        "name": "울분",
+        "desc": "착한 척하느라 삼킨 화",
+        "carrier": "self",
+        "cap": 3,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.05,
+            "who": "allies"
+          }
+        ],
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.6
+        },
+        "rules": [
+          {
+            "name": "착한 척은 힘들어",
+            "when": {
+              "on": "play",
+              "type": "스킬",
+              "every": 2
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "울분",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "파수꾼",
+            "when": {
+              "on": "turnEnd"
+            },
+            "fx": [
+              {
+                "k": "heal",
+                "ratio": 0.31
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "사일런트 크래쉬",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.62,
+            "target": "allEnemies",
+            "hits": 2
+          },
+          {
+            "k": "status",
+            "id": "취약",
+            "v": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 1,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "셰이디_역전_s1",
+        "셰이디_역전_s2",
+        "셰이디_역전_s3",
+        "셰이디_역전_u4"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "셰이디_역전_s1",
+      "name": "파수 사슬",
+      "hero": "셰이디_역전",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "셰이디_역전_s2",
+      "name": "늪지 등불 온기",
+      "hero": "셰이디_역전",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "hero": "셰이디_역전",
+      "token": true,
+      "id": "셰이디_역전_pumpkin",
+      "name": "늪지 호박",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.02
+        },
+        {
+          "k": "stack",
+          "id": "울분",
+          "v": 1
+        }
+      ],
+      "blurb": "스피키가 늪지에 두고 간 호박. 삶아 먹으면 기운이 납니다."
+    },
+    {
+      "id": "셰이디_역전_u4",
+      "name": "내 방식대로 지키겠어",
+      "hero": "셰이디_역전",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "울분",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "울분",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "울분",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "who": "other"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "울분",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.92
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셰이디_역전_u1",
+      "name": "차원의 틈",
+      "hero": "셰이디_역전",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "울분",
+          "v": 1
+        },
+        {
+          "k": "ifChoice",
+          "n": 1
+        },
+        {
+          "k": "make",
+          "id": "셰이디_역전_pumpkin",
+          "v": 2
+        },
+        {
+          "k": "ifChoice",
+          "n": 2
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 2
+            },
+            {
+              "k": "ifChoice",
+              "n": 1
+            },
+            {
+              "k": "make",
+              "id": "셰이디_역전_pumpkin",
+              "v": 3
+            },
+            {
+              "k": "ifChoice",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "셰이디_역전_pumpkin",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 5.22,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 3
+            },
+            {
+              "k": "make",
+              "id": "셰이디_역전_pumpkin",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셰이디_역전_u2",
+      "name": "유령 인형 샌드백",
+      "hero": "셰이디_역전",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.21,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "울분",
+          "all": true
+        },
+        {
+          "k": "perEvent"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.81,
+          "target": "allEnemies"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "셰이디_역전_u5",
+      "name": "헤벌레 쓰다듬기",
+      "hero": "셰이디_역전",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "spend",
+          "id": "울분",
+          "all": true
+        },
+        {
+          "k": "perEvent"
+        },
+        {
+          "k": "heal",
+          "ratio": 3.12
+        },
+        {
+          "k": "feed",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "spend",
+              "id": "울분",
+              "all": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "heal",
+              "ratio": 6.12
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "spend",
+              "id": "울분",
+              "all": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "shield",
+              "ratio": 4.08
+            },
+            {
+              "k": "feed",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 14.88
+            },
+            {
+              "k": "perOverheal",
+              "per": 25,
+              "max": 8
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.47,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "spend",
+              "id": "울분",
+              "all": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "heal",
+              "ratio": 3.12
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "spend",
+              "id": "울분",
+              "all": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "heal",
+              "ratio": 3.12
+            },
+            {
+              "k": "feed",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "셰이디_역전_s3",
+      "name": "사슬 후려치기",
+      "hero": "셰이디_역전",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "셰이디_역전_s4",
+      "name": "울분 삼키기",
+      "hero": "셰이디_역전",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 5.6
+        },
+        {
+          "k": "stack",
+          "id": "울분",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 8.36
+            },
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 5.6
+            },
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 5.6
+            },
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 5.6
+            },
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 7.24
+            },
+            {
+              "k": "stack",
+              "id": "울분",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

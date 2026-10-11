@@ -53,6 +53,16 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(0, CardValue.LiveGuard(0, 0, 50, 50, 100, 100, 100));
         }
 
+        [Test] public void 태그_계기_장비는_그_태그를_내는_파티만_센다()
+        {
+            var tagged = new PassiveRule { When = new When { On = "play", Tag = "열정", Who = "any" }, Fx = new List<Fx> { new Fx { K = FxK.Draw, V = 1 } } };
+            var plain = Rule("fightStart", new List<Fx> { new Fx { K = FxK.Shield, Ratio = 1 } });
+            var rules = new List<PassiveRule> { tagged, plain };
+            Assert.AreEqual(1, RunBot.FitGear(new HashSet<string> { "tag:소멸" }, rules).Count, "열정 카드가 없는 파티 — 태그 계기는 빼고 센다");
+            Assert.AreEqual(2, RunBot.FitGear(new HashSet<string> { "tag:열정" }, rules).Count);
+            Assert.AreEqual(2, RunBot.FitGear(null, rules).Count, "초보 봇은 다 센다");
+        }
+
         [Test] public void 증폭_짝_고통이면_고통_각인을_듣는다()
         {
             Assert.That(DeckPlan.AMP, Has.Member(("st:고통 각인", "st:고통")));

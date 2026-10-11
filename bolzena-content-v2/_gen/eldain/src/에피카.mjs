@@ -1,0 +1,91 @@
+// 에피카 — 딜러 · 활발 · 수인. 설계: _measure/엘다인_엔진/01_사도별.md §4 (4차 10-11 — 3차 그대로 · 연계 단독 소유)
+// 엔진: 0 · 1코로 손을 갈며(뽑고 · 버리고 · 내고) 그 장수만큼 「에피콘의 분신술」(무대 열기 — 엔진이 세는 수)을 띄우고
+//   → 열기를 「에피칸」(에피콘 무리)으로 바꿔 남기면 동료 카드마다 따라 치고(★) · 아니면 「교주에게 바칩니다」 로 그 수만큼 쏟는다.
+// 원작 보강(10-11 검토): 영감은 「에피콘 부르기」 ⑤ 한 갈래로 · 동료 템포 공급은 「극적인 연출」 ⑤. 자동 규칙은 「아군에게 바칩니다」 하나.
+import { hero, dmg, ddmg, shield, heal, stack, spend, make, draw, discard, status, empower, ifStack, power, rule } from '../lib.mjs';
+
+const H = '에피카', HEAT = '에피콘의 분신술', K = '에피칸';
+const S = (v = 1, x) => stack(K, v, x);
+const heat = { k: 'perStack', id: HEAT, n: 2 };   // 열기 1개당(최소 2회)
+
+export default hero({
+  id: H, name: '에피카', nature: '활발', race: '수인', role: '딜러', star: 3,
+  blurb: '하프를 켜는 유니콘 음유시인. 손을 빠르게 갈며 무대를 달구고, 똑같은 차림의 에피콘 제자들은 동료가 카드를 낼 때마다 따라 칩니다.',
+  keyword: {
+    name: HEAT, desc: '이번 턴 에피카가 낸 · 버린 카드만큼 달아오른 무대', carrier: 'self', cap: 10, endClear: true,
+    tally: ['play', 'discardBy'],
+  },
+  keywords: [{
+    name: K, desc: '똑같은 차림으로 공연하는 에피콘 제자들', carrier: 'self', cap: 4, start: 1,
+    rules: [{ name: '아군에게 바칩니다', when: { on: 'play', who: 'other' }, conds: [{ c: 'stack', id: K, n: 1 }], fx: [{ k: 'extra', ratio: 0.1, target: 'oneEnemy' }] }],
+  }],
+  // 사용자 10-11: 20명 모두 고유 능력 2개
+  passives: [
+    { name: '극적인 연출', when: { on: 'turnStart' }, conds: [{ c: 'stack', id: K, n: 3 }], fx: [status('사기', 1)] },   // 에피칸 3 이상이면 매 턴 사기 1
+  ],
+  ult: { name: '교주에게 바칩니다(공연)', cost: 250, fx: [S(3), status('사기', 2), draw(3)] },
+}, {
+  basicNames: ['하프 튕기기', '현 뜯기', '용각산 한 숟갈'], deck: 'light', starter: true,
+  uniques: [
+    { // 시동(은총으로)
+      name: '극적인 연출', cost: 0, type: '스킬',
+      fx: [draw(2), discard(1)],
+      oracles: [
+        { fx: [draw(3), discard(1)] },
+        { fx: [draw(2), stack(HEAT, 2)] },
+        { fx: [discard(1, { all: true }), draw(5)] },
+        { power: true, fx: [draw(1), power([rule({ on: 'play', every: 3 }, [draw(1)])])] },
+        { fx: [{ k: 'costMod', v: -1, n: 1, who: 'other', turns: 1 }, draw(1)] },
+      ],
+      blesses: ['draw', 'ap', [stack(HEAT, 1)]],
+    },
+    {
+      name: '앵콜', cost: 0, type: '스킬',
+      fx: [discard(2), draw(2)],
+      oracles: [
+        { fx: [discard(3), draw(3)] },
+        { fx: [discard(2), draw(2), S(1)] },
+        { type: '공격', cost: 1, fx: [discard(2), { k: 'perDiscarded' }, dmg(0.7, 'randomEnemy'), draw(2)] },
+        { fx: [discard(1), draw(3)] },
+        { fx: [discard(2), { k: 'pull', from: 'discarded', n: 1 }] },
+      ],
+      blesses: ['draw', 'ap', [stack(HEAT, 1)]],
+    },
+    {
+      name: '에피콘 부르기', cost: 1, type: '스킬',
+      fx: [S(1), draw(1), ifStack(HEAT, 3), S(1)],
+      oracles: [
+        { fx: [S(1), draw(1), ifStack(HEAT, 3), S(2)] },
+        { cost: 0, fx: [ifStack(HEAT, 3), spend(HEAT, 3), S(1)] },
+        { fx: [ifStack(HEAT, 2), spend(HEAT, 2), S(1), status('사기', 1)] },
+        { fx: [discard(1), S(1)] },
+        { fx: [draw(1), ifStack(HEAT, 3), S(1), { k: 'when', on: 'draw' }, S(1)] },
+      ],
+      blesses: ['cost', 'draw', [S(1)]],
+    },
+    { // 마무리 — 열기만큼(최소 2회), 열기를 쓰지 않는다
+      name: '교주에게 바칩니다', cost: 1, type: '공격',
+      fx: [heat, dmg(0.4, 'randomEnemy'), status('사기', 1)],
+      oracles: [
+        { power: true, fx: [S(1), power([rule({ on: 'play', nth: 4 }, [S(1)])])] },
+        { fx: [heat, dmg(0.4), status('사기', 1)] },
+        { fx: [{ k: 'perStack', id: K, n: 1 }, dmg(0.4, 'randomEnemy', { hits: 2 })] },
+        { cost: 0, fx: [heat, dmg(0.3, 'randomEnemy'), draw(1)] },
+        { fx: [heat, dmg(0.4, 'randomEnemy'), { k: 'nextAp', v: 1 }] },
+      ],
+      blesses: ['power', 'cost', [S(1)]],
+    },
+    { // 4차 8장 — 터뜨리기(에피칸 쪽): 무대에 남긴 에피콘과 함께 인사한다
+      name: '무대 인사', cost: 1, type: '공격',
+      fx: [dmg(0.4, 'randomEnemy', { hits: 2 }), { k: 'perStack', id: K }, dmg(0.3, 'randomEnemy')],
+      oracles: [
+        { fx: [dmg(0.4, 'randomEnemy', { hits: 2 }), { k: 'perStack', id: K }, dmg(0.4, 'randomEnemy')] },
+        { fx: [dmg(0.4, 'randomEnemy', { hits: 2 }), S(1)] },
+        { fx: [{ k: 'perStack', id: K, n: 1 }, dmg(0.6)] },
+        { cost: 0, fx: [{ k: 'perStack', id: K }, dmg(0.3, 'randomEnemy'), draw(1)] },
+        { fx: [dmg(0.4, 'randomEnemy', { hits: 2 }), status('사기', 1)] },
+      ],
+      blesses: ['power', 'cost', [S(1)]],
+    },
+  ],
+});

@@ -270,7 +270,7 @@ namespace Bolzena.UI
             }
             y -= 0.14f * k;
             // 고유 효과 · 고학년
-            Band(R, x, w, ref y, k, "고유 효과");
+            Band(R, x, w, ref y, k, "고유 능력");
             if (!string.IsNullOrEmpty(h.KeywordName))
             {
                 T("kn", R, $"「{h.KeywordName}」", new Vector3(x + 0.1f, y - 0.18f * k, 0), Tone.Body * k, Tone.Gold);

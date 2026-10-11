@@ -1,0 +1,887 @@
+{
+  "heroes": [
+    {
+      "id": "캬롯",
+      "name": "캬롯",
+      "nature": "순수",
+      "race": "요정",
+      "role": "서포터",
+      "style": "예약형",
+      "star": 3,
+      "hp": 580,
+      "atk": 90,
+      "def": 52,
+      "crit": 5,
+      "blurb": "세계수 외곽에 정원을 꾸린 요정 \"일등 정원사\". 사탕수수를 사랑하고 상냥하게 정원에 초대하지만, 작물을 깔보는 자와 공장제 자동화 농법에는 가차 없습니다. 특제 영양제를 과하게 뿌려 세계수 접근 금지를 당한 전적이 있습니다.",
+      "keyword": {
+        "name": "씨앗",
+        "desc": "아군 곁에 심어 기다리는 탄산수액",
+        "carrier": "hero",
+        "cap": 2,
+        "reserve": true,
+        "decay": 1,
+        "rules": [
+          {
+            "name": "수확",
+            "when": {
+              "on": "stackGone",
+              "id": "씨앗",
+              "decay": true
+            },
+            "fx": [
+              {
+                "k": "dealtMod",
+                "v": 0.3,
+                "target": "oneAlly",
+                "turns": 2
+              },
+              {
+                "k": "shield",
+                "ratio": 0.68
+              },
+              {
+                "k": "draw",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "꼼꼼한 정원사",
+            "when": {
+              "on": "shuffle",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "씨앗",
+                "v": 2,
+                "target": "strongestAlly"
+              }
+            ]
+          },
+          {
+            "name": "햇님이",
+            "when": {
+              "on": "reserveFire"
+            },
+            "fx": [
+              {
+                "k": "shield",
+                "ratio": 0.38
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "수액 펌프 발사!",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.14,
+            "target": "allEnemies"
+          },
+          {
+            "k": "ap",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "씨앗",
+            "v": 1,
+            "target": "allAllies"
+          }
+        ]
+      },
+      "starter": [
+        "캬롯_s1",
+        "캬롯_s2",
+        "캬롯_s3",
+        "캬롯_u2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "캬롯_s1",
+      "name": "수액 방울",
+      "hero": "캬롯",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "캬롯_s2",
+      "name": "당근 주스",
+      "hero": "캬롯",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "캬롯_sprout",
+      "name": "당근 새싹",
+      "hero": "캬롯",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.23
+        },
+        {
+          "k": "stack",
+          "id": "씨앗",
+          "v": 1,
+          "target": "strongestAlly"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "먼저 일군 텃밭에서 난 새싹입니다"
+    },
+    {
+      "id": "캬롯_u1",
+      "name": "탄산수액 발사",
+      "hero": "캬롯",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "씨앗",
+          "v": 2,
+          "target": "oneAlly"
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1,
+              "target": "allAllies"
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 2,
+              "target": "strongestAlly"
+            },
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "피해 감소",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "heal",
+              "ratio": 3.6
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1,
+              "target": "strongestAlly"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "캬롯_u2",
+      "name": "아침 물 주기",
+      "hero": "캬롯",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.52
+        },
+        {
+          "k": "stack",
+          "id": "씨앗",
+          "v": 1,
+          "target": "allAllies"
+        },
+        {
+          "k": "make",
+          "id": "캬롯_sprout",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.28
+            },
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 2,
+              "target": "allAllies"
+            },
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1,
+              "target": "allAllies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "캬롯_sprout",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "heal",
+              "ratio": 0.91
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.6
+            },
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.91
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.04
+            },
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1,
+              "target": "allAllies"
+            },
+            {
+              "k": "gauge",
+              "v": 25
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "캬롯_u3",
+      "name": "일찍 캐기",
+      "hero": "캬롯",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "ripen",
+          "id": "씨앗",
+          "v": 0.3,
+          "target": "oneAlly"
+        },
+        {
+          "k": "shield",
+          "ratio": 1.2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "씨앗",
+              "v": 0.3,
+              "target": "oneAlly"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.84
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "씨앗",
+              "v": 0.3
+            },
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 0.72
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "씨앗",
+              "v": 0.3,
+              "target": "oneAlly"
+            },
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 0.72
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "씨앗",
+              "v": 0.3,
+              "target": "oneAlly"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.79,
+              "who": "any"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.72
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "씨앗",
+              "v": 0.3,
+              "target": "oneAlly"
+            },
+            {
+              "k": "heal",
+              "ratio": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1,
+              "target": "strongestAlly"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "캬롯_u4",
+      "name": "사탕수수 몽둥이",
+      "hero": "캬롯",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.57,
+          "target": "allEnemies"
+        },
+        {
+          "k": "hasten",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.86,
+              "target": "allEnemies"
+            },
+            {
+              "k": "hasten",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.11,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "allEnemies"
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.65,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.33,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1,
+              "target": "strongestAlly"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "캬롯_s3",
+      "name": "수액 폭탄",
+      "hero": "캬롯",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "캬롯_s4",
+      "name": "씨앗 심기",
+      "hero": "캬롯",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.72
+        },
+        {
+          "k": "stack",
+          "id": "씨앗",
+          "v": 1,
+          "target": "oneAlly"
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 4.12
+            },
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 2,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.72
+            },
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.72
+            },
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.72
+            },
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.56
+            },
+            {
+              "k": "stack",
+              "id": "씨앗",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_carrotcane",
+      "name": "캬롯의 사탕수수",
+      "grade": "희귀",
+      "slot": "무기",
+      "stats": {
+        "atk": 16
+      },
+      "effect": [
+        {
+          "name": "달콤한 기운",
+          "when": {
+            "on": "play",
+            "type": "스킬",
+            "every": 3
+          },
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "affinity": "캬롯",
+      "affinityStats": {
+        "hp": 40,
+        "def": 5
+      },
+      "affinityEffect": [
+        {
+          "name": "먼저 일군 텃밭",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "캬롯_sprout",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "텃밭에서 갓 꺾은 사탕수수. 씹으면 기운이 돕니다."
+    }
+  ]
+}

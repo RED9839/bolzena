@@ -14,13 +14,15 @@ namespace Bolzena.RunUI
         public Core.CardView View;
         public string Label;
         public string BlessName, BlessText;
+        /// <summary>얹힌 축복을 받으면 스킬이 공격 카드가 된다(Core.OracleOption.ToAttack) — 카드 아래 한 줄.</summary>
+        public bool ToAttack;
 
         /// <summary>신탁 후보(Core.OracleOption — 전투 · 보상 · 이벤트 · 캠프가 같은 꼴)를 연출 후보로.</summary>
         public static List<RevealPick> Of(Core.GameData d, string cardId, IList<Core.OracleOption> opts)
         {
             var o = new List<RevealPick>();
             foreach (var x in opts)
-                o.Add(new RevealPick { CardId = cardId, View = d.View(cardId, x.N), Label = null, BlessName = x.Blessed ? x.BlessName : null, BlessText = x.Blessed ? x.BlessText : null });
+                o.Add(new RevealPick { CardId = cardId, View = x.View ?? d.View(cardId, x.N), Label = null, BlessName = x.Blessed ? x.BlessName : null, BlessText = x.Blessed ? x.BlessText : null, ToAttack = x.ToAttack });
             return o;
         }
     }
@@ -212,6 +214,11 @@ namespace Bolzena.RunUI
                     var gl = Ui.Img(h, Theme.S("soft"), new Color(0.72f, 0.58f, 1f, 0.75f), "blessglow");
                     gl.rectTransform.At(0.5f, 0.5f, 0, 0, cw * 1.6f, ch * 1.45f); gl.transform.SetAsFirstSibling();
                     Tw.Pulse(gl, 0.45f, 0.85f, 1.6f);
+                }
+                if (p.ToAttack)
+                {   // 축복이 피해를 더해 스킬이 공격 카드가 된다 — 카드 바로 아래 한 줄
+                    var at = Ui.Text(h, Core.OracleOption.ATTACK_LINE, compact ? 12 : 14, new Color(0.88f, 0.8f, 1f), TextAlignmentOptions.Top);
+                    at.rectTransform.At(0.5f, 0, 0, -16, cw * 1.3f, 22); at.enableAutoSizing = true; at.fontSizeMin = 9; at.fontSizeMax = compact ? 12 : 14;
                 }
                 var b = face.gameObject.AddComponent<Btn>();
                 b.OnHold = () => { if (Phase == "choose" && chosen < 0) f.CardZoom(p.CardId); };   // 길게 누르면 카드 상세

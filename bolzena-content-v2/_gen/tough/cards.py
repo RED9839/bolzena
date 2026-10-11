@@ -1,3 +1,5 @@
+import os as _os, sys as _sys
+if not _os.environ.get("BZ_OLD_GEN"): _sys.exit("[중단] 옛 생성기입니다(2026-10-11 엘다인 리뉴얼). heroes/** 는 _gen/eldain 이 씁니다. 꼭 돌려야 하면 BZ_OLD_GEN=1")
 # 강인도 덤(k:tough) 리뉴얼 — 2026-10-05 새 강인도 단위(약점 공격 AP 1 = 1, 아니면 1/3)에 맞춰.
 # 원칙: 덤은 그 카드(사도)의 「격파」 개성일 때만. 단일 1 · 조건/소비/큰 한 방 2 · 광역은 그 절반 · 고학년 단일 2 / 광역 1.
 # 다시 돌려도 같은 결과(값을 덮어쓴다). python _gen/tough/cards.py [--dry]

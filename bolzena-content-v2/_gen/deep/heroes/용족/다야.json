@@ -1,0 +1,843 @@
+{
+  "heroes": [
+    {
+      "id": "다야",
+      "name": "다야",
+      "nature": "순수",
+      "race": "용족",
+      "role": "딜러",
+      "style": "성장형",
+      "star": 3,
+      "hp": 600,
+      "atk": 155,
+      "def": 25,
+      "crit": 10,
+      "blurb": "완벽해지기를 꿈꾸는 노력파 다이아몬드 용족. 손에 쥔 카드를 갈고 닦아 광택을 올리면 그 카드가 판 내내 반짝이고, 쓰러뜨린 적마다 원석이 다시 솟습니다.",
+      "keyword": {
+        "name": "다이아 쓰라림",
+        "desc": "살갗에 박힌 다이아 조각",
+        "carrier": "enemy",
+        "cap": 3,
+        "decay": 1,
+        "per": [
+          {
+            "stat": "dot",
+            "ratio": 0.25
+          }
+        ],
+        "rules": [
+          {
+            "name": "연쇄 피어스",
+            "when": {
+              "on": "kill"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "다이아 쓰라림",
+                "v": 1,
+                "target": "oneEnemy"
+              },
+              {
+                "k": "draw",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "완벽한 커팅",
+            "when": {
+              "on": "break"
+            },
+            "fx": [
+              {
+                "k": "dealtMod",
+                "v": 0.1,
+                "target": "otherAllies"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "다이아 브레…츄!",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.03,
+            "target": "allEnemies"
+          },
+          {
+            "k": "tough",
+            "v": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "고통",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "make",
+            "id": "다야_gem",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "다야_s1",
+        "다야_s2",
+        "다야_s3",
+        "다야_u3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "다야_s1",
+      "name": "보석 파편",
+      "hero": "다야",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "다야_s2",
+      "name": "방어 자세",
+      "hero": "다야",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "hero": "다야",
+      "token": true,
+      "id": "다야_gem",
+      "name": "원석",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "보존",
+        "소멸",
+        "결속"
+      ],
+      "evolve": {
+        "n": 2,
+        "into": "다야_real"
+      },
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.81,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "다이아 쓰라림",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "bondCard": "다야_real"
+    },
+    {
+      "hero": "다야",
+      "token": true,
+      "id": "다야_real",
+      "name": "진품 다이아",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸",
+        "약점 공격"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.97,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "다이아 쓰라림",
+          "v": 2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "다야_u3",
+      "name": "갈고, 닦고",
+      "hero": "다야",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "cardStatus",
+          "id": "광택",
+          "v": 1,
+          "to": "hand",
+          "n": 1,
+          "who": "self",
+          "type": "공격",
+          "max": 5
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "make",
+          "id": "다야_gem",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "광택",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격",
+              "max": 5
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "다야_gem",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "광택",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격",
+              "max": 5
+            },
+            {
+              "k": "draw",
+              "v": 4
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "다야_gem",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "cardStatus",
+                      "id": "광택",
+                      "v": 1,
+                      "to": "hand",
+                      "n": 1,
+                      "who": "self",
+                      "type": "공격",
+                      "max": 5
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "power": true
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "광택",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격",
+              "max": 5
+            },
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "다야_u2",
+      "name": "다이아 박기",
+      "hero": "다야",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.69,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "다이아 쓰라림",
+          "v": 2,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.54,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 3,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.69,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.91,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "다야_gem",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.74,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.97,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "다야_u1",
+      "name": "다이아 피어스",
+      "hero": "다야",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 3.04,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perCardSt",
+          "id": "광택"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.56,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifKill"
+        },
+        {
+          "k": "make",
+          "id": "다야_gem",
+          "v": 1
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "다야_u4",
+      "name": "완벽해지는 소원",
+      "hero": "다야",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "다이아 쓰라림",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.84,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "cardStatus",
+          "id": "광택",
+          "v": 1,
+          "to": "hand",
+          "n": 1,
+          "who": "self",
+          "type": "공격",
+          "max": 5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "다이아 쓰라림",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.27,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "cardStatus",
+              "id": "광택",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "type": "공격",
+              "max": 5
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "다이아 쓰라림"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "다이아 쓰라림",
+              "all": true
+            },
+            {
+              "k": "make",
+              "id": "다야_gem",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.69,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.26,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "다이아 쓰라림",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.62,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "다야_s3",
+      "name": "보석 폭발",
+      "hero": "다야",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "다야_s4",
+      "name": "다이아 조각 박기",
+      "hero": "다야",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "다이아 쓰라림",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "empower",
+          "ratio": 0.3
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.45
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "다이아 쓰라림",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.35
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_dayacutter",
+      "name": "다야의 다이아몬드 커터",
+      "grade": "전설",
+      "slot": "무기",
+      "stats": {
+        "atk": 20,
+        "crit": 10
+      },
+      "effect": [
+        {
+          "name": "흠집 찾기",
+          "when": {
+            "on": "always"
+          },
+          "conds": [
+            {
+              "c": "debuffs",
+              "n": 1
+            }
+          ],
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.15,
+              "target": "self"
+            }
+          ]
+        }
+      ],
+      "affinity": "다야",
+      "affinityStats": {
+        "atk": 8
+      },
+      "affinityEffect": [
+        {
+          "name": "감정 접수",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "make",
+              "id": "다야_gem",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "흠이 있는 원석만 골라 자르는 커터. 디버프가 걸린 적에게 더 잘 듭니다."
+    }
+  ]
+}

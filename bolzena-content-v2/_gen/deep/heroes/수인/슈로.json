@@ -1,0 +1,743 @@
+{
+  "heroes": [
+    {
+      "id": "슈로",
+      "name": "슈로",
+      "nature": "활발",
+      "race": "수인",
+      "role": "서포터",
+      "style": "거드는 형",
+      "star": 3,
+      "hp": 700,
+      "atk": 92,
+      "def": 65,
+      "crit": 5,
+      "blurb": "먼저 휘두르지 않는 검사. 검 끝으로 「검의 영역」 을 그어 그 안의 동료가 덜 다치고 더 세게 치게 하고, 칼을 맞댄 적과는 결투로 친구가 됩니다.",
+      "keyword": {
+        "name": "검의 영역",
+        "desc": "검 끝으로 그어 세운 둘레",
+        "carrier": "ally",
+        "cap": 3,
+        "decay": 1,
+        "per": [
+          {
+            "stat": "taken",
+            "v": -0.04
+          }
+        ],
+        "rules": [
+          {
+            "name": "검으로 사귄 친구",
+            "when": {
+              "on": "fightStart"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "검의 영역",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "물러났다 전진",
+            "when": {
+              "on": "hurt",
+              "guarded": true
+            },
+            "fx": [
+              {
+                "k": "dmg",
+                "ratio": 0.1,
+                "target": "allEnemies"
+              },
+              {
+                "k": "heal",
+                "ratio": 0.07
+              }
+            ],
+            "self": true
+          },
+          {
+            "name": "역할의 검",
+            "when": {
+              "on": "play",
+              "who": "other"
+            },
+            "fx": [
+              {
+                "k": "shield",
+                "ratio": 0.07
+              }
+            ],
+            "self": true
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "종이 한 장 차이",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "atkMod",
+            "v": 0.3,
+            "target": "self"
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.19,
+            "target": "allEnemies",
+            "hits": 3
+          },
+          {
+            "k": "stack",
+            "id": "검의 영역",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "슈로_s1",
+        "슈로_s2",
+        "슈로_s3",
+        "슈로_u4"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "슈로_s1",
+      "name": "목검 찌르기",
+      "hero": "슈로",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "슈로_s2",
+      "name": "유리비늘 붕대",
+      "hero": "슈로",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "슈로_u4",
+      "name": "독 없는 투구꽃",
+      "hero": "슈로",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "검의 영역",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검의 영역",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검의 영역",
+                      "v": 3
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.48
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검의 영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "검의 영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "슈로_u1",
+      "name": "검 조율",
+      "hero": "슈로",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "검의 영역",
+          "v": 2
+        },
+        {
+          "k": "shield",
+          "ratio": 1.52
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 2.32
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 3
+            },
+            {
+              "k": "heal",
+              "ratio": 2.52
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 3
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.15,
+              "target": "otherAllies"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.91
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 3.72
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.91
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "슈로_u3",
+      "name": "장검 · 단도 · 한손검",
+      "hero": "슈로",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.14,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.24,
+          "target": "allEnemies"
+        },
+        {
+          "k": "reflect",
+          "ratio": 0.5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.22,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "allEnemies"
+            },
+            {
+              "k": "reflect",
+              "ratio": 0.5
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "reflect",
+              "ratio": 0.5
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "allEnemies"
+            },
+            {
+              "k": "reflect",
+              "ratio": 0.5
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.96
+            },
+            {
+              "k": "reflect",
+              "ratio": 0.5
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.24,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
+            },
+            {
+              "k": "reflect",
+              "ratio": 0.5
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "슈로_u2",
+      "name": "통성명",
+      "hero": "슈로",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.53,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "검의 영역",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 1.25
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "슈로_s3",
+      "name": "목검 내려치기",
+      "hero": "슈로",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "슈로_s4",
+      "name": "검으로 긋는 둘레",
+      "hero": "슈로",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.72
+        },
+        {
+          "k": "stack",
+          "id": "검의 영역",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.6
+            },
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.72
+            },
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.72
+            },
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.72
+            },
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.24
+            },
+            {
+              "k": "stack",
+              "id": "검의 영역",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -323,7 +323,7 @@ namespace Bolzena.Core
                         if (i < 0) return "덱에 없는 카드입니다";
                         if (p.Basic && !IsBasic(id)) return "시작 카드만 뺄 수 있습니다";
                         if (ViewOf(id).IsTaboo) return "금기 카드는 뺄 수 없습니다";
-                        S.Deck.RemoveAt(i); ForgetCard(id);
+                        S.Deck.RemoveAt(i); if (!S.Deck.Contains(id)) ForgetCard(id);   // 같은 카드가 더 있으면 남긴다(같은 기본 카드 2장)
                         E.Log.Add($"「{Data.Card(id).Name}」 — 덱에서 뺐습니다");
                         break;
                     }
@@ -336,7 +336,11 @@ namespace Bolzena.Core
                         var pool = own.Count > 0 ? own : p.Kind != null ? new List<string> { p.Kind } : DivineKindsFor(ViewOf(id));
                         if (pool.Count == 0) return "축복을 얹을 수 없는 카드입니다";
                         S.Shin[id] = pool[RndInt(pool.Count)];
-                        E.Log.Add($"{R.DIVINE_NAME}! 「{c.Name}」");
+                        if (c.Complete) { E.Log.Add($"{R.DIVINE_NAME}! 「{c.Name}」(완성형)"); break; }   // 완성형 — 신탁 없이 축복만
+                        var oks = Enumerable.Range(1, c.Oracles.Count).Where(n => FlashOk(id, n)).ToList();   // 축복 받은 카드는 신탁도 늘 함께(2026-10-09 사용자)
+                        int on = oks[RndInt(oks.Count)];
+                        TakeFlash(id, on);
+                        E.Log.Add($"{R.DIVINE_NAME}! 「{c.Name}」 — 신탁 {on}도 함께");
                         break;
                     }
                 case "grace":
@@ -416,10 +420,13 @@ namespace Bolzena.Core
             ApplyOutcomes(f.Win);
         }
 
-        /// <summary>축복을 얹을 수 있는 카드 — 덱의 카드 종류 가운데 축복이 아직 없는 것(저주 · 복제본 빼고).</summary>
+        /// <summary>축복을 얹을 수 있는 카드 — 덱의 고유 · 교주 카드 가운데 축복이 아직 없는 것(저주 · 상태 · 복제본 빼고).
+        ///   2026-10-09 사용자: 기본 카드와 이미 신탁을 받은 카드는 후보에서 뺀다(블랑셰 「축복을 얻을 카드를 고르시오」 등 이벤트 축복 고르기 모두).</summary>
         public List<string> ShinAble(string kind)
         {
-            var ids = S.Deck.Distinct().Where(id => Data.Card(id) is CardDef c && !c.IsCurse && !c.IsStatusCard && !GameData.IsCopy(id) && !S.Shin.ContainsKey(id)).ToList();
+            var ids = S.Deck.Distinct().Where(id => Data.Card(id) is CardDef c && !c.IsCurse && !c.IsStatusCard && !GameData.IsCopy(id) && !S.Shin.ContainsKey(id)
+                && (c.Unique || c.Neutral) && !S.Flash.ContainsKey(id)
+                && ((c.Oracles.Count == 5 && Enumerable.Range(1, 5).Any(n => FlashOk(id, n))) || (c.Complete && c.Oracles.Count == 0))).ToList();   // 완성형은 신탁 없이 축복만   // 신탁도 함께 붙으니 신탁 다섯이 있고 붙일 수 있는 카드만
             if (kind == "cost") return ids.Where(id => ViewOf(id).Cost >= 1).ToList();
             return kind != null ? ids : ids.Where(id => DivineKindsFor(ViewOf(id)).Count > 0).ToList();
         }

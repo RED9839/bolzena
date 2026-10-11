@@ -174,6 +174,20 @@ namespace Bolzena.Demo
             {
                 yield return WaitInput();
                 if (d.Over) break;
+                // idle(-demo-herosay) — 첫 턴에 입력 없이 기다려 공백 말풍선(IdleSecs 초 뒤)이 뜨는지, 커서를 움직이면 바로 닫히는지
+                if (acts == 1 && RunDemo.FightMode == "idle")
+                {
+                    float w = 0;
+                    while ((d.IdleShown == null || !d.IdleShown.Alive) && w < BattleDirector.IdleSecs + 6f) { w += Time.unscaledDeltaTime; yield return null; }
+                    bool shown = d.IdleShown != null && d.IdleShown.Alive;
+                    if (shown) { yield return Wait(0.5f); Snap("idle_bubble"); }
+                    yield return MoveTo(new Vector2(1.5f, -5f), 0.2f);
+                    yield return null; yield return null;
+                    bool closed = d.IdleShown == null;
+                    RunDemo.IdleResult = $"shown={shown} at={w:0.0}s closed={closed} count={d.IdleCount}";
+                    Debug.Log("[Demo] 공백 말풍선 " + RunDemo.IdleResult);
+                    RunDemo.FightMode = "win";
+                }
                 // pass1(사도 한마디 시범 -demo-herosay) — 첫 턴은 카드 없이 넘겨 적의 공격을 한 번 받는다(위기 한마디 보기)
                 if (lose || (acts == 1 && RunDemo.FightMode == "pass1")) { yield return Click(d.Hud.EndPos); yield return WaitTurnDone(); continue; }
                 // 고학년

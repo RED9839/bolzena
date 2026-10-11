@@ -16,6 +16,8 @@ namespace Bolzena.Core
         /// <summary>HP 를 값으로 치른 것(payHp) — 「HP가 N% 이하가 되면」 을 깨운다.</summary>
         public bool Pay;
         public HashSet<string> Tags;
+        /// <summary>전투 기록에서 이 피해를 받을 사도(From 이 없을 때만 — 지속 피해 · 응징처럼 상태를 건 사도). 피해 계산에는 쓰지 않는다.</summary>
+        public Unit Credit;
     }
 
     public sealed partial class Battle
@@ -32,30 +34,46 @@ namespace Bolzena.Core
             return d?.Nature != null ? R.WeakTo(d.Nature) : new List<string>();
         }
 
+        /// <summary>WeakOf(e).Contains(n) 를 목록을 만들지 않고 — R.WeakTo(x) 에 n 이 든다 ⇔ R.BEATS[n] == x(2026-10-09).</summary>
+        bool WeakHas(Unit e, string n)
+        {
+            var d = Data.Enemy(e.Key);
+            if (EnemyNature != null && e?.Nature != null && d?.Clone == null) return R.BEATS.TryGetValue(n, out var b1) && b1 == e.Nature;
+            if (d?.Weak != null && d.Weak.Count > 0) return d.Weak.Contains(n);
+            return d?.Nature != null && R.BEATS.TryGetValue(n, out var b2) && b2 == d.Nature;
+        }
+
         /// <summary>약점으로 쳤나 — 사도 성격이 그 적의 약점이거나(공명은 늘), 카드에 「약점」 이 붙었다.</summary>
         public bool IsWeakHit(Unit from, Unit to, HashSet<string> tags)
         {
             if (from == null || to == null || from.Side != Side.Party || to.Side != Side.Enemy) return false;
             if (tags != null && tags.Contains(Tag.Weak)) return true;
             if (tags != null && tags.Contains(Tag.Passion) && St(to, "열정 약점") > 0) return true;
+            if (to.Status.Count > 0)   // 「약점 노출」 · 「<성격> 약점」(2026-10-10)
+            {
+                if (St(to, R.EXPOSED) > 0) return true;
+                var nw = R.NatureWeakSt(NatureOf(from)); if (nw != null && St(to, nw) > 0) return true;
+            }
             if (MarkedWeak(to)) return true;
             var n = NatureOf(from);
-            return !NoNature && n != null && (n == "공명" || WeakOf(to).Contains(n));
+            return !NoNature && n != null && (n == "공명" || WeakHas(to, n));
         }
 
         double NatureMod(Unit from, Unit to)
         {
             if (NoNature || from == null || to == null) return 1;
             int e = R.NatureEdge(NatureOf(from), NatureOf(to));
-            return e > 0 ? 1 + R.NATURE_DMG : e < 0 ? 1 - R.NATURE_DEF : 1;
+            // 2026-10-10 카제나식 — 상성 불리 페널티 없음: 적이 사도를 이기는 성격이어도 더 세게 치지 않고, 사도가 지는 상성이어도 덜 치지 않는다
+            if (from.Side == Side.Party) return e > 0 ? 1 + R.NATURE_DMG : 1;
+            return e < 0 ? 1 - R.NATURE_DEF : 1;
         }
 
-        /// <summary>맞는 쪽 — 취약 +50%(횟수) · 피해 감소 -15%(횟수) · 불굴 겹마다 -20%(세기, Cap 까지).</summary>
+        /// <summary>맞는 쪽 — 피해 감소 -15%(횟수) · 불굴 겹마다 -20%(세기, Cap 까지) · 포자증식은 합연산, 취약 ×1.5(횟수)는 따로 곱한다.</summary>
         int Taken(Unit to, int v)
         {
-            // 받는 피해 증감은 합연산(카제나 — 불굴 -20%p · 취약 +50%p · 피해 감소 -15%p · 포자증식 +10%p)
+            // 받는 피해 증감은 합연산(카제나 — 불굴 -20%p · 피해 감소 -15%p · 포자증식 +10%p). 취약은 2026-10-10 카제나 공식대로 묶음 밖에서 ×(1 + 50%) 따로 곱한다
             double m = 1;
-            if (Charge(to, "취약")) m += R.SV("취약");
+            bool vul = Charge(to, "취약");
             if (Charge(to, "피해 감소")) m -= R.SV("피해 감소");
             m -= R.StackEff("불굴", St(to, "불굴"));
             // 포자증식 — 겹마다 받는 피해 +10%, 발동하면 모두 사라진다(그 한 번의 일 동안은 붙는다)
@@ -63,7 +81,7 @@ namespace Bolzena.Core
             if (spore > 0) { to.Body.StUse["포자증식"] = ActSeq; to.Body.DotU["포자증식K"] = spore; DelSt(to, "포자증식"); }
             if (ActSeq != 0 && to.Body.StUse.TryGetValue("포자증식", out var sq) && sq == ActSeq && to.Body.DotU.TryGetValue("포자증식K", out var sk)) m += R.SV("포자증식") * sk;
             if (to.Side == Side.Enemy) m += CounterMod(to, "taken");
-            return Math.Max(0, Num.Round(v * Math.Max(0, m)));
+            return Math.Max(0, Num.Round(v * Math.Max(0, m) * (vul ? 1 + R.SV("취약") : 1)));
         }
 
         /// <summary>받는 피해 증감 — 파티는 사도마다 걸린 것 가운데 가장 큰 감소 하나와 가장 큰 증가 하나.</summary>
@@ -127,11 +145,21 @@ namespace Bolzena.Core
             if (u.Side == Side.Party && from != null && from.Side == Side.Enemy && !o.Pure && !o.Dot && d > 0)
             {
                 if (CutNext > 0) { d = Num.Round(d * (1 - CutNext)); Say($"한 대 깎기 -{Num.Round(CutNext * 100)}%"); CutNext = 0; }
+                else if (CutOf(from) is int cp && cp > 0) { d = Num.Round(d * (1 - cp / 100.0)); Counts.Remove("cut|" + from.Idx); Say($"{from.Name}: 한 대 깎기 -{cp}%"); }   // 적마다 깎기(엘다인 3차)
                 if (MinionGuard(ref d)) return;
             }
             int guard = 0;
+            bool foeHit = u.Side == Side.Party && from != null && from.Side == Side.Enemy && !o.Pure && !o.Dot;
+            int shareCut = foeHit && Kw.Count > 0 ? ShareCut(u, ref d) : 0;   // 분산(▶E69)
+            double tk = foeHit ? TauntK(u) : 0;   // 도발 — 그 대에 실드 (1+k) 배(▶E63)
             if (!o.Pure && !o.Dot && !o.Pierce && u.Block > 0) { int a = Math.Min(u.Block, d); u.Block -= a; d -= a; guard += a; }
-            if (!o.Pure && !o.Dot && u.Shield > 0) { int a = Math.Min(u.Shield, d); u.Shield -= a; d -= a; guard += a; }
+            if (!o.Pure && !o.Dot && u.Shield > 0)
+            {
+                if (tk > 0) { int a = Math.Min(d, (int)Math.Floor(u.Shield * (1 + tk))); int used = Math.Min(u.Shield, (int)Math.Ceiling(a / (1 + tk))); u.Shield -= used; d -= a; guard += a; }
+                else { int a = Math.Min(u.Shield, d); u.Shield -= a; d -= a; guard += a; }
+            }
+            if (shareCut > 0 && !Pool.Dead) { Pool.Shield += shareCut; GainCue(PartyRep(u), "shield", shareCut); }
+            if (u.Side == Side.Party && d > 0 && from != null && from.Side == Side.Enemy && !o.Pure && !o.Dot && !o.Pay) HandHurtBig(u, ref d);   // 손에서 반응하는 카드(엘다인 3차 ▶E48)
             // 절대 무적(1턴) · 회피(한 대에 1) — 파티가 체력을 잃지 않는다(값으로 치른 HP 는 예외)
             if (u.Side == Side.Party && d > 0 && !o.Pay)
             {
@@ -143,10 +171,13 @@ namespace Bolzena.Core
                 if (DealtSeq != ActSeq) { DealtSeq = ActSeq; DealtAct = 0; }
                 DealtAct += d + guard;
             }
+            if (from != null && from.Side == Side.Party && u.Side == Side.Enemy) FormDealtAdd(from, d + guard);   // 이번 변신 중 준 피해(▶E76)
             // 끈기 — 파티가 쓰러질 피해에서 HP 1 로 버틴다(1 준다)
-            if (u.Side == Side.Party && d >= u.Hp && d > 0 && St(u, "끈기") > 0) { AddSt(u, "끈기", -1); d = Math.Max(0, u.Hp - 1); Say("파티: 끈기 — HP 1 로 버틴다"); StatusCue(u, "끈기!", true); Emit("endure", new EmitInfo { Who = u }); }
+            if (u.Side == Side.Party && d >= u.Hp && d > 0 && St(u, "끈기") > 0) { AddSt(u, "끈기", -1); d = Math.Max(0, u.Hp - 1); Say("파티: 끈기 — HP 1 로 버틴다"); StatusCue(u, "끈기!", true); Emit("endure", new EmitInfo { Who = u, From = from }); }   // 「적 1명」 = 그 대를 친 적(엘다인 3차 ▶E68)
             double before = (double)u.Hp / u.MaxHp; int hp0 = u.Hp;
             u.Hp -= d;
+            // 전투 기록 — 적에게 실제로 깎인 HP(넘친 피해 빼고) + 벗긴 방어 · 실드. 반격 · 추가 공격 · 소환물 · 지속 피해도 From(없으면 Credit) 사도 몫
+            if (u.Side == Side.Enemy) TallyDealt(from ?? o.Credit, Math.Max(0, Math.Min(d, hp0)) + guard);
             if (d > 0 || guard > 0) Cue("hurt", u, new Cue { V = d, Guard = guard, Crit = o.Crit, From = Math.Max(0, hp0), To = Math.Max(0, u.Hp) });
             if (u.Side == Side.Party && d > 0) Talk(u, "hit");
             if (u.Hp <= 0) { LethalKill(u); return; }
@@ -154,15 +185,17 @@ namespace Bolzena.Core
             if (u.Side == Side.Enemy && d > 0 && u.Seized.Count > 0) SeizeHurt(u, d);   // 빼앗은 적에게 준 피해(지속 피해 포함)
             if (u.Side == Side.Enemy && guard > 0) Say($"{u.Name}: 실드가 {guard} 막음 (남은 실드 {u.Block + u.Shield})");
             if (u.Side == Side.Enemy && guard > 0 && guard0 > 0 && u.Block + u.Shield == 0 && !u.Dead) { FoePassives("guardBreak", u); Emit("foeShieldBreak", new EmitInfo { Target = u, By = from?.Side == Side.Party ? from.Key : Acting, V = guard }); }
-            if (u.Side == Side.Party && guard > 0 && guard0 > 0 && u.Block + u.Shield == 0 && from != null && from.Side == Side.Enemy) Emit("shieldBreak", new EmitInfo { Who = u, From = from, Target = from, V = guard, By = ShieldBy });
+            if (u.Side == Side.Party && guard > 0 && guard0 > 0 && u.Block + u.Shield == 0 && from != null && from.Side == Side.Enemy && St(Pool, "은방울") > 0) SilverBell("실드가 깨짐");   // (▶E65)
+            if (u.Side == Side.Party && guard > 0 && guard0 > 0 && u.Block + u.Shield == 0 && from != null && from.Side == Side.Enemy) Emit("shieldBreak", new EmitInfo { Who = u, From = from, Target = from, V = guard, By = ShieldBy, Seq = ActSeq });
+            if (u.Side == Side.Enemy && o.Card && from != null && from.Side == Side.Party && (d > 0 || guard > 0)) CountHit(u, from);   // 그 적을 친 횟수(▶E71)
             if (u.Side == Side.Enemy && o.Card && from != null && from.Side == Side.Party && (d > 0 || guard > 0) && !u.Dead) Emit("hit", new EmitInfo { By = from.Key, Target = u, V = d + guard, Seq = ActSeq, Weak = IsWeakHit(from, u, o.Tags) });
-            if (u.Side == Side.Party && !o.Pure && !o.Dot && from != null && from.Side == Side.Enemy) { TakenNow += d + guard; GuardedNow += guard; }
+            if (u.Side == Side.Party && !o.Pure && !o.Dot && from != null && from.Side == Side.Enemy) { HitTakenAdd(); TakenNow += d + guard; GuardedNow += guard; SumIncoming += d + guard; SumGuarded += guard; }
             if (u.Side == Side.Party && (d > 0 || (guard > 0 && from != null && from.Side == Side.Enemy)) && !o.Pure && !o.Dot)
             {
                 if (d > 0) foreach (var h in Party) HurtNow.Add(h.Key);
                 var tgt = from != null && from.Side == Side.Enemy ? from : null;
                 if (d > 0) Emit("hurt", new EmitInfo { Who = u, From = from, V = d + guard, N = d, Target = tgt });
-                else Emit("blocked", new EmitInfo { Who = u, From = from, V = guard, Target = tgt });
+                else Emit("blocked", new EmitInfo { Who = u, From = from, V = guard, Target = tgt, Seq = ActSeq });
                 if (d > 0) Emit("lowHp", new EmitInfo { Who = u, Before = before, After = (double)u.Hp / u.MaxHp });
             }
             // HP 를 치렀다(대가) — 「HP가 N% 이하가 되면」 은 치른 HP 로도 돈다
@@ -175,15 +208,7 @@ namespace Bolzena.Core
                 if (body.CtrSeq != ActSeq && (St(u, "빙벽") > 0 || Charge(u, "반격")))
                 {
                     body.CtrSeq = ActSeq;
-                    var g = GiverOf("반격") ?? PartyGuard();
-                    bool full = d <= 0 && guard > 0;
-                    double critPct = g != null ? g.Crit + StatMod(g, "crit") * 100 : 0;
-                    bool isCrit = !Preview && Rng.Next() * 100 < critPct;
-                    int bas = g != null ? R.DefDmgStat(AtkNow(g), DefNow(g)) : PartyDef();
-                    int cv = R.FinalDamage(bas, full ? R.SV("반격Full") : R.SV("반격"), crit: isCrit, critX: CritDmgX);
-                    Say($"파티: 반격{(full ? "(다 막음)" : "")} → {from.Name} ({cv}{(isCrit ? " 치명" : "")})");
-                    StatusCue(u, full ? "반격!!" : "반격!", true);
-                    Hurt(from, cv, new HurtOpts { From = g ?? u, Counter = true, Crit = isCrit });
+                    CounterStrike(u, from, d <= 0 && guard > 0);   // 반격 모양 · 증감(엘다인 3차 ▶E38~E40) — 모양이 없으면 옛 반격 그대로
                 }
             }
             // 충격(파티 — 적이 건 것) — 적의 치는 수에 맞으면 고정 피해 80%(방어 · 실드가 받아 냈으면 +50%), 수 하나에 한 번

@@ -141,7 +141,10 @@ namespace Bolzena.RunUI
             if (hasOracle)
                 Box(new CardTerms.Term { Name = "신탁", Hero = true, Kind = "오른쪽 아래 「신탁」 단추",
                     Body = "이 카드에는 신탁이 나올 수 있습니다. 신탁이 나오면 카드의 비용 · 효과가 바뀝니다." });
-            if (boxes.Count == 0 && !mark.Any && !hasOracle)
+            if (def != null && def.Complete)
+                Box(new CardTerms.Term { Name = "완성형", Hero = true, Kind = "신탁 없음",
+                    Body = "처음부터 완성된 카드입니다 — 신탁이 나오지 않고, 축복은 받을 수 있습니다." });
+            if (boxes.Count == 0 && !mark.Any && !hasOracle && !(def != null && def.Complete))
             {
                 var none = Ui.Text(rc, "설명할 낱말이 없는 카드입니다.", Theme.FsSm, Theme.Sub, TextAlignmentOptions.TopLeft); none.Pref(-1, 40);
             }

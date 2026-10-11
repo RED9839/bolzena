@@ -7,14 +7,14 @@ using UnityEngine.UI;
 
 namespace Bolzena.RunUI
 {
-    // 로비 메인 사도(2026-10 사용자: 「로비 메인 사도 변경도」) — 135명 가운데 하나를 골라 로비에 세운다.
-    //   저장: PlayerPrefs bz.lobbyHero(Settings.LobbyHero). 기본 에르핀. 저장된 사도가 로스터에 없거나 스탠딩 스파인이 없으면 에르핀.
+    // 로비 메인 사도(2026-10 사용자: 「로비 메인 사도 변경도」) — 고를 수 있는 사도(Roster.Players — 2026-10-11 엘다인 20명) 가운데 하나를 골라 로비에 세운다.
+    //   저장: PlayerPrefs bz.lobbyHero(Settings.LobbyHero). 기본 에르핀(왕도). 저장된 사도가 고를 수 없거나(옛 135명 때 고른 사도) 스탠딩 스파인이 없으면 기본.
     //   스탠딩: 표(standing_fit · standing_head · standing_center)로 같은 구도 — 전신 · 같은 바닥선 · 키 배율 1(원작 비율: 작은 사도는 작게).
     //     크기는 캔버스 높이에 비례(저해상도 · 폰 캔버스 720 에서도 같은 구도). 기준 키 = 표 95%, 그보다 큰 사도는 칸에 맞게 줄인다.
-    //   고르기 창: 도감과 같은 칸(정지 상반신) · 정렬(성급 → 가나다) · 검색(초성). 누르면 바로 바뀐다(확인 없음).
+    //   고르기 창: 도감과 같은 칸(정지 상반신) · 정렬(가나다) · 검색(초성). 누르면 바로 바뀐다(확인 없음).
     public partial class Flow
     {
-        const string DefaultLobbyHero = "에르핀";
+        const string DefaultLobbyHero = "에르핀_왕도";
         /// <summary>로비 스탠딩 상한(화면 높이 몫) — 2026-10-07 사용자: 예전 93% 는 「에르핀이 너무 크다」 · 넓은 화면에서 다리가 잘렸다 → 85%(기준 키 사도의 몸 = 화면 높이의 79%).</summary>
         const float LobbyCap = 0.85f;
 
@@ -27,7 +27,7 @@ namespace Bolzena.RunUI
         public static HeroInfo LobbyHeroInfo()
         {
             var h = Roster.ByKey(DemoLobbyHero ?? Settings.LobbyHero);
-            if (h == null || h.art == null || SpineUi.Data("st_" + h.art) == null) h = Roster.ByKey(DefaultLobbyHero);
+            if (h == null || !h.Playable || h.art == null || SpineUi.Data("st_" + h.art) == null) h = Roster.ByKey(DefaultLobbyHero);
             return h;
         }
 
@@ -82,7 +82,7 @@ namespace Bolzena.RunUI
             float k = Theme.C(0.9f, 0.8f);
             var grid = content.gameObject.AddComponent<GridLayoutGroup>();
             grid.cellSize = new Vector2(150 * k, 214 * k); grid.spacing = new Vector2(12, 12); grid.padding = new RectOffset(4, 16, 4, 12);
-            var list = SortHeroes(Roster.All, "성급").ToList();
+            var list = SortHeroes(Roster.Players, "이름").ToList();
             int idx = 0;
             foreach (var h in list)
             {
@@ -102,7 +102,6 @@ namespace Bolzena.RunUI
                 var mask = Ui.Img(rt, Theme.Round, Color.white, "mask"); mask.rectTransform.Fill(2, 2, 2, 2); mask.gameObject.AddComponent<Mask>().showMaskGraphic = false;
                 HeroArt(mask.rectTransform, h, 150 * k - 4, 214 * k - 4, 0.5f, 0, 0, can ? (Color?)null : new Color(0.5f, 0.5f, 0.56f), false, true);
                 var shade = Ui.Img(rt, Theme.S("fade_down"), Color.black.A(0.8f), "shade"); shade.rectTransform.Band(0, 70 * k, 2, 2, 2);
-                var stars = Ui.Title(rt, $"<size=70%>★</size>{h.star}", Theme.FsLg, Theme.Gold, TextAlignmentOptions.BottomLeft); stars.rectTransform.At(0, 0, 8, 26 * k, 80, 30 * k); stars.Outline(0.25f);
                 var nm = Ui.Title(rt, h.ko, Theme.FsBody, Color.white, TextAlignmentOptions.BottomRight); nm.rectTransform.Band(0, 26 * k, 6, 8, 6 * k);
                 nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 10; nm.fontSizeMax = Theme.FsBody; nm.Outline(0.25f);
                 var rim = Ui.Img(rt, Theme.Frame, (can ? nc : Theme.Dim).A(0.85f), "rim"); rim.rectTransform.Fill();

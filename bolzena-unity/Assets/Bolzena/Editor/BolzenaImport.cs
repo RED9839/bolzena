@@ -36,7 +36,7 @@ namespace Bolzena.EditorTools
         // 사도 소리(고학년 효과음 · 목소리 — 135명, 원본 WAV) — 빌드가 붓지 않게 모노 · Vorbis 60%
         void OnPreprocessAudio()
         {
-            var p = assetPath.Replace("\\", "/");
+            var p = WebImport.Original(assetPath.Replace("\\", "/"));   // 웹 빌드 동안 옮겨 둔 목소리도 원래 자리 규칙대로
             if (!(p.Contains("/Resources/Voice/") || p.Contains("/Resources/Sfx/hero/"))) return;
             var ai = (AudioImporter)assetImporter;
             ai.forceToMono = true;

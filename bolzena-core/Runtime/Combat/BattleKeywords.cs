@@ -72,6 +72,25 @@ namespace Bolzena.Core
         {
             var ids = f.To == "hand" || f.To == "draw" ? PickCards(f.To, f.N, f, ctx.Owner) : f.To == "pulled" ? new List<string> { ctx.Pulled } : new List<string> { ctx.CardId };
             if (f.Battle) BattleVals.Add(f.Id);
+            if (f.Keep) Counts["keepSt|" + f.Id] = 1;   // 붙은 동안 보존(엘다인 3차 ▶E43)
+            if (f.Choose == "priciest" && (f.To == "hand" || f.To == null))
+                ids = Priciest(Hand.Where(id => FxMatch(f, id, ctx.Owner) && !(CardOf(id)?.IsStatus ?? true) && !(CardOf(id)?.IsCurse ?? true))) is string pc ? new List<string> { pc } : new List<string>();
+            else if (f.Pick && f.To == "hand")
+            {   // 고른 만큼 나눠 입히기(엘다인 3차 ▶E42) — 앞 조각의 일의 값(고른 만큼 쓴 양)만큼, 같은 카드 여러 번 가능
+                var cands = Hand.Where(id => FxMatch(f, id, ctx.Owner) && !(CardOf(id)?.IsStatus ?? true) && !(CardOf(id)?.IsCurse ?? true)).Distinct().ToList();
+                ids = cands.Count == 0 ? new List<string>() : SpreadTargets(cands, ctx.EventV > 0 ? ctx.EventV : Math.Max(1, f.N));
+            }
+            else if (f.To == "hand" && f.Tag != null && Data.Card(f.Tag) != null && ids.Count == 0)
+            {   // 그 카드(카드 id) — 손에 없으면 뽑을 더미 · 버린 더미의 그 카드에(엘다인 3차 ▶E60)
+                var alt = Draw.LastOrDefault(id => GameData.BaseId(id) == f.Tag) ?? Discard.LastOrDefault(id => GameData.BaseId(id) == f.Tag);
+                if (alt != null) ids = new List<string> { alt };
+            }
+            if (f.Set != null || f.Half)
+            {   // (엘다인 ▶E17) 그 값으로 정하기 · 절반 — 낸 카드 자신(this)이면 카드가 다 돈 뒤(앞 조각의 「1당」 은 낸 때 값을 센다)
+                if (ctx.Card && (f.To == null || f.To == "this") && ctx.CardId != null) { (ctx.AfterSet ??= new List<Fx>()).Add(f); return; }
+                foreach (var id in ids) CardStatusSet(f, id);
+                return;
+            }
             foreach (var id in ids)
             {
                 if (id == null) continue;
@@ -81,6 +100,14 @@ namespace Bolzena.Core
                 if (CardStOf(id, f.Id) > before && !NOT_GROWTH.Contains(f.Id) && Over == null)
                     Emit("grow", new EmitInfo { Id = id, Hero = CardOf(id)?.Hero, By = ctx.Owner?.Key, Kind = f.Id, V = CardStOf(id, f.Id) - before });
             }
+        }
+        /// <summary>카드 값을 그 값으로(set) · 절반으로(half, 내림).</summary>
+        void CardStatusSet(Fx f, string id)
+        {
+            if (id == null) return;
+            int cur = CardStOf(id, f.Id);
+            int to = f.Set != null ? Math.Max(0, (int)f.Set.Value) : cur / 2;
+            if (to != cur) AddCardSt(id, f.Id, to - cur);
         }
         static readonly HashSet<string> NOT_GROWTH = new() { "비용", "빙결", "침체", "독" };
 
@@ -95,10 +122,10 @@ namespace Bolzena.Core
 
         // ── 소멸 · 망각 · 소각 · 축복 ────────────────────────────────
         /// <summary>카드가 소멸한다 — 망각이면 뽑을 더미 맨 위로. 「소각:」 마디가 있으면 돈다.</summary>
-        void Exile(string id, string from, string why = null)
+        void Exile(string id, string from, string why = null, bool noForget = false)
         {
             var c = CardOf(id);
-            if (HasTagB(id, Tag.Forget))
+            if (HasTagB(id, Tag.Forget) && !noForget)   // noForget(엘다인 ▶E32) — 이번 한 번 망각 없이
             {
                 Draw.Add(id); CardCue(id, from, "draw", "forget");
                 Say($"「{c?.Name}」 — 망각: 뽑을 더미 맨 위로");
@@ -115,7 +142,7 @@ namespace Bolzena.Core
             var c = CardOf(id);
             var owner = c?.Hero != null ? HeroUnit(c.Hero) : null;
             int v = Math.Max(1, Num.Round((owner != null ? DefNow(owner) : PartyDef()) * R.SV("축복")));
-            Pool.Shield += v; GainCue(PartyRep(owner), "shield", v);
+            Pool.Shield += v; GainCue(PartyRep(owner), "shield", v); TallyShield(owner, v);
             Say($"축복 「{c?.Name}」 — 고정 실드 +{v}");
         }
 
@@ -175,6 +202,7 @@ namespace Bolzena.Core
             int v = HitAmount(hero, ratio + Morale(), bas: bas);
             Say($"{hero.Name}: {label} → {t.Name} ({v})"); StatusCue(hero, label, true);
             Hurt(t, v, new HurtOpts { From = hero, Card = true });
+            if (!t.Dead && Over == null) ToughHit(t, R.ToughExtra(IsWeakHit(hero, t, null)));   // 추가 공격류 강인도(카제나 표 — 약점 0.5칸)
             AfterExtra(hero);
         }
 
@@ -186,11 +214,24 @@ namespace Bolzena.Core
             if (n > 0 && !Pool.Dead)
             {
                 int h0 = Pool.Hp, v = Math.Max(1, Num.Round(PartyDef() * R.StackEff("탄성", n)));
-                Pool.Hp = Math.Min(Pool.MaxHp, Pool.Hp + v); HealCue(PartyRep(hero), h0);
+                var by = TallyBy(Pool, "탄성");
+                Pool.Hp = Math.Min(Pool.MaxHp, Pool.Hp + v); HealCue(PartyRep(hero), h0); TallyHeal(by, Pool.Hp - h0);
                 DelSt(Pool, "탄성");
                 Say($"탄성 {n} — 파티 HP +{Pool.Hp - h0}");
             }
             Emit("extra", new EmitInfo { By = hero?.Key, Seq = ActSeq });
+        }
+
+        /// <summary>
+        /// 탄환(2026-10-10) — 탄환 카드가 효과 · 연결로 손에서 버려지면 그 카드의 주인 사도(교주 카드면 공격력이 가장 높은 사도)가
+        /// 가장 앞의 적에게 추가 공격(공격력 R.SV("탄환")). 턴 끝 버림은 아니다 — 「버려서 쏜다」 가 빌드의 몫.
+        /// </summary>
+        void BulletDrop(string id)
+        {
+            if (Over != null || !HasTagB(id, Tag.Bullet)) return;
+            var owner = CardOf(id)?.Hero;
+            var hero = owner != null && HeroUnit(owner) is Unit h && !h.Dead ? h : AliveParty().OrderByDescending(AtkNow).FirstOrDefault();
+            ExtraHit(hero, AliveEnemies().FirstOrDefault(), R.SV("탄환"), null, "탄환!");
         }
 
         /// <summary>공명 — 카드를 버리면 추가 공격 80%(버린 카드 한 장에 1). 치는 사도는 버린 사도, 없으면 공격력이 가장 높은 사도.</summary>
@@ -210,10 +251,11 @@ namespace Bolzena.Core
         {
             if (holder == null || holder.Dead || St(holder, "응징") <= 0 || Over != null) return;
             int v = Math.Max(1, Num.Round(DotUnit(holder, "응징") * R.SV("응징")));
+            var by = holder.Side == Side.Enemy ? TallyBy(holder, "응징") : null;   // 전투 기록 — 적에게 응징을 건 사도 몫
             AddSt(holder, "응징", -1);
             Say($"{(holder.Side == Side.Party ? "파티" : holder.Name)}: 응징 — 고정 피해 {v}"); StatusCue(holder, "응징!");
             var ts = holder.Side == Side.Party ? new List<Unit> { PartyRep() } : AliveEnemies();
-            foreach (var x in ts) { Hurt(x, v, new HurtOpts { Fixed = true }); if (Over != null) return; }
+            foreach (var x in ts) { Hurt(x, v, new HurtOpts { Fixed = true, Credit = by }); if (Over != null) return; }
         }
 
         // ── 턴 시작의 상태 ────────────────────────────────────────────
@@ -226,9 +268,16 @@ namespace Bolzena.Core
             if (!Pool.Dead && St(Pool, "초재생") > 0)
             {
                 int h0 = Pool.Hp, v = Math.Max(1, Num.Round(PartyDef() * R.SV("초재생")));
-                Pool.Hp = Math.Min(Pool.MaxHp, Pool.Hp + v); HealCue(PartyRep(), h0);
+                Pool.Hp = Math.Min(Pool.MaxHp, Pool.Hp + v); HealCue(PartyRep(), h0); TallyHeal(TallyBy(Pool, "초재생"), Pool.Hp - h0);
                 Say($"초재생 — 파티 HP +{Pool.Hp - h0}");
             }
+            foreach (var e in Enemies)   // 성격 약점(적에게 걸린 턴 수 상태)
+                if (!e.Dead && e.Status.Count > 0)
+                {
+                    foreach (var id in R.NATURE_WEAK_ST)
+                        if (e.Status.TryGetValue(id, out var n)) { if (n <= 1) e.Status.Remove(id); else e.Status[id] = n - 1; }
+                    if (e.Status.TryGetValue(R.EXPOSED, out var x)) { if (x <= 1) e.Status.Remove(R.EXPOSED); else e.Status[R.EXPOSED] = x - 1; }
+                }
             foreach (var u in new[] { Pool }.Concat(Party))
                 foreach (var id in R.TICK_ST)
                     if (u.Status.TryGetValue(id, out var n)) { if (n <= 1) u.Status.Remove(id); else u.Status[id] = n - 1; }

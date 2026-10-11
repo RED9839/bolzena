@@ -6,7 +6,7 @@ namespace Bolzena.RunUI
 {
     // 사도별 대사(2026-10-08 사용자: 「에르핀이 존댓말할 일이 없는데」) — 로비 · 만지기 반응 · 편성 한마디를 사도마다 원작 말투로.
     //   표: Resources/RunUI/hero_lines.json — 사도 키마다 reg(말 단계) · lobby · cheek · tickle · angry · knock(꿀밤) · pat · party · promote(진급) · graduate(졸업).
-    //     판 진행(2026-10-09): rest · shop · reward · victory · bossStart · lowhp · event 를 표에 둔다 — 지금 화면에 띄우는 것은 bossStart(보스 시작) · victory(승리)뿐(사용자 결정, 나머지는 나중에 쓸 수 있게).
+    //     판 진행(2026-10-09): rest · shop · reward · victory · bossStart · lowhp · event 를 표에 둔다 — 지금 화면에 띄우는 판 진행 말풍선은 idle(전투 중 가만있을 때)뿐 — 나머지는 HeroBubble.AllKinds 스위치로 꺼 둠(사용자 결정 2026-10-09, 나중에 되살릴 수 있게).
     //     reg = casual(반말) · royal(왕 말투, 반말 계열) · polite(존댓말) · special(하오체 · 「~사와요」 · 로봇 따위 특이 말투).
     //   우리가 쓴 2차 창작 대사다(원작 대사 원문이 아니다). 검사: Tools~/hero_lines_check.py
     //   표에 없는 사도 · 빈 칸은 공통 문구 — 존댓말 / 반말 두 벌 가운데 그 사도의 reg 로 고른다(reg 도 없으면 존댓말).
@@ -19,6 +19,7 @@ namespace Bolzena.RunUI
             public string[] lobby, cheek, tickle, angry, knock, pat, party, promote, graduate;
             // 판 진행 중 한마디(2026-10-09) — 휴식 · 상점 · 보상 · 승리 · 엘리트/보스 시작 · 위기(파티 HP 30% 아래) · 이벤트
             public string[] rest, shop, reward, victory, bossStart, lowhp, @event;
+            public string[] idle;   // 전투 중 내 턴에 한참 가만있을 때 혼잣말 · 재촉(2026-10-09 — 지금 화면에 띄우는 판 진행 말풍선은 이것뿐)
         }
 
         [Serializable] class FileT { public List<Entry> heroes = new List<Entry>(); }
@@ -58,6 +59,7 @@ namespace Bolzena.RunUI
             ["bossStart"] = new[] { "강한 상대예요. 조심해요!", "여기가 고비예요. 힘내요!" },
             ["lowhp"] = new[] { "아직 안 끝났어요… 버텨요!", "조금만 더 힘내요!" },
             ["event"] = new[] { "여긴 뭐가 있을까요?", "조심해서 들어가 봐요." },
+            ["idle"] = new[] { "카드는 언제 내실 거예요?", "천천히 생각하세요. 기다릴게요.", "적이 기다려 주지는 않을 텐데요…" },
         };
         static readonly Dictionary<string, string[]> Casual = new Dictionary<string, string[]>
         {
@@ -77,6 +79,7 @@ namespace Bolzena.RunUI
             ["bossStart"] = new[] { "센 상대다. 조심해!", "여기가 고비야. 힘내자!" },   // 문체:허용 — 사도 대사(반말)
             ["lowhp"] = new[] { "아직 안 끝났어… 버텨!", "조금만 더 힘내!" },   // 문체:허용 — 사도 대사(반말)
             ["event"] = new[] { "여긴 뭐가 있으려나?", "조심해서 들어가 보자." },   // 문체:허용 — 사도 대사(반말)
+            ["idle"] = new[] { "카드는 언제 낼 거야?", "천천히 생각해. 기다릴게.", "적이 기다려 주진 않을 텐데…" },   // 문체:허용 — 사도 대사(반말)
         };
 
         /// <summary>그 사도의 말 단계(casual · royal · polite · special). 표에 없으면 null.</summary>
@@ -94,7 +97,7 @@ namespace Bolzena.RunUI
             string[] a = null;
             if (h != null && Map.TryGetValue(h.key, out var e))
                 a = kind switch { "lobby" => e.lobby, "cheek" => e.cheek, "tickle" => e.tickle, "angry" => e.angry, "knock" => e.knock, "pat" => e.pat, "party" => e.party, "promote" => e.promote, "graduate" => e.graduate,
-                    "rest" => e.rest, "shop" => e.shop, "reward" => e.reward, "victory" => e.victory, "bossStart" => e.bossStart, "lowhp" => e.lowhp, "event" => e.@event, _ => null };
+                    "rest" => e.rest, "shop" => e.shop, "reward" => e.reward, "victory" => e.victory, "bossStart" => e.bossStart, "lowhp" => e.lowhp, "event" => e.@event, "idle" => e.idle, _ => null };
             if (a != null && a.Length > 0) return a;
             var set = IsCasual(h) ? Casual : Polite;
             return set.TryGetValue(kind, out var f) ? f : Polite["lobby"];

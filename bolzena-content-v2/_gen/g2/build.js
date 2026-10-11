@@ -1,3 +1,4 @@
+if (!process.env.BZ_OLD_GEN) { console.error("[중단] 옛 생성기입니다(2026-10-11 엘다인 리뉴얼). heroes/** 는 _gen/eldain 이 씁니다. 꼭 돌려야 하면 BZ_OLD_GEN=1 — 엘다인 파일을 덮어쓰니 주의."); process.exit(1); }
 // G2 빌드 — node build.js
 // 쓰는 것: world/equips/{무기,방어구,장신구}.json · world/neutral/교주카드.json · 애착 사도 파일의 "equips" 부분만 ·
 //          _ref/그림짝.json(장비 · 교주 카드 id → 원작 아이콘 번호, 화면 몫) · _ref/장비_칸나눔.md(칸 나눔 표)

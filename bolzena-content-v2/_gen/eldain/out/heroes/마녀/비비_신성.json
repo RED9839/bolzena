@@ -1,0 +1,1034 @@
+{
+  "heroes": [
+    {
+      "id": "비비_신성",
+      "name": "비비(신성)",
+      "nature": "공명",
+      "race": "미스틱",
+      "role": "딜러",
+      "star": 3,
+      "hp": 650,
+      "atk": 140,
+      "def": 40,
+      "crit": 10,
+      "blurb": "세계수의 은총을 받은 비비. 손에 쥐고 아껴 둔 카드마다 새싹이 자라고, 다 자란 카드를 꺼내면 파티 모두가 축복을 받습니다.",
+      "keyword": {
+        "name": "사랑받은 새싹",
+        "desc": "손에 쥔 카드마다 자라는 새싹(카드 값)",
+        "carrier": "self",
+        "cap": 4,
+        "cardValue": {
+          "grow": "handEnd",
+          "reset": "play"
+        }
+      },
+      "keywords": [
+        {
+          "name": "은총",
+          "desc": "다 자란 새싹이 내린 세계수의 은총 — 아군 모두의 치명이 잦아지고, 치명이 터질 때마다 하나씩 흩어진다",
+          "carrier": "self",
+          "cap": 10,
+          "per": [
+            {
+              "stat": "crit",
+              "v": 0.05,
+              "who": "allies"
+            }
+          ]
+        }
+      ],
+      "passives": [
+        {
+          "name": "신성한 품 속",
+          "when": {
+            "on": "crit",
+            "who": "any"
+          },
+          "fx": [
+            {
+              "k": "spend",
+              "id": "은총",
+              "v": 1
+            },
+            {
+              "k": "cardStatus",
+              "id": "사랑받은 새싹",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "unique": true,
+              "max": 4,
+              "battle": true
+            }
+          ]
+        },
+        {
+          "name": "이른 봄의 기운",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.3
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "모든 이를 굽어살피리",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.8,
+            "target": "allEnemies"
+          },
+          {
+            "k": "critDmg",
+            "v": 0.4,
+            "turns": 3,
+            "id": "신성",
+            "off": [
+              {
+                "k": "status",
+                "id": "취약",
+                "v": 1,
+                "target": "allEnemies"
+              }
+            ]
+          },
+          {
+            "k": "cardStatus",
+            "id": "사랑받은 새싹",
+            "v": 1,
+            "to": "hand",
+            "n": 0,
+            "who": "self",
+            "unique": true,
+            "max": 4,
+            "battle": true
+          }
+        ]
+      },
+      "starter": [
+        "비비_신성_s1",
+        "비비_신성_s2",
+        "비비_신성_s3",
+        "비비_신성_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "비비_신성_s1",
+      "name": "빛구슬",
+      "hero": "비비_신성",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "비비_신성_s2",
+      "name": "영롱한 빛구슬",
+      "hero": "비비_신성",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "비비_신성_s3",
+      "name": "녹발의 베일",
+      "hero": "비비_신성",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "비비_신성_u1",
+      "name": "손잡기",
+      "hero": "비비_신성",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "cardStatus",
+          "id": "사랑받은 새싹",
+          "v": 2,
+          "to": "hand",
+          "n": 1,
+          "who": "self",
+          "unique": true,
+          "max": 4,
+          "battle": true
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "사랑받은 새싹",
+              "v": 3,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "unique": true,
+              "max": 4,
+              "battle": true
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "사랑받은 새싹",
+              "v": 1,
+              "to": "hand",
+              "n": 0,
+              "who": "self",
+              "unique": true,
+              "max": 4,
+              "battle": true
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "power": true,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make",
+                    "who": "other"
+                  },
+                  "fx": [
+                    {
+                      "k": "cardStatus",
+                      "id": "사랑받은 새싹",
+                      "v": 1,
+                      "to": "hand",
+                      "n": 1,
+                      "who": "self",
+                      "unique": true,
+                      "max": 4,
+                      "battle": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "cardStatus",
+              "id": "사랑받은 새싹",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "unique": true,
+              "max": 4,
+              "battle": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "costMod",
+              "v": -1,
+              "n": 1,
+              "who": "self",
+              "unique": true,
+              "turns": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "사랑받은 새싹",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "unique": true,
+              "max": 4,
+              "battle": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "비비_신성_u2",
+      "name": "셋의 몫",
+      "hero": "비비_신성",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifCardSt",
+          "id": "사랑받은 새싹",
+          "n": 3
+        },
+        {
+          "k": "dealtMod",
+          "v": 0.2,
+          "target": "allAllies"
+        },
+        {
+          "k": "stack",
+          "id": "은총",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifCardSt",
+              "id": "사랑받은 새싹",
+              "n": 3
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.3,
+              "target": "allAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perCardSt",
+              "id": "사랑받은 새싹"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifCardSt",
+              "id": "사랑받은 새싹",
+              "n": 3
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "allAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifCardSt",
+              "id": "사랑받은 새싹",
+              "n": 4
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "cardStatus",
+              "id": "사랑받은 새싹",
+              "to": "this",
+              "half": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "사랑받은 새싹",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "unique": true,
+              "max": 4,
+              "battle": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "비비_신성_u3",
+      "name": "작은 뜻이 빛이 되어",
+      "hero": "비비_신성",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "ifCardSt",
+          "id": "사랑받은 새싹",
+          "n": 3
+        },
+        {
+          "k": "critNext",
+          "who": "other",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "ifCardSt",
+              "id": "사랑받은 새싹",
+              "n": 3
+            },
+            {
+              "k": "critNext",
+              "who": "other",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "cardStatus",
+              "id": "사랑받은 새싹",
+              "v": 2,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "unique": true,
+              "max": 4,
+              "battle": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "type": "공격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perCardSt",
+              "id": "사랑받은 새싹"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "ifCardSt",
+              "id": "사랑받은 새싹",
+              "n": 3
+            },
+            {
+              "k": "gauge",
+              "v": 30,
+              "target": "oneAlly"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "사랑받은 새싹",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "unique": true,
+              "max": 4,
+              "battle": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "비비_신성_u4",
+      "name": "영원한 포옹",
+      "hero": "비비_신성",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.3,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifCardSt",
+          "id": "사랑받은 새싹",
+          "n": 3
+        },
+        {
+          "k": "status",
+          "id": "끈기",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "은총",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "power": true,
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "allAllies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "cardSt": "사랑받은 새싹"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "끈기",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifCardSt",
+              "id": "사랑받은 새싹",
+              "n": 3
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.3,
+              "target": "allAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "type": "스킬",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.3,
+              "target": "allAllies"
+            },
+            {
+              "k": "ifCardSt",
+              "id": "사랑받은 새싹",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifCardSt",
+              "id": "사랑받은 새싹",
+              "n": 3
+            },
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifCardSt",
+              "id": "사랑받은 새싹",
+              "n": 3
+            },
+            {
+              "k": "nextAp",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "사랑받은 새싹",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "unique": true,
+              "max": 4,
+              "battle": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "비비_신성_u5",
+      "name": "녹발의 기도",
+      "hero": "비비_신성",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.5,
+          "target": "randomEnemy",
+          "hits": 3
+        },
+        {
+          "k": "ifCardSt",
+          "id": "사랑받은 새싹",
+          "n": 3
+        },
+        {
+          "k": "critNext",
+          "who": "other",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifCardSt",
+              "id": "사랑받은 새싹",
+              "n": 3
+            },
+            {
+              "k": "critNext",
+              "who": "other",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifCardSt",
+              "id": "사랑받은 새싹",
+              "n": 3
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "allAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "cardStatus",
+              "id": "사랑받은 새싹",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "unique": true,
+              "max": 4,
+              "battle": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "perCardSt",
+              "id": "사랑받은 새싹",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifCardSt",
+              "id": "사랑받은 새싹",
+              "n": 3
+            },
+            {
+              "k": "critNext",
+              "who": "other",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "사랑받은 새싹",
+              "v": 1,
+              "to": "hand",
+              "n": 1,
+              "who": "self",
+              "unique": true,
+              "max": 4,
+              "battle": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

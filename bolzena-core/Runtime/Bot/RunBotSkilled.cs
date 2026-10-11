@@ -46,7 +46,12 @@ namespace Bolzena.Core
                     if (!run.S.Deck.Any(x => GameData.NoInst(x) == nk)) continue;
                     for (int i = 0; i < g.Picks.Count; i++) { double v = OracleScore(kv.Key, g.Picks[i].N, g.Picks[i].Shin); if (v > bv) { bv = v; best = i; } }
                 }
-                else for (int i = 0; i < g.Options.Count; i++) { double v = plan.Score(data.View(g.Options[i])); if (v > bv) { bv = v; best = i; } }
+                else
+                {
+                    for (int i = 0; i < g.Options.Count; i++) { double v = plan.Score(data.View(g.Options[i])); if (v > bv) { bv = v; best = i; } }
+                    // 빠진 기본 카드 은총(2026-10-10) — 덱 문턱보다 낮으면 받지 않는다(고유 카드로 덱을 짜는 숙련 봇)
+                    if (data.Card(g.Options[best]) is CardDef oc && !oc.Unique && bv < DeckPlan.TakeBar(run.S.Deck.Count)) continue;
+                }
                 run.ClaimGlow(kv.Key, g, best);
             }
             SettleNeutrals(run);

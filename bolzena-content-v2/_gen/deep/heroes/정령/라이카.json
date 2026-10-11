@@ -1,0 +1,951 @@
+{
+  "heroes": [
+    {
+      "id": "라이카",
+      "name": "라이카",
+      "nature": "순수",
+      "role": "딜러",
+      "style": "대가형",
+      "star": 3,
+      "hp": 830,
+      "atk": 137,
+      "def": 40,
+      "crit": 10,
+      "blurb": "220V 콘센트를 사랑하는 번개 정령. 파티 HP 를 치러 제 몸에 전류를 꽂으면 감전 — 감전된 주먹은 한 번 더 내달리고, 과충전이 꽉 차면 다음 주먹이 무거워집니다. 원격 충전을 터뜨리면 최대 출력에 들어갑니다.",
+      "keyword": {
+        "name": "과충전",
+        "desc": "제 몸에 꽂은 220V",
+        "carrier": "self",
+        "cap": 3,
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5
+        },
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.2
+          }
+        ],
+        "rules": [
+          {
+            "name": "220V 콘센트",
+            "when": {
+              "on": "play",
+              "who": "any",
+              "maxCost": 0
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "과충전",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "찌릿 질주",
+            "when": {
+              "on": "spend",
+              "id": "과충전"
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "충격",
+                "v": 1,
+                "target": "allEnemies"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "원격 충전!!",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.5,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "충격",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "과충전",
+            "v": 1
+          },
+          {
+            "k": "form",
+            "id": "라이카_최대출력"
+          }
+        ]
+      },
+      "forms": [
+        {
+          "id": "라이카_최대출력",
+          "name": "최대 출력",
+          "desc": "「최대 출력!」 — 220V 가 몸에 꽉 차 주먹이 눈에 안 보이게 빨라짐. 멈출 수 없고, 다 쓰면 방전",
+          "turns": 2,
+          "cards": {
+            "라이카_s1": "라이카_f1"
+          },
+          "bonus": [
+            {
+              "type": "공격",
+              "fx": [
+                {
+                  "k": "extra",
+                  "ratio": 0.3
+                }
+              ]
+            }
+          ],
+          "off": [
+            {
+              "k": "spend",
+              "id": "과충전",
+              "all": true
+            }
+          ],
+          "anim": "Idle_Change"
+        }
+      ],
+      "race": "정령",
+      "starter": [
+        "라이카_s1",
+        "라이카_s2",
+        "라이카_s3",
+        "라이카_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "라이카_s1",
+      "name": "찌릿 펀치",
+      "hero": "라이카",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "라이카_s2",
+      "name": "콰지직 펀치",
+      "hero": "라이카",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "라이카_s3",
+      "name": "방어 자세",
+      "hero": "라이카",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "라이카_f1",
+      "name": "최대 출력 펀치",
+      "hero": "라이카",
+      "token": true,
+      "cost": 1,
+      "type": "공격",
+      "blurb": "최대 출력의 찌릿 펀치 — 한 번 낼 주먹이 두 번 들어갑니다",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.86,
+          "target": "oneEnemy",
+          "hits": 2
+        }
+      ]
+    },
+    {
+      "id": "라이카_u1",
+      "name": "급속 충전!",
+      "hero": "라이카",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "payHpPct",
+          "v": 0.02
+        },
+        {
+          "k": "stack",
+          "id": "과충전",
+          "v": 2
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "payHpPct",
+                  "v": 0.01
+                },
+                {
+                  "k": "stack",
+                  "id": "과충전",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.02
+            },
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "payHpPct",
+                      "v": 0.01
+                    },
+                    {
+                      "k": "stack",
+                      "id": "과충전",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "과충전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "과충전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.02
+            },
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "payHpPct",
+                      "v": 0.01
+                    },
+                    {
+                      "k": "stack",
+                      "id": "과충전",
+                      "v": 1
+                    },
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 2
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "과충전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "라이카_u2",
+      "name": "감전 질주",
+      "hero": "라이카",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.37,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "과충전",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.38,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "과충전",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.06,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "과충전",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "과충전",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.21,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "과충전",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.81,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "과충전",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.76,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "과충전",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "과충전",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.73,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "과충전",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "라이카_u4",
+      "name": "풀 스윙",
+      "hero": "라이카",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.49,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "과충전",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.74,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.24,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "과충전",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.11,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.02
+            },
+            {
+              "k": "dmg",
+              "ratio": 3.81,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.94,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.71,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "과충전",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.66,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perDebuff"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.92,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "라이카_u5",
+      "name": "전기 지짐이",
+      "hero": "라이카",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "payHpPct",
+          "v": 0.03
+        },
+        {
+          "k": "stack",
+          "id": "과충전",
+          "v": 1
+        },
+        {
+          "k": "pull",
+          "from": "discard",
+          "n": 1,
+          "type": "공격"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 2
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "type": "공격"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.02
+            },
+            {
+              "k": "pull",
+              "from": "discard",
+              "n": 1,
+              "type": "공격"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "payHpPct",
+              "v": 0.03
+            },
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "라이카_s4",
+      "name": "콘센트 꽂기",
+      "hero": "라이카",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "과충전",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "과충전",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

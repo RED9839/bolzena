@@ -54,6 +54,8 @@ namespace Bolzena.Battle
                 f.EnemyNature = Arg("-nature");
                 // -wavehp 배율: 적 체력 배율(시험 캡처 — 격파까지 버티게)
                 if (double.TryParse(Arg("-wavehp"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var whp)) f.WaveHp.Add(whp);
+                // -wavegauge N: 첫 웨이브 게이지(점검 — 고학년으로 변신 · 태세 확인, 2026-10-11)
+                if (int.TryParse(Arg("-wavegauge"), out var wg)) f.WaveGauge.Add(wg);
                 // -glow: 고유 카드를 모두 빛나게(신탁 창 시험)
                 if (Array.IndexOf(a, "-glow") >= 0) f.Glow.AddRange(f.Deck.Where(id => (d.Card(id)?.Unique ?? false) && d.Card(id).Oracles.Count > 0).Distinct());
                 return f;
@@ -106,9 +108,9 @@ namespace Bolzena.Battle
             {
                 var v2 = d.Hero("rico") == null ? V2(d) : null;
                 if (v2 != null) return v2;
-                // 코어 샘플(rico · carrot · sion) 또는 콘텐츠 폴더(리코타 · 캬롯 · 시온더다크불릿 — 웹판 키)
+                // 코어 샘플(rico · carrot · sion) 또는 콘텐츠 폴더(2026-10-11 엘다인 20명 — 란 · 아야 · 시온더다크불릿)
                 bool sample = d.Hero("rico") != null;
-                var f = new Fixture { Party = sample ? new List<string> { "rico", "carrot", "sion" } : new List<string> { "리코타", "캬롯", "시온더다크불릿" } };
+                var f = new Fixture { Party = sample ? new List<string> { "rico", "carrot", "sion" } : new List<string> { "란", "아야", "시온더다크불릿" } };
                 f.Deck = d.BuildDeck(f.Party);
                 // 시범 — 고유 카드 둘을 덱에 넣고 하나를 빛나게(신탁 창을 보이려고)
                 var uniq = sample ? new List<string> { "sion_u1", "rico_u1" }
@@ -180,6 +182,10 @@ namespace Bolzena.Battle
         CoreFight preset;
         public static CoreBattle ForRun(GameData data) => new CoreBattle(data, new Fixture());
         public List<Cue> CueSink => cues;
+        /// <summary>판 전체 전투 기록의 앞몫 — 이 싸움을 열 때까지 끝낸 싸움들의 사도별 합(BattleBridge 가 판의 RunState.Tally 를 베껴 넣는다). null 이면 판 탭 없음(전투 시범).</summary>
+        public Dictionary<string, HeroTally> RunTally;
+        // 지난 웨이브들의 전투 기록(전투 시범의 여러 웨이브 — 한 전투 화면의 몫으로 함께 센다)
+        readonly Dictionary<string, HeroTally> waveTally = new Dictionary<string, HeroTally>();
         public void Attach(CoreFight opened)
         {
             preset = opened;
@@ -301,15 +307,19 @@ namespace Bolzena.Battle
                     var p = g.Picks[k];
                     if (p.N < 1 || p.N > def.Oracles.Count) continue;
                     var o = def.Oracles[p.N - 1];
-                    var info = Info(data.View(id, p.N), null);
+                    var oo = opts != null ? opts.Find(x => x.N == p.N && x.Shin == p.Shin) : null;
+                    var info = Info(oo?.View ?? data.View(id, p.N), null);   // 축복까지 얹은 모습 — 피해 축복이면 고를 때부터 공격 카드로(2026-10-11)
                     if (!oracleTexts.TryGetValue((id, p.N), out var otx))   // 신탁 글(낱말 맞추기)은 카드 · 갈래마다 그대로
                         oracleTexts[(id, p.N)] = otx = Fmt(Bolzena.RunUI.OracleDiff.Mark(NoTagLine(text.Card(def), def.Tags), NoTagLine(text.Oracle(def, o), info.Tags)));
                     info.Text = otx;
                     info.CostDown = o.Cost.HasValue && o.Cost.Value < def.Cost;
                     info.EpiphanyLabel = "신탁";   // 이름 대신 갈래 번호(2026-10-08 사용자)
                     info.Epiphany = false;
-                    var oo = opts != null ? opts.Find(x => x.N == p.N && x.Shin == p.Shin) : null;
-                    if (oo != null && oo.Blessed) { info.BlessName = oo.BlessName; info.BlessText = Fmt(oo.BlessText); info.MarkBless = oo.BlessName; info.MarkBlessText = oo.BlessText; }
+                    if (oo != null && oo.Blessed)
+                    {
+                        var bt = oo.ToAttack ? oo.BlessText + "\n" + OracleOption.ATTACK_LINE : oo.BlessText;
+                        info.BlessName = oo.BlessName; info.BlessText = Fmt(bt); info.MarkBless = oo.BlessName; info.MarkBlessText = bt;
+                    }
                     list.Add(info);
                 }
             }
@@ -808,6 +818,7 @@ namespace Bolzena.Battle
                 int hp = b.Pool.Hp, gauge = b.Gauge;
                 var glow = b.Glow.ToDictionary(kv => kv.Key, kv => kv.Value.Copy());
                 turnBase += b.Turn;
+                AddTally(waveTally, b.Tally);
                 wave++;
                 b = StartWave(wave, hp, gauge, glow);
                 shownAp = -1; shownGauge = -1;
@@ -900,6 +911,9 @@ namespace Bolzena.Battle
             {   // 다음 카드 강화(core EmpowerOf: 사도 몫 + 파티 몫) — 걸려 있으면 배율 · 강화된 수치 글
                 int emp = b.EmpowerOf(cv.Hero);
                 if (emp > 0) { info.EmpowerMul = (float)(1 + emp / 100.0); info.Text = EmpowerText(info.Text, 1 + emp / 100.0); }
+                // 태세 덤 강조(엘다인 4차) — 그 사도가 지금 든 태세의 「「이름」:」 마디는 금빛으로(켜진 덤이 보이게 · 우로스 선 · 악)
+                var fv = b.FormOf(cv.Hero);
+                if (fv != null && fv.Stance && info.Text != null) info.Text = info.Text.Replace($"「{fv.Name}」:", $"<color=#F2CF7A>「{fv.Name}」:</color>");
             }
             var glow = b.GlowOf(cv.Id);
             info.Epiphany = glow != null; info.Grace = glow?.Kind == "hero";
@@ -925,6 +939,14 @@ namespace Bolzena.Battle
             return info;
         }
 
+        // 카드마다 몸짓을 정해 둔 것 — 비용 규칙(1비용 평타 · 2비용 강공)이 원작 몸짓과 어긋나는 카드만(카드 id → 몸짓).
+        //   2026-10-09 디아나(왕년): 원작 강공(Attack2)이 바위 던지기 · 평타(Attack1)가 도끼질이라 둘을 바꿔 맞춘다(사용자)
+        static readonly Dictionary<string, Motion> CARD_MOTION = new Dictionary<string, Motion>
+        {
+            ["디아나_왕년_u4"] = Motion.Attack2,   // 바위 던지기(1비용)
+            ["디아나_왕년_s2"] = Motion.Attack1,   // 도끼 내려찍기(2비용)
+        };
+
         /// <summary>카드 정보의 바뀌지 않는 몫 — 전투(b) · CardView 가 같으면 늘 같다. 카드 글(text.Card)은 한 번만 짓는다(예전엔 세 번).</summary>
         InfoBase InfoBaseOf(CardView cv, int depth)
         {
@@ -943,7 +965,7 @@ namespace Bolzena.Battle
                 Cost = cv.Cost, Type = type, TypeName = cv.Type,
                 Target = cv.Target == "적" ? TargetKind.Enemy : cv.Target == "아군" ? TargetKind.Ally : allDmg ? TargetKind.AllEnemies : TargetKind.None,
                 Text = Fmt(cv.Oracle != null ? Bolzena.RunUI.OracleDiff.Mark(NoTagLine(text.Card(cv.Def), cv.Def.Tags), NoTagLine(card, cv.Tags)) : NoTagLine(card, cv.Tags)), CostDown = cv.Oracle != null && cv.Oracle.Cost.HasValue && cv.Oracle.Cost.Value < cv.Def.Cost, Art = Look.CardArt(cv.Def.Hero, GameData.BaseId(cv.Id), cv.Unique, cv.Type),
-                Motion = type == CardType.Attack ? (cv.Cost >= 2 ? Motion.Attack2 : Motion.Attack1) : dmg ? Motion.Skill1 : Motion.None,
+                Motion = CARD_MOTION.TryGetValue(GameData.BaseId(cv.Id), out var fixedM) ? fixedM : type == CardType.Attack ? (cv.Cost >= 2 ? Motion.Attack2 : Motion.Attack1) : dmg ? Motion.Skill1 : Motion.None,
                 Hit = Look.Hero(cv.Hero).Hit,
                 EpiphanyLabel = cv.Oracle != null ? "신탁" : null, Tags = cv.Tags.ToList(), Unplayable = cv.HasTag(Bolzena.Core.Tag.Unplayable),
                 Unique = cv.Unique, Owner = owner, Grade = cv.Def.Hero == null ? cv.Def.Grade : null, Nature = hero >= 0 ? b.Party[hero].Nature : owner >= 0 ? b.Party[owner].Nature : null,
@@ -1015,8 +1037,12 @@ namespace Bolzena.Battle
             {
                 if (kv.Value == 0) continue;
                 if (b.Kw.TryGetValue(kv.Key, out var kw))
-                {
-                    res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = KwText(kw) });
+                {   // 사도 고유 효과(적에게 거는 표식 — 비비 수은 중독 · 란 사냥감 …) — 건 사도 초상 · 몇 겹인지 · 풀이(2026-10-11 사용자 「적에게 걸린 효과가 안 나와 있음」)
+                    var kwOwner = kw.Owner != null ? data.Hero(kw.Owner) : null;
+                    string cap = kw.Def.Cap is int kc && kc > 0 ? $" / 최대 {kc}" : "";
+                    string head = u.Side == CSide.Enemy && kwOwner != null ? $"<color=#A7B1CC>{kwOwner.Name}의 고유 효과 · 이 적에게 {kv.Value}겹{cap}</color>\n" : "";
+                    res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = head + KwText(kw),
+                        From = kw.Owner != null ? new List<string> { Look.Hero(kw.Owner).Art } : null });
                     continue;
                 }
                 if (kv.Key == R.SEIZED)
@@ -1063,8 +1089,8 @@ namespace Bolzena.Battle
                     // 변신이 무엇인지 — 부제(desc) + 규칙에서 만든 본문(core CardText.FormBody, 2026-10-07 「성전 모드가 뭔지 안 나온다」)
                     var fd = data.Hero(u.Key)?.Forms?.Find(x => x.Name == fv.Name);
                     string about = fd != null ? (string.IsNullOrEmpty(fd.Desc) ? "" : $"\n<color=#A7B1CC>{fd.Desc.TrimEnd('.')}</color>") + "\n" + Fmt(text.FormBody(fd)) : "";
-                    res.Insert(0, new StatusChip { Id = fv.Name, Value = fv.Left > 0 ? fv.Left.ToString() : "", Turns = fv.Left > 0 ? fv.Left : -1, Kind = "buff",
-                        Text = $"변신 「{fv.Name}」 · {(fv.Left > 0 ? "남은 " + fv.Left + "턴" : "전투 끝까지")}{about}" });
+                    res.Insert(0, new StatusChip { Id = fv.Name, Value = fv.Left > 0 ? fv.Left.ToString() : "", Turns = fv.Left > 0 ? fv.Left : -1, Kind = "buff", FormOf = u.Key,
+                        Text = $"{(fd != null && fd.Stance ? "태세" : "변신")} 「{fv.Name}」 · {(fv.Left > 0 ? "남은 " + fv.Left + "턴" : "전투 끝까지")}{about}" });
                 }
             }
             return res;
@@ -1158,6 +1184,24 @@ namespace Bolzena.Battle
             }
         }
 
+        static void AddTally(Dictionary<string, HeroTally> to, Dictionary<string, HeroTally> from)
+        {
+            if (from == null) return;
+            foreach (var kv in from) { if (!to.TryGetValue(kv.Key, out var t)) to[kv.Key] = t = new HeroTally(); t.Add(kv.Value); }
+        }
+
+        // 전투 기록 줄 — 지금 파티의 사도 차례대로(몫이 없어도 한 줄)
+        List<MeterRow> MeterRows(Dictionary<string, HeroTally> d)
+        {
+            var o = new List<MeterRow>();
+            foreach (var u in b.Party)
+            {
+                d.TryGetValue(u.Key, out var t);
+                o.Add(new MeterRow { Key = Look.Hero(u.Key).Art, Id = u.Key, Name = u.Name, Dealt = t?.Dealt ?? 0, Shield = t?.Shield ?? 0, Heal = t?.Heal ?? 0 });
+            }
+            return o;
+        }
+
         BattleSnapshot BuildSnapshot()
         {
             {
@@ -1228,6 +1272,11 @@ namespace Bolzena.Battle
                 s.PileSource = k => piles[k].ConvertAll(id => Info(b.CardOf(id), null));
                 s.PartyChips = ChipsOf(b.Pool, false);
                 AddEmpowerChip(s.PartyChips);
+                // 전투 기록 — 이번 싸움(지난 웨이브 + 지금) · 판 전체(판의 앞몫 + 이번 싸움)
+                var now = new Dictionary<string, HeroTally>();
+                AddTally(now, waveTally); AddTally(now, b.Tally);
+                s.Meter = MeterRows(now);
+                if (RunTally != null) { var all = new Dictionary<string, HeroTally>(); AddTally(all, RunTally); AddTally(all, now); s.MeterRun = MeterRows(all); }
                 snap = s;
                 return s;
             }

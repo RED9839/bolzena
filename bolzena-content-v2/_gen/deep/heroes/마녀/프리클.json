@@ -1,0 +1,791 @@
+{
+  "heroes": [
+    {
+      "id": "프리클",
+      "name": "프리클",
+      "nature": "냉정",
+      "race": "마녀",
+      "role": "딜러",
+      "style": "소환형",
+      "star": 3,
+      "hp": 640,
+      "atk": 135,
+      "def": 28,
+      "crit": 10,
+      "blurb": "마녀 왕궁의 참모. 적 앞에 가시 덫을 깔아 두고, 계획이 어긋나도 덫은 거두지 않습니다 — 다음 공격까지 기다릴 뿐.",
+      "keyword": {
+        "name": "가시 촉수",
+        "desc": "덩굴에서 돋아나 적의 움직임을 노리는 촉수",
+        "carrier": "self",
+        "cap": 5,
+        "rules": [
+          {
+            "name": "문지기 소환",
+            "when": {
+              "on": "hit",
+              "who": "any",
+              "weak": true
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "가시 촉수",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "찌르는 촉수",
+            "when": {
+              "on": "turnEnd"
+            },
+            "fx": [
+              {
+                "k": "summon",
+                "id": "가시 촉수",
+                "ratio": 0.4,
+                "max": 5
+              }
+            ]
+          },
+          {
+            "name": "미리 세운 계획",
+            "when": {
+              "on": "fightStart"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "가시 촉수",
+                "v": 2
+              }
+            ]
+          },
+          {
+            "name": "이미 손을 써 두었습니다",
+            "when": {
+              "on": "blocked"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "가시 촉수",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "계획은 그 자리에서",
+            "when": {
+              "on": "spend",
+              "id": "가시 촉수"
+            },
+            "fx": [
+              {
+                "k": "draw",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "조여오는 경비병",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.87,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "가시 촉수",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "가시 덩굴",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "프리클_s1",
+        "프리클_s2",
+        "프리클_s3",
+        "프리클_u1"
+      ],
+      "keywords": [
+        {
+          "name": "가시 덩굴",
+          "desc": "적을 감싸 조이는 덩굴",
+          "carrier": "self",
+          "cap": 1,
+          "rules": [
+            {
+              "name": "덩굴이 시들면",
+              "when": {
+                "on": "turnStart"
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "가시 덩굴",
+                  "n": 1
+                }
+              ],
+              "fx": [
+                {
+                  "k": "cue",
+                  "id": "prickle_tentacle"
+                },
+                {
+                  "k": "stack",
+                  "id": "가시 촉수",
+                  "v": 2
+                },
+                {
+                  "k": "spend",
+                  "id": "가시 덩굴",
+                  "all": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "프리클_s1",
+      "name": "가시 투척",
+      "hero": "프리클",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "프리클_s2",
+      "name": "가시 작살",
+      "hero": "프리클",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "프리클_s3",
+      "name": "방어 자세",
+      "hero": "프리클",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "프리클_u1",
+      "name": "가시 덫 설치",
+      "hero": "프리클",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "가시 촉수",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 5
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "프리클_u3",
+      "name": "따끔한 문지기",
+      "hero": "프리클",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.96,
+          "target": "allEnemies"
+        },
+        {
+          "k": "trap",
+          "target": "oneEnemy",
+          "then": [
+            {
+              "k": "dmg",
+              "ratio": 1.85,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "프리클_u5",
+      "name": "가시 울타리",
+      "hero": "프리클",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "가시 촉수",
+          "v": 2
+        },
+        {
+          "k": "empower",
+          "ratio": 0.5
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.75
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 1.26
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.5
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.77
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "프리클_u4",
+      "name": "마녀의 힘은 대단했다!",
+      "hero": "프리클",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "가시 촉수",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnEnd"
+              },
+              "fx": [
+                {
+                  "k": "summon",
+                  "id": "가시 촉수",
+                  "ratio": 0.25,
+                  "max": 5
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "summon",
+                      "id": "가시 촉수",
+                      "ratio": 0.25,
+                      "max": 5
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "가시 촉수",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "가시 촉수",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "가시 촉수",
+                      "v": 2
+                    },
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.36,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "프리클_s4",
+      "name": "촉수 심기",
+      "hero": "프리클",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "가시 촉수",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_pricklesigil",
+      "name": "프리클의 여왕 대리 인장",
+      "grade": "희귀",
+      "slot": "장신구",
+      "stats": {
+        "atk": 20,
+        "crit": 6
+      },
+      "effect": [
+        {
+          "name": "대리 집행",
+          "when": {
+            "on": "play",
+            "type": "스킬",
+            "every": 3
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "affinity": "프리클",
+      "affinityStats": {
+        "atk": 6
+      },
+      "affinityEffect": [
+        {
+          "name": "함정 결재",
+          "when": {
+            "on": "play",
+            "type": "스킬"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "가시 촉수",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "여왕 대리의 인장. 찍히는 쪽은 꼼짝 못 합니다."
+    }
+  ]
+}

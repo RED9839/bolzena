@@ -72,7 +72,7 @@ namespace Bolzena.RunUI
             log.Append($"  ② 바꾼 뒤\tlobby\t{Span("stand")}\t캔버스 {f.Stage.Size.x:0}x{f.Stage.Size.y:0}\n");
             yield return Shot($"r2_lobby_resized_{tag}");
             // ③ 사도 바꾸기(고르기 창 → 벨라 → 에르핀) — 저장은 끝에 되돌린다
-            foreach (var k in new[] { "벨라", "에르핀" })
+            foreach (var k in new[] { "벨라", "에르핀_왕도" })
             {
                 yield return Press("lobby.swap", 1.0f);
                 var fld = f.DexSearchField;

@@ -1,0 +1,840 @@
+{
+  "heroes": [
+    {
+      "id": "란",
+      "name": "란",
+      "nature": "순수",
+      "race": "수인",
+      "role": "딜러",
+      "star": 3,
+      "hp": 650,
+      "atk": 140,
+      "def": 40,
+      "crit": 10,
+      "blurb": "요도 「사랑니」 를 찬 아기 늑대 검사. 「행복한 아기 늑대」 를 붙여 두면 턴 끝마다 물어뜯고, 늑대가 붙은 적은 사랑니가 깊게 벱니다. 벤 자리엔 늑대가 다시 붙습니다.",
+      "keyword": {
+        "name": "행복한 아기 늑대",
+        "desc": "적에게 새겨 두는 아기 늑대의 이빨 자국",
+        "carrier": "enemy",
+        "cap": 4,
+        "per": [
+          {
+            "stat": "dot",
+            "ratio": 0.5
+          }
+        ],
+        "rules": [
+          {
+            "name": "함께 속죄하는 벗",
+            "when": {
+              "on": "debuff",
+              "who": "other",
+              "id": "약화"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "행복한 아기 늑대",
+                "v": 2,
+                "target": "oneEnemy"
+              }
+            ]
+          }
+        ]
+      },
+      "keywords": [
+        {
+          "name": "늑대 야수의 발톱",
+          "desc": "란이 노리는 사냥감 — 쓰러지면 가장 약한 적에게 겹째로",
+          "carrier": "enemy",
+          "cap": 3,
+          "hunt": true,
+          "huntCarry": "lowEnemy",
+          "per": [
+            {
+              "stat": "taken",
+              "v": 0.2,
+              "from": "owner"
+            }
+          ]
+        }
+      ],
+      "passives": [
+        {
+          "name": "란과 벗님들",
+          "when": {
+            "on": "huntDown"
+          },
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "몰이 사냥",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.1,
+            "target": "oneEnemy",
+            "hits": 4
+          },
+          {
+            "k": "ifKill"
+          },
+          {
+            "k": "dmg",
+            "ratio": 1.1,
+            "target": "oneEnemy",
+            "hits": 4
+          }
+        ]
+      },
+      "starter": [
+        "란_s1",
+        "란_s1",
+        "란_s3",
+        "란_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "란_s1",
+      "name": "발도",
+      "hero": "란",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "란_s3",
+      "name": "칼집 막기",
+      "hero": "란",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "란_u1",
+      "name": "아랑의 여유",
+      "hero": "란",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "행복한 아기 늑대",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "늑대 야수의 발톱",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "늑대 야수의 발톱",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "type": "스킬",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "란_u2",
+      "name": "투구꽃 독",
+      "hero": "란",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "행복한 아기 늑대",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "고통",
+          "v": 2,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "란_u3",
+      "name": "날선 늑대의 발톱",
+      "hero": "란",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "critNext",
+          "now": true,
+          "foeStack": "늑대 야수의 발톱"
+        },
+        {
+          "k": "dmg",
+          "ratio": 2.5,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "critNext",
+              "now": true,
+              "foeStack": "늑대 야수의 발톱"
+            },
+            {
+              "k": "dmg",
+              "ratio": 3.6,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "critNext",
+              "now": true,
+              "foeStack": "늑대 야수의 발톱"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "행복한 아기 늑대"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "행복한 아기 늑대",
+              "each": true,
+              "max": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "ifStack",
+              "id": "늑대 야수의 발톱",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "critNext",
+              "now": true,
+              "foeStack": "늑대 야수의 발톱"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "란_u4",
+      "name": "사랑니 발도술",
+      "hero": "란",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "행복한 아기 늑대",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 2.1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "행복한 아기 늑대",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "행복한 아기 늑대",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "약점 노출",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "spend",
+              "id": "행복한 아기 늑대",
+              "v": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.4,
+              "target": "oneEnemy",
+              "hits": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "행복한 아기 늑대",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "status",
+              "id": "약점 노출",
+              "v": 1,
+              "target": "lowEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "행복한 아기 늑대",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약점 노출",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "행복한 아기 늑대",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "란_u5",
+      "name": "란과 벗님들",
+      "hero": "란",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "행복한 아기 늑대",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "늑대 야수의 발톱",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "empower",
+          "ratio": 0.3,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.5,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "늑대 야수의 발톱",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "늑대 야수의 발톱",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행복한 아기 늑대",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

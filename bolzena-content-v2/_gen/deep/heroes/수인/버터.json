@@ -1,0 +1,1049 @@
+{
+  "heroes": [
+    {
+      "id": "버터",
+      "name": "버터",
+      "nature": "활발",
+      "race": "수인",
+      "role": "딜러",
+      "style": "쌓고 고르기",
+      "star": 3,
+      "hp": 550,
+      "atk": 135,
+      "def": 25,
+      "crit": 10,
+      "blurb": "부탁은 거절 못 하는 골든 리트리버 수인. 친구를 친 녀석에게 옐로카드를 주고, 튕기는 짱돌은 경고받은 녀석에게 더 자주 날아가며, 카드가 넘치도록 쌓이면 웃음기가 싹 가십니다.",
+      "keyword": {
+        "name": "옐로카드",
+        "desc": "꾹 참는 부당한 대우",
+        "carrier": "self",
+        "cap": 4,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.06
+          }
+        ],
+        "onMax": {
+          "make": "버터_red",
+          "consume": true
+        },
+        "rules": [
+          {
+            "name": "참다 참다",
+            "when": {
+              "on": "blocked"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "옐로카드",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "만반잘부",
+            "when": {
+              "on": "crit"
+            },
+            "fx": [
+              {
+                "k": "empower",
+                "ratio": 0.2,
+                "who": "any"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "새쭁! 쓔튜라이크!",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 3.56,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1
+          },
+          {
+            "k": "stack",
+            "id": "옐로카드",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "버터_s1",
+        "버터_s2",
+        "버터_s3",
+        "버터_u2"
+      ],
+      "forms": [
+        {
+          "id": "버터_퇴장",
+          "name": "웃음기 없는 버터",
+          "desc": "참을 만큼 참은 버터 — 쏘는 족족 급소",
+          "turns": 2,
+          "mods": {
+            "crit": 1,
+            "dealt": 0.15
+          },
+          "cards": {
+            "버터_s1": "버터_f1"
+          },
+          "off": [
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ],
+          "skin": null,
+          "anim": null
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "버터_s1",
+      "name": "짱돌 던지기",
+      "hero": "버터",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "버터_s2",
+      "name": "왕짱돌 던지기",
+      "hero": "버터",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "버터_s3",
+      "name": "방어 자세",
+      "hero": "버터",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "버터_red",
+      "name": "레드카드",
+      "hero": "버터",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "form",
+          "id": "버터_퇴장"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "참을 만큼 참았습니다 — 꺼내 들면 2턴 동안 웃음기 없는 버터가 됩니다"
+    },
+    {
+      "id": "버터_f1",
+      "name": "앞치마 총",
+      "hero": "버터",
+      "token": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "oneEnemy",
+          "hits": 2
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "blurb": "웃음기 없는 버터의 짱돌 — 개껌이 정확히 꽂힙니다",
+      "tags": [
+        "열정"
+      ]
+    },
+    {
+      "id": "버터_u2",
+      "name": "첫 칭구",
+      "hero": "버터",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "옐로카드",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "hurt",
+                "guarded": true
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "옐로카드",
+                  "v": 1
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.62,
+                  "target": "randomEnemy"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "옐로카드",
+                      "v": 2
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.93,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "옐로카드",
+                      "v": 3
+                    },
+                    {
+                      "k": "empower",
+                      "ratio": 0.57
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "empower",
+              "ratio": 0.57
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬",
+                    "who": "other"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "옐로카드",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "옐로카드",
+                      "v": 1
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.48,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "crit"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "옐로카드",
+                      "v": 1
+                    },
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "버터_u1",
+      "name": "버터 플라이!",
+      "hero": "버터",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.74,
+          "target": "randomEnemy",
+          "hits": 4
+        },
+        {
+          "k": "stack",
+          "id": "옐로카드",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "randomEnemy",
+              "hits": 4
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "옐로카드",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.61,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.86,
+              "target": "oneEnemy",
+              "hits": 4
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.24,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 1.07,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "옐로카드",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.74,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "tags": [
+        "열정"
+      ]
+    },
+    {
+      "id": "버터_u3",
+      "name": "에이프런 매그넘",
+      "hero": "버터",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.69,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "옐로카드"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.62,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "옐로카드",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.55,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.93,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "옐로카드",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "옐로카드",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "옐로카드",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.97,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "옐로카드"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.74,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "옐로카드",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.74,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "옐로카드",
+              "all": true
+            },
+            {
+              "k": "make",
+              "id": "버터_red",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.91,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "stackReach",
+                    "id": "옐로카드",
+                    "n": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 1.26,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "버터_u4",
+      "name": "개껌 발사",
+      "hero": "버터",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "critMod",
+          "v": 1,
+          "target": "self"
+        },
+        {
+          "k": "dmg",
+          "ratio": 2.19,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "옐로카드",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "critMod",
+              "v": 1.5,
+              "target": "self"
+            },
+            {
+              "k": "dmg",
+              "ratio": 3.29,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "critMod",
+              "v": 1,
+              "target": "self"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.68,
+              "target": "randomEnemy",
+              "hits": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "critMod",
+              "v": 1,
+              "target": "self"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.94,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 4.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "fx": [
+                    {
+                      "k": "critMod",
+                      "v": 0.3,
+                      "target": "self"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "critMod",
+              "v": 1,
+              "target": "self"
+            },
+            {
+              "k": "dmg",
+              "ratio": 3.57,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "버터_red",
+              "v": 4
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "버터_s4",
+      "name": "꾹꾹 참기",
+      "hero": "버터",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "옐로카드",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_butteryellow",
+      "name": "버터의 옐로카드",
+      "grade": "전설",
+      "slot": "장신구",
+      "stats": {
+        "atk": 32
+      },
+      "effect": [
+        {
+          "name": "분노의 새총",
+          "when": {
+            "on": "hurt"
+          },
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "randomEnemy"
+            }
+          ]
+        }
+      ],
+      "affinity": "버터",
+      "affinityStats": {
+        "atk": 8
+      },
+      "affinityEffect": [
+        {
+          "name": "경고 누적",
+          "when": {
+            "on": "hurt",
+            "guarded": true
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "옐로카드",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blurb": "주머니에서 꺼내기만 해도 분위기가 바뀌는 노란 카드."
+    }
+  ]
+}

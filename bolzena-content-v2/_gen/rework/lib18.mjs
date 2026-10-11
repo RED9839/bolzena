@@ -1,3 +1,4 @@
+if (!process.env.BZ_OLD_GEN) { console.error("[중단] 옛 생성기입니다(2026-10-11 엘다인 리뉴얼). heroes/** 는 _gen/eldain 이 씁니다. 꼭 돌려야 하면 BZ_OLD_GEN=1 — 엘다인 파일을 덮어쓰니 주의."); process.exit(1); }
 // 18갈래 재설계 — 나머지 118명 공용 부품(2026-10-08). 시범16.mjs 의 조각 · 신탁 틀(five · unshallow) · 세기 맞춤(tune) · 값어치 보정(boost)을 그대로 옮겼다.
 // 종족 스크립트(<종족>_18.mjs)가 import 한다. 원본은 백업 SRC 에서 읽는다(몇 번 돌려도 같은 결과). 저장은 사도 단위 원자적(임시 파일 → rename).
 // 쓰는 법: import * as L from './lib18.mjs'; … L.run18(JOBS, TUNE, new URL('./boost_<종족>_18.json', import.meta.url));

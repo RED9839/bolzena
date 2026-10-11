@@ -1,0 +1,728 @@
+{
+  "heroes": [
+    {
+      "id": "슈팡",
+      "name": "슈팡",
+      "nature": "활발",
+      "race": "요정",
+      "role": "서포터",
+      "style": "박자형",
+      "star": 3,
+      "hp": 630,
+      "atk": 75,
+      "def": 58,
+      "crit": 5,
+      "blurb": "과로 끝에 애마 슈파볼트에 엘프가 심어 둔 고장장치를 알아채고 복수극을 벌인 뒤 프리랜서가 된 과속 배달부. 소포는 던지고, 흘리고, 가끔 쌍손가락 욕도 곁들입니다. 그래도 달리고 싶습니다.",
+      "keyword": {
+        "name": "배달 속도",
+        "desc": "멈출 수 없는 배달 속도",
+        "carrier": "self",
+        "cap": 4,
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.3
+        },
+        "rules": [
+          {
+            "name": "배달 폭주",
+            "when": {
+              "on": "play",
+              "who": "any",
+              "nth": 4
+            },
+            "fx": [
+              {
+                "k": "heal",
+                "ratio": 0.23
+              },
+              {
+                "k": "stack",
+                "id": "배달 속도",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "배달의 요정",
+            "when": {
+              "on": "fightStart"
+            },
+            "fx": [
+              {
+                "k": "gauge",
+                "v": 30
+              },
+              {
+                "k": "stack",
+                "id": "배달 속도",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "받은 소포",
+            "when": {
+              "on": "make",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "배달 속도",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "슈팡 배송",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "heal",
+            "ratio": 1.52
+          },
+          {
+            "k": "status",
+            "id": "피해 감소",
+            "v": 2
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.46,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 1,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "슈팡_s1",
+        "슈팡_s2",
+        "슈팡_s3",
+        "슈팡_u5"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "슈팡_s1",
+      "name": "소포 투척",
+      "hero": "슈팡",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "슈팡_s2",
+      "name": "구급 소포",
+      "hero": "슈팡",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "슈팡_parcel",
+      "name": "택배 상자",
+      "hero": "슈팡",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "신속",
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.19,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.11
+        }
+      ],
+      "blurb": "아무 데나 던진 택배 상자입니다"
+    },
+    {
+      "id": "슈팡_u5",
+      "name": "야, 타!",
+      "hero": "슈팡",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "make",
+          "id": "슈팡_parcel",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "배달 속도",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "슈팡_parcel",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "슈팡_parcel",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.36
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "슈팡_parcel",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "슈팡_u1",
+      "name": "무책임 배달부",
+      "hero": "슈팡",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "perPlayed"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.44
+        },
+        {
+          "k": "stack",
+          "id": "배달 속도",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "perPlayed"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.68
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "perPlayed"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.68
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "perPlayed"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.52
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "perPlayed"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.12,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "배달 속도",
+              "n": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.6
+            },
+            {
+              "k": "spend",
+              "id": "배달 속도",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "슈팡_u2",
+      "name": "슈팡은⋯ 달리고 싶다!",
+      "hero": "슈팡",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "ifNth",
+          "n": 4
+        },
+        {
+          "k": "ap",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ifNth",
+              "n": 4
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 2
+            },
+            {
+              "k": "ifNth",
+              "n": 4
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ifNth",
+              "n": 5
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "make",
+              "id": "슈팡_parcel",
+              "v": 1
+            },
+            {
+              "k": "ifNth",
+              "n": 4
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "슈팡_u3",
+      "name": "케이크 위 코너링",
+      "hero": "슈팡",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.25,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perPlayed"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.08,
+          "target": "allEnemies"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "슈팡_s3",
+      "name": "소포 던지기",
+      "hero": "슈팡",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "슈팡_s4",
+      "name": "속도 올리기",
+      "hero": "슈팡",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.72
+        },
+        {
+          "k": "stack",
+          "id": "배달 속도",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 4.12
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.72
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.72
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.72
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.56
+            },
+            {
+              "k": "stack",
+              "id": "배달 속도",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

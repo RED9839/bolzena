@@ -19,24 +19,28 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(R.GOLD_START, run.S.Gold);
         }
 
-        [Test] public void 지도는_열_칸_보스_앞은_휴식_상점_같은_씨앗이면_같은_길()
+        [Test] public void 지도는_열일곱_칸_보스_앞은_휴식_상점_같은_씨앗이면_같은_길()
         {
             var d = K.Sample();
+            int N = Run.MAP_ROWS;
+            Assert.AreEqual(17, N);
             for (long seed = 1; seed <= 20; seed++)
                 for (int floor = 0; floor < 2; floor++)
                 {
                     var m = Run.GenMap(d, seed, floor, "erpien");
-                    Assert.AreEqual(Run.MAP_ROWS + 1, m.Rows.Count);
+                    Assert.AreEqual(N + 1, m.Rows.Count);
                     Assert.AreEqual("start", m.Rows[0][0].Type);
-                    Assert.AreEqual("boss", m.Rows[10][0].Type);
-                    Assert.AreEqual("campshop", m.Rows[9][0].Type);
+                    Assert.AreEqual("boss", m.Rows[N][0].Type);
+                    Assert.AreEqual("campshop", m.Rows[N - 1][0].Type);
                     Assert.IsTrue(m.Rows[1].All(n => n.Type == "fight"));
                     Assert.That(m.Rows[1].Count, Is.InRange(2, 4));
-                    for (int r = 2; r <= 8; r++) Assert.IsTrue(m.Rows[r].Any(n => n.Type == "fight" || n.Type == "elite"));
-                    Assert.IsFalse(m.Rows[2].Concat(m.Rows[3]).Any(n => n.Type == "elite" || n.Type == "camp"), "엘리트 · 휴식은 1-4 부터");
+                    for (int r = 2; r <= N - 2; r++) Assert.IsTrue(m.Rows[r].Any(n => n.Type == "fight" || n.Type == "elite"));
+                    Assert.IsFalse(m.Rows.Skip(2).Take(4).SelectMany(x => x).Any(n => n.Type == "elite" || n.Type == "camp"), "엘리트 · 휴식은 1-6 부터");
+                    Assert.IsTrue(m.Rows.Skip(1).Take(5).SelectMany(x => x).Where(n => n.Type == "fight").All(n => n.Fight == 0), "1-1 ~ 1-5 는 약한 싸움");
+                    Assert.IsTrue(m.Rows.Skip(10).Take(N - 11).SelectMany(x => x).Where(n => n.Type == "fight").All(n => n.Fight == 2), "1-10 부터 센 싸움");
                     // 모든 칸이 보스에 닿는다
-                    var reach = new HashSet<string> { "r10c0" };
-                    for (int r = 9; r >= 0; r--) foreach (var n in m.Rows[r]) if (n.Next.Any(reach.Contains)) reach.Add(n.Id);
+                    var reach = new HashSet<string> { $"r{N}c0" };
+                    for (int r = N - 1; r >= 0; r--) foreach (var n in m.Rows[r]) if (n.Next.Any(reach.Contains)) reach.Add(n.Id);
                     Assert.IsTrue(m.Rows.SelectMany(x => x).All(n => reach.Contains(n.Id)));
                     foreach (var n in m.Rows.SelectMany(x => x).Where(n => n.Type == "fight" || n.Type == "elite")) Assert.IsNotNull(n.Foes);
                     Assert.AreEqual(GameData.ToJson(m), GameData.ToJson(Run.GenMap(d, seed, floor, "erpien")));
@@ -101,6 +105,26 @@ namespace Bolzena.Core.Tests
                 }
             Assert.Greater(both, 0, "다른 사도끼리는 은총 · 신탁이 한 전투에 같이 선다");
             Assert.Greater(cards, 0); Assert.Greater(graces, 0);
+        }
+
+        [Test] public void 시작_덱에서_빠진_기본_카드는_은총에_낮은_확률로()
+        {
+            // 2026-10-10 시작 덱 4장(기본 3 + 시동 1) — 빠진 기본 카드(「사도_sN」)는 은총 후보에 R.GRACE_BASIC 로, 고유 카드보다 드물게
+            int basic = 0, uniq = 0;
+            for (long seed = 1; seed <= 300; seed++)
+            {
+                var run = New(seed);
+                run.Data.Cards["rico_s9"] = new CardDef { Id = "rico_s9", Name = "시험 강타", Hero = "rico", Type = "공격", Cost = 2 };
+                Assert.Contains("rico_s9", run.BasicsLeft("rico"));
+                run.S.Node = 3;   // 보스 — 은총 하나는 반드시
+                foreach (var g in run.RollEpiphany().Values.Where(g => g.Kind == "hero" && g.Hero == "rico"))
+                    if (g.Options[0] == "rico_s9") basic++; else uniq++;
+            }
+            Assert.Greater(basic, 0, "빠진 기본 카드도 은총에 뜬다");
+            Assert.Greater(uniq, basic, "고유 카드보다 드물게");
+            var r2 = New(1); r2.Data.Cards["rico_s9"] = new CardDef { Id = "rico_s9", Name = "시험 강타", Hero = "rico", Type = "공격", Cost = 2 };
+            r2.S.Deck.Add("rico_s9");
+            Assert.IsFalse(r2.BasicsLeft("rico").Contains("rico_s9"), "덱에 있으면 후보가 아니다");
         }
 
         [Test] public void 교주_카드는_주인_사도_몫으로_센다()
@@ -184,6 +208,51 @@ namespace Bolzena.Core.Tests
             Assert.IsNotNull(c.Train);
             Assert.IsNull(run.CampTrain(c.Train.Picks[0]));
             Assert.AreEqual(c.Train.Picks[0], run.S.Flash["sion_u2"]);
+        }
+
+        [Test] public void 수련_후보에서_신탁_받은_카드와_축복만_받은_카드는_빠진다()
+        {
+            var run = New();
+            run.S.Deck.AddRange(new[] { "sion_u2", "rico_u1", "carrot_u1" });
+            var all = run.CampTargets();
+            CollectionAssert.IsSubsetOf(new[] { "sion_u2", "rico_u1", "carrot_u1" }, all);
+            run.S.Flash["sion_u2"] = 1;     // 신탁 받음
+            run.S.Shin["rico_u1"] = "draw"; // 축복만 받음
+            var t = run.CampTargets();
+            CollectionAssert.DoesNotContain(t, "sion_u2");
+            CollectionAssert.DoesNotContain(t, "rico_u1");
+            CollectionAssert.Contains(t, "carrot_u1");
+            CollectionAssert.Contains(run.FlashTargets(), "rico_u1", "전투 · 이벤트 신탁 후보는 축복만 받은 카드를 그대로 둔다");
+            // 같은 카드 두 장 가운데 한 장(id#n)만 신탁 · 축복
+            run.S.Deck.AddRange(new[] { "carrot_u1", "carrot_u1#2" });
+            run.S.Flash["carrot_u1#2"] = 1;
+            CollectionAssert.DoesNotContain(run.CampTargets(), "carrot_u1#2");
+            CollectionAssert.Contains(run.CampTargets(), "carrot_u1");
+            run.S.Shin["carrot_u1"] = "draw";
+            CollectionAssert.DoesNotContain(run.CampTargets(), "carrot_u1");
+            // 캠프 — 후보가 아니면 못 연다 · 처음 제시도 후보 안에서
+            run.S.Map = null; run.S.Floor = 1;
+            var c = run.EnterCamp("camp");
+            Assert.IsTrue(c.Train == null || run.CampTargets().Contains(c.Train.CardId));
+            Assert.IsNull(run.CampOffer("rico_u1"));
+            Assert.IsNull(run.CampOffer("sion_u2"));
+        }
+
+        [Test] public void 이벤트_축복을_받으면_신탁도_함께_붙는다()
+        {
+            var run = New();
+            run.S.Deck.AddRange(new[] { "sion_u2", "rico_u1", "carrot_u1" });
+            foreach (var id in run.ShinAble(null)) Assert.AreEqual(5, run.Data.Card(id).Oracles.Count);
+            var target = run.ShinAble(null).First();
+            run.S.Event = new EventState();
+            run.S.Event.Pending.Add(new Pending { K = "shinPick" });
+            Assert.IsNull(run.ResolvePending(target));
+            Assert.IsTrue(run.S.Shin.ContainsKey(target), "축복");
+            Assert.IsTrue(run.S.Flash.TryGetValue(target, out var n) && n >= 1 && n <= 5, "신탁도 함께");
+            CollectionAssert.DoesNotContain(run.FlashTargets(), target);
+            CollectionAssert.DoesNotContain(run.CampTargets(), target);
+            CollectionAssert.DoesNotContain(run.ShinAble(null), target);
+            Assert.IsTrue(run.S.Event.Log.Any(x => x.Contains("신탁") && x.Contains("함께")));
         }
 
         [Test] public void 상점_사기_새로고침_제거()

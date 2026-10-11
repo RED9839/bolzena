@@ -145,7 +145,7 @@ namespace Bolzena.RunUI
             var name = Ui.Title(rt, g.Kind == CardOrder.Kind.Leader ? "교주" : g.Kind == CardOrder.Kind.Status ? "상태" : g.Kind == CardOrder.Kind.Curse ? "저주" : info?.ko ?? g.Hero, Theme.FsLg, Theme.Ink, TextAlignmentOptions.BottomLeft);
             name.rectTransform.Band(0, 30, 12, 8, 12);
             name.textWrappingMode = TextWrappingModes.NoWrap; name.enableAutoSizing = true; name.fontSizeMin = 12; name.fontSizeMax = Theme.FsLg; name.Outline(0.2f);
-            var sub = Ui.Text(rt, g.Kind == CardOrder.Kind.Hero ? new string('★', Mathf.Clamp(info?.star ?? 3, 1, 5)) : g.Kind == CardOrder.Kind.Leader ? "교주 카드" : "적 · 이벤트가 넣은 카드", Theme.FsSm, g.Kind == CardOrder.Kind.Hero ? Theme.Gold : Theme.Sub, TextAlignmentOptions.BottomLeft);
+            var sub = Ui.Text(rt, g.Kind == CardOrder.Kind.Hero ? (info != null ? $"{info.nature} · {info.role}" : "사도 카드") : g.Kind == CardOrder.Kind.Leader ? "교주 카드" : "적 · 이벤트가 넣은 카드", Theme.FsSm, Theme.Sub, TextAlignmentOptions.BottomLeft);
             sub.rectTransform.Band(0, 20, 12, 8, 44); sub.Outline(0.2f);
             var frame = Ui.Img(rt, Theme.S("frame", 24), tint, "frame"); frame.rectTransform.Fill();
             return rt;
@@ -200,7 +200,7 @@ namespace Bolzena.RunUI
                 int idx = i;
                 var o = opts[i];
                 var holder = Ui.Rect("oracle" + o.N, row); holder.Pref(cw, cw * 1.4f + 70);
-                var view = P.Data.View(cardId, o.N);
+                var view = o.View ?? P.Data.View(cardId, o.N);   // 축복까지 얹은 모습(피해를 더하는 축복이면 공격 카드)
                 var face = W.Card(holder, this, cardId, cw, "card", view, noFace: true);   // 신탁 창은 주인 얼굴 핀 없이
                 face.At(0.5f, 1, 0, -6, cw, cw * 1.4f);
                 if (o.Blessed)
@@ -209,7 +209,7 @@ namespace Bolzena.RunUI
                     var rt2 = Ui.Title(rib.transform, "축복!", Theme.FsMd, Theme.Brown, TextAlignmentOptions.Center); rt2.rectTransform.Fill();
                     var glow = Ui.Img(holder, Theme.S("soft"), Theme.Gold.A(0.45f), "glow"); glow.rectTransform.At(0.5f, 1, 0, 30, cw * 1.5f, cw * 1.9f); glow.transform.SetAsFirstSibling();
                     Tw.Pulse(glow, 0.25f, 0.55f, 1.6f);
-                    var bt = Ui.Text(holder, $"{o.BlessText}", Theme.FsCap, Theme.Ink, TextAlignmentOptions.Top);
+                    var bt = Ui.Text(holder, o.ToAttack ? o.BlessText + "\n" + Core.OracleOption.ATTACK_LINE : $"{o.BlessText}", Theme.FsCap, Theme.Ink, TextAlignmentOptions.Top);
                     bt.rectTransform.At(0.5f, 0, 0, 0, cw + 20, 48); bt.enableAutoSizing = true; bt.fontSizeMin = 10; bt.fontSizeMax = Theme.FsCap;
                 }
                 var b = face.gameObject.AddComponent<Btn>();

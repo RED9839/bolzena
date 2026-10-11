@@ -17,6 +17,11 @@ namespace Bolzena.Core
         /// </summary>
         public static bool GRADE_ON = false;
 
+        // ── 지도 ───────────────────────────────────────────────────
+        /// <summary>층 길이 — 1-1 ~ 1-17(17번째가 보스, 16번째가 보스 앞 휴식+상점). 2026-10-10 10 → 17. 칸 종류 경계는 이 길이의 비율(RunMap.cs).
+        /// const 가 아닌 건 bz --nodes 로 옛 길이와 견주려고.</summary>
+        public static int FLOOR_NODES = 17;
+
         // ── AP · 손 ─────────────────────────────────────────────────
         public const int AP_PER_TURN = 3;
         public const int DRAW_PER_TURN = 5;
@@ -25,12 +30,27 @@ namespace Bolzena.Core
         // ── 눈금 · 적 세기 ───────────────────────────────────────────
         public const double ENEMY_HP = 0.85;
         public const int SCALE = 10;
-        public static readonly Dictionary<int, double> FLOOR_HP = new() { [1] = 2.0, [2] = 3.25 };
-        public static readonly Dictionary<int, double> BOSS_HP = new() { [1] = 0.7, [2] = 0.6 };
+        /// <summary>층별 적 체력 배율. 2026-10-10 적 수치 재조정 — 2층 3.25 → 4.3(2층 일반 싸움 2.35턴 → 2.9턴, _measure/난이도_재조정_20261010.md §8)</summary>
+        public static readonly Dictionary<int, double> FLOOR_HP = new() { [1] = 2.0, [2] = 4.3 };
+        /// <summary>층별 보스 체력 배율. 2026-10-11 엘다인 4차 0.7 · 0.6 → 1.0 · 0.7 — 1층 보스 4.35턴 → 5.6턴, 보스 쓰러짐 1층 2.1 → 5.1% · 2층 3.3 → 3.9%(§12). 사도 8장 · 태세 뒤 2층 0.7 → 0.58 — 2층 보스 7.3턴 → 6.2턴(BOSS_DMG 2층 1.15 와 함께, §13). 고유 효과 2개 · 시작 덱 4장 뒤 2층 0.58 → 0.6 — 2층 보스 5.8 → 5.9턴(§14)</summary>
+        public static readonly Dictionary<int, double> BOSS_HP = new() { [1] = 1.0, [2] = 0.6 };
+        /// <summary>층별 일반 싸움(엘리트 · 보스가 아닌 싸움, 이벤트 일반 싸움 포함) 적 체력 배율 — FLOOR_HP 위에 곱한다. 일반 싸움 턴만 늘리는 손잡이(2026-10-11 엘다인 4차, _measure/난이도_재조정_20261010.md §12)</summary>
+        public static readonly Dictionary<int, double> FIGHT_HP = new() { [1] = 1.5, [2] = 1.15 };
+        /// <summary>층별 보스 피해 배율 — FLOOR_DMG 위에 곱한다. 보스 체력을 줄여 턴을 줄일 때 쓰러짐을 지키는 손잡이(2026-10-11 엘다인 4차 뒤, §13)</summary>
+        public static readonly Dictionary<int, double> BOSS_DMG = new() { [1] = 1.05, [2] = 1.15 };
         /// <summary>층별 적 피해 배율. 2층 3.8 → 5.15(2026-10-09 — 학년 시스템 켬 · 크레파스 없음 · 숙련 봇 역할 편성 완주 33% 맞춤. 모든 층을 올리면 1층 쓰러짐이 20% 넘어 2층만 올렸다).
         /// 2026-10-09 재조정 1층 2.4 → 3.1 · 2층 5.15 → 5.4 — 턴당 제한 제거 · 끊기 제거 · 장비 확률 · 클론 키트 · 학년 보상 뒤 완주 45.6% → 33.1%. 2층 일반 쓰러짐이 몰리지 않게 1층 몫을 더 올렸다(1층 쓰러짐 18.5% · 2층 일반 34.6%, _measure/난이도_재조정_20261009.md).
         /// 2026-10-09 학년 꺼짐(GRADE_ON false) 뒤 1층 3.1 → 2.9 · 2층 5.4 → 4.4 — 학년 몫이 빠져 17.4% 로 떨어진 것을 32.7% 로(1층 쓰러짐 18.3% · 2층 일반 37.3%). 학년을 되살리면 3.1 · 5.4 로 되돌린다</summary>
-        public static readonly Dictionary<int, double> FLOOR_DMG = new() { [1] = 2.9, [2] = 4.4 };
+        /// 2026-10-10 최종(3성 리뉴얼 · 적 리뉴얼 6마을 · 17칸 · 카제나 규칙 뒤) 1층 2.9 → 2.6 · 2층 4.4 → 4.1 — 25.6% → 36.9%(목표 35~40), 1층 일반 쓰러짐 20.0 → 11.9%, 보스 1층 3.1 · 2층 5.3(_measure/난이도_재조정_20261010.md)
+        /// 2026-10-10 생존 손질(역할 실드 · 회복 ×1.5 · 추가 방어력 다 듦 · 전투당 제한 없앰) 뒤 적 피해를 올려 막을 가치를 키움 — 1층 2.6 → 3.0 · 2층 4.1 → 5.0, 완주 37.3%(보스 1층 3.2 · 2층 5.0)
+        /// 2026-10-10 적 수치 재조정(사도 · 장비 리뉴얼 뒤, 적 데이터 · 보스 몸 손질과 함께) — 1층 3.0 → 2.8 · 2층 5.0 → 3.7, 완주 36%(§8)
+        /// 2026-10-10 시작 덱 5장 → 4장 뒤 — 2층 3.7 → 3.5, 완주 32.1 → 36.6%(§9)
+        /// 2026-10-11 사도 카제나식 스탯표 · 10% 반올림 · 기본 카드 같은 기준 뒤 — 2.8 · 3.5 → 2.6 · 3.2, 완주 26.4 → 37.7%(§10)
+        /// 2026-10-11 엘다인 20명(새 설계 · 엔진 E1~E37) 뒤 — 2.6 · 3.2 → 2.0 · 1.9, 완주 약 5 → 37.6%(§11)
+        /// 2026-10-11 엘다인 4차 최종(일반 싸움 FIGHT_HP 1.5 · 1.15 · 보스 BOSS_HP 1.0 · 0.7 와 함께) — 2.0 · 1.9 → 1.85 · 2.0, 완주 38.1%(§12)
+        /// 2026-10-11 사도 8장(고유 5) · 변신 → 태세 뒤 — 2층 2.0 → 1.95(보스 체력 · 피해 조정과 함께), 완주 38.3%(§13)
+        /// 2026-10-11 고유 효과 2개씩 · 시작 덱 4장(시동 필수) 뒤 — 1.85 · 1.95 → 2.1 · 2.35(보스 피해 1층 1.05 와 함께), 완주 63.6 → 38.3%(§14)
+        public static readonly Dictionary<int, double> FLOOR_DMG = new() { [1] = 2.1, [2] = 2.35 };
         public const double ELITE_HP = 1.5;
 
         /// <summary>층(0부터) · 보스 · 엘리트 → 적 체력 배율 · 피해 배율.</summary>
@@ -38,8 +58,9 @@ namespace Bolzena.Core
         {
             int k = floor + 1;
             double hp = ENEMY_HP * (FLOOR_HP.TryGetValue(k, out var a) ? a : 1)
-                * (boss ? (BOSS_HP.TryGetValue(k, out var b) ? b : 1) : 1) * (elite ? ELITE_HP : 1);
-            return (hp, FLOOR_DMG.TryGetValue(k, out var d) ? d : 1);
+                * (boss ? (BOSS_HP.TryGetValue(k, out var b) ? b : 1) : 1) * (elite ? ELITE_HP : 1)
+                * (!boss && !elite && FIGHT_HP.TryGetValue(k, out var f) ? f : 1);
+            return (hp, (FLOOR_DMG.TryGetValue(k, out var d) ? d : 1) * (boss && BOSS_DMG.TryGetValue(k, out var bd) ? bd : 1));
         }
 
         // ── 적의 손패 흡수(수 seize) ──────────────────────────────────
@@ -53,6 +74,8 @@ namespace Bolzena.Core
         public const int ENEMY_RUSH_MIN = 3;
 
         // ── 신탁(전투 중) · 축복 ────────────────────────────────────
+        /// <summary>은총 하나가 고유 카드 대신 시작 덱에서 빠진 그 사도의 기본 카드(2코 강타 등)로 뜰 확률(2026-10-10 시작 덱 4장 — 기본 3 + 시동 1). 남은 고유 카드가 없으면 늘 기본 카드.</summary>
+        public static double GRACE_BASIC = 0.2;
         public static readonly Dictionary<string, double> EPI_HERO = new() { ["fight"] = 0.4, ["elite"] = 0.7, ["boss"] = 0.8, ["event"] = 0.3 };
         public static readonly Dictionary<string, double> EPI_CARD = new() { ["fight"] = 0.3, ["elite"] = 0.5, ["boss"] = 0.4, ["event"] = 0.15 };
         public static readonly string[] EPI_SURE_HERO = { "fight", "elite", "boss" };
@@ -63,7 +86,7 @@ namespace Bolzena.Core
         /// 15% 근거: 전투당 신탁이 0.3~0.5번 꼴이라 판(싸움 열 남짓)에 축복 0.5~1장 — 옛 20% 보다 조금 드물게, 「발생할 수도 있음」 의 감.
         /// </summary>
         public const int ORACLE_PICKS = 3;
-        public const double ORACLE_BLESS = 0.15;
+        public const double ORACLE_BLESS = 0.20;   // 2026-10-10 15% → 20%(사용자)
         public const double DIVINE = ORACLE_BLESS;
         /// <summary>공용 축복 풀 — 카드 종류마다. (웹판의 thorn 「중독」 은 중독을 뺐으므로 없앴다)</summary>
         public static readonly Dictionary<string, string[]> DIVINE_KINDS = new()
@@ -144,12 +167,15 @@ namespace Bolzena.Core
             ["분쇄"] = 0.2,
             ["리듬Max"] = 10,
             // 2026-10-05 키워드 사전(Docs/키워드.md) — 카제나 효과 사전 값
-            ["공명"] = 0.8, ["탄성"] = 0.5, ["탄성Max"] = 5, ["칼날 벼리기"] = 0.2, ["칼날 벼리기Max"] = 3, ["형상 강화"] = 1.0, ["형상 강화Max"] = 3,
+            ["공명"] = 0.8, ["탄환"] = 1.0, ["탄성"] = 0.5, ["탄성Max"] = 5, ["칼날 벼리기"] = 0.2, ["칼날 벼리기Max"] = 3, ["형상 강화"] = 1.0, ["형상 강화Max"] = 3,
             ["급속Max"] = 9, ["둔화Max"] = 9, ["초재생"] = 3.0, ["집중"] = 0.5, ["탐구심"] = 0.2, ["고통 각인"] = 2, ["응징"] = 2.0, ["포자증식"] = 0.1,
             ["죽음의 낙인"] = 0.8, ["행동 둔화"] = 0.2, ["독"] = 1.0, ["부상"] = 0.3, ["흡수Max"] = 0.2, ["축복"] = 0.6, ["축복At"] = 0.3,
         };
         public static double SV(string id) => STATUS_V.TryGetValue(id, out var v) ? v : 0;
-        public static double? SMax(string id) => STATUS_V.TryGetValue(id + "Max", out var v) ? v : (double?)null;
+        public static double? SMax(string id) => STATUS_V.TryGetValue(MaxKey(id), out var v) ? v : (double?)null;
+        /// <summary>「id + Max」 열쇠 — 판 점수가 상태마다 부르니 문자열을 한 번만 만든다(2026-10-09).</summary>
+        static string MaxKey(string id) => MAX_KEYS.TryGetValue(id, out var k) ? k : MAX_KEYS.GetOrAdd(id, x => x + "Max");
+        static readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> MAX_KEYS = new();
 
         public const string RHYTHM = "리듬";
         public const string STUN = "기절";
@@ -164,19 +190,36 @@ namespace Bolzena.Core
         public static readonly string[] TURN_ST = { "칼날 벼리기", "빙벽", "절대 무적", "열정 약점", "형상 강화" };
         /// <summary>턴 수 — 내 턴이 시작될 때마다 1 준다.</summary>
         public static readonly string[] TICK_ST = { "구속", "초재생", "정신 붕괴" };
+        /// <summary>
+        /// 성격 약점(적) — 「광기 약점 n」 이면 n턴 동안 그 적에게 광기 사도의 카드가 약점 공격으로 들어간다(2026-10-10 카제나식 — 약점 만들기 수단).
+        /// 내 턴이 시작될 때마다 1 준다(적에게 걸려 있어도). 성격 이름 → 상태 이름은 NatureWeakSt.
+        /// </summary>
+        public static readonly string[] NATURE_WEAK_ST = { "순수 약점", "광기 약점", "냉정 약점", "활발 약점", "우울 약점", "공명 약점" };
+        /// <summary>약점 노출(적) — n턴 동안 그 적에게 아군의 모든 카드가 약점 공격으로 들어간다. 성격 약점처럼 내 턴 시작마다 1 준다(교주 카드 · 아티팩트의 약점 만들기 수단, 2026-10-10).</summary>
+        public const string EXPOSED = "약점 노출";
+        /// <summary>
+        /// 첫 수 약점 노출 — 전투를 열 때 모든 적(처음 선 적만, 소환 · 국면 전환 빼고)에 약점 노출 n(= 첫 n턴 동안 누구의 카드든 약점).
+        /// 2026-10-10 사용자 목표 「메인 딜러 1명만 약점이어도 충분히 깰 수 있게 · 약점 0명도 수단으로」 — 측정(_measure/속성_의존도_20261009.md §6)에서 2턴이
+        /// 약점 0명 −6%p 안 · 딜러만 약점 ≈ 3명 −3.5%p 로 목표를 맞췄다. 0 이면 끈다. 카제나 규칙(약점 ×1.25 · 강인도 1/3)은 그대로.
+        /// </summary>
+        public static int OPEN_EXPOSE = 0;   // 2026-10-10 — 2 로 켜면 보스가 첫 두 턴에 격파되어 위협이 사라져(보스 쓰러짐 0.1%) 결정 전까지 끔
+        static readonly Dictionary<string, string> natureWeakSt = NATURE_WEAK_ST.ToDictionary(s => s.Substring(0, s.IndexOf(' ')), s => s);
+        /// <summary>성격 → 그 성격 약점 상태 이름(없으면 null) — 글을 짓지 않고 찾는다.</summary>
+        public static string NatureWeakSt(string nature) => nature != null && natureWeakSt.TryGetValue(nature, out var s) ? s : null;
         /// <summary>그 밖 — 다음 턴 드로우(다음 턴 시작에 겹만큼 뽑고 사라진다) · 죽음의 낙인(적) · 급속 · 둔화(적의 행동 카운트, 그 적이 행동하면 사라진다).</summary>
-        public static readonly string[] OTHER_ST = { "다음 턴 드로우", "죽음의 낙인", "급속", "둔화", "끈기" };
+        public static readonly string[] OTHER_ST = { "다음 턴 드로우", "죽음의 낙인", "급속", "둔화", "끈기", "은방울" };   // 은방울(엘다인 3차 ▶E65) — 파티 실드가 깨지거나 턴 끝에 남으면 그만큼 피해 감소로
         /// <summary>카드에 붙는 상태 — 상태 이름이 아니라 카드 id 에 붙는다(cardStatus 조각 · 적의 수 cardDebuff).</summary>
         public static readonly string[] CARD_ST = { "독", "봉쇄", "침체", "빙결", "탐구심" };
         public static readonly string[] UNIT_ST = { "고통", "균열", "고동", "그을림", "충격", "충격파", "응징" };
         /// <summary>해로운 상태 — 「디버프 해제」 의 차례 · 면역이 막는 것.</summary>
         public static readonly string[] BAD_ST = { "취약", "약화", "손상", "고통", "균열", "그을림", "충격", "충격파", "잔불",
-            "고통 각인", "응징", "포자증식", "죽음의 낙인", "열정 약점", "정신 붕괴", "둔화", "미끄러움" };
+            "고통 각인", "응징", "포자증식", "죽음의 낙인", "열정 약점", "정신 붕괴", "둔화", "미끄러움",
+            "순수 약점", "광기 약점", "냉정 약점", "활발 약점", "우울 약점", "공명 약점", "약점 노출" };
         /// <summary>적에게 걸려도 「디버프를 걸면」 이 아닌 좋은 상태.</summary>
         public static readonly HashSet<string> BUFF_ST = new() { "사기", "불굴", "결의", "반격", "결정화", "잔광", "피해 감소", "면역", "실드 유지", "저장", "협공", "고동",
-            "회피", "공명", "탄성", "칼날 벼리기", "빙벽", "구속", "형상 강화", "행동 둔화", "급속", "근면", "계몽", "집중", "다음 턴 드로우", "초재생", "절대 무적", "실드 보존", "끈기" };
+            "회피", "공명", "탄성", "칼날 벼리기", "빙벽", "구속", "형상 강화", "행동 둔화", "급속", "근면", "계몽", "집중", "다음 턴 드로우", "초재생", "절대 무적", "실드 보존", "끈기", "은방울" };
         /// <summary>엔진이 아는 상태 전부(검사기가 본다) — 카드에 붙는 상태(CARD_ST)는 빼고.</summary>
-        public static readonly HashSet<string> ALL_ST = new(CHARGE_ST.Concat(INTENSITY_ST).Concat(DOT_ST).Concat(TURN_ST).Concat(TICK_ST).Concat(OTHER_ST).Concat(new[] { "잔불", RHYTHM, STUN }));
+        public static readonly HashSet<string> ALL_ST = new(CHARGE_ST.Concat(INTENSITY_ST).Concat(DOT_ST).Concat(TURN_ST).Concat(TICK_ST).Concat(NATURE_WEAK_ST).Concat(new[] { EXPOSED }).Concat(OTHER_ST).Concat(new[] { "잔불", RHYTHM, STUN }));
         public static bool IsTurnSt(string id) => Array.IndexOf(TURN_ST, id) >= 0;
         public static bool IsCardSt(string id) => Array.IndexOf(CARD_ST, id) >= 0;
 
@@ -201,6 +244,8 @@ namespace Bolzena.Core
         public const int KILL_AP = 0;
 
         // ── 강인도 · 격파 ────────────────────────────────────────────
+        /// <summary>최소 강인도(사용자 2026-10-10) — 엔진이 적을 세울 때 tough = max(데이터, 최소). 일반 적 · 소환물 3, 엘리트(id …_elite) · 보스 · 보스 클론 5. 데이터가 낮으면 검사기 주의(오류 아님). TOUGH.Min · MinBoss 는 더 쓰지 않는다.</summary>
+        public const double MIN_TOUGH_FIGHT = 3, MIN_TOUGH_BIG = 5;
         public static class TOUGH
         {
             /// <summary>
@@ -217,25 +262,42 @@ namespace Bolzena.Core
             public const int Ap = 1;
             /// <summary>소수 찌꺼기를 지우는 눈금(1/60 — 1/2 · 1/3 · 1/4 · 1/5 · 1/6 · ×0.8 이 다 맞아떨어진다).</summary>
             public const double Grid = 60;
-            /// <summary>광역(allEnemies · 퍼짐) 카드가 적 하나에 주는 강인도 피해 배율 — 1 이면 적마다 단일과 같은 양(2026-10-08 사용자 제보 「1코 광역이 1칸을 못 깎는다」, 옛 0.5).</summary>
-            public const double Area = 1;
+            /// <summary>광역(allEnemies) · 논타겟(무작위 대상) 카드가 적 하나에 주는 강인도 피해 배율 — 2026-10-10 카제나 표 1/2(2026-10-08 의 1 을 되돌림).</summary>
+            public const double Area = 1;   // 2026-10-11 사용자 「강인도 0.5 같은 것 깔끔하게 — 1로」: 광역 · 논타겟도 단일과 같게
+            /// <summary>0코 카드의 강인도 단위(카제나 표 0.5칸).</summary>
+            public const double Zero = 1;   // 2026-10-11 사용자: 0코도 1칸
+            /// <summary>추가 공격류(협공 · 공명 · 추가 공격 · 표식 터짐 · 소환물 공격) 한 번의 약점 강인도(카제나 표 0.5칸).</summary>
+            public const double Extra = 1;   // 2026-10-11 사용자: 추가 공격류도 1칸
+            /// <summary>고학년 → 카제나 에고 EP 환산 — 고학년 게이지 50% 가 EP 1, 약점 단일 EP 1 당 0.5칸 ⇒ 게이지 100% 당 1칸(250% 고학년 = 2.5칸).</summary>
+            public const double UltPerGauge = 0.01;
         }
 
         /// <summary>
-        /// 강인도 피해(카드가 적 하나를 처음 칠 때) — 사용자 확정 단위(Docs/키워드.md §1): 약점 공격은 카드 비용 1 당 1 · 약점이 아니면 그 1/3.
-        /// 비용은 최소 1 로 친다 — 0코(적힌 0 · 신탁 · 축복으로 0 이 된 것 · X 로 0 낸 것)도 1코처럼 약점 1 · 아니면 1/3(2026-10-08 사용자, 옛 0코 = 1/2).
-        /// 광역(allEnemies)은 대상마다 TOUGH.Area 배(지금 1 — 적마다 단일과 같은 양) · X 는 낸 AP · 고학년은 비용 2.
-        /// 2026-10-05 — 옛 「카드마다 0.5 + 약점 0.5」 를 바꿨다.
+        /// 강인도 피해(카드가 적 하나를 처음 칠 때) — 2026-10-10 카제나 표(커뮤니티 실측): 약점 단일은 0코 0.5칸 · 1코 1 · 2코 2 · 3코 3(비용당 1),
+        /// 광역 · 논타겟은 1/2, 약점이 아니면 1/3(곱해 겹친다 — 광역 비약점 1/6). X 는 낸 AP. 고학년은 ToughUnitUlt.
+        /// (옛: 2026-10-08 「0코도 1칸 · 광역도 단일과 같음」 — 이 표로 대체)
         /// </summary>
-        public static double ToughDmg(int cost, bool weak, bool area)
+        public static double ToughDmg(int cost, bool weak, bool area) => ToughOf(cost <= 0 ? TOUGH.Zero : cost, weak, area);
+        /// <summary>강인도 단위(약점 단일 기준 칸) → 약점 · 광역을 친 강인도 피해.</summary>
+        public static double ToughOf(double unit, bool weak, bool area)
         {
-            double unit = Math.Max(1, cost);
             double v = weak ? unit : unit / 3;
             return area ? v * TOUGH.Area : v;
         }
+        /// <summary>추가 공격류 한 번(협공 · 공명 · 추가 공격 · 표식 · 소환물) — 약점 0.5칸 · 아니면 1/6 · 광역이면 그 1/2.</summary>
+        public static double ToughExtra(bool weak, bool area = false) => ToughOf(TOUGH.Extra, weak, area);
+        /// <summary>고학년의 강인도 단위 — 게이지 비용(%) × TOUGH.UltPerGauge(게이지 100% = 약점 단일 1칸).</summary>
+        public static double ToughUnitUlt(int gaugeCost) => Math.Max(TOUGH.Zero, gaugeCost * TOUGH.UltPerGauge);
 
-        /// <summary>약점 속성으로 치면 피해 +25%(카제나 추정값, Docs/키워드.md §0). 약점이 아닌 상성 우위는 NATURE_DMG.</summary>
+        /// <summary>약점 속성으로 치면 피해 +25%(카제나, Docs/키워드.md §0 — 2026-10-10 사용자 확인). 약점이 아닌 상성 우위는 NATURE_DMG. 사도 쪽 상성 불리 페널티(적이 이기는 성격이면 받는 피해 +10% · 지는 상성이면 주는 피해 −5%)는 2026-10-10 없앴다(카제나에 없음) — NATURE_DEF 는 이제 사도가 이기는 성격의 적이 주는 피해 −5% 에만.</summary>
         public const double WEAK_DMG = 0.25;
+        /// <summary>실드 · 회복에 드는 추가 방어력(아티팩트 · 성장 · 교주 보드)의 몫 — 기본 방어력은 다 들고 추가는 이만큼(2026-10-10 카제나식 「기본 + 추가 × 50%」). 방어 기반 피해는 방어력 그대로.</summary>
+        public static double GUARD_EXTRA_K = 1.0;   // 2026-10-10 「탱커 · 서포터 쉴드 · 힐이 너무 적다」 — 0.5 → 1.0(추가 방어력도 다 든다)
+        /// <summary>역할별 실드 · 회복 배율(카드 · 패시브 · 고학년의 실드 · 회복 효과에 곱한다) — 2026-10-10 사용자 「탱커 · 서포터 쉴드 · 힐이 너무 적다」. 없는 역할은 1.</summary>
+        public static readonly Dictionary<string, double> ROLE_GUARD = new() { ["탱커"] = 1.0, ["서포터"] = 1.0, ["딜러"] = 1.0 };   // 2026-10-10 밤 사용자 「숨은 규칙 없앰」 — 역할 차이는 사도 데이터(스탯 · 카드 계수)로
+        /// <summary>같은 역할 겹침 — 파티에 같은 역할(탱커 · 서포터)이 n 명이면 그 역할의 실드 · 회복 배율 ÷ (1 + ROLE_DUP × (n − 1)). 「탱커 2 + 서포터」 쏠림 막기(2026-10-10).</summary>
+        public static double ROLE_DUP = 0;   // 2026-10-10 밤 사용자 「숨은 규칙 없앰」 — 끔(옛 0.5)
+        public static double RoleGuard(string role) => role != null && ROLE_GUARD.TryGetValue(role, out var v) ? v : 1;
 
         // ── 성격 상성 ────────────────────────────────────────────────
         public static readonly Dictionary<string, string> BEATS = new() { ["광기"] = "순수", ["순수"] = "냉정", ["냉정"] = "광기", ["활발"] = "우울", ["우울"] = "활발" };
@@ -272,6 +334,9 @@ namespace Bolzena.Core
         public const int BOON_TURNS = 9999;
         /// <summary>「전투 내내 공격력 +N%」 의 사도마다 상한 — 15% × 사기 겹 상한(10).</summary>
         public const double MORALE_ATK = 0.15;
+
+        /// <summary>희귀종 덧붙임을 쓰나(사용자 2026-10-10: 끔 — 엘리트는 이름 붙은 기믹으로 대신, 콘텐츠 적 리뉴얼). 끄면 데이터의 rare 가 있어도 패시브 · 타격 · 강인도 · 글에 안 들어간다.</summary>
+        public static bool FOE_RARE = false;
 
         /// <summary>희귀종 덧붙임(엘리트) — id → 뜻. EnemyDef.Rare 에 쓴다.</summary>
         public static readonly Dictionary<string, string> RARES = new()

@@ -18,10 +18,10 @@ namespace Bolzena.Core
             // 키워드 사전(2026-10-05)
             ["회피"] = 0.35, ["공명"] = 0.35, ["탄성"] = 0.2, ["칼날 벼리기"] = 0.3, ["빙벽"] = 0.6, ["구속"] = 0.1, ["형상 강화"] = 0.2, ["행동 둔화"] = 0.2,
             ["급속"] = -0.15, ["근면"] = 0.4, ["계몽"] = 0.3, ["집중"] = 0.3, ["다음 턴 드로우"] = 0.35, ["초재생"] = 0.6, ["절대 무적"] = 1.2, ["실드 보존"] = 0.3, ["끈기"] = 0.6,
-            ["고통 각인"] = 0.2, ["응징"] = 0.3, ["포자증식"] = 0.12, ["죽음의 낙인"] = 0.3, ["열정 약점"] = 0.2, ["정신 붕괴"] = 0.3, ["둔화"] = 0.15, ["미끄러움"] = 0.2, ["기절"] = 0.8,
+            ["고통 각인"] = 0.2, ["응징"] = 0.3, ["포자증식"] = 0.12, ["죽음의 낙인"] = 0.3, ["열정 약점"] = 0.2, ["순수 약점"] = 0.25, ["광기 약점"] = 0.25, ["냉정 약점"] = 0.25, ["활발 약점"] = 0.25, ["우울 약점"] = 0.25, ["공명 약점"] = 0.1, ["약점 노출"] = 0.3, ["정신 붕괴"] = 0.3, ["둔화"] = 0.15, ["미끄러움"] = 0.2, ["기절"] = 0.8,
         };
         public static readonly Dictionary<string, double> TAG_VAL = new() { ["연계"] = 0.6, ["천상"] = 0.45, ["신속"] = 0.15, ["주도"] = 0.2, ["증발"] = -0.15, ["연결"] = -0.1, ["금기"] = 0, ["봉인"] = -0.5, ["개막"] = 0.2,
-            ["망각"] = 0.1, ["제거"] = -0.1, ["축복"] = 0.15, ["결속"] = 0.2, ["봉인된 금기"] = 0, ["열정"] = 0.05, ["탄환"] = 0 };
+            ["망각"] = 0.1, ["제거"] = -0.1, ["축복"] = 0.15, ["결속"] = 0.2, ["봉인된 금기"] = 0, ["열정"] = 0.05, ["탄환"] = 0.15 };
         public static readonly Dictionary<string, double> HIT_TAG_VAL = new() { ["분쇄"] = 0.06, ["약점"] = 0.1, ["약점 공격"] = 0.1 };
         public const double TOUGH_VAL = 0.3;
         public static readonly Dictionary<string, double> COND_VAL = new()
@@ -37,9 +37,13 @@ namespace Bolzena.Core
             ["drawAny"] = 0.9, ["burn"] = 0.4, ["passion"] = 0.4,
             // 시범 16(2026-10-08 2단계) — 직전보다 비싼가 · 이번 전투 쌓은 양 · 엘리트/보스 처치
             [FxK.IfPricier] = 0.4, [FxK.IfGained] = 0.5, ["killElite"] = 0.12, ["killBoss"] = 0.05,
+            // 엘다인 4차 — 이번 턴 n대 맞았으면 · 적이 하나뿐이면
+            [FxK.IfHitTaken] = 0.4, ["alone"] = 0.35, [FxK.IfCost] = 0.4, ["known"] = 0.5,
         };
         /// <summary>시범 16 — 이번 전투 소멸 장수의 보통 수 · 소환물 한 대의 보통 대 수 · 당겨 쓰기(남은 칸 비례)의 보통 몫.</summary>
         public const double GONE_PER = 3, SUMMON_HITS = 2.5, RIPEN_VAL = 0.9;
+        /// <summary>(엘다인) 실드 비례의 보통 수(실드 100당 · 대충) · 변신 조건이 설 확률(변신 사도의 카드).</summary>
+        public const double SHIELD_PER = 1.5, FORM_ON = 0.45;
         /// <summary>「… 1개당」 의 보통 수 — 버린 장수 · 치른 HP(단위) · 적의 디버프 가짓수.</summary>
         public const double DISC_PER = 1.5, PAID_PER = 1.5, DEBUFF_PER = 2;
         public const int RHYTHM_PER = 2;
@@ -66,6 +70,7 @@ namespace Bolzena.Core
         public static double ValueOf(List<Fx> fx, IList<string> tags = null, bool power = false, bool live = false, int? rhythm = null)
         {
             double v = 0, per = 1, cond = 1, dmgV = 0, dmgArea = 1;
+            bool shieldSpent = false;
             var marks = new List<Fx>();
             foreach (var f in fx ?? new List<Fx>())
             {
@@ -82,10 +87,36 @@ namespace Bolzena.Core
                     case FxK.IfKill: case FxK.IfBreak: case FxK.IfWounded: case FxK.IfChoice: case FxK.IfRandom: case FxK.IfHand: case FxK.IfPile: case FxK.IfNth: case FxK.IfStreak: case FxK.IfAllHeroes: case FxK.IfFoe: case FxK.IfCardSt:
                     case FxK.IfPricier: case FxK.IfGained:
                         if (f.K == FxK.IfPricier && live && !f.Not) { cond = 1; break; }   // 지금 바로 앞 카드보다 비싸다(봇 LiveVal)
-                        cond = f.K == FxK.IfRandom ? (f.Pct > 0 ? f.Pct : 0.5) : f.K == FxK.IfKill && f.Id != null ? COND_VAL[f.Id == "boss" ? "killBoss" : "killElite"] : COND_VAL[f.K];
+                        cond = f.K == FxK.IfRandom ? (f.Pct > 0 ? f.Pct : 0.5) : f.K == FxK.IfKill && f.Id != null ? COND_VAL[f.Id == "boss" ? "killBoss" : "killElite"] : f.K == FxK.IfFoe && f.Id == "alone" ? COND_VAL["alone"] : f.K == FxK.IfFoe && f.Id == "known" ? COND_VAL["known"] : f.K == FxK.IfNth && f.After ? 0.5 : COND_VAL[f.K];
                         if (f.Not && (f.K == FxK.IfKill || f.K == FxK.IfBreak || f.K == FxK.IfPricier || f.K == FxK.IfGained)) cond = 1 - cond;
                         break;
-                    case FxK.PerGone: per = f.Who == "self" ? GONE_PER * 0.7 : GONE_PER; break;
+                    case FxK.PerGone: per = f.Turn ? (f.Id != null ? 1.5 : 2) : f.Who == "self" ? GONE_PER * 0.7 : GONE_PER; break;
+                    // 엘다인 문법(2026-10-11) — 실드 소모 · 실드 비례 · 변신 조건 · 연장 · 망각 끔
+                    case FxK.SpendShield: shieldSpent = true; v -= 0.25; break;   // 막을 실드를 헌다(대가)
+                    case FxK.PerShield: per = SHIELD_PER; break;
+                    case FxK.IfForm: cond = f.Not ? 0.5 : FORM_ON; break;
+                    case FxK.FormExtend: v += 0.5 * Math.Max(1, f.V); break;
+                    case FxK.NoForget: break;
+                    // 엘다인 3차 — 반격 모양 · 증감 · 게이지 잠금 · 기록 · 낭독 · 적마다 깎기
+                    case FxK.CounterHits: v += 0.4 + 0.1 * Math.Max(2, f.V); break;
+                    case FxK.CounterAll: v += 0.8; break;
+                    case FxK.CounterMod: v += 0.6 * Math.Abs(f.V) * Math.Min(f.TurnsOr1, 3); break;
+                    case FxK.GaugeLock: v -= 0.3; break;
+                    case FxK.Record: v += 0.5 * Math.Max(1, f.V); break;
+                    case FxK.Replay: v += 0.9 * (f.Ratio > 0 ? f.Ratio : 1) * (f.All ? 2 : Math.Max(1, f.V)); break;
+                    case FxK.CutHit: v += 0.6 * f.V * Area(f.Target ?? "oneEnemy"); break;
+                    case FxK.IfEvent: cond = 0.5; break;
+                    case FxK.Taunt: v += 0.3 + 0.6 * f.V; break;
+                    // 엘다인 4차(E76~E87) — 당겨 셈 · 고학년 요구 게이지 · 이번 턴 신속 · 치명 피해 상태 · 맞은 대 수
+                    case FxK.Learn: v += 0.3 * (f.Target == "allEnemies" ? 1.5 : 1); break;
+                    case FxK.NthNext: v += 0.3 * Math.Max(1, f.V); break;
+                    case FxK.UltCostMod: v += 2 * -f.V; break;   // 요구 게이지 25% ↓ ≈ 게이지 25 를 고학년마다(보통 두 번)
+                    case FxK.SwiftTurn: v += 0.5; break;
+                    case FxK.CritDmg: v += 0.5 * f.V * Math.Min(f.TurnsOr1, 3) + 0.5 * ValueOf(f.Off); break;
+                    case FxK.IfCost: cond = f.Not ? 1 - COND_VAL[FxK.IfCost] : COND_VAL[FxK.IfCost]; break;
+                    case FxK.IfHitTaken: cond = f.Not ? 1 - COND_VAL[FxK.IfHitTaken] : COND_VAL[FxK.IfHitTaken]; break;
+                    case FxK.CritNext: v += 0.5; break;
+                    case FxK.Execute: v += 0.4 + 0.3 * f.BossRatio; break;
                     case FxK.Summon: v += f.Ratio * Math.Min(f.Max > 0 ? f.Max : Battle.SUMMON_CAP, SUMMON_HITS) * 0.83 * Area(f.Target ?? "randomEnemy"); break;
                     case FxK.Ripen: v += RIPEN_VAL; break;
                     case FxK.PerTag: case FxK.PerPlayed: case FxK.PerCardSt: per = 2; break;
@@ -106,7 +137,7 @@ namespace Bolzena.Core
                     case FxK.Later: case FxK.AfterCards: v += 0.8 * ValueOf(f.Then); break;
                     case FxK.Trap: v += 0.6 * ValueOf(f.Then); break;
                     case FxK.Confuse: v += 0.6; break;
-                    case FxK.AutoPlay: v += 0.5 * Math.Max(1, f.N); break;
+                    case FxK.AutoPlay: v += 0.5 * (f.All ? 2.5 : Math.Max(1, f.N)); break;
                     case FxK.CastOther: v += 0.8; break;
                     case FxK.Pull: v += 0.5 * Math.Max(1, f.N); break;
                     case FxK.ExileFrom: v += 0.1; break;
@@ -129,9 +160,15 @@ namespace Bolzena.Core
                     case FxK.PerStack: per = Math.Max(3, f.N); break;
                     case FxK.Dmg:
                         {
-                            double d = f.Ratio * n * 0.83 * Area(f.Target ?? "oneEnemy") * (f.XHits ? 3 : 1) * per * (f.Fixed ? 0.9 : 1);
+                            if (f.HitsPer != null) n = Math.Max(1, 2 + f.HitsAdd);   // 고유 효과 겹 + hitsAdd(보통 2)
+                            // 일의 값 고정 피해 — 쓴 실드(보통 한 장 반의 실드) · 지금 실드(보통 두 장) × ofEvent
+                            if (f.OfForm > 0) { double d1 = f.OfForm * 12 * Area(f.Target ?? "oneEnemy"); v += d1; dmgV += d1 * cond; per = 1; break; }   // 이번 변신 중 준 피해(보통 카드 열두 장 몫) × 비율(▶E76)
+                            if (f.OfEvent > 0 && (shieldSpent || f.OfShield)) { double d0 = f.OfEvent * (f.OfShield ? 0.9 : 0.6) * Area(f.Target ?? "oneEnemy"); v += d0; dmgV += d0 * cond; per = 1; break; }
+                            double d = f.Ratio * n * 0.83 * Area(f.Target ?? "oneEnemy") * (f.XHits ? 3 : 1) * per * (f.Fixed ? 0.9 : 1) * (f.KillMore ? 1.2 : 1) * (f.KnownHits > 1 ? 1 + 0.5 * (f.KnownHits - 1) : 1);   // 처치하면 한 대 더(▶E79)
                             if (dmgV == 0) dmgArea = Area(f.Target ?? "oneEnemy");
-                            v += d; dmgV += d * cond; per = 1; break;
+                            v += d; dmgV += d * cond; per = 1;
+                            if (f.HitFx != null) v += 0.5 * n * ValueOf(f.HitFx);   // 맞은 적마다(대충 절반이 산다)
+                            break;
                         }
                     case FxK.Block: case FxK.Shield: v += (f.Ratio / 2) * 0.8 * per; per = 1; break;
                     case FxK.Heal: v += (f.Ratio / 2.4) * 0.8 * per; per = 1; break;
@@ -147,12 +184,12 @@ namespace Bolzena.Core
                         v += Math.Abs(f.V) * 2 * Math.Min(f.Run ? 4 : f.TurnsOr1, 4) * Area(f.Target); break;
                     case FxK.DealtMod: case FxK.TakenMod: case FxK.DefMod: case FxK.CritMod:
                         v += Math.Abs(f.V) * 2 * Math.Min(f.Run ? 4 : f.TurnsOr1, 4) * Area(f.Target); break;
-                    case FxK.Stack: if (f.V > 0) v += 0.3 * f.V; break;
+                    case FxK.Stack: if (f.V > 0) v += 0.3 * f.V; else if (f.Carry) v += 0.6; else if (f.Set != null) v += 0.3 * Math.Max(1, f.Set.Value / 2); break;
                     case FxK.Strip: v += 0.3; break;
                     case FxK.Cleanse: v += 0.2; break;
                     case FxK.RushDown: v += 0.15 * f.V * Area(f.Target); break;
                     case FxK.NextCheaper: v += 0.8 * f.V; break;
-                    case FxK.Make: v += 0.8 * Math.Max(1, f.V); break;
+                    case FxK.Make: v += 0.8 * Math.Max(1, f.V) * per; per = 1; break;
                 }
                 if (cond != 1) v = v0 + (v - v0) * cond;
             }
@@ -181,8 +218,15 @@ namespace Bolzena.Core
         public static bool GrowsWith(List<Fx> fx, string kw)
         {
             if (fx == null) return false;
-            bool per = fx.Any(f => f.K == FxK.PerStack && f.Id == kw), spends = fx.Any(f => f.K == FxK.Spend && f.Id == kw);
-            return (per && !spends) || fx.Any(f => f.K == FxK.IfStack && f.Id == kw && f.N >= 2 && !f.Not);
+            bool per = false, spends = false, ifs = false;   // LINQ 없이 — 봇 판 점수(StackWorth)가 손패 × 겹마다 부른다(2026-10-09)
+            foreach (var f in fx)
+            {
+                if (f.Id != kw) continue;
+                if (f.K == FxK.PerStack) per = true;
+                else if (f.K == FxK.Spend) spends = true;
+                else if (f.K == FxK.IfStack && f.N >= 2 && !f.Not) ifs = true;
+            }
+            return (per && !spends) || ifs;
         }
 
         public static double ValueOf(CardView c, bool live = false, int? rhythm = null) => c == null ? 0 : ValueOf(c.Fx, c.Tags, c.IsPower, live, rhythm);
@@ -243,13 +287,15 @@ namespace Bolzena.Core
             double perTurn = w.On switch
             {
                 "turnStart" or "turnEnd" => 1,
-                "play" => (w.Who == "any" ? 3.0 : w.Who == "other" ? 2.0 : 1.4) * (w.Type != null ? 0.55 : 1) * (w.Tag != null || w.MaxCost != null || w.Marked != null ? 0.5 : 1) * (w.MinCost > 1 ? 0.5 : 1) / Math.Max(1, w.Every) * (w.Nth > 0 || w.Sig || (w.Seq != null && w.Seq.Count > 0) ? 0.35 : 1),
+                "play" => (w.Who == "any" ? 3.0 : w.Who == "other" ? 2.0 : 1.4) * (w.Type != null ? 0.55 : 1) * (w.Tag != null || w.MaxCost != null || w.PaidMax != null || w.Marked != null ? 0.5 : 1) * (w.MinCost > 1 ? 0.5 : 1) / Math.Max(1, w.Every) * (w.Nth > 0 || w.Sig || (w.Seq != null && w.Seq.Count > 0) ? 0.35 : 1),
                 "hit" => w.Who == "any" ? 2.5 : 1.0,
                 "extra" => w.Who == "any" ? 1.2 : 0.6,
                 "hurt" => 1.2, "blocked" => 0.6, "guard" => 1.3, "debuff" => w.Who == "any" ? 1.5 : 0.8,
                 "drawn" => 1.2, "kill" => 0.35, "break" => 0.3, "crit" => 0.5, "spend" => 0.8, "make" => 0.6,
                 "stackReach" => 0.4, "stackGone" => 0.4, "stackOver" => 0.3, "shieldBreak" => 0.4, "foeAct" => 1.5, "foeActBefore" => 1.5,
-                "discard" => 0.6, "exhaust" => 0.4, "ult" => 0.25, "overheal" => 0.4,
+                "discard" => 0.6, "exhaust" => 0.4, "pulled" => 0.3, "ult" => 0.25, "overheal" => 0.4,
+                // 2026-10-09 깊이 시범 — 끈기로 버팀은 전투에 한두 번 · AP 를 남기고 끝냄은 아껴 두기 사도가 꽤 고른다
+                "endure" => 0.15, "keepAp" => 0.6,
                 "summonAct" => w.Kind == "atk" ? 1.0 : w.Kind == "guard" ? 0.8 : w.Kind == "lost" ? 0.4 : 1.2,
                 _ => 0.5,
             };

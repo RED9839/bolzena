@@ -86,6 +86,58 @@ namespace Bolzena.Core
         public string Owner;
         /// <summary>spend — 낼 때 소모량을 고른다(PlayOpts.Spend · 안 고르면 전부). 소모한 양이 일의 값(perEvent)이 된다.</summary>
         public bool Pick;
+        // ── 엘다인 문법(2026-10-11, Docs/데이터.md §22) ──
+        /// <summary>spendShield — 파티 실드 절반 · cardStatus — 카드 값을 절반으로.</summary>
+        public bool Half;
+        /// <summary>dmg · shield — 일의 값 = 지금 파티 실드(ofEvent 와 같이).</summary>
+        public bool OfShield;
+        /// <summary>카드 거르개 — 생성 카드(token)만.</summary>
+        public bool Token;
+        /// <summary>dmg — 한 대마다 맞은 그 적에게 도는 효과.</summary>
+        public List<Fx> HitFx;
+        /// <summary>stack — v 대신 일을 겪은(쓰러진) 적의 그 표식 겹(표식 옮기기).</summary>
+        public bool Carry;
+        /// <summary>stack · cardStatus — 더하기 대신 그 값으로 정한다.</summary>
+        public double? Set;
+        /// <summary>dmg — 친 횟수 = 이 고유 효과의 지금 겹 + hitsAdd.</summary>
+        public string HitsPer;
+        public int HitsAdd;
+        /// <summary>spend pick — 치는 동안 새로 얻은 겹을 이어 쓴다(max 대까지, 기본 12).</summary>
+        public bool Loop;
+        /// <summary>ifFoe — 고른 적 HP 비율이 이 값 이하면(id hp 와 같다).</summary>
+        public double HpBelow;
+        /// <summary>perGone — 이번 턴에 사라진 것만.</summary>
+        public bool Turn;
+        // ── 엘다인 3차(2026-10-11 카제나 재정렬) ──
+        /// <summary>costMod · cardStatus — 손에서 고를 카드: priciest(가장 비싼 카드 한 장 — 같으면 앞의 것).</summary>
+        public string Choose;
+        /// <summary>cardStatus — 이 값이 붙은 동안 그 카드는 보존(낸 뒤 벗는다).</summary>
+        public bool Keep;
+        /// <summary>ifFoe — 이번 전투에 이 사도(self)가 그 적을 친 횟수(타마다) n 이상이면(▶E71).</summary>
+        public string HitsBy;
+        /// <summary>execute — 보스 · 클론에게는 쓰러뜨리는 대신 이 비율의 피해(▶E72).</summary>
+        public double BossRatio;
+        /// <summary>stack — 정한 뒤 turns 턴 동안 이 고유 효과가 움직이지 않는다(▶E74 위상 고정).</summary>
+        public bool Lock;
+        // ── 엘다인 4차(2026-10-11, 02 E76~E87) ──
+        /// <summary>dmg — 일의 값 = 이번 변신 중 그 사도가 준 피해(새로 들 때 0), × ofForm 고정 피해(▶E76).</summary>
+        public double OfForm;
+        /// <summary>ifNth — 꼭 n번째가 아니라 n번째 이후면(▶E77). id 가 있으면 글 이름(「정각이면」).</summary>
+        public bool After;
+        /// <summary>dmg — 치는 동안 처치하면 한 대 더(max 대까지, 기본 12 — ▶E79).</summary>
+        public bool KillMore;
+        /// <summary>critDmg — 끝날 때 도는 효과(▶E83).</summary>
+        public List<Fx> Off;
+        /// <summary>critNext — 다음 카드가 아니라 이 카드(이 조각 뒤의 피해)에 치명 확정.</summary>
+        public bool Now;
+        /// <summary>critNext now — 이 카드가 친 적에게 이 표식(적 표식 키워드 · 상태)이 있으면 그 대만 치명 확정(조건 조각이 아니다 · 카드의 어디에 둬도 처음부터).</summary>
+        public string FoeStack;
+        /// <summary>카드 거르개 · empower — 비용이 이 값 이상인 카드만(0 이면 없음).</summary>
+        public int MinCost;
+        /// <summary>(아야) dmg — 아는 수(만년설의 앎)를 하는 적에게는 이 횟수로 친다.</summary>
+        public int KnownHits;
+        /// <summary>(아야) ifFoe known · knownHits — foeTurn 이면 같은 적에게 그 적 차례마다(내 턴마다) 한 번만 덤.</summary>
+        public string Once;
 
         [Newtonsoft.Json.JsonIgnore] public int NOr1 => N <= 0 ? 1 : N;
 
@@ -143,15 +195,34 @@ namespace Bolzena.Core
         public const string Empower = "empower", PerGuarded = "perGuarded", PerOverheal = "perOverheal";
         // 시범 16(2026-10-08 2단계) — 직전보다 비싼가 · 이번 전투 소멸 장수 비례 · 이번 전투 쌓은 고유 효과 · 예약 당겨 쓰기(남은 칸 비례) · 소환물 행동
         public const string IfPricier = "ifPricier", PerGone = "perGone", IfGained = "ifGained", Ripen = "ripen", Summon = "summon";
+        // 엘다인 문법(2026-10-11) — 파티 실드 소모 · 실드 비례 · 변신 조건 · 변신 연장 · 이번엔 망각 없이
+        public const string SpendShield = "spendShield", PerShield = "perShield", IfForm = "ifForm", FormExtend = "formExtend", NoForget = "noForget";
+        // 엘다인 3차(2026-10-11) — 반격 모양 · 반격 피해 · 게이지 잠금 · 카드 기록 · 재현
+        public const string IfEvent = "ifEvent";
+        // 엘다인 3차 원작 검토(E63~E75) — 도발 · 다음 동료 카드 치명 · 처형
+        public const string Taunt = "taunt", CritNext = "critNext", Execute = "execute", StackLock = "stackLock";
+        public const string CounterHits = "counterHits", CounterAll = "counterAll", CounterMod = "counterMod", GaugeLock = "gaugeLock", Record = "record", Replay = "replay";
+        // 엘다인 4차(E76~E87) — 정각 당겨 쓰기 · 고학년 요구 게이지 · 이번 턴 신속 · 치명 피해 상태 · 맞은 대 수 조건
+        public const string NthNext = "nthNext", UltCostMod = "ultCostMod", SwiftTurn = "swiftTurn", CritDmg = "critDmg", IfHitTaken = "ifHitTaken";
+        // 엘다인 4차 태세 — n턴간 태세(변신) 보존(풀리는 계기 · 시간에 안 풀림)
+        public const string FormKeep = "formKeep";
+        // 엘다인 4차 리뉴아 「시간」 — 이 카드를 비용 n 이하로 내면(정각)
+        public const string IfCost = "ifCost";
+        // 우로스 선 · 악 — 이번엔 태세를 바꾸지 않음
+        public const string NoToggle = "noToggle";
+        // 벨라 「존속의 촛불」 — 다른 동료에게 붙은 그 표시를 지금 대상에게 모두 옮김
+        public const string MoveMark = "moveMark";
+        // 아야 「만년설의 앎」 — 적의 지금 수 종류를 적음
+        public const string Learn = "learn";
 
         public static readonly HashSet<string> Conditions = new() { IfBroken, IfTune, IfChain, IfLink, IfPrev, IfRhythm, IfSwitched, IfStack, When,
             IfRepeat, IfHeld, IfPlayedMax, IfApLeft, IfSpent, IfBalanced, IfHunted, IfDebuffs, IfHp, IfKill, IfBreak, IfWounded,
             IfChoice, IfRandom, IfHand, IfPile, IfNth, IfStreak, IfAllHeroes, IfFoe, IfCardSt,
-            IfRoll, IfPrevSame, IfInHand, IfBond, IfLastMine, IfPulled, IfShield, IfDebt, IfTypeNew, IfPricier, IfGained };
+            IfRoll, IfPrevSame, IfInHand, IfBond, IfLastMine, IfPulled, IfShield, IfDebt, IfTypeNew, IfPricier, IfGained, IfForm, IfEvent, IfHitTaken, IfCost };
         /// <summary>「… 1개당」 — 바로 뒤 피해 · 방어 · 실드 · 회복 한 줄을 그 수만큼.</summary>
-        public static readonly HashSet<string> Pers = new() { PerStack, PerRhythm, PerDiscarded, PerPaid, PerDebuff, PerApLeft, PerTag, PerPlayed, PerPile, PerCardSt, PerEvent, PerGuarded, PerOverheal, PerGone };
+        public static readonly HashSet<string> Pers = new() { PerStack, PerRhythm, PerDiscarded, PerPaid, PerDebuff, PerApLeft, PerTag, PerPlayed, PerPile, PerCardSt, PerEvent, PerGuarded, PerOverheal, PerGone, PerShield };
         /// <summary>카드의 때 붙은 마디(when on) — 영감(능력으로 뽑힘) · 감응(뽑힘) · 안식(버려짐) · 턴 끝에 손에 · 소각(소멸할 때) · 열정(손에 있을 때 열정 카드가 나가면).</summary>
-        public static readonly string[] WHEN_ON = { "draw", "drawAny", "discard", "handEnd", "burn", "passion" };
+        public static readonly string[] WHEN_ON = { "draw", "drawAny", "discard", "handEnd", "burn", "passion", "handHurtBig", "shieldLeft" };   // shieldLeft(엘다인 4차 벨라) — 낸 뒤 이번 적 차례가 끝날 때 파티 실드가 남았으면   // handHurtBig(엘다인 3차) — 손에 있는 동안 아군이 한 대에 최대 HP pct 넘게 잃으려 하면
         /// <summary>옛 운영 방식 부품(리듬 · 전환 · 재촉/예약 · 잇기 · 앞이 … · 되풀이 …) — 지우지 않는다. 새 콘텐츠는 키워드 사전(Docs/키워드.md)의 것을 쓴다.</summary>
         public static readonly HashSet<string> Old = new() { IfLink, IfPrev, IfRhythm, IfSwitched, PerRhythm, SpendRhythm, Flip, Hasten, IfRepeat, IfHeld, IfPlayedMax, IfSpent, IfBalanced, IfHunted };
         public static readonly HashSet<string> Mods = new() { DealtMod, TakenMod, AtkMod, DefMod, CritMod, HealMod };
@@ -169,6 +240,10 @@ namespace Bolzena.Core
             Roll, IfRoll, IfPrevSame, IfInHand, IfBond, IfLastMine, IfPulled, IfShield, IfDebt, IfTypeNew, Recast, CostMod, AddTag, CutHit, ClearDebt, HealMod,
             Form, FormEnd, Power, Cue, Empower, PerGuarded, PerOverheal,
             IfPricier, PerGone, IfGained, Ripen, Summon,
+            SpendShield, PerShield, IfForm, FormExtend, NoForget,
+            CounterHits, CounterAll, CounterMod, GaugeLock, Record, Replay, IfEvent,
+            Taunt, CritNext, Execute, StackLock,
+            NthNext, UltCostMod, SwiftTurn, CritDmg, IfHitTaken, FormKeep, IfCost, NoToggle, MoveMark, Learn,
         };
         public static string ModStat(string k) => k switch
         {
@@ -233,6 +308,8 @@ namespace Bolzena.Core
         public EvolveDef Evolve;
         /// <summary>결속 — 겹친 수가 3 이상이면 이 카드(강해진 카드) 로 낸다. 사도마다 카드 데이터에서 정한다.</summary>
         public string BondCard;
+        /// <summary>완성형(2026-10-10 카제나식) — 신탁(번뜩임) 없이 처음부터 완성된 고유 카드. 신탁 후보에 안 뜨고, 축복은 신탁 없이 혼자 붙는다.</summary>
+        public bool Complete;
         /// <summary>봉인된 금기 — 보스를 처치하면 덱에서 이 카드(금기 카드)로 바뀐다.</summary>
         public string Becomes;
         /// <summary>비용을 AP 대신 이 키워드(사도 고유 효과의 겹)로 치른다 — 「시간 초월로 비용 지불」 꼴.</summary>
@@ -244,6 +321,10 @@ namespace Bolzena.Core
         public bool PayMix;
         /// <summary>두 갈래로 내기 — 갈래 이름(둘). 낼 때 PlayOpts.Choice(1 · 2)로 고르고 효과는 ifChoice n 으로 가른다.</summary>
         public List<string> Choices;
+        /// <summary>(엘다인 ▶E2) 천상 계기에서만 이 카드를 비용 N 으로 센다(직접 낼 때). 0 이면 적힌 비용.</summary>
+        public int CountAs;
+        /// <summary>(엘다인 4차 태세) 그 변신 · 태세 중에만 낼 수 있다(변신 id · 「*」 = 아무 변신).</summary>
+        public string NeedForm;
 
         [Newtonsoft.Json.JsonIgnore] public bool Neutral => Hero == null && (Type == "공격" || Type == "스킬" || Type == "강화") && !Gift && !Token;
         /// <summary>얻을 때 주인 사도를 고르는 카드 — 교주 카드 · 선물 카드 · 골칫거리(저주) · 상태 카드처럼 사도가 없는 것(만든 카드 제외).
@@ -270,6 +351,12 @@ namespace Bolzena.Core
         public List<Fx> Fx = new();
         /// <summary>「강화 카드.」 신탁 — 고르면 이 카드가 강화 카드가 된다.</summary>
         public bool Power;
+        /// <summary>(엘다인) 「스킬로」 · 「공격으로」 신탁 — 고르면 카드 종류가 이것으로. 없으면 그대로(power 가 앞선다).</summary>
+        public string Type;
+        /// <summary>(엘다인 ▶E2) 천상 계기에서 이 신탁의 카드를 비용 N 으로 센다. 없으면 카드의 countAs.</summary>
+        public int? CountAs;
+        /// <summary>(엘다인 4차 태세) 이 신탁을 얹으면 그 변신 · 태세 중에만 낼 수 있다.</summary>
+        public string NeedForm;
     }
 
     /// <summary>그 카드만의 축복 — 배율 하나(kind) · 덤 효과 · 덤 태그.</summary>
@@ -316,6 +403,8 @@ namespace Bolzena.Core
         public string Blurb;
         /// <summary>변신(고학년 등의 효과 form 으로 들어간다) — 모습 · 능력이 바뀌는 상태. id 는 모든 사도 사이에서 겹치면 안 된다.</summary>
         public List<FormDef> Forms = new();
+        /// <summary>(엘다인 4차) 전투 시작 때 든 변신 · 태세 id.</summary>
+        public string StartForm;
     }
 
     /// <summary>
@@ -347,7 +436,28 @@ namespace Bolzena.Core
         public List<Fx> Off = new();
         /// <summary>모습 키 — 스파인 스킨 이름 · 애니 접두어(화면이 읽는다, 엔진은 안 본다). 모르면 "?".</summary>
         public string Skin, Anim;
+        /// <summary>(엘다인 ▶E6) 변신에 드는 순간 + 변신 중 내 턴 시작마다 손에 만드는 변신 카드(token · 증발 · 소멸). when 이 있는 줄은 그 고유 효과가 n 이상이 되는 순간 그 턴 한 장.</summary>
+        public List<FormMake> TurnMake = new();
+        /// <summary>(엘다인 ▶E22) 지속이 다 돼 풀릴 때만(반동) · formEnd 카드로 풀 때만(보상) — 둘 다 off 뒤에.</summary>
+        public List<Fx> OffExpire = new();
+        /// <summary>(엘다인 3차) 새로 드는 순간 효과(그 사도가 한다) — 규칙이 아니다.</summary>
+        public List<Fx> OnEnter = new();
+        public List<Fx> OffEnd = new();
+        /// <summary>(엘다인 4차 — 카제나 린 「흑운태세」) 태세 — 변신과 같은 틀(들기 form · 풀기 formEnd · until · turns)이되 글은 「획득 · 해제」, 매 턴 토큰(turnMake) · 겉모습이 없어도 된다.</summary>
+        public bool Stance;
+        /// <summary>(엘다인 4차 — 우로스 선 · 악) 그 사도가 자기 카드를 내면(카드 효과가 다 돈 뒤) 이 짝 태세로 바뀐다. 덤은 내는 순간의 태세로 본다. 자동 규칙이 아니다.</summary>
+        public string Toggle;
     }
+
+    /// <summary>변신 카드 한 줄 — id 카드 n 장(기본 1). when(stack · n)이 있으면 그 고유 효과가 n 이상이 되는 순간 그 턴 한 장.</summary>
+    public sealed class FormMake
+    {
+        public string Id;
+        public int N;
+        public FormMakeWhen When;
+        [Newtonsoft.Json.JsonIgnore] public int NOr1 => N <= 0 ? 1 : N;
+    }
+    public sealed class FormMakeWhen { public string Stack; public int N; }
 
     /// <summary>변신 중 카드 덤 — card(그 카드 id) · type · unique · tag 거르개(모두 맞아야), ratio(피해 배율 ×) · fx(뒤에 덧붙임) · tags(덧붙임).</summary>
     public sealed class FormBonus
@@ -392,6 +502,12 @@ namespace Bolzena.Core
         public bool Reserve;
         /// <summary>찍기(표적형) — 적에게 거는 표식이 한 번에 한 적에게만. 다른 적에게 쌓으면 옛 적의 것은 사라진다(옮기면 처음부터).</summary>
         public bool Hunt;
+        /// <summary>(엘다인 4차 — 란 사냥감) hunt 표식이 붙은 적이 쓰러지면 그 겹 그대로 다른 적에게 옮긴다 — lowEnemy(HP 비율이 가장 낮은 산 적). 규칙이 아니다.</summary>
+        public string HuntCarry;
+        /// <summary>(엘다인 4차 — 벨라 「존속의 촛불」) 아군 표시(carrier hero)가 타는 꼴 — 붙은 동료가 자기 카드를 낼 때마다 1 이 타며 키워드 주인 방어력 기준 실드. 규칙이 아니다.</summary>
+        public KwBurn Burn;
+        /// <summary>(엘다인 4차 — 아야 「만년설의 앎」) 적의 수 종류(공격 · 방어 · 강화 · 방해)를 적어 두는 칸 — 겹 = 아는 종류 수(최대 4 · 전투 끝까지 · 쓰지 않음). learn 이 적는다.</summary>
+        public bool Known;
         /// <summary>내 턴이 끝나면 이만큼 준다 · 전부 사라진다(decay 는 적의 차례가 끝난 뒤 = 다음 내 턴 시작).</summary>
         public int EndDecay;
         public bool EndClear;
@@ -415,12 +531,46 @@ namespace Bolzena.Core
         public KwOnMax OnMax;
         /// <summary>1개당 …</summary>
         public List<PerStat> Per = new();
+        /// <summary>(엘다인 3차) 엔진이 세는 수 — 규칙이 아니다(자동 규칙 수에 안 든다): play(그 사도가 카드를 내면 +1) · discardBy(그 사도 효과로 카드가 버려지면 장마다 +1).</summary>
+        public List<string> Tally;
+        /// <summary>(▶E69 분산) 아군 표시(carrier hero) — 그 표시가 붙은 아군을 노린 적의 공격 피해 -share, 깎인 양만큼 파티 실드.</summary>
+        public double Share;
+        /// <summary>(▶E73) 순환 칸에 닿을 때 그 칸의 효과(1번째 칸부터) — 규칙 하나로 센다.</summary>
+        public List<List<Fx>> OnStage;
+        /// <summary>(▶E75) 지금 단계마다 그 사도 카드 덤(변신 bonus 꼴 + stage).</summary>
+        public List<StageBonus> StageBonus;
+        /// <summary>(엘다인 3차) 전투 시작 값 — 규칙이 아니다(E62 규칙 수에 안 든다). 순환이면 단계(1부터).</summary>
+        public int? Start;
+        /// <summary>(엘다인 3차) 이 이름의 카드 값 — grow handEnd(그 사도 고유 카드가 턴 끝 손에 있으면 +1) · reset play(그 사도 카드를 낸 뒤 0). 규칙이 아니다.</summary>
+        public CardValueDef CardValue;
         /// <summary>규칙 문장(「X」가 N개가 되면 · 사라지면 · 다 닳으면 …).</summary>
         public List<PassiveRule> Rules = new();
 
         [Newtonsoft.Json.JsonIgnore] public int? CapOrMode => Mode ? 1 : Cap;
         [Newtonsoft.Json.JsonIgnore] public bool Consumes => ConsumeAll || Consume > 0;
         [Newtonsoft.Json.JsonIgnore] public bool Decays => DecayAll || Decay > 0;
+    }
+
+    /// <summary>카드 값 키워드 — grow: handEnd · reset: play.</summary>
+    /// <summary>
+    /// 카드 값 키워드 — grow(handEnd: 턴 끝에 손에 있으면 +1 · allyPlay: 아군이 카드를 낼 때마다 손의 그 사도 고유 카드 +1) · reset(play: 낸 뒤 0).
+    /// (엘다인 4차 리뉴아 「시간」) cost — 값 1당 그 카드 비용 증감(-1) · max — 값의 최대 · who — allyPlay 의 「아군」(any 자신 포함 · other 자신 빼고, 기본 any).
+    /// </summary>
+    /// <summary>(엘다인 4차) 표시가 탈 때 — on: play(붙은 동료가 자기 카드를 내면) · shield: 키워드 주인 방어력 × 이 비율 실드.</summary>
+    public sealed class KwBurn { public string On = "play"; public double Shield; /// <summary>(2026-10-11 벨라 힐러 겸 탱커) 1 탈 때 파티 회복 — 주인 방어력 기준 비율.</summary>
+        public double Heal; }
+
+    public sealed class CardValueDef { public string Grow, Reset, Who; public int Cost, Max; }
+
+    /// <summary>(▶E75) 단계 카드 덤 — stage(1부터)일 때 거르개(card · type · unique · tag)에 맞는 그 사도 카드에 ratio(피해 배율) · fx(덧붙임) · tags.</summary>
+    public sealed class StageBonus
+    {
+        public int Stage;
+        public string Card, Type, Tag;
+        public bool Unique;
+        public double Ratio;
+        public List<Fx> Fx = new();
+        public List<string> Tags = new();
     }
 
     /// <summary>
@@ -452,6 +602,8 @@ namespace Bolzena.Core
         public string From;
         /// <summary>(from owner) 그 사도가 표식이 없는 적을 칠 때의 덤(음수면 깎임).</summary>
         public double Else;
+        /// <summary>who marked(엘다인 4차 ▶E81) — 이 아군 표시(carrier hero)가 붙은 아군에게만.</summary>
+        public string Mark;
     }
 
     /// <summary>패시브 규칙 한 줄 — 언제 · 조건 · 효과 · 횟수 제한.</summary>
@@ -462,6 +614,8 @@ namespace Bolzena.Core
         public List<Cond> Conds = new();
         public Limit Limit;
         public List<Fx> Fx = new();
+        /// <summary>고유 능력(keyword) 규칙이어도 패시브처럼 그 사도 자신의 계기로 돈다 — 패시브를 고유 능력으로 합칠 때(2026-10-10), 아군에 붙는(ally) 고유 효과 아래로 옮긴 규칙이 「아군 누구든」 으로 바뀌지 않게.</summary>
+        public bool Self;
     }
 
     /// <summary>
@@ -477,6 +631,14 @@ namespace Bolzena.Core
         public string On;
         /// <summary>play — 카드 종류만.</summary>
         public string Type;
+        /// <summary>play — true: 생성 카드(token)를 낼 때만(2026-10-10 빌드 피드백 — 생성 소비자) · false: 생성 카드를 빼고(엘다인 ▶E25).</summary>
+        public bool? Token;
+        /// <summary>(엘다인 ▶E7) discard · exhaust — 버리게 한(지운) 사도: other(다른 아군의 효과) · self(자신의 효과). 카드 주인은 상관없다.</summary>
+        public string By;
+        /// <summary>(엘다인 ▶E10) 한 번의 일(카드 한 장 · 패시브 한 번)에 한 번만.</summary>
+        public bool Once;
+        /// <summary>(▶E64) hit — 맞은 적에게 이 고유 효과(적 표식)가 있을 때만.</summary>
+        public string FoeStack;
         /// <summary>play — N장마다.</summary>
         public int Every;
         /// <summary>play every — 장수를 턴마다 다시 센다.</summary>
@@ -505,6 +667,10 @@ namespace Bolzena.Core
         public bool Decay;
         /// <summary>debuff — 그 적에게 없던 가짓수가 새로 붙을 때만.</summary>
         public bool Fresh;
+        /// <summary>play — 바로 앞 카드와 성격이 같을 때만(카제나 「연속」, 2026-10-10 계기 넓히기).</summary>
+        public bool Chain;
+        /// <summary>play — 바로 앞 카드와 같은 사도의 카드일 때만(같은 사도 잇달아).</summary>
+        public bool SameHero;
         /// <summary>play — 바로 앞에 낸 카드와 같은 카드일 때만(같은 카드 잇달아).</summary>
         public bool Repeat;
         /// <summary>hurt — 방어 · 실드가 다 막은 공격에도(「공격을 받으면」).</summary>
@@ -513,6 +679,8 @@ namespace Bolzena.Core
         public string Tag;
         /// <summary>play — 적힌 코스트 N 이하인 카드만.</summary>
         public int? MaxCost;
+        /// <summary>(엘다인 4차 리뉴아) play — 낼 때의 비용(줄어든 값 · 할인 반영)이 이 값 이하인 카드만. maxCost 는 카드에 적힌 비용.</summary>
+        public int? PaidMax;
         /// <summary>play · drawn — 이 사도 표시(carrier hero 키워드)가 붙은 사도의 카드만(「지정 아군이 카드를 내면」).</summary>
         public string Marked;
         /// <summary>hit — 약점으로 들어갔을 때만 · drawn — 고유 카드만 · exhaust — 시작 카드만.</summary>

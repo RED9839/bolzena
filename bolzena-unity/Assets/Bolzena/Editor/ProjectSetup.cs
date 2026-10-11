@@ -302,26 +302,30 @@ namespace Bolzena.EditorTools
             // 스파인(353 폴더)은 첫 로딩(.data)에서 빼 번들로(WebBundleBuild · 런타임 WebBundles). BOLZENA_WEB_BUNDLES=1 일 때만(기본은 예전처럼 전부 .data — WebBundleBuild.Enabled)
             bool ok;
             bool bundles = WebBundleBuild.Enabled;
+            // 판에서 안 쓰는 것(Tools/web_exclude.txt · 판 화면 사본 st_*)은 두 벌 빌드가 끝날 때까지 Resources 밖에 둔다(WebBundleBuild.ExcludeOut)
             try
             {
                 if (bundles) WebBundleBuild.MoveOut();
+                WebBundleBuild.ExcludeOut();
+                WebBundleBuild.VoiceOut();   // 목소리는 사도별 번들로(런타임 WebVoice) — BOLZENA_WEB_VOICE=0 이면 .data 에
                 ok = BuildWebPlayer();
+                if (ok) ok = WebBundleBuild.BuildVoices(WebPath + "/Voice");
                 if (ok && bundles) ok = WebBundleBuild.Build(WebPath + "/Bundles");
-            }
-            finally { if (bundles) WebBundleBuild.Restore(); }
-            // 폰(ASTC) 판 — 같은 코드로 그림만 ASTC 인 .data 를 하나 더 만들어 WebBuild/Build 에 넣는다(index.html 이 기기에 맞게 고른다 — web_post.py).
-            //   번들 판은 번들 그림이 DXT 라 건너뛴다. BOLZENA_WEB_ASTC=0 이면 건너뛴다(데스크톱 판만).
-            if (ok && !bundles && System.Environment.GetEnvironmentVariable("BOLZENA_WEB_ASTC") != "0")
-            {
-                try
+                // 폰(ASTC) 판 — 같은 코드로 그림만 ASTC 인 .data 를 하나 더 만들어 WebBuild/Build 에 넣는다(index.html 이 기기에 맞게 고른다 — web_post.py).
+                //   번들 판은 번들 그림이 DXT 라 건너뛴다. BOLZENA_WEB_ASTC=0 이면 건너뛴다(데스크톱 판만).
+                if (ok && !bundles && System.Environment.GetEnvironmentVariable("BOLZENA_WEB_ASTC") != "0")
                 {
-                    SwitchWebTextures(WebGLTextureSubtarget.ASTC);
-                    WebTextureAudit.Run();
-                    ok = BuildWebPlayer(MobilePath, WebGLTextureSubtarget.ASTC);
-                    if (ok) ok = CopyMobileData();
+                    try
+                    {
+                        SwitchWebTextures(WebGLTextureSubtarget.ASTC);
+                        WebTextureAudit.Run();
+                        ok = BuildWebPlayer(MobilePath, WebGLTextureSubtarget.ASTC);
+                        if (ok) ok = CopyMobileData();
+                    }
+                    finally { SwitchWebTextures(WebGLTextureSubtarget.DXT); }   // 다음 빌드 · 다른 일이 늘 DXT 결과에서 시작하게
                 }
-                finally { SwitchWebTextures(WebGLTextureSubtarget.DXT); }   // 다음 빌드 · 다른 일이 늘 DXT 결과에서 시작하게
             }
+            finally { WebBundleBuild.Restore(); }
             if (Application.isBatchMode) EditorApplication.Exit(ok ? 0 : 1);
         }
 
@@ -349,6 +353,7 @@ namespace Bolzena.EditorTools
                 Resources.UnloadAsset(t);
                 // 다른 판의 형식으로 남은 것만 — 압축 없이 남은 것(UI 의 2의 거듭제곱 아닌 밉맵 그림 · 글꼴)은 다시 가져와도 그대로라 건너뛴다
                 if (astc ? (f.StartsWith("DXT") || f.StartsWith("BC")) : f.StartsWith("ASTC")) stale.Add(p);
+                else if (astc && f.StartsWith("ASTC") && WebImport.AstcFormatOf(WebImport.Original(p), k) is string want && !f.StartsWith(want)) stale.Add(p);   // 규칙이 바뀐 것(배경 8×8 등)
             }
             if (stale.Count > 0)
             {

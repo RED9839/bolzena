@@ -1,0 +1,730 @@
+{
+  "heroes": [
+    {
+      "id": "나이아",
+      "name": "나이아",
+      "nature": "순수",
+      "role": "서포터",
+      "style": "쌓고 고르기",
+      "star": 3,
+      "hp": 600,
+      "atk": 75,
+      "def": 60,
+      "crit": 5,
+      "blurb": "인사 대신 물총부터 쏘는 외로운 수문장. 스킬을 낼 때마다 물탱크가 차올라 친구들이 힘을 내고, 물총에 몇 발을 실을지는 나이아가 고릅니다 — 가득 채우면 넘친 물이 파티의 다음 한 수에 실립니다.",
+      "passives": [],
+      "ult": {
+        "name": "물의 세례를 받아라!",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.23,
+            "target": "allEnemies"
+          },
+          {
+            "k": "heal",
+            "ratio": 1.72
+          },
+          {
+            "k": "cleanse",
+            "v": 1
+          },
+          {
+            "k": "stack",
+            "id": "물탱크",
+            "v": 1
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "나이아_s1",
+        "나이아_s2",
+        "나이아_s3",
+        "나이아_u1"
+      ],
+      "keyword": {
+        "name": "물탱크",
+        "desc": "돌고래 물총에 채운 호숫물",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.07,
+            "who": "allies"
+          }
+        ],
+        "rules": [
+          {
+            "name": "뽀득뽀득 씻어요",
+            "when": {
+              "on": "ult"
+            },
+            "fx": [
+              {
+                "k": "gauge",
+                "v": 30
+              }
+            ]
+          },
+          {
+            "name": "퓨퓨~",
+            "when": {
+              "on": "overheal",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "물탱크",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "물장난 상대",
+            "when": {
+              "on": "spend",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "heal",
+                "ratio": 0.08
+              }
+            ]
+          }
+        ],
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.5
+        }
+      }
+    }
+  ],
+  "cards": [
+    {
+      "id": "나이아_s1",
+      "name": "물방울",
+      "hero": "나이아",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "나이아_s2",
+      "name": "물 뿌리기",
+      "hero": "나이아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "나이아_u1",
+      "name": "같이 놀자!",
+      "hero": "나이아",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "물탱크",
+          "v": 1
+        },
+        {
+          "k": "feed",
+          "v": 1,
+          "target": "oneAlly"
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 2
+            },
+            {
+              "k": "feed",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "feed",
+              "v": 2,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "feed",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "heal",
+              "ratio": 2.12
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 2
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "나이아_u3",
+      "name": "물총 연사",
+      "hero": "나이아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        },
+        {
+          "k": "spend",
+          "id": "물탱크",
+          "all": true
+        },
+        {
+          "k": "perEvent"
+        },
+        {
+          "k": "heal",
+          "ratio": 1.61
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "나이아_u2",
+      "name": "그게 씻은거야?",
+      "hero": "나이아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 3.44
+        },
+        {
+          "k": "cleanse",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "물탱크",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 5.16
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 4.04
+            },
+            {
+              "k": "cleanse",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.92
+            },
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.2
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 4.76
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "feed",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "나이아_u4",
+      "name": "외로운 수문장",
+      "hero": "나이아",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "사기",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "물탱크",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "물탱크",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "물탱크",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.64
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "who": "other"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "물탱크",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "물탱크",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "나이아_s3",
+      "name": "물대포",
+      "hero": "나이아",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "나이아_s4",
+      "name": "물탱크 채우기",
+      "hero": "나이아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.8
+        },
+        {
+          "k": "stack",
+          "id": "물탱크",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 4.2
+            },
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.8
+            },
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.8
+            },
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.8
+            },
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.64
+            },
+            {
+              "k": "stack",
+              "id": "물탱크",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

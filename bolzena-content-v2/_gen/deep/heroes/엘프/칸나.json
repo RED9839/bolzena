@@ -1,0 +1,742 @@
+{
+  "heroes": [
+    {
+      "id": "칸나",
+      "name": "칸나",
+      "nature": "활발",
+      "race": "엘프",
+      "role": "딜러",
+      "style": "예약형",
+      "star": 3,
+      "hp": 550,
+      "atk": 155,
+      "def": 25,
+      "crit": 10,
+      "blurb": "명령엔 칼 같고 휴가 신청서는 늘 반려되는 진압반장. 위험한 적에게 포격을 조준해 두면 두 차례 뒤 포탄이 떨어지고, 명령이 떨어지면 기다리지 않고 바로 쏩니다. 쏠 때마다 반려 도장이 늘어 화풀이 한 방이 됩니다.",
+      "keyword": {
+        "name": "반려 도장",
+        "desc": "휴가 신청서마다 찍히는 반려 도장",
+        "carrier": "self",
+        "cap": 3,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.06
+          }
+        ],
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5,
+          "consume": true
+        },
+        "rules": [
+          {
+            "name": "반려 도장 쾅",
+            "when": {
+              "on": "reserveFire",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "반려 도장",
+                "v": 1
+              },
+              {
+                "k": "stack",
+                "id": "포격 조준",
+                "v": 1,
+                "target": "topEnemy"
+              }
+            ]
+          },
+          {
+            "name": "명포수",
+            "when": {
+              "on": "fightStart"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "포격 조준",
+                "v": 2,
+                "target": "topEnemy"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "양자폭탄",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 5.25,
+            "target": "nextEnemy"
+          },
+          {
+            "k": "tough",
+            "v": 2,
+            "target": "nextEnemy"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "nextEnemy"
+          },
+          {
+            "k": "stack",
+            "id": "반려 도장",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "칸나_s1",
+        "칸나_s2",
+        "칸나_s3",
+        "칸나_u5"
+      ],
+      "keywords": [
+        {
+          "name": "포격 조준",
+          "desc": "포격을 요청해 둔 좌표",
+          "carrier": "enemy",
+          "cap": 2,
+          "reserve": true,
+          "decay": 1,
+          "rules": [
+            {
+              "name": "포탄 낙하",
+              "when": {
+                "on": "stackGone",
+                "id": "포격 조준",
+                "decay": true
+              },
+              "fx": [
+                {
+                  "k": "dmg",
+                  "ratio": 1.88,
+                  "target": "oneEnemy"
+                },
+                {
+                  "k": "tough",
+                  "v": 1
+                },
+                {
+                  "k": "stack",
+                  "id": "반려 도장",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "칸나_s1",
+      "name": "제압 사격",
+      "hero": "칸나",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "칸나_s2",
+      "name": "제압 연사",
+      "hero": "칸나",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "칸나_s3",
+      "name": "방어 자세",
+      "hero": "칸나",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "칸나_u5",
+      "name": "포격 요청",
+      "hero": "칸나",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "포격 조준",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "포격 조준",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "포격 조준",
+              "v": 2,
+              "target": "topEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "포격 조준",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "반려 도장",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "포격 조준",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "포격 조준",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "칸나_u1",
+      "name": "큰 거 한 방",
+      "hero": "칸나",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 3.42,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.98,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "반려 도장",
+          "v": 1
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "칸나_u3",
+      "name": "명 받았습니다!",
+      "hero": "칸나",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "ripen",
+          "id": "포격 조준",
+          "v": 0.2
+        },
+        {
+          "k": "stack",
+          "id": "반려 도장",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "포격 조준",
+              "v": 0.2
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "포격 조준",
+              "v": 0.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "포격 조준",
+              "v": 0.2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 1.22,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "포격 조준",
+              "v": 0.25
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "칸나_u4",
+      "name": "충격 포탄",
+      "hero": "칸나",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.59,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "반려 도장",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.39,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.78,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.56,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "empower",
+                  "ratio": 0.89
+                }
+              ]
+            },
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "반려 도장",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "칸나_s4",
+      "name": "도장 꺼내기",
+      "hero": "칸나",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "반려 도장",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "반려 도장",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

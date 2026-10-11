@@ -14,18 +14,11 @@
           "name": "한 번에 들어 올리기",
           "when": {
             "on": "play",
-            "minCost": 2
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "minCost": 2,
+            "who": "any",
+            "every": 2
           },
           "fx": [
-            {
-              "k": "extra",
-              "ratio": 0.4,
-              "target": "oneEnemy"
-            },
             {
               "k": "status",
               "id": "잔광",
@@ -34,7 +27,7 @@
           ]
         }
       ],
-      "blurb": "느리지만 한 번 휘두르면 묵직합니다. 무거운 카드일수록 힘이 실립니다."
+      "blurb": "느리지만 한 번 휘두르면 묵직합니다. 무거운 카드를 낼 때마다 다음 한 수에 힘이 실립니다."
     },
     {
       "id": "eq_furnace",
@@ -54,14 +47,30 @@
           "fx": [
             {
               "k": "atkMod",
-              "v": 0.05,
+              "v": 0.04,
+              "target": "self",
+              "run": true
+            }
+          ]
+        },
+        {
+          "name": "옮겨붙는 불",
+          "when": {
+            "on": "play",
+            "tag": "열정",
+            "who": "any"
+          },
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.04,
               "target": "self",
               "run": true
             }
           ]
         }
       ],
-      "blurb": "싸울수록 달아오르는 검."
+      "blurb": "싸울수록 달아오르는 검. 뜨거운 카드가 지나가면 더 달아오릅니다."
     },
     {
       "id": "eq_rustyred",
@@ -72,23 +81,6 @@
         "atk": 27
       },
       "effect": [
-        {
-          "name": "붉은 오기",
-          "when": {
-            "on": "hurt"
-          },
-          "limit": {
-            "per": "fight",
-            "n": 1
-          },
-          "fx": [
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
-            }
-          ]
-        },
         {
           "name": "벼랑 끝",
           "when": {
@@ -102,13 +94,27 @@
           "fx": [
             {
               "k": "dealtMod",
-              "v": 0.15,
+              "v": 0.2,
               "target": "self"
+            }
+          ]
+        },
+        {
+          "name": "붉은 오기",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.5
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 2
             }
           ]
         }
       ],
-      "blurb": "한 대 맞으면 붉게 빛납니다. 알고 보니 말라붙은 석류 주스."
+      "blurb": "반쯤 다치면 붉게 빛납니다. 알고 보니 말라붙은 석류 주스."
     },
     {
       "id": "eq_glove",
@@ -126,10 +132,6 @@
             "on": "kill",
             "mine": true
           },
-          "limit": {
-            "per": "fight",
-            "n": 3
-          },
           "fx": [
             {
               "k": "status",
@@ -139,25 +141,19 @@
           ]
         },
         {
-          "name": "연타",
+          "name": "다음 상대",
           "when": {
-            "on": "extra",
-            "who": "any"
-          },
-          "limit": {
-            "per": "fight",
-            "n": 2
+            "on": "kill"
           },
           "fx": [
             {
-              "k": "status",
-              "id": "잔광",
+              "k": "draw",
               "v": 1
             }
           ]
         }
       ],
-      "blurb": "한 놈 쓰러뜨릴 때마다 주먹이 빨라집니다(세 번까지). 덤으로 날린 주먹도 가끔 묵직합니다."
+      "blurb": "한 놈 쓰러뜨릴 때마다 주먹이 빨라지고, 다음 상대가 눈에 들어옵니다."
     },
     {
       "id": "eq_sharpstaff",
@@ -173,22 +169,19 @@
           "name": "지팡이 끝 칼날",
           "when": {
             "on": "play",
-            "type": "스킬"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "type": "스킬",
+            "every": 2
           },
           "fx": [
             {
-              "k": "extra",
-              "ratio": 0.45,
-              "target": "oneEnemy"
+              "k": "status",
+              "id": "잔광",
+              "v": 1
             }
           ]
         }
       ],
-      "blurb": "지팡이와 검을 하나로 합친 물건. 주문을 외우는 틈에 칼날이 먼저 나갑니다."
+      "blurb": "지팡이와 검을 하나로 합친 물건. 주문을 외우면 칼날이 다음 공격을 벼립니다."
     },
     {
       "id": "eq_mace",
@@ -202,23 +195,18 @@
         {
           "name": "웃으며 참회",
           "when": {
-            "on": "hurt",
-            "guarded": true
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "on": "hurt"
           },
           "fx": [
             {
               "k": "status",
-              "id": "반격",
+              "id": "칼날 벼리기",
               "v": 1
             }
           ]
         }
       ],
-      "blurb": "맞을수록 손이 매워지는 메이스."
+      "blurb": "맞을수록 손이 매워지는 메이스. 아프게 맞은 만큼 방패로 되갚습니다."
     },
     {
       "id": "eq_cloakdagger",
@@ -236,20 +224,15 @@
             "maxCost": 0,
             "who": "any"
           },
-          "limit": {
-            "per": "turn",
-            "n": 2
-          },
           "fx": [
             {
-              "k": "extra",
-              "ratio": 0.6,
-              "target": "oneEnemy"
+              "k": "empower",
+              "ratio": 0.25
             }
           ]
         }
       ],
-      "blurb": "괴도 놀이 소품. 망토를 펄럭이는 틈에 단검이 먼저 나갑니다."
+      "blurb": "괴도 놀이 소품. 가벼운 손놀림이 지나간 자리에 단검이 숨어 있습니다."
     },
     {
       "id": "eq_elfwand",
@@ -268,7 +251,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 1
+              "ratio": 1.0
             }
           ]
         }
@@ -292,10 +275,6 @@
             "type": "공격",
             "minCost": 2
           },
-          "limit": {
-            "per": "turn",
-            "n": 1
-          },
           "fx": [
             {
               "k": "tough",
@@ -316,36 +295,22 @@
       },
       "effect": [
         {
-          "name": "첫 불씨",
+          "name": "타오르는 재",
           "when": {
-            "on": "play",
-            "type": "공격"
-          },
-          "conds": [
-            {
-              "c": "firstTurn"
-            }
-          ],
-          "limit": {
-            "per": "fight",
-            "n": 1
+            "on": "exhaust",
+            "who": "any"
           },
           "fx": [
             {
               "k": "status",
               "id": "그을림",
-              "v": 3,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "잔광",
-              "v": 1
+              "v": 1,
+              "target": "randomEnemy"
             }
           ]
         }
       ],
-      "blurb": "전투가 시작되면 불이 붙는 나뭇가지."
+      "blurb": "불이 붙은 나뭇가지. 다 쓴 카드를 태우면 불똥이 적에게 튑니다."
     },
     {
       "id": "eq_obsidianstar",
@@ -362,12 +327,12 @@
             "on": "play",
             "type": "공격",
             "maxCost": 1,
-            "every": 3
+            "every": 2
           },
           "fx": [
             {
               "k": "extra",
-              "ratio": 0.5,
+              "ratio": 0.4,
               "target": "randomEnemy"
             }
           ]
@@ -390,15 +355,11 @@
             "on": "discard",
             "who": "any"
           },
-          "limit": {
-            "per": "turn",
-            "n": 1
-          },
           "fx": [
             {
               "k": "extra",
-              "ratio": 0.3,
-              "target": "oneEnemy"
+              "ratio": 0.25,
+              "target": "randomEnemy"
             }
           ]
         }
@@ -417,21 +378,19 @@
         {
           "name": "곧게 날기",
           "when": {
-            "on": "play",
-            "type": "공격",
-            "maxCost": 1,
-            "every": 4
+            "on": "crit"
           },
           "fx": [
             {
-              "k": "extra",
-              "ratio": 0.6,
+              "k": "status",
+              "id": "약점 노출",
+              "v": 1,
               "target": "oneEnemy"
             }
           ]
         }
       ],
-      "blurb": "오래됐지만 아직 곧게 납니다."
+      "blurb": "오래됐지만 아직 곧게 납니다. 제대로 꽂힌 화살이 급소를 짚어 줍니다."
     },
     {
       "id": "eq_foxdagger",
@@ -501,7 +460,7 @@
           "when": {
             "on": "play",
             "type": "공격",
-            "every": 4
+            "every": 3
           },
           "fx": [
             {
@@ -528,8 +487,8 @@
           "name": "불화살",
           "when": {
             "on": "play",
-            "type": "공격",
-            "every": 3
+            "tag": "열정",
+            "who": "any"
           },
           "fx": [
             {
@@ -541,7 +500,7 @@
           ]
         }
       ],
-      "blurb": "옆에만 둬도 후끈한 불화살 활."
+      "blurb": "옆에만 둬도 후끈한 불화살 활. 뜨거운 카드에 불이 옮겨붙습니다."
     },
     {
       "id": "eq_patchstaff",

@@ -1,0 +1,860 @@
+{
+  "heroes": [
+    {
+      "id": "벨라",
+      "name": "벨라",
+      "nature": "활발",
+      "race": "유령",
+      "role": "탱커",
+      "style": "버티형",
+      "star": 3,
+      "hp": 990,
+      "atk": 84,
+      "def": 79,
+      "crit": 5,
+      "blurb": "소설 속 주인공이 현실로 걸어 나온 유령 소녀. 막아 낸 공격이 작은 불꽃 「존속」 으로 바뀌어 모이고, 다 차면 그 불꽃을 파티의 다음 한 수에 나눠 줍니다. 쓰러질 한 대를 한 번 버텨 내 자신을 증명합니다.",
+      "keyword": {
+        "name": "존속",
+        "desc": "벨라가 나눠 준 작은 불꽃",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.02,
+            "who": "allies"
+          }
+        ],
+        "rules": [
+          {
+            "name": "타오르는 존속",
+            "when": {
+              "on": "guardSum"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "존속",
+                "v": 1,
+                "ofEvent": 0.02
+              },
+              {
+                "k": "shield",
+                "ratio": 0.07
+              }
+            ]
+          },
+          {
+            "name": "우린 이미 완전한 존재들",
+            "when": {
+              "on": "always"
+            },
+            "conds": [
+              {
+                "c": "status",
+                "id": "끈기",
+                "n": 1
+              }
+            ],
+            "fx": [
+              {
+                "k": "dealtMod",
+                "v": 0.15,
+                "target": "allAllies",
+                "run": true
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "앳된 존재의 증명",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "heal",
+            "ratio": 3.66
+          },
+          {
+            "k": "stack",
+            "id": "존속",
+            "v": 2
+          },
+          {
+            "k": "dmg",
+            "ratio": 2.44,
+            "base": "def",
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "벨라_s1",
+        "벨라_s2",
+        "벨라_s3",
+        "벨라_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "벨라_s1",
+      "name": "유령 손짓",
+      "hero": "벨라",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "벨라_s2",
+      "name": "반투명 가드",
+      "hero": "벨라",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "벨라_u1",
+      "name": "경계선상의 유령",
+      "hero": "벨라",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "끈기",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "존속",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "blocked"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "존속",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "존속",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "약화",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.88,
+                      "base": "def",
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 2.85
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 1.43
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "fx": [
+                    {
+                      "k": "empower",
+                      "ratio": 0.2,
+                      "who": "any"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "벨라_u2",
+      "name": "도깨비불",
+      "hero": "벨라",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "shield",
+          "ratio": 1.31
+        },
+        {
+          "k": "stack",
+          "id": "존속",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.98
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.66,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "base": "def",
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.4,
+                      "base": "def",
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "stack",
+                      "id": "존속",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 5.25
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "벨라_u3",
+      "name": "서툰 챙김",
+      "hero": "벨라",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.86
+        },
+        {
+          "k": "perStack",
+          "id": "존속"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.86
+        },
+        {
+          "k": "spend",
+          "id": "존속",
+          "v": 2
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "벨라_u4",
+      "name": "존재란 무엇인가",
+      "hero": "벨라",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.31
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "endure"
+              },
+              "fx": [
+                {
+                  "k": "heal",
+                  "ratio": 2.2
+                },
+                {
+                  "k": "stack",
+                  "id": "존속",
+                  "v": 5
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.98
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "endure"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 3.29
+                    },
+                    {
+                      "k": "stack",
+                      "id": "존속",
+                      "v": 8
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "endure"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "기절",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "conds": [
+                    {
+                      "c": "status",
+                      "id": "끈기",
+                      "n": 1
+                    }
+                  ],
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "존속",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.86
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "endure"
+                  },
+                  "fx": [
+                    {
+                      "k": "empower",
+                      "ratio": 1.42,
+                      "who": "any"
+                    },
+                    {
+                      "k": "stack",
+                      "id": "존속",
+                      "v": 3
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "endure"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 2.59
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "벨라_s3",
+      "name": "유령 손짓 연타",
+      "hero": "벨라",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "벨라_s4",
+      "name": "존재 증명",
+      "hero": "벨라",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2.2
+        },
+        {
+          "k": "stack",
+          "id": "존속",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.29
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.2
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.74
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.2
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.85
+            },
+            {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1020 @@
+{
+  "heroes": [
+    {
+      "id": "리뉴아",
+      "name": "리뉴아",
+      "nature": "광기",
+      "race": "엘프",
+      "role": "딜러",
+      "star": 3,
+      "hp": 650,
+      "atk": 140,
+      "def": 40,
+      "crit": 10,
+      "blurb": "오천 년을 건너온 인조 엘다인. 손에 쥔 시공 포격은 동료가 움직일 때마다 시간이 흘러 싸지고, 비용이 0 이 되는 정각에 가장 셉니다.",
+      "keyword": {
+        "name": "시간",
+        "desc": "손에 쥔 리뉴아 카드마다 따로 흐르는 시간 — 쌓일수록 그 카드가 싸진다",
+        "carrier": "self",
+        "cap": 6,
+        "cardValue": {
+          "grow": "allyPlay",
+          "reset": "play",
+          "cost": -1,
+          "max": 6,
+          "who": "other"
+        }
+      },
+      "keywords": [
+        {
+          "name": "메아리",
+          "desc": "정각에 울린 포격의 메아리 — 이번 턴 정지된 6초가 더 여러 번 몰아친다",
+          "carrier": "self",
+          "cap": 3,
+          "endClear": true
+        }
+      ],
+      "passives": [
+        {
+          "name": "우리들의 평화로운 시간",
+          "when": {
+            "on": "play",
+            "paidMax": 0
+          },
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.1,
+              "target": "allAllies"
+            }
+          ]
+        },
+        {
+          "name": "시공간, 저 너머로!",
+          "when": {
+            "on": "ult",
+            "who": "any"
+          },
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "시간",
+              "v": 1,
+              "to": "hand",
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "타임 브레이크",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.3,
+            "target": "allEnemies",
+            "hits": 4
+          },
+          {
+            "k": "cardStatus",
+            "id": "시간",
+            "v": 4,
+            "to": "hand",
+            "who": "self",
+            "unique": true
+          },
+          {
+            "k": "swiftTurn"
+          }
+        ]
+      },
+      "starter": [
+        "리뉴아_s1",
+        "리뉴아_s1",
+        "리뉴아_s3",
+        "리뉴아_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "리뉴아_s1",
+      "name": "시공 사격",
+      "hero": "리뉴아",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_s3",
+      "name": "호버보드 회피",
+      "hero": "리뉴아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_u1",
+      "name": "멈춰 버린 시계",
+      "hero": "리뉴아",
+      "unique": true,
+      "cost": 4,
+      "type": "공격",
+      "tags": [
+        "신속",
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifCost",
+          "max": 0,
+          "id": "정각"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "메아리",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "cardStatus",
+              "id": "시간",
+              "v": 1,
+              "to": "hand",
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "costMod",
+              "v": -1,
+              "n": 1,
+              "who": "other",
+              "turns": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifNth",
+              "n": 4,
+              "after": true
+            },
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 3,
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "recast",
+              "ratio": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "시간",
+              "v": 1,
+              "to": "hand",
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_u2",
+      "name": "시간 저 너머로",
+      "hero": "리뉴아",
+      "unique": true,
+      "cost": 5,
+      "type": "공격",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.5,
+          "target": "randomEnemy",
+          "hits": 3
+        },
+        {
+          "k": "ifCost",
+          "max": 0,
+          "id": "정각"
+        },
+        {
+          "k": "draw",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "cardStatus",
+              "id": "시간",
+              "v": 1,
+              "to": "hand",
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "costMod",
+              "v": -1,
+              "n": 1,
+              "who": "other",
+              "turns": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "type": "스킬",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "gauge",
+              "v": 20
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "recast",
+              "ratio": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "시간",
+              "v": 1,
+              "to": "hand",
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_u3",
+      "name": "시공의 메아리",
+      "hero": "리뉴아",
+      "unique": true,
+      "cost": 6,
+      "type": "공격",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "oneEnemy",
+          "hits": 5
+        },
+        {
+          "k": "dispel",
+          "n": 1
+        },
+        {
+          "k": "ifCost",
+          "max": 0,
+          "id": "정각"
+        },
+        {
+          "k": "strip",
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "dispel",
+              "n": 1
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "strip",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "cardStatus",
+              "id": "시간",
+              "v": 1,
+              "to": "hand",
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies",
+              "hits": 5
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "dispel",
+              "n": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "recast",
+              "ratio": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "시간",
+              "v": 1,
+              "to": "hand",
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_u4",
+      "name": "정지된 6초",
+      "hero": "리뉴아",
+      "unique": true,
+      "cost": 6,
+      "type": "공격",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "allEnemies",
+          "hitsPer": "메아리",
+          "hitsAdd": 6
+        },
+        {
+          "k": "ifCost",
+          "max": 0,
+          "id": "정각"
+        },
+        {
+          "k": "swiftTurn"
+        },
+        {
+          "k": "status",
+          "id": "둔화",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "any",
+                    "nth": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "cardStatus",
+                      "id": "시간",
+                      "v": 1,
+                      "to": "hand",
+                      "who": "self",
+                      "unique": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy",
+              "hits": 6
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "swiftTurn"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies",
+              "hits": 6
+            },
+            {
+              "k": "cardStatus",
+              "id": "시간",
+              "v": 2,
+              "to": "hand",
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies",
+              "hits": 6
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "nextAp",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "allEnemies",
+              "hits": 6
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "costMod",
+              "v": -1,
+              "n": 1,
+              "who": "other",
+              "turns": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "시간",
+              "v": 1,
+              "to": "hand",
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_u5",
+      "name": "호버보드 질주",
+      "hero": "리뉴아",
+      "unique": true,
+      "cost": 5,
+      "type": "공격",
+      "tags": [
+        "신속",
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifCost",
+          "max": 0,
+          "id": "정각"
+        },
+        {
+          "k": "draw",
+          "v": 2
+        },
+        {
+          "k": "stack",
+          "id": "메아리",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "cardStatus",
+              "id": "시간",
+              "v": 1,
+              "to": "hand",
+              "who": "self",
+              "unique": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "costMod",
+              "v": -1,
+              "n": 1,
+              "who": "other",
+              "turns": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "status",
+              "id": "둔화",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 3,
+          "tags": [
+            "신속",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifCost",
+              "max": 0,
+              "id": "정각"
+            },
+            {
+              "k": "recast",
+              "ratio": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "power"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "시간",
+              "v": 1,
+              "to": "hand",
+              "who": "self",
+              "unique": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,763 @@
+{
+  "heroes": [
+    {
+      "id": "리코타",
+      "name": "리코타",
+      "nature": "냉정",
+      "race": "요정",
+      "role": "탱커",
+      "style": "박자형",
+      "star": 3,
+      "hp": 960,
+      "atk": 90,
+      "def": 67,
+      "crit": 5,
+      "blurb": "요정이 요리를 한다고 무시당하던 모나티엄에서 밤잠과 단맛까지 포기하며 버텨 수석으로 졸업한 요정 왕궁 셰프. 요리 실력은 완벽한데 상황을 읽는 눈썰미가 없어 접객만 하면 사고가 나고, 돌맛이 궁금하다며 궁전 바닥까지 핥아 봅니다. 파인애플 피자만큼은 용서 못 합니다.",
+      "keyword": {
+        "name": "코스",
+        "desc": "가벼운 접시에서 무거운 접시로",
+        "carrier": "self",
+        "cap": 3,
+        "per": [
+          {
+            "stat": "guard",
+            "v": 0.05
+          }
+        ],
+        "rules": [
+          {
+            "name": "다음 접시",
+            "when": {
+              "on": "play",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "ifPricier"
+              },
+              {
+                "k": "stack",
+                "id": "코스",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "처음 접시로",
+            "when": {
+              "on": "play",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "ifPricier",
+                "not": true
+              },
+              {
+                "k": "spend",
+                "id": "코스",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "웍질",
+            "when": {
+              "on": "play",
+              "who": "any",
+              "nth": 4
+            },
+            "fx": [
+              {
+                "k": "dmg",
+                "ratio": 0.22,
+                "base": "def",
+                "target": "allEnemies"
+              },
+              {
+                "k": "heal",
+                "ratio": 0.27
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "준비만전",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.27,
+            "base": "def",
+            "target": "topEnemy",
+            "hits": 4
+          },
+          {
+            "k": "drain",
+            "ratio": 0.3
+          },
+          {
+            "k": "shield",
+            "ratio": 0.89
+          }
+        ]
+      },
+      "starter": [
+        "리코타_s1",
+        "리코타_s2",
+        "리코타_s3",
+        "리코타_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "리코타_s1",
+      "name": "주방칼 썰기",
+      "hero": "리코타",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리코타_s2",
+      "name": "냄비 뚜껑",
+      "hero": "리코타",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "리코타_u1",
+      "name": "아뮤즈 부쉬",
+      "hero": "리코타",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.41
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "ifNth",
+          "n": 1
+        },
+        {
+          "k": "stack",
+          "id": "코스",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ifNth",
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.32
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.59
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "ifNth",
+              "n": 1
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.55
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.48
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리코타_u3",
+      "name": "리코타 풀코스",
+      "hero": "리코타",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "코스",
+          "n": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 0.36
+        },
+        {
+          "k": "empower",
+          "ratio": 0.52,
+          "who": "any"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "리코타_u5",
+      "name": "똑같이 본뜬 요리",
+      "hero": "리코타",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.48
+        },
+        {
+          "k": "cardStatus",
+          "id": "비용",
+          "v": 1,
+          "to": "hand",
+          "n": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.6,
+          "who": "any"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.72
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": 1,
+              "to": "hand",
+              "n": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.9,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.68
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": 1,
+              "to": "hand",
+              "n": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": 1,
+              "to": "hand",
+              "n": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.55,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.22
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.41
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": 1,
+              "to": "hand",
+              "n": 1
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.15,
+              "target": "otherAllies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리코타_u2",
+      "name": "다 조려버리겠습니다",
+      "hero": "리코타",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.32,
+          "base": "def",
+          "target": "oneEnemy",
+          "hits": 2
+        },
+        {
+          "k": "ifPricier"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.41,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "tough",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.48,
+              "base": "def",
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifPricier"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "base": "def",
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "ifPricier"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.44,
+              "base": "def",
+              "target": "topEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifPricier"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.59,
+              "base": "def",
+              "target": "topEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "분쇄"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.51,
+              "base": "def",
+              "target": "oneEnemy",
+              "hits": 2
+            },
+            {
+              "k": "ifPricier"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.64
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "분쇄"
+          ],
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리코타_s3",
+      "name": "주방칼 내려찍기",
+      "hero": "리코타",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리코타_s4",
+      "name": "접시 내기",
+      "hero": "리코타",
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        },
+        {
+          "k": "stack",
+          "id": "코스",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.03
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.28
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.6
+            },
+            {
+              "k": "stack",
+              "id": "코스",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

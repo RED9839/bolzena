@@ -51,7 +51,7 @@ namespace Bolzena.RunUI
                     Tw.Pop(row.rectTransform, 1.1f + i * 0.18f, 0.8f, 0.4f);
                 }
                 if (hasNat) FoeSide(panel, v, FoeNature, 1.4f);
-                var note = Ui.Text(main, $"1-1 부터 {v.Floors.Count}-10 까지 이 마을의 적만 나옵니다. {v.Floors.Count}층 보스를 이기면 모험 완주입니다.", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center);
+                var note = Ui.Text(main, $"1-1 부터 {v.Floors.Count}-{Core.R.FLOOR_NODES} 까지 이 마을의 적만 나옵니다. {v.Floors.Count}층 보스를 이기면 모험 완주입니다.", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center);
                 note.rectTransform.Band(0, 30, 30, 30, 112);
                 var row2 = Ui.Rect("buttons", main).Band(0, 66, 40, 40, 34);
                 Ui.Row(row2, 16, TextAnchor.MiddleCenter, null, false, true);

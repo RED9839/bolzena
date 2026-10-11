@@ -1,0 +1,759 @@
+{
+  "heroes": [
+    {
+      "id": "폴랑",
+      "name": "폴랑",
+      "nature": "광기",
+      "race": "요정",
+      "role": "서포터",
+      "style": "거드는 형",
+      "star": 3,
+      "hp": 580,
+      "atk": 86,
+      "def": 58,
+      "crit": 5,
+      "blurb": "요정 왕국 에르피엔의 경비대장으로, 네르와 함께 왕국의 양날개로 꼽힙니다. 한때 롤렛의 이간질에 넘어가 반란을 일으켰지만 지금은 에르핀에게 광적으로 충성합니다. 「셋이서 120도로 둘러싸 패기」라는 전통 전술을 신봉합니다.",
+      "keyword": {
+        "name": "머스킷 장전",
+        "desc": "포위를 위해 장전한 머스킷",
+        "carrier": "self",
+        "cap": 3,
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.3
+        },
+        "rules": [
+          {
+            "name": "120도 포위",
+            "when": {
+              "on": "play",
+              "type": "공격",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "머스킷 장전",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "세 번째 장전",
+            "when": {
+              "on": "play",
+              "every": 3
+            },
+            "fx": [
+              {
+                "k": "heal",
+                "ratio": 0.27
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "로얄 스트레이트",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.85,
+            "target": "allEnemies"
+          },
+          {
+            "k": "heal",
+            "ratio": 1.16
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "oneEnemy"
+          }
+        ]
+      },
+      "starter": [
+        "폴랑_s1",
+        "폴랑_s2",
+        "폴랑_s3",
+        "폴랑_u3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "폴랑_s1",
+      "name": "머스킷 사격",
+      "hero": "폴랑",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "폴랑_s2",
+      "name": "야전 붕대",
+      "hero": "폴랑",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "폴랑_u3",
+      "name": "120도 삼각 편대",
+      "hero": "폴랑",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "머스킷 장전",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "머스킷 장전",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 3,
+                      "who": "other"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "머스킷 장전",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "폴랑_u1",
+      "name": "요정 왕국에 경례",
+      "hero": "폴랑",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.48
+        },
+        {
+          "k": "dealtMod",
+          "v": 0.2,
+          "target": "allAllies"
+        },
+        {
+          "k": "stack",
+          "id": "머스킷 장전",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.68
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.3,
+              "target": "allAllies"
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.52
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 3
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.3,
+              "target": "allAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 10.64
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.25,
+              "target": "allAllies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.49
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 4.32
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "폴랑_u2",
+      "name": "일제 사격",
+      "hero": "폴랑",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.4,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "머스킷 장전",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.2,
+          "target": "allEnemies"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "폴랑_u4",
+      "name": "경비대장 폴랑입니다",
+      "hero": "폴랑",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 1.56
+        },
+        {
+          "k": "ifAllHeroes"
+        },
+        {
+          "k": "dealtMod",
+          "v": 0.25,
+          "target": "allAllies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 2.32
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.38,
+              "target": "allAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 1.24
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 6.64
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 1
+            },
+            {
+              "k": "ifAllHeroes"
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.3,
+              "target": "allAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "power": true,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.56
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.48
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "폴랑_s3",
+      "name": "머스킷 연사",
+      "hero": "폴랑",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "폴랑_s4",
+      "name": "탄알 재기",
+      "hero": "폴랑",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.76
+        },
+        {
+          "k": "stack",
+          "id": "머스킷 장전",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 4.16
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.76
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.76
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.76
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.6
+            },
+            {
+              "k": "stack",
+              "id": "머스킷 장전",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

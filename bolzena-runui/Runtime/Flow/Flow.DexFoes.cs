@@ -177,7 +177,7 @@ namespace Bolzena.RunUI
                         {
                             string key = v.Id + "|" + h;
                             if (!rows.TryGetValue(key, out var r))
-                                rows[key] = r = new CloneRow { Hero = h, H = d.Hero(h), Info = Roster.OfCore(h), Village = v.Id, V = v, VillageIdx = vi };
+                                rows[key] = r = new CloneRow { Hero = h, H = d.CloneHero(h), Info = Roster.OfCore(h), Village = v.Id, V = v, VillageIdx = vi };
                             r.Floors.Add(f);
                         }
             }
@@ -207,11 +207,7 @@ namespace Bolzena.RunUI
 
         /// <summary>강인도 칸 수 — 적 데이터(tough), 없으면 등급 기본(R.TOUGH). 강인도 없는 소환물은 0.</summary>
         static double FoeTough(FoeSpot s) => s.NoTough ? 0 : FoeTough(s.Def, s.Grade);
-        static double FoeTough(EnemyDef e, string grade)
-        {
-            if (e.Tough > 0) return e.Tough;
-            return grade == "보스" || e.Boss ? R.TOUGH.Boss : grade == "엘리트" ? R.TOUGH.Elite : R.TOUGH.Fight;
-        }
+        static double FoeTough(EnemyDef e, string grade) => Battle.ToughOf(e, grade == "엘리트", summon: grade == "소환물");   // 엔진과 같은 값(최소 강인도 포함, 2026-10-10)
 
         static string FoeNum(double v)
         {
@@ -527,7 +523,7 @@ namespace Bolzena.RunUI
                 {
                     var go = CloneTile((RectTransform)sec.Grid.transform, r, ls, cw, ch, idx, anim, floor);
                     sec.Cells.Add((go, new[] { r.H.Name, r.Info?.ko, r.Hero, r.V.Name }));
-                    if (ls.Focus == "c:" + r.Village + "|" + r.Hero) { var r2 = r; focusName = r.H.Name + " 클론"; focusSub = $"{r.V.Name} · {r.H.Nature} · ★{r.H.Star} · {FloorsKo(r.Floors)} 후보"; openFocus = () => CloneDetail(r2, floor >= 0 ? floor : r2.Floors.Max); }
+                    if (ls.Focus == "c:" + r.Village + "|" + r.Hero) { var r2 = r; focusName = r.H.Name + " 클론"; focusSub = $"{r.V.Name} · {r.H.Nature} · {FloorsKo(r.Floors)} 후보"; openFocus = () => CloneDetail(r2, floor >= 0 ? floor : r2.Floors.Max); }
                     idx++; cards++;
                 }
             }
@@ -688,7 +684,7 @@ namespace Bolzena.RunUI
             return b.gameObject;
         }
 
-        /// <summary>클론 후보 카드 하나(사도) — 상반신 · 성격 색 테 · 성급 · 종족 · 어느 마을 몇 층 후보.</summary>
+        /// <summary>클론 후보 카드 하나(사도) — 상반신 · 성격 색 테 · 종족 · 어느 마을 몇 층 후보.</summary>
         GameObject CloneTile(RectTransform parent, CloneRow r, FoeListState ls, float w, float h, int idx, bool anim, int floor)
         {
             var nc = Theme.NatureCardOf(r.H.Nature);
@@ -714,9 +710,6 @@ namespace Bolzena.RunUI
             }
             var nm = Ui.Title(rt, r.H.Name, Theme.FsSm, Theme.Ink, TextAlignmentOptions.Center); nm.rectTransform.Band(0, 24, 6, 6, h * 0.36f - 30);
             nm.enableAutoSizing = true; nm.fontSizeMin = 9; nm.fontSizeMax = Theme.FsSm; nm.textWrappingMode = TextWrappingModes.NoWrap; nm.Outline(0.2f);
-            var stars = Ui.Rect("stars", rt).Band(0, 18, 6, 6, h * 0.36f - 52);
-            Ui.Row(stars, 1, TextAnchor.MiddleCenter, null, false, true);
-            for (int i = 0; i < Mathf.Max(1, r.H.Star); i++) { var s = Ui.Img(stars, Icon("별_켜짐"), Color.white, "star"); s.Pref(16, 16); s.preserveAspect = true; }
             var sub = Ui.Text(rt, $"{NatTag(r.H.Nature)} · {r.H.Race}  <color={Theme.SubTag}>{r.V.Name}</color>", Theme.FsCap - 1, Theme.Ink, TextAlignmentOptions.Center);
             sub.rectTransform.Band(0, 20, 6, 6, 8); sub.textWrappingMode = TextWrappingModes.NoWrap; sub.enableAutoSizing = true; sub.fontSizeMin = 8; sub.fontSizeMax = Theme.FsCap - 1;
             var rim = Ui.Img(rt, Theme.Frame, nc.A(0.85f), "rim"); rim.rectTransform.Fill();
@@ -779,7 +772,7 @@ namespace Bolzena.RunUI
                         var r = CloneIndex().FirstOrDefault(x => x.Hero == e.Clone && x.Village == v.Id);
                         if (r == null)
                         {
-                            var h = P.Data.Hero(e.Clone);
+                            var h = P.Data.CloneHero(e.Clone);
                             if (h == null) return;
                             r = new CloneRow { Hero = e.Clone, H = h, Info = Roster.OfCore(e.Clone), Village = v.Id, V = v, VillageIdx = vi };
                             r.Floors.Add(f);
@@ -936,7 +929,7 @@ namespace Bolzena.RunUI
             var d = P.Data;
             var h = r.H;
             var nc = Theme.NatureCardOf(h.Nature);
-            var (body, close, _) = Stage.ModalBox("foezoom", 1160, Theme.C(680, 680), h.Name + " 클론", $"{r.V.Name} · {h.Nature} · ★{h.Star} · {h.Race} · {FloorsKo(r.Floors)} 보스 후보");
+            var (body, close, _) = Stage.ModalBox("foezoom", 1160, Theme.C(680, 680), h.Name + " 클론", $"{r.V.Name} · {h.Nature} · {h.Race} · {FloorsKo(r.Floors)} 보스 후보");
             FitScale.Fit(body.parent as RectTransform, Stage.Size, 1160, Theme.C(680, 680), 0.72f, 0.74f);
             float aw = Theme.C(340, 300), ah = aw * 1.0f, sdH = Theme.C(170, 150);
             // 스탠딩(위) · SD(아래)
@@ -958,7 +951,7 @@ namespace Bolzena.RunUI
             Ui.Col(content, 8, TextAnchor.UpperLeft, new RectOffset(4, 10, 4, 10), true, false);
             // 클론 정보
             W.Section(content, "클론", null, 36);
-            DexLine(content, $"{NatTag(h.Nature)} · ★{h.Star} · {h.Race}   <color={Theme.SubTag}>{r.V.Name}</color> {FloorsKo(r.Floors)} 보스 후보", Theme.FsLg, Theme.Ink);
+            DexLine(content, $"{NatTag(h.Nature)} · {h.Race}   <color={Theme.SubTag}>{r.V.Name}</color> {FloorsKo(r.Floors)} 보스 후보", Theme.FsLg, Theme.Ink);
             DexLine(content, EdgeKo(h.Nature), Theme.FsBody, Theme.Ink);
             bool alt = r.Floors.Contains(0) && h.Star >= 3;
             DexLine(content, $"<color={Theme.SubTag}>모험의 적 속성이 {h.Nature}이고 마을이 {r.V.Name}이면 이 클론이 보스로 설 수 있습니다. 클론은 사도 성격 그대로입니다." + (alt ? $" {r.V.Race} 종족에 {h.Nature} 1~2성이 없어 3성이 1층에도 섭니다(1층 몸 · 1층 고학년 값)." : "") + "</color>", Theme.FsSm, Theme.Sub);
@@ -980,8 +973,8 @@ namespace Bolzena.RunUI
             if (plan == null) DexLine(content, $"<color={Theme.SubTag}>고학년 없음</color>", Theme.FsSm, Theme.Sub);
             else
             {
-                DexLine(content, $"<color={Theme.GoldTag}>{BossUlt.FIRST}턴째</color> 예고 → 다음 턴 사용 · 그 뒤 <color={Theme.GoldTag}>{BossUlt.EVERY}턴</color>마다 · 예고 · 사용 턴에 격파하면 끊김", Theme.FsBody, Theme.Ink);
-                W.IntentRow(content, this, plan.Warn, $"{floor + 1}층 값");
+                DexLine(content, $"<color={Theme.GoldTag}>{BossUlt.FIRST}턴째</color> 에 바로 사용 · 그 뒤 <color={Theme.GoldTag}>{BossUlt.EVERY}턴</color>마다 · 예고 · 끊기 없음", Theme.FsBody, Theme.Ink);
+                W.IntentRow(content, this, plan.Use, $"{floor + 1}층 값");
                 DexLine(content, $"<color={Theme.SubTag}>원래 고학년 — {plan.Orig}</color>" + (plan.Dropped.Count > 0 ? $"\n<color={Theme.SubTag}>보스판에서 빠진 것 — {string.Join(", ", plan.Dropped)}</color>" : ""), Theme.FsSm, Theme.Sub);
             }
             SummonSection(content, e, true);

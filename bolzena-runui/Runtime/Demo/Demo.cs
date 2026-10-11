@@ -16,6 +16,7 @@ namespace Bolzena.RunUI
         public static Demo Me { get; private set; }
         /// <summary>지금 싸움을 어떻게 받을지 — win(이기게) · lose(지게). 전투 화면(FightScreen)이 열 때 읽는다.</summary>
         public static string FightMode = "win";
+        public static string IdleResult;   // 공백 말풍선 점검 결과(-demo-herosay · 전투 봇이 채운다)
         Flow f;
         string dir, tail = "";
         int no;
@@ -52,7 +53,7 @@ namespace Bolzena.RunUI
             StartCoroutine(AutoOwner());
             if (Has("-demo-loop")) { limit = float.TryParse(Arg("-demo-timeout"), out var ll) ? ll : 3600f; }
             StartCoroutine(Watchdog(limit));
-            StartCoroutine(Has("-demo-rec") ? Rec_() : Has("-demo-herosay") ? HeroSay_() : Has("-demo-uitour") ? UiTour_() : Has("-demo-touch") ? Touch_() : Has("-demo-evby") ? EvBy_() : Has("-demo-partykit") ? PartyKit_() : arca ? Arca_() : Has("-demo-grade") ? Grade_() : Has("-demo-crayon") ? Crayon_() : Has("-demo-bless") ? Bless_() : Has("-demo-oraclepeek") ? OraclePeek_() : keepPrefs ? Settings_() : Has("-demo-cardtext") ? CardText_() : Has("-demo-mem") ? Mem_() : Has("-demo-listperf") ? ListPerf_() : Has("-demo-snapdiff") ? SnapDiff_() : Has("-demo-listsheet") ? ListSheet_() : Has("-demo-picsheet") ? PicSheet_() : Has("-demo-cardsheet") ? CardSheet_() : Has("-demo-facesheet") ? FaceSheet_() : Has("-demo-floatshots") ? FloatShots_() : Has("-demo-resize") ? Resize_() : Has("-demo-detailsheet") ? DetailSheet_() :Has("-demo-clonesize") ? CloneSize_() : Has("-demo-cardgain") ? CardGain_() : Has("-demo-sdsize") ? SdSize_() : Has("-demo-marks") ? Marks_() : Has("-demo-partyfoe") ? PartyFoe_() : Has("-demo-foedex") ? FoeDex_() :Has("-demo-events") ? Events_() : Has("-demo-loop") ? Loop() : Has("-demo-lobby") ? Lobby_() : Has("-demo-traits") ? Traits_() : Has("-demo-search") ? Search_() : Has("-demo-sheet") ? Sheet_() : quick ? Quick() : shortRun ? Roster_() : Run());
+            StartCoroutine(Has("-demo-rec") ? Rec_() : Has("-demo-herosay") ? HeroSay_() : Has("-demo-uitour") ? UiTour_() : Has("-demo-maplen") ? MapLen_() : Has("-demo-touch") ? Touch_() : Has("-demo-evby") ? EvBy_() : Has("-demo-partykit") ? PartyKit_() : arca ? Arca_() : Has("-demo-grade") ? Grade_() : Has("-demo-crayon") ? Crayon_() : Has("-demo-bless") ? Bless_() : Has("-demo-oraclepeek") ? OraclePeek_() : keepPrefs ? Settings_() : Has("-demo-cardtext") ? CardText_() : Has("-demo-mem") ? Mem_() : Has("-demo-listperf") ? ListPerf_() : Has("-demo-snapdiff") ? SnapDiff_() : Has("-demo-listsheet") ? ListSheet_() : Has("-demo-picsheet") ? PicSheet_() : Has("-demo-cardsheet") ? CardSheet_() : Has("-demo-facesheet") ? FaceSheet_() : Has("-demo-floatshots") ? FloatShots_() : Has("-demo-resize") ? Resize_() : Has("-demo-detailsheet") ? DetailSheet_() :Has("-demo-clonesize") ? CloneSize_() : Has("-demo-cardgain") ? CardGain_() : Has("-demo-sdsize") ? SdSize_() : Has("-demo-marks") ? Marks_() : Has("-demo-partyfoe") ? PartyFoe_() : Has("-demo-foedex") ? FoeDex_() :Has("-demo-events") ? Events_() : Has("-demo-loop") ? Loop() : Has("-demo-lobby") ? Lobby_() : Has("-demo-traits") ? Traits_() : Has("-demo-search") ? Search_() : Has("-demo-sheet") ? Sheet_() : quick ? Quick() : shortRun ? Roster_() : Run());
         }
 
         // 이벤트(-demo-events) — 꼴이 다른 이벤트 여섯(선택지 적음 · 많음 · 카드 고르기 · 신탁 · 전투 · 도박/판정)의 처음 화면 · 고른 뒤 결과를 찍고,
@@ -603,10 +604,10 @@ namespace Bolzena.RunUI
             {
                 var saved = Settings.LobbyHero;
                 Settings.LobbyHero = "없는사도";
-                Expect(Flow.LobbyHeroInfo()?.key == "에르핀", $"없는 사도 → {Flow.LobbyHeroInfo()?.key}");
+                Expect(Flow.LobbyHeroInfo()?.key == "에르핀_왕도", $"없는 사도 → {Flow.LobbyHeroInfo()?.key}");
                 Settings.LobbyHero = saved;
                 bool first = true;
-                foreach (var k in new[] { "리코타", "키디언", "쥬비", "티그_영웅" })
+                foreach (var k in new[] { "란", "요미", "벨라", "티그_영웅" })   // 2026-10-11 엘다인 20명
                 {
                     yield return Press("lobby.swap", 1.0f);
                     if (first) { yield return Shot("lobby_picker"); first = false; }
@@ -630,7 +631,7 @@ namespace Bolzena.RunUI
             yield return Wait(0.5f);
             f.Lobby();
             yield return Screen_("lobby", 1.0f);
-            var want = new[] { "그윈", "밍스", "레비", "리코타" };
+            var want = new[] { "아야", "우로스", "요미", "란" };   // 2026-10-11 엘다인 20명
             var keys = want.Select(k => Roster.ByKey(k)?.key).Where(k => k != null).ToList();
             Debug.Log("[Demo] 상세 사도: " + string.Join(", ", keys));
             for (int i = 0; i < keys.Count; i++)
@@ -767,9 +768,9 @@ namespace Bolzena.RunUI
             var all = f.DexSearchShown.Count;
             yield return Type("ㅌㄱ");
             yield return Shot("search_chosung");
-            Expect(f.DexSearchShown.Contains("티그") && f.DexSearchShown.All(n => HangulSearch.Match(n, "ㅌㄱ")), $"초성 「ㅌㄱ」 → {string.Join(", ", f.DexSearchShown)}");
+            Expect(f.DexSearchShown.Any(n => n.StartsWith("티그")) && f.DexSearchShown.All(n => HangulSearch.Match(n, "ㅌㄱ")), $"초성 「ㅌㄱ」 → {string.Join(", ", f.DexSearchShown)}");
             yield return Type("티ㄱ");
-            Expect(f.DexSearchShown.Contains("티그"), $"섞어 쓰기 「티ㄱ」 → {string.Join(", ", f.DexSearchShown)}");
+            Expect(f.DexSearchShown.Any(n => n.StartsWith("티그")), $"섞어 쓰기 「티ㄱ」 → {string.Join(", ", f.DexSearchShown)}");
             yield return Type("왕년");
             yield return Shot("search_partial");
             Expect(f.DexSearchShown.Count >= 1 && f.DexSearchShown.All(n => n.Contains("왕년")), $"부분 이름 「왕년」 → {string.Join(", ", f.DexSearchShown)}");
@@ -871,7 +872,7 @@ namespace Bolzena.RunUI
                 yield return Shot("hero_detail_cards_gen");
                 if (TermPop.DemoOpen(true)) { yield return Wait(0.6f); yield return Shot("termpop_card_gen"); }
                 TermPop.Close();
-                var cz = FirstHot("detail.card고유 카드");
+                var cz = FirstHot("detail.card은총 카드");
                 if (Hot(cz) != null) { yield return Press(cz, 1.0f); yield return Shot("card_zoom_terms"); yield return Press("zoom.close", 0.5f); }
                 yield return Press("detail.close", 0.6f);
             }
@@ -879,24 +880,24 @@ namespace Bolzena.RunUI
             // 시동 카드 · 카드 상세 점검 — 로네(시장)의 카드 탭(시동 표식 · 고유 카드 줄에서 빠짐)과 카드 상세(큰 카드 · 풀이 상자 가운데)
             {
                 string dh = null; { var ca = System.Environment.GetCommandLineArgs(); int di = System.Array.IndexOf(ca, "-demohero"); if (di >= 0 && di + 1 < ca.Length) dh = ca[di + 1]; }
-                var rone = Roster.All.FirstOrDefault(h => h.ko != null && h.ko.StartsWith(dh ?? "로네") && h.CoreId != null) ?? gen ?? Roster.ByKey(keys[0]);
+                var rone = Roster.All.FirstOrDefault(h => h.ko != null && h.ko.StartsWith(dh ?? "란") && h.Playable) ?? gen ?? Roster.ByKey(keys[0]);
                 f.HeroDetail(rone.key, null, null, "카드");
                 yield return Wait(1.2f);
                 yield return Shot("rone_cards");
                 Expect(f.Stage.ScreenLayer.GetComponentsInChildren<Transform>(true).Count(t0 => t0.name == "costmark" || t0.name == "oracleglow" || t0.name == "blessline") == 0, "사도 상세 카드에 신탁 · 축복 마크 0");
                 var first = FirstHot("detail.card시작 카드");
                 if (Hot(first) != null) { yield return Press(first, 1.0f); yield return Shot("rone_card_zoom"); yield return Press("zoom.close", 0.5f); }
-                var uz = FirstHot("detail.card고유 카드");
+                var uz = FirstHot("detail.card은총 카드");
                 if (Hot(uz) != null) { yield return Press(uz, 1.0f); yield return Shot("rone_unique_zoom"); yield return Press("zoom.close", 0.5f); }
                 yield return Press("detail.close", 0.6f);
             }
 
-            // 도감 — 버그 확인(가비아 → 닫기 → 그윈, 한 번씩)
+            // 도감 — 버그 확인(벨라 → 닫기 → 요미, 한 번씩 — 2026-10-11 전엔 가비아 · 그윈)
             f.Dex(f.Lobby);
             yield return Screen_("dex", 1.0f);
             var sr = f.Stage.ScreenLayer.GetComponentInChildren<UnityEngine.UI.ScrollRect>();
-            string a = Roster.All.Any(h => h.key == "가비아") ? "가비아" : Roster.All[5].key;
-            string b = Roster.All.Any(h => h.key == "그윈") ? "그윈" : Roster.All[6].key;
+            string a = Roster.Players.Any(h => h.key == "벨라") ? "벨라" : Roster.Players.ElementAt(5).key;
+            string b = Roster.Players.Any(h => h.key == "요미") ? "요미" : Roster.Players.ElementAt(6).key;
             // A 가 보이게 내려 둔다(스크롤이 돌아가면 목록이 「초기화」된 것처럼 보인다)
             if (sr != null && Hot("hero:" + a) != null)
             {
@@ -1669,6 +1670,8 @@ namespace Bolzena.RunUI
             yield return Wait(1.2f);
             if (f.Stage.Current != "event") yield break;
             yield return Screen_("event", 1.2f);
+            // 「갈림길」 — 두 이야기 가운데 하나를 먼저 고른다(Flow.EventFork · event.fork0/1)
+            if (Hot("event.fork0") != null) { yield return Shot("event_fork"); yield return Press("event.fork0", 1.4f); }
             yield return Shot("event");
             // 잠기지 않은 첫 선택지(떠나기가 아닌 것)
             int pick = 0;
@@ -1682,10 +1685,21 @@ namespace Bolzena.RunUI
                 yield return Wait(0.5f);
                 if (f.Stage.ModalLayer.childCount > 0 && Hot("gear.ok") != null) { yield return Gear("gear_event"); continue; }
                 if (Hot("pending0") != null) { yield return Shot("event_pending"); yield return Press("pending0", 0.8f); continue; }
+                // 「은총 — 누구의 고유 카드를 받겠습니까?」(Flow.EventGrace · grace:<키> · grace.skip) — 고를 수 있는 첫 사도, 없으면 받지 않기
+                var grace = f.Stage.Hot.Keys.FirstOrDefault(k => k.StartsWith("grace:") && Hot(k) != null);
+                if (grace != null) { yield return Shot("event_grace"); yield return Press(grace, 1.0f); continue; }
+                if (Hot("grace.skip") != null) { yield return Press("grace.skip", 0.8f); continue; }
                 break;
             }
             // 카드 얻는 연출(CardGain, 약 2초 뒤 저절로 닫힘)이 끝나야 떠나기(event.leave)가 생긴다 — 기다린 뒤에 누른다
-            yield return Until(() => !CardGain.IsOpen && Hot("event.leave") != null, 10);
+            // 늦게 뜨는 고르기 창(교주 카드 등 pending · 은총)도 그동안 넘긴다
+            for (float t = 0; t < 14 && !(!CardGain.IsOpen && Hot("event.leave") != null); t += 0.5f)
+            {
+                if (!CardGain.IsOpen && Hot("pending0") != null && f.Stage.ModalLayer.Find("modal pending") != null) { yield return Press("pending0", 0.8f); continue; }
+                var g2 = f.Stage.Hot.Keys.FirstOrDefault(k => k.StartsWith("grace:") && Hot(k) != null);
+                if (g2 != null) { yield return Press(g2, 1.0f); continue; }
+                yield return Wait(0.5f);
+            }
             yield return Wait(0.6f);
             yield return Shot("event_result");
             yield return Press("event.leave", 0.4f);

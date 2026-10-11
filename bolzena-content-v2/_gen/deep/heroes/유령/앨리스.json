@@ -1,0 +1,825 @@
+{
+  "heroes": [
+    {
+      "id": "앨리스",
+      "name": "앨리스",
+      "nature": "광기",
+      "race": "유령",
+      "role": "딜러",
+      "style": "계산형",
+      "star": 3,
+      "hp": 620,
+      "atk": 125,
+      "def": 28,
+      "crit": 10,
+      "blurb": "타로로 남의 미래를 봐 주다 슬쩍 골려 먹는 점술사 유령. 카드마다 적힌 점괘대로 이번 턴 쓴 AP 를 꼭 맞혀 내면 손에 타로 한 장이 펼쳐집니다. 남의 불운을 먹고 차오른 「행운」 은 한 방에 몰아 씁니다.",
+      "keyword": {
+        "name": "행운",
+        "desc": "남의 불운을 먹고 차오르는 행운",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.12
+          }
+        ],
+        "rules": [
+          {
+            "name": "완전 럭키 앨리스잖아",
+            "when": {
+              "on": "blocked"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "행운",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "행운 카드",
+            "when": {
+              "on": "spend",
+              "id": "행운"
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "사기",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "버려진 카드 점괘",
+            "when": {
+              "on": "discard",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "행운",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "액땜",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.38,
+            "target": "allEnemies"
+          },
+          {
+            "k": "roll",
+            "n": 3
+          },
+          {
+            "k": "ifRoll",
+            "n": 1
+          },
+          {
+            "k": "status",
+            "id": "사기",
+            "v": 1
+          },
+          {
+            "k": "ifRoll",
+            "n": 2
+          },
+          {
+            "k": "status",
+            "id": "취약",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "ifRoll",
+            "n": 3
+          },
+          {
+            "k": "stack",
+            "id": "행운",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "앨리스_s1",
+        "앨리스_s2",
+        "앨리스_s3",
+        "앨리스_u3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "앨리스_s1",
+      "name": "카드 날리기",
+      "hero": "앨리스",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "앨리스_s2",
+      "name": "방어 자세",
+      "hero": "앨리스",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "앨리스_s3",
+      "name": "카드 한 벌 날리기",
+      "hero": "앨리스",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "hero": "앨리스",
+      "token": true,
+      "id": "앨리스_tarot",
+      "name": "타로 한 장",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.51,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "행운",
+          "v": 1
+        }
+      ],
+      "blurb": "뒤집기 전까지는 누구의 불운인지 모릅니다."
+    },
+    {
+      "id": "앨리스_u3",
+      "name": "비추는 거울",
+      "hero": "앨리스",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "행운",
+          "v": 2
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "행운",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "행운",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "행운",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "앨리스_tarot",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "행운",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "drawn",
+                    "who": "any",
+                    "unique": true
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "행운",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "power": true
+        }
+      ]
+    },
+    {
+      "id": "앨리스_u1",
+      "name": "아르카나",
+      "hero": "앨리스",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.13,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "행운",
+          "v": 1
+        },
+        {
+          "k": "ifSpent",
+          "n": 2
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.68,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 2
+            },
+            {
+              "k": "ifSpent",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.68,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "충격",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.65,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "잔불",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.32,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 3
+            },
+            {
+              "k": "ifSpent",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "약점 노출",
+              "v": 1,
+              "target": "randomEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.68,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "tags": [
+        "회수 3"
+      ]
+    },
+    {
+      "id": "앨리스_u2",
+      "name": "남의 불운",
+      "hero": "앨리스",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.33,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "행운",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.88,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "행운",
+          "all": true
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "앨리스_u4",
+      "name": "밑장 빼기",
+      "hero": "앨리스",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "discard",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "ifSpent",
+          "n": 3
+        },
+        {
+          "k": "stack",
+          "id": "행운",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "ifSpent",
+              "n": 3
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "앨리스_tarot",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "tally"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "행운",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "power": true
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "앨리스_s4",
+      "name": "행운의 카드",
+      "hero": "앨리스",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "행운",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "행운",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

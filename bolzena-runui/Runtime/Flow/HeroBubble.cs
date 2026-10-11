@@ -26,6 +26,9 @@ namespace Bolzena.RunUI
 
         public bool Alive => Rect != null;
 
+        /// <summary>사도 말풍선 글 스위치(2026-10-09 사용자 결정) — 전투 중 가만있을 때(idle)만 띄운다. 로비 · 보스 시작 · 승리 · 편성 · 진급 · 졸업은 true 로 하면 되살아난다.</summary>
+        public static bool AllKinds = false;
+
         // 원작 그림 치수(Tools~/bubble_art.py 와 짝) — 몸통 9칸 테두리 · 화면 배율, 꼬리 판(232×176)의 끝점 · 윗변
         const float BodyBorder = 120, BodyPpu = 4f;
         const float TailW = 48, TailCanvasW = 232, TailCanvasH = 176, TailTipX = 40, TailTipY = 152, TailTopY = 24;
@@ -42,6 +45,7 @@ namespace Bolzena.RunUI
         /// </summary>
         public static HeroBubble Show(RectTransform parent, HeroInfo h, string line, Vector2 anchor, Vector2 pos, Vector2 pivot, float hold = 0, float delay = 0, string kind = null)
         {
+            if (!AllKinds && kind != "idle") return new HeroBubble { hero = h, kind = kind ?? "-" };   // 꺼 둠 — Rect 가 없어(Alive false) SetLine · Close 는 아무 일도 안 한다
             var b = new HeroBubble { hero = h, kind = kind ?? "-", parent = parent, anchor = anchor, pos = pos, pivot = pivot };
             b.Build(line, hold, delay);
             return b;

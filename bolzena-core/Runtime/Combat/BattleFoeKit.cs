@@ -100,7 +100,7 @@ namespace Bolzena.Core
         // ── 희귀종 ────────────────────────────────────────────────────
         bool HasRare(Unit e, string id, out RareDef r)
         {
-            r = Data.Enemy(e?.Key)?.Rare?.FirstOrDefault(x => x.Id == id);
+            r = R.FOE_RARE ? Data.Enemy(e?.Key)?.Rare?.FirstOrDefault(x => x.Id == id) : null;
             return r != null;
         }
 
@@ -110,7 +110,7 @@ namespace Bolzena.Core
         public static List<EnemyPassive> FoePassList(EnemyDef d)
         {
             if (d == null) return new List<EnemyPassive>();
-            if (d.Rare == null || d.Rare.Count == 0) return d.Passives ?? new List<EnemyPassive>();
+            if (!R.FOE_RARE || d.Rare == null || d.Rare.Count == 0) return d.Passives ?? new List<EnemyPassive>();
             lock (passCache)
             {
                 if (passCache.TryGetValue(d, out var hit)) return hit;
@@ -220,7 +220,7 @@ namespace Bolzena.Core
                     {
                         foreach (var id in Hand) CardCue(id, "hand", "discard", "foe");
                         Discard.AddRange(Hand); Hand.Clear();
-                        Draw = Shuffle(Rng, Draw.Concat(Discard).ToList()); Discard.Clear(); CardCue(null, "discard", "draw", "shuffle");
+                        Draw = Shuffle(Rng, Draw.Concat(Discard).ToList()); Discard.Clear(); Used.Clear(); CardCue(null, "discard", "draw", "shuffle");
                         if (it.Id != null && Data.Card(it.Id) != null)
                             for (int k = 0; k < Math.Max(1, it.N); k++) { Draw.Insert(Rng.Int(Draw.Count + 1), it.Id); CardCue(it.Id, "new", "draw", "foe"); }
                         Say($"{e.Name}: {say} (손을 모두 버리고 섞는다{(it.Id != null ? $" · 「{Data.Card(it.Id)?.Name}」" : "")})");

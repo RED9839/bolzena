@@ -15,6 +15,7 @@ namespace Bolzena.RunUI
         IEnumerator Touch_()
         {
             yield return Wait(0.5f);
+            if (Has("-touch-zones")) { yield return TouchZones_(); yield break; }
             var arts = (Arg("-touch-heroes") ?? "erpin,butter,alice").Split(',');
             foreach (var art in arts)
             {
@@ -132,6 +133,35 @@ namespace Bolzena.RunUI
             Debug.Log("[Demo] 끝");
             yield return Wait(0.3f);
             Application.Quit(fails == 0 ? 0 : 4);
+        }
+
+        // 머리 판정 점검(-demo-touch -touch-zones [-touch-heroes a,b,c | -touch-audit]) — 판정 표시를 켜고 사도마다 찍고,
+        //   -touch-audit 이면 135명 전부 머리 상자가 그려진 그림 위로 얼마나 벗어나는지 표로 로그([TouchAudit])에 남긴다.
+        IEnumerator TouchZones_()
+        {
+            bool audit = Has("-touch-audit");
+            var list = audit ? Roster.All.Where(x => Flow.CanLobby(x)).ToList()
+                : (Arg("-touch-heroes") ?? "erpin,bibi,jubee,maestro2,tig,ner,aragnia,daya").Split(',').Select(a => Roster.All.FirstOrDefault(x => x.art == a)).Where(x => x != null).ToList();
+            int bad = 0; float worst = 0;
+            foreach (var h in list)
+            {
+                Flow.DemoLobbyHero = h.key;
+                LobbyTouch.ShowZones = true;
+                f.Lobby();
+                yield return Screen_("lobby", audit ? 0.45f : 1.2f);
+                var t = Flow.LobbyTouchNow;
+                if (t == null || t.Sg == null) { Debug.Log($"[TouchAudit] {h.art} 부품 없음"); continue; }
+                var info = t.AuditHead(out float over, out float legacy);
+                if (over > 0.15f || over < -0.6f) bad++;
+                worst = Mathf.Max(worst, over);
+                Debug.Log($"[TouchAudit] {h.key}({h.art}) {info}");
+                if (!audit) yield return Shot($"zones_after_{h.art}");
+            }
+            LobbyTouch.ShowZones = false;
+            Flow.DemoLobbyHero = null;
+            Debug.Log($"[TouchAudit] 사도 {list.Count}명 · 상자가 그림 위로 0.15u 넘게 벗어남 또는 0.6u 넘게 모자람 {bad}명 · 가장 크게 벗어남 {worst:0.00}u");
+            Debug.Log("[Demo] 끝");
+            Application.Quit(0);
         }
 
         // ── 가짜 포인터 ──

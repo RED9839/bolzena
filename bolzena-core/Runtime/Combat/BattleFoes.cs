@@ -126,11 +126,10 @@ namespace Bolzena.Core
             var p = BossUlt.PlanFor(Data, d, Floor);
             if (p == null) return false;
             e.UltAt = Turn + BossUlt.EVERY;
-            e.Intent = p.Warn; e.IntentFromCharge = false;
-            e.Hist.Add(p.Warn.T);
-            int shown = UltHitOf(e, p.Use);
-            Say($"{e.Name}: 고학년 예고 — 「{p.Name}」(다음 턴 피해 {shown} · 격파하면 끊김)");
-            Cue("foeUltWarn", e, new Cue { Hero = p.Hero, Name = p.Name, V = shown, T = p.Use.Then.FirstOrDefault(x => IsHit(x.T))?.T });
+            // 2026-10-09 예고 없이 이 차례의 수로 바로 — 끊기지 않는다(격파 · 기절된 턴엔 다른 수처럼 쉰다)
+            e.Intent = p.Use; e.IntentFromCharge = false;
+            e.Hist.Add(p.Use.T);
+            Say($"{e.Name}: 고학년 「{p.Name}」 — 이번 차례(피해 {UltHitOf(e, p.Use)})");
             return true;
         }
 
@@ -151,7 +150,7 @@ namespace Bolzena.Core
         /// <summary>고학년이 끊겼다(격파 · 기절) — 쪽지 foeUltCut.</summary>
         void UltCut(Unit e, string why)
         {
-            if (!BossUlt.IsUlt(e?.Intent)) return;
+            if (!BossUlt.IsUlt(e?.Intent) || !(e.Intent.Brk || e.Intent.Next?.Brk == true)) return;   // 2026-10-09 끊기 없음 — 끊기는 고학년이 없다
             var use = e.Intent.T == "ult" ? e.Intent : e.Intent.Next;
             Say($"{e.Name}: {why} — 고학년 「{use.Say}」 이(가) 끊겼다");
             Cue("foeUltCut", e, new Cue { Hero = use.Id, Name = use.Say, Label = why, T = e.Intent.T });
@@ -176,7 +175,7 @@ namespace Bolzena.Core
             var d = Data.Enemy(id);
             if (d == null || AliveEnemies().Count >= MAX_FOES) return null;
             int ehp = Num.Round(d.Hp * EnemyHpx);
-            double tm = noTough ? 0 : ToughOf(d, EliteFight);   // 강인도 없는 소환물(수 summon 의 noTough)
+            double tm = noTough ? 0 : ToughOf(d, EliteFight, summon: true);   // 강인도 없는 소환물(수 summon 의 noTough)
             var u = new Unit { Side = Side.Enemy, Key = d.Id, Name = d.Name, Idx = Enemies.Count, Row = d.Row ?? "front", Nature = FoeNature(d), Boss = d.Boss, Dmgx = EnemyDmgx, Tough = tm, ToughMax = tm };
             u.MaxHp = ehp; u.Hp = ehp;
             u.Summoner = by?.Idx ?? -1;
@@ -212,7 +211,7 @@ namespace Bolzena.Core
             int Floor(int n) => n != 0 ? Math.Max(R.ENEMY_RUSH_MIN, n) : 0;
             if (it.Rush != null) return Floor(it.Rush.Value);
             if (d?.Rush != null) return Floor(d.Rush.Value);
-            if (it.T == "charge" || fromCharge) return 0;
+            if (it.T == "charge" || it.T == "ult" || fromCharge) return 0;   // 보스 고학년(바로 쓰기)도 즉시 행동으로 당기지 않는다(옛 예고 → 사용과 같게)
             double threat = it.T == "attack" || it.T == "back" ? it.V : it.T == "multi" ? it.V * Math.Max(1, it.N) : it.T == "attackAll" ? it.V * 2.5 : 0;
             if (threat <= 0) return R.ENEMY_RUSH_SMALL;
             int K = R.SCALE;
@@ -232,9 +231,10 @@ namespace Bolzena.Core
                 if (St(e, "그을림") > 0)
                 {
                     int v = Math.Max(1, Num.Round(DotUnit(e, "그을림") * R.SV("그을림")));
+                    var by = TallyBy(e, "그을림");
                     AddSt(e, "그을림", -1);
                     Say($"{e.Name}: 그을림 — 지속 피해 {v}");
-                    Hurt(e, v, new HurtOpts { Dot = true });
+                    Hurt(e, v, new HurtOpts { Dot = true, Credit = by });
                     if (Over != null) return;
                     if (e.Dead) continue;
                 }
@@ -537,13 +537,15 @@ namespace Bolzena.Core
         }
 
         /// <summary>맞는 모습을 보일 사도(연출 · 성격 상성) — 피해는 늘 파티 몸으로 간다. 사도에게 열은 없다: 편성 순서 맨 앞 사도, 관통은 맨 뒤 사도.</summary>
-        Unit PickTarget(bool fromBack) => PickInOrder(AliveParty().ToList(), fromBack);
+        Unit PickTarget(bool fromBack) => Taunter() ?? PickInOrder(AliveParty(), fromBack);   // 도발(엘다인 3차 ▶E63)
 
         /// <summary>편성 순서로 맞을 사도 — 앞(Idx 가 작은)부터, 관통은 뒤부터. 봇(Bots.PickT)도 같은 셈.</summary>
         public static Unit PickInOrder(List<Unit> live, bool fromBack)
         {
             if (live.Count == 0) return null;
-            return live.Aggregate((a, b) => fromBack ? (b.Idx > a.Idx ? b : a) : (b.Idx < a.Idx ? b : a));
+            var a = live[0];   // Aggregate 와 같은 차례로 — 람다 없이(2026-10-09)
+            for (int i = 1; i < live.Count; i++) { var b = live[i]; a = fromBack ? (b.Idx > a.Idx ? b : a) : (b.Idx < a.Idx ? b : a); }
+            return a;
         }
 
         /// <summary>적이 치는 값 — 층 배율 · 약화(-25%) · 사기(겹마다 +20%).</summary>

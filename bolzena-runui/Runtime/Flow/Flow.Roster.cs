@@ -246,7 +246,7 @@ namespace Bolzena.RunUI
             // 고유 효과 · 패시브 · 고학년 — 누르면 판 묶음(수치가 다 든 글 · 길면 스크롤)
             if (hero.Playable)
             {
-                var tc = TraitsChip(rt, hero.CoreId, "고유 효과", "traits" + i);
+                var tc = TraitsChip(rt, hero.CoreId, "고유 능력", "traits" + i);
                 var trt = tc.GetComponent<RectTransform>(); trt.anchorMin = trt.anchorMax = trt.pivot = new Vector2(1, 1); trt.anchoredPosition = new Vector2(-62, -15);
                 Stage.Hot["party.traits" + i] = tc;
             }
@@ -264,7 +264,7 @@ namespace Bolzena.RunUI
             var plate = NavyBox(slot, "plate"); plate.At(0, 1, 0, -(h + 6), w, plateH);
             var stripe = Ui.Img(plate, Theme.Round, nc, "stripe"); stripe.rectTransform.At(0, 0.5f, 10, 0, 5, plateH - 24);
             var d = P.Data.Hero(hero.CoreId);
-            var nm = Ui.Title(plate, $"{hero.ko}  <size=70%><color={Theme.GoldTag}>{new string('★', Mathf.Clamp(hero.star, 1, 5))}</color></size>", Theme.FsLg, Theme.Ink, TextAlignmentOptions.TopLeft); nm.rectTransform.Fill(24, plateH * 0.45f, PartyStore.Cleared(hero.key) > 0 ? 84 : 10, 9);
+            var nm = Ui.Title(plate, hero.ko, Theme.FsLg, Theme.Ink, TextAlignmentOptions.TopLeft); nm.rectTransform.Fill(24, plateH * 0.45f, PartyStore.Cleared(hero.key) > 0 ? 84 : 10, 9);
             nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 14; nm.fontSizeMax = Theme.FsLg;
             ClearBadge(plate, hero.key, -10, -10);
             var stt = Ui.Text(plate, $"HP <b>{d?.Hp ?? hero.hp:N0}</b>   공격 <b>{d?.Atk ?? hero.atk}</b>   방어 <b>{d?.Def ?? hero.def}</b>", Theme.FsSm, Theme.Sub, TextAlignmentOptions.BottomLeft);
@@ -382,16 +382,16 @@ namespace Bolzena.RunUI
         }
         // ═════════════════════════════ 사도 목록 ═════════════════════════════
         // 목록 상태 — 다시 그려도(파티 넣기 · 상세에서 돌아오기) 필터 · 정렬 · 고른 사도 · 스크롤 자리를 그대로 둔다.
-        class ListState { public string Nature; public string Sort = "성급"; public bool Quick = true; public string Focus; public float ScrollY; public bool Drawn; }
-        static readonly string[] Sorts = { "성급", "이름", "역할", "종족" };
+        class ListState { public string Nature; public string Sort = "이름"; public bool Quick = true; public string Focus; public float ScrollY; public bool Drawn; }
+        static readonly string[] Sorts = { "이름", "역할", "종족" };   // 2026-10-09 성급 표시 · 정렬 뺌(사용자)
 
-        /// <summary>정렬 — 성급(높은 별 먼저) · 이름 · 역할 · 종족, 같으면 가나다순.</summary>
+        /// <summary>정렬 — 이름 · 역할 · 종족, 같으면 가나다순.</summary>
         static IEnumerable<HeroInfo> SortHeroes(IEnumerable<HeroInfo> list, string sort) => sort switch
         {
             "이름" => list.OrderBy(h => h.ko, StringComparer.Ordinal),
             "역할" => list.OrderBy(h => h.role, StringComparer.Ordinal).ThenBy(h => h.ko, StringComparer.Ordinal),
             "종족" => list.OrderBy(h => h.race, StringComparer.Ordinal).ThenBy(h => h.ko, StringComparer.Ordinal),
-            _ => list.OrderByDescending(h => h.star).ThenBy(h => h.ko, StringComparer.Ordinal),
+            _ => list.OrderBy(h => h.ko, StringComparer.Ordinal),
         };
 
         /// <summary>사도 목록 — st 가 있으면 편성(target 칸에 넣기 · 빼기), 없으면 도감(보기만). done 은 닫을 때.</summary>
@@ -462,7 +462,7 @@ namespace Bolzena.RunUI
             var grid = content.gameObject.AddComponent<GridLayoutGroup>();
             grid.cellSize = new Vector2(150 * k, 214 * k); grid.spacing = new Vector2(14, 14); grid.padding = new RectOffset(6, 18, 8, 16);
             grid.childAlignment = TextAnchor.UpperLeft;
-            var list = SortHeroes(Roster.All.Where(h => ls.Nature == null || h.nature == ls.Nature), ls.Sort);
+            var list = SortHeroes(Roster.Players.Where(h => ls.Nature == null || h.nature == ls.Nature), ls.Sort);
             if (!dex) list = list.OrderByDescending(h => h.Playable);   // 고를 수 있는 사도 먼저(안정 정렬 — 정렬 순서는 그대로)
             var shown = list.ToList();
             var shownKeys = shown.Select(x => x.key).ToList();
@@ -491,7 +491,11 @@ namespace Bolzena.RunUI
                 var later = new List<int>();
                 for (int i = 0; i < shown.Count; i++)
                 {
-                    if (Dist(i) == 0) ListCard(cells[i], shown[i], st, ls, target, k, i, anim, Rebuild, shownKeys);
+                    if (Dist(i) == 0)
+                    {
+                        ListCard(cells[i], shown[i], st, ls, target, k, i, anim, Rebuild, shownKeys);
+                        VoiceSource.Prefetch(shown[i].art, true);   // 웹 — 보이는 사도 목소리를 뒤에서 미리(칸에 넣는 순간 바로 나게)
+                    }
                     else later.Add(i);
                 }
                 later.Sort((a, b) => Dist(a) != Dist(b) ? Dist(a).CompareTo(Dist(b)) : a.CompareTo(b));
@@ -550,7 +554,7 @@ namespace Bolzena.RunUI
             {
                 st.Slots[slot] = h.key;
                 HeroVoice.Speak(h);   // 칸에 넣을 때 그 사도의 목소리 한 번(앞 소리는 끊긴다)
-                Toast.Show($"<color={Theme.GoldTag}>{h.ko}</color>  {HeroLines.Pick(h, "party")}");   // 그 사도 말투로 한마디(hero_lines.json)
+                if (HeroBubble.AllKinds) Toast.Show($"<color={Theme.GoldTag}>{h.ko}</color>  {HeroLines.Pick(h, "party")}");   // 그 사도 말투로 한마디(hero_lines.json)
             }
             else Toast.Show("세 칸이 다 찼습니다 — 넣은 사도를 눌러 빼세요");
         }
@@ -598,8 +602,6 @@ namespace Bolzena.RunUI
                 var sp = Icon(key); if (sp == null) continue;
                 var ic = Ui.Img(col, sp, locked ? Color.white.A(0.6f) : Color.white, key); ic.Pref(24 * k, 24 * k); ic.preserveAspect = true;
             }
-            var stars = Ui.Title(rt, $"<size=70%>★</size>{h.star}", Theme.FsXl, Theme.Gold, TextAlignmentOptions.BottomLeft);
-            stars.rectTransform.At(0, 0, 8, 28 * k, 80, 34 * k); stars.Outline(0.25f);
             var nm = Ui.Title(rt, h.ko, Theme.FsBody, Color.white, TextAlignmentOptions.BottomRight);
             nm.rectTransform.Band(0, 26 * k, 6, 8, 6 * k);
             nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 11; nm.fontSizeMax = Theme.FsBody; nm.Outline(0.25f);
@@ -755,9 +757,6 @@ namespace Bolzena.RunUI
             }
             var nm = Ui.Title(body, h.ko, Theme.Fs3xl - 10, Theme.Ink); nm.Pref(-1, 56);
             nm.textWrappingMode = TextWrappingModes.NoWrap; nm.enableAutoSizing = true; nm.fontSizeMin = 22; nm.fontSizeMax = Theme.Fs3xl - 10; nm.Outline(0.15f);
-            var starRow = Ui.Rect("stars", body); starRow.Pref(-1, 26);
-            Ui.Row(starRow, 2, TextAnchor.MiddleLeft, null, false, false);
-            for (int i = 0; i < 5; i++) { var s = Ui.Img(starRow, Icon(i < h.star ? "별_켜짐" : "별_꺼짐"), Color.white, "star"); s.Pref(24, 24); s.preserveAspect = true; }
             var sub = Ui.Text(body, $"<color=#{ColorUtility.ToHtmlStringRGB(Theme.NatureOf(h.nature))}>{h.nature}</color> · {h.race} · {h.role}", Theme.FsBody, Theme.Sub); sub.Pref(-1, 28);
             W.Section(body, "능력치", d == null ? "코어 데이터 준비 중 — 원작 표의 값" : null, 36);
             (string, string)[] rows =
@@ -809,14 +808,22 @@ namespace Bolzena.RunUI
             Ui.Col(content, 8, TextAnchor.UpperLeft, new RectOffset(4, 14, 0, 10), true, false);
             // 카드 상세의 이전 · 다음 — 시작 카드 → 고유 카드 순 그대로
             var graceIds = P.Data.UniquesOf(d.Id).Where(u => !d.Starter.Contains(u)).ToList();   // 시동 카드(시작 카드 가운데 고유 카드)는 시작 카드 줄에만 — 은총으로 얻는 것만
-            var allCards = CardOrder.Sort(d.Starter, P.Data, new[] { d.Id }).Concat(CardOrder.Sort(graceIds, P.Data, new[] { d.Id })).ToList();
-            void Row(string title, string sub, List<string> ids)
+            // 시작 덱에서 뺀 기본 카드(2코 강타 등)도 은총으로 드물게 얻는다 — 시작 카드 줄 다음 줄에(2026-10-10 시작 덱 4장)
+            var basicsOut = P.Data.Cards.Values.Where(c => c.Hero == d.Id && !c.Unique && !c.Token && System.Text.RegularExpressions.Regex.IsMatch(c.Id, @"_s\d+$") && !d.Starter.Contains(c.Id)).Select(c => c.Id).ToList();
+            // 변신 카드(forms[].turnMake — 변신마다) · 그 밖의 생성 카드(그 사도의 token) — 2026-10-11 사용자 「성전 모드의 카드를 볼 수 있으면」
+            var formRows = (d.Forms ?? new List<Core.FormDef>()).Select(f => (f, ids: (f.TurnMake ?? new List<Core.FormMake>()).Select(m => m.Id).Where(x => P.Data.Card(x) != null).Distinct().ToList()))
+                .Where(x => x.ids.Count > 0).ToList();
+            var inForm = new HashSet<string>(formRows.SelectMany(x => x.ids));
+            var tokens = P.Data.Cards.Values.Where(c => c.Hero == d.Id && c.Token && !inForm.Contains(c.Id) && !(d.Forms ?? new List<Core.FormDef>()).Any(f => f.Cards != null && f.Cards.ContainsValue(c.Id))).Select(c => c.Id).OrderBy(x => x, System.StringComparer.Ordinal).ToList();
+            var allCards = CardOrder.Sort(d.Starter, P.Data, new[] { d.Id }).Concat(CardOrder.Sort(basicsOut, P.Data, new[] { d.Id })).Concat(CardOrder.Sort(graceIds, P.Data, new[] { d.Id }))
+                .Concat(formRows.SelectMany(x => x.ids)).Concat(tokens).ToList();
+            void Row(string title, string sub, List<string> ids, bool keep = false)
             {
                 var s = W.Section(content, title, sub, 40);
                 var ii = Ui.Img(s.transform.parent, Theme.S("ic_info"), Theme.Dim, "i"); ii.rectTransform.At(0, 0.5f, 14 + s.preferredWidth + 8, 0, 20, 20); ii.preserveAspect = true;
                 var holder = Ui.Rect("row " + title, content); holder.Pref(-1, Mathf.CeilToInt(ids.Count / (float)cols) * (ch + 12));
                 // 사도 안에서도 순서는 CardOrder(기본 → 고유 · 같은 카드 나란히)
-                var sorted = CardOrder.Sort(ids, P.Data, new[] { d.Id });
+                var sorted = keep ? ids : CardOrder.Sort(ids, P.Data, new[] { d.Id });   // 변신 카드는 turnMake 순서(쓰는 차례) 그대로
                 for (int i = 0; i < sorted.Count; i++)
                 {
                     var id = sorted[i];
@@ -826,8 +833,14 @@ namespace Bolzena.RunUI
                     Tw.Pop(c, 0.03f * i, 0.85f, 0.3f);
                 }
             }
-            Row("시작 카드", $"{d.Starter.Count}장 · 모험을 시작할 때 덱에", d.Starter);
-            Row("고유 카드", $"{graceIds.Count}장 · 은총으로 얻습니다 · 신탁이 나올 수 있습니다", graceIds);
+            // 같은 카드 2장(가벼운 덱의 1코 기본 공격)은 두 장 다 그린다 — 「기본 3 · 시동 1」 처럼 자기 카드 장수를 셀 수 있게(2026-10-11 사용자)
+            int nOpen = d.Starter.Count(id => P.Data.IsOpener(id)), nBasic = d.Starter.Count - nOpen, nUniq = P.Data.UniquesOf(d.Id).Count;
+            Row("시작 카드", $"{d.Starter.Count}장(기본 {nBasic}{(nOpen > 0 ? $" · 시동 {nOpen}" : "")}) · 모험을 시작할 때 덱에 · 자기 카드 {nBasic + nUniq}장(기본 {nBasic} + 고유 {nUniq})", d.Starter);
+            if (basicsOut.Count > 0) Row("기본 카드", $"{basicsOut.Count}장 · 시작 덱에는 없고 은총으로 드물게 얻습니다", basicsOut);
+            Row("은총 카드", $"{graceIds.Count}장 · 싸우며 은총으로 얻는 고유 카드 · 신탁이 나올 수 있습니다", graceIds);   // 「시작 카드」 · 「은총 카드」 로 나눠 덜 헷갈리게(2026-10-11 사용자)
+            foreach (var (f, ids) in formRows)
+                Row($"변신 카드 — {f.Name}", $"{ids.Count}종 · 「{f.Name}」 중 매 턴 손에 · 증발 · 소멸(덱에 안 남음)", ids, true);
+            if (tokens.Count > 0) Row("생성 카드", $"{tokens.Count}종 · 카드 · 고유 능력이 전투 중에 만듭니다(덱에 안 남음)", tokens);
 
             // 오른쪽 — 고학년 → 고유 효과 → 패시브(2026-10 사용자: 「고유 효과 탭을 없애고 카드 목록 옆에, 자세히 없이 다 보이게」)
             var side = Ui.Rect("side", stage); side.anchorMin = new Vector2(0, 0); side.anchorMax = new Vector2(0, 1); side.pivot = new Vector2(0, 0.5f);
@@ -883,10 +896,10 @@ namespace Bolzena.RunUI
             {
                 var part = traits.Where(x => x.Kind == kind).ToList();
                 if (part.Count == 0) continue;
-                Head(kind);
+                Head(kind == "고유 효과" ? "고유 능력" : kind);   // 패시브를 고유 능력으로 합침(2026-10-10) — 칸 이름만 「고유 능력」
                 foreach (var t in part)
                 {
-                    var kn = Ui.Title(content, t.Name, Theme.FsMd, kind == "고유 효과" ? Theme.Gold : Theme.Ink, TextAlignmentOptions.TopLeft, "kw " + t.Name);
+                    var kn = Ui.Title(content, t.Name + CarrierTag(t.Keyword), Theme.FsMd, kind == "고유 효과" ? Theme.Gold : Theme.Ink, TextAlignmentOptions.TopLeft, "kw " + t.Name);
                     kn.textWrappingMode = TextWrappingModes.Normal; kn.Pref(-1, 26);
                     if (!string.IsNullOrEmpty(t.Sub)) Body(t.Sub, Theme.FsCap + 1, Theme.Sub, false);
                     Body(t.Body, Theme.FsSm, Theme.Ink);

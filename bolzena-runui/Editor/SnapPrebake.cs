@@ -44,6 +44,7 @@ namespace Bolzena.RunUI.EditorTools
                     if (p.Length >= 9 && !line.StartsWith("#")) old[p[0] + "|" + p[1]] = line;
                 }
             var arts = StandingFit.Arts.Where(a => !a.StartsWith("_")).OrderBy(a => a, System.StringComparer.Ordinal).ToList();
+            var players = PlayerArts();
             var lines = new List<string> { $"#v{Version}\tkind\tart\tratio\tfrac\tx\ty\tw\th\tsrc" };
             int made = 0, kept = 0, missing = 0;
             var wrote = new List<string>();
@@ -57,6 +58,7 @@ namespace Bolzena.RunUI.EditorTools
                     bool any = false;
                     foreach (var k in Kinds)
                     {
+                        if (players != null && !players.Contains(art) && k.kind != "face") continue;   // 클론 전용 · NPC 사도는 얼굴(지도 보스 칸)만
                         var body = StandingSnap.SnapLine(k.kind, art, k.ratio, k.frac);
                         if (body == null) continue;
                         var line = body + "\t" + $"v{Version}:{k.w}x{k.h}:{src}";
@@ -90,6 +92,24 @@ namespace Bolzena.RunUI.EditorTools
             long bytes = Kinds.Sum(k => Directory.GetFiles(Path.Combine(Dir, k.kind), "*.png").Sum(f => new FileInfo(f).Length));
             Debug.Log($"[Snap] 사도 정지 그림 미리 굽기 — 새로 {made} · 그대로 {kept} · 지움 {removed} · 스파인 없음 {missing} · PNG 합 {bytes / 1048576f:F1}MB · {(System.DateTime.Now - t0).TotalSeconds:F0}s");
             return made;
+        }
+
+        /// <summary>
+        /// 고를 수 있는 사도의 그림 키(2026-10-11 엘다인 20명 전환) — 목록(list) · 카드(card)는 이 사도만 굽는다. 콘텐츠 스냅샷(StreamingAssets/CoreData — 빌드 Setup 이 먼저 만든다)을
+        /// 읽어 Roster 와 잇는다. 못 읽으면 null(예전처럼 표의 사도 전부).
+        /// </summary>
+        static HashSet<string> PlayerArts()
+        {
+            const string dir = "Assets/StreamingAssets/CoreData";
+            if (!Directory.Exists(dir)) return null;
+            try
+            {
+                var d = Bolzena.Core.GameData.FromFolder(dir);
+                Roster.Link(d);
+                var set = new HashSet<string>(Roster.Players.Select(h => h.art).Where(a => a != null));
+                return set.Count > 0 ? set : null;
+            }
+            catch (System.Exception e) { Debug.LogWarning("[Snap] 콘텐츠를 못 읽어 표의 사도를 다 굽는다: " + e.Message); return null; }
         }
 
         // 스탠딩 스파인 파일 표시(이름 · 내용 MD5) — 바뀌면 다시 굽는다. Resources 두 곳(Spine/st_<art>) 가운데 있는 것

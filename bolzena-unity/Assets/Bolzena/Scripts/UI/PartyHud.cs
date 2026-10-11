@@ -10,7 +10,7 @@ namespace Bolzena.UI
     // 화면 UI — 카제나 전투 화면의 배치 · 밀도를 따른다(그림 · 아이콘 · 글은 우리 것, 색 · 글자 단계는 판 화면 톤.md).
     // 판 · 상자를 거의 없애고 화면 대부분을 싸움터에 쓴다. 무리마다 화면 모서리 · 가장자리에 붙는다(21:9 · 16:10 에서도), 폰은 1.25배.
     //   위 왼쪽: 가는 파티 HP 막대(숫자 얹기 · 예고 피해 ▼) → 사도 초상 띠 셋(비스듬한 조각 · 옆에 키워드 수) → 파티 상태 칩(작게)
-    //   위 오른쪽: 자동 전투(알약) · 배속(1× · 2× 알약) · 메뉴(≡ — 일시정지 · 설정 · 화면), 얇은 구분선
+    //   위 오른쪽: 전투 기록(막대 셋 — MeterPanel) · 자동 전투(알약) · 배속(1× · 2× 알약) · 메뉴(≡ — 일시정지 · 설정 · 화면), 얇은 구분선
     //   왼쪽 가운데: 뽑을 더미(아이콘 + 수)       오른쪽 가운데: 무덤(버린 더미 — 아이콘 + 수)
     //   (턴 칩 · 웨이브 · 소멸 더미 표시 · 게이지 머리 아이콘 · 「/ 최대」 는 2026-10-07 사용자 요청으로 걷음 — 턴 · 웨이브는 로그 · 스냅샷에만, 소멸 더미는 무덤 창의 탭으로 본다)
     //   왼쪽 아래: 고학년 게이지(큰 % + 세로 칸) 옆에 고학년 띠 셋(비스듬한 초상 · 값 · 쓸 수 있으면 반짝이)
@@ -28,7 +28,7 @@ namespace Bolzena.UI
         public ChipRow Chips => chips;
         Group TL, TR, ML, MR, BL, BR, BC;
         public System.Action<int> OnPile;           // 0 뽑을 · 1 버린 · 2 사라진
-        public System.Action OnSpeed, OnPause, OnParty, OnAuto;
+        public System.Action OnSpeed, OnPause, OnParty, OnAuto, OnMeter;
         SpriteRenderer autoKnob, autoTrack, autoIcon, speedIcon;
         public System.Action<int> OnHero;           // 왼쪽 위 초상을 누름 — 사도 정보
         public BattleSnapshot Snap;                 // 툴팁이 읽는 지금 모습
@@ -38,6 +38,7 @@ namespace Bolzena.UI
         public readonly List<UltButton> Ults = new List<UltButton>();
         int hp, maxHp, gauge, gaugeMax = 300, block, due, ap;
         float fillF = 1, lagF = 1, lagHold, gaugeShown;
+        int shownHand = -1, shownGauge = int.MinValue;   // 글을 바뀔 때만 다시 쓰려고
         float apPop;
         // AP 를 얻은 순간(격파 · 격파하며 처치) — AP 숫자 오른쪽 위에 「+N」 이 떠올랐다 사라진다
         TextMeshPro apPlus; float apPlusT;
@@ -58,11 +59,17 @@ namespace Bolzena.UI
         static readonly Vector3 AutoAt = new Vector3(5.74f, 4.05f, 0), MenuAt = new Vector3(7.6f, 4.05f, 0);
         static readonly Vector3 SpeedAt = new Vector3(6.72f, 4.05f, 0);      // 자동 전투와 같은 알약(시계 + 1× · 2×)
         const float PillW = 0.86f, PillH = 0.4f;
+        // 전투 기록 단추(막대 셋) — 자동 전투 왼쪽(2026-10-11 데미지 지표)
+        static readonly Vector3 MeterAt = new Vector3(4.86f, 4.05f, 0);
+        readonly SpriteRenderer[] meterBars = new SpriteRenderer[3];
+        /// <summary>위 왼쪽 무리(파티 HP 막대 · 실드 칸)의 오른쪽 끝 — 모서리에서 잰 16:9 기준 거리(전투 기록 표가 이보다 오른쪽에 선다).</summary>
+        public const float HudRight = 8f + BarX0 + BarW + 0.5f;
 
         public Vector3 EndPos => endTurn.transform.position;
         public Vector3 SpeedPos => speedBg.transform.position;
         public Vector3 PartyPos => TL.At(new Vector3(BarX0 + BarW / 2, BarY, 0));
         public Vector3 PausePos => menuBg.transform.position;
+        public Vector3 MeterPos => TR.At(MeterAt);
         public bool EndHover;
         const int O = 560, OAp = 692;
 
@@ -162,6 +169,11 @@ namespace Bolzena.UI
             { var ab = autoTrack.gameObject.AddComponent<Button>(); ab.Size = new Vector2(0.9f, 0.46f); ab.OnClick = () => OnAuto?.Invoke(); TipZone.Add(autoTrack, ab.Size, () => "자동 전투 — 카드 · 고학년을 저절로 냅니다 · 단축키 Q", 2); }
             Make.Box("sep", tr, Res.UI("white"), (SpeedAt + MenuAt) / 2 + new Vector3(0.1f, 0, 0), new Vector2(0.015f, 0.36f), O + 1, new Color(1, 1, 1, 0.3f));
             menuBg = IconBtn("menu", tr, MenuAt, "ic_menu", () => OnPause?.Invoke(), "메뉴 — 일시정지 · 설정 · 화면 · Esc");
+            // 전투 기록 — 막대 셋 아이콘(그림 없이 흰 막대). 누르면 위 가운데에 사도별 피해 · 실드 · 회복 표(MeterPanel)를 여닫는다
+            IconBtn("meter", tr, MeterAt, null, () => OnMeter?.Invoke(), "전투 기록 — 사도별 피해 · 실드 · 회복 · 단축키 D");
+            float[] mh = { 0.14f, 0.26f, 0.19f };
+            for (int i = 0; i < 3; i++)
+                meterBars[i] = Make.Box("meter_b" + i, tr, Res.UI("white"), MeterAt + new Vector3((i - 1) * 0.1f, -0.13f + mh[i] / 2, 0), new Vector2(0.065f, mh[i]), O + 2, new Color(0.95f, 0.93f, 0.88f));
 
             // ── 왼쪽 가운데 — 뽑을 더미 ──
             deckText = PileButton(ml, "deck", DeckAt, 0, "ic_pile_up", false, "뽑을 더미 — 다음에 뽑을 카드들(차례는 감춤). 누르면 봅니다 · 단축키 A");
@@ -336,6 +348,12 @@ namespace Bolzena.UI
             speedBg.color = fast ? new Color(0.85f, 0.66f, 0.28f, 0.95f) : new Color(0.08f, 0.1f, 0.2f, 0.85f);
         }
 
+        /// <summary>전투 기록 표가 열려 있으면 단추 막대를 금빛으로.</summary>
+        public void SetMeter(bool on)
+        {
+            foreach (var b in meterBars) if (b != null) b.color = on ? Tone.Gold : new Color(0.95f, 0.93f, 0.88f);
+        }
+
         public void SetAuto(bool on)
         {
             autoTrack.color = on ? new Color(0.85f, 0.66f, 0.28f, 0.95f) : new Color(0.08f, 0.1f, 0.2f, 0.85f);
@@ -353,7 +371,11 @@ namespace Bolzena.UI
             if (!s.Over)
                 foreach (var e in s.Enemies)
                     if (!e.Dead && !e.Broken && !e.Sealed && !e.IntentLater && (e.Intent == IntentKind.Attack || e.Intent == IntentKind.Heavy)) due += e.IntentValue * Mathf.Max(1, e.IntentHits);
-            chips.Set(s.PartyChips);
+            // 변신 · 태세는 파티 칩 줄에도 — 「성전 3턴」(남은 턴이 바로 보이게, 2026-10-11 사용자)
+            var row = new List<StatusChip>();
+            foreach (var h in s.Heroes) foreach (var c in h.Chips) if (c.FormOf != null) row.Add(new StatusChip { Id = c.Id, Value = c.Value, Turns = c.Turns, Kind = "form", Text = c.Text, FormOf = c.FormOf });
+            row.AddRange(s.PartyChips);
+            chips.Set(row);
             gauge = s.Gauge;
             gaugeMax = Mathf.Max(1, s.GaugeMax);
             for (int i = 0; i < Ults.Count && i < s.Heroes.Count; i++) Ults[i].State = s.Heroes[i];
@@ -593,10 +615,11 @@ namespace Bolzena.UI
             }
             var hand = BattleDirector.I != null ? BattleDirector.I.Hand : null;
             int hc = hand != null ? hand.Cards.Count : 0;
-            handText.text = $"{hc:00}<color={Tone.DimTag}>/{Bolzena.Core.R.HAND_MAX:00}</color>";
+            if (hc != shownHand) { shownHand = hc; handText.text = $"{hc:00}<color={Tone.DimTag}>/{Bolzena.Core.R.HAND_MAX:00}</color>"; }   // 바뀔 때만(매 프레임 문자열 할당 — perf_20261009)
             // 고학년 게이지 — 큰 %(실제 값) · 부드러운 세로 채움 · 필요치 눈금
             gaugeShown = Mathf.MoveTowards(gaugeShown, gauge, Time.unscaledDeltaTime * Mathf.Max(120f, Mathf.Abs(gauge - gaugeShown) * 4f));
-            gaugeText.text = Mathf.RoundToInt(gaugeShown) + "<size=45%>%</size>";
+            int gpc = Mathf.RoundToInt(gaugeShown);
+            if (gpc != shownGauge) { shownGauge = gpc; gaugeText.text = gpc + "<size=45%>%</size>"; }
             {
                 float gH = GBarTop - GBarBot, gf = Mathf.Clamp01(gaugeShown / gaugeMax), fh = gH * gf;
                 bool any = false;

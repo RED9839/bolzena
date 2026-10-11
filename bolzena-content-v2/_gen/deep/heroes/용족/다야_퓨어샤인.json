@@ -1,0 +1,821 @@
+{
+  "heroes": [
+    {
+      "id": "다야_퓨어샤인",
+      "name": "다야(퓨어샤인)",
+      "nature": "광기",
+      "race": "용족",
+      "role": "서포터",
+      "style": "회복형",
+      "star": 3,
+      "hp": 600,
+      "atk": 75,
+      "def": 60,
+      "crit": 5,
+      "blurb": "마법 소녀로 변신한 다야. 변신이 부끄러워 누구보다 빨리 끝내고 싶습니다. 발밑의 영역이 파티를 아물리고, 넘친 빛은 반짝임으로 모여 파티의 다음 한 수를 빛냅니다.",
+      "keyword": {
+        "name": "퓨어☆영역",
+        "desc": "발밑에 펼친 반짝이는 마법진",
+        "carrier": "self",
+        "cap": 3,
+        "endDecay": 1,
+        "per": [
+          {
+            "stat": "hot",
+            "ratio": 0.25
+          }
+        ],
+        "rules": [
+          {
+            "name": "퓨어☆포즈",
+            "when": {
+              "on": "play",
+              "who": "any",
+              "nth": 4
+            },
+            "fx": [
+              {
+                "k": "heal",
+                "ratio": 0.12
+              },
+              {
+                "k": "stack",
+                "id": "퓨어☆영역",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "반짝반짝 넘침",
+            "when": {
+              "on": "overheal",
+              "pct": 0.8
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "반짝임",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "퓨어☆샤이닝 빔",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "shield",
+            "ratio": 1.15
+          },
+          {
+            "k": "status",
+            "id": "결의",
+            "v": 1
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.28,
+            "target": "farEnemy"
+          },
+          {
+            "k": "status",
+            "id": "사기",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "다야_퓨어샤인_s1",
+        "다야_퓨어샤인_s2",
+        "다야_퓨어샤인_s3",
+        "다야_퓨어샤인_u4"
+      ],
+      "keywords": [
+        {
+          "name": "반짝임",
+          "desc": "넘친 빛이 모인 반짝이",
+          "carrier": "self",
+          "cap": 4,
+          "onMax": {
+            "empower": "any",
+            "ratio": 0.4,
+            "consume": true
+          }
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "다야_퓨어샤인_s1",
+      "name": "별빛 스틱",
+      "hero": "다야_퓨어샤인",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "다야_퓨어샤인_s2",
+      "name": "반짝 반창고",
+      "hero": "다야_퓨어샤인",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "hero": "다야_퓨어샤인",
+      "token": true,
+      "id": "다야_퓨어샤인_finish",
+      "name": "샤이닝 피니시",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "증발"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.16,
+          "target": "oneEnemy",
+          "hits": 4
+        }
+      ]
+    },
+    {
+      "id": "다야_퓨어샤인_u4",
+      "name": "매지컬☆샤인 영역",
+      "hero": "다야_퓨어샤인",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "퓨어☆영역",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "퓨어☆영역",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "conds": [
+                    {
+                      "c": "stack",
+                      "id": "퓨어☆영역",
+                      "n": 3
+                    }
+                  ],
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "반짝임",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "power": true
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "퓨어☆영역",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.72
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "퓨어☆영역",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.56
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "overheal"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "반짝임",
+                      "v": 1
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "다야_퓨어샤인_u1",
+      "name": "매지컬☆샤인",
+      "hero": "다야_퓨어샤인",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2.04
+        },
+        {
+          "k": "heal",
+          "ratio": 0.92
+        },
+        {
+          "k": "stack",
+          "id": "퓨어☆영역",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.04
+            },
+            {
+              "k": "heal",
+              "ratio": 1.4
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.72
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.84
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.84
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.92
+            },
+            {
+              "k": "heal",
+              "ratio": 1.28
+            },
+            {
+              "k": "stack",
+              "id": "반짝임",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "다야_퓨어샤인_u3",
+      "name": "스타☆샤인",
+      "hero": "다야_퓨어샤인",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "퓨어☆영역",
+          "n": 1
+        },
+        {
+          "k": "heal",
+          "ratio": 1.2
+        },
+        {
+          "k": "spend",
+          "id": "퓨어☆영역",
+          "all": true
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "다야_퓨어샤인_u5",
+      "name": "1초 컷",
+      "hero": "다야_퓨어샤인",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.35,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perOverheal",
+          "per": 25,
+          "pct": 0.8
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.08,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "반짝임",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perOverheal",
+              "per": 25,
+              "pct": 0.8
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.12,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "반짝임",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "target": "farEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "반짝임",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.46,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.24
+            },
+            {
+              "k": "stack",
+              "id": "반짝임",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.36,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.64,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "반짝임",
+              "v": 4
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "다야_퓨어샤인_s3",
+      "name": "별빛 스틱 빙글",
+      "hero": "다야_퓨어샤인",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "다야_퓨어샤인_s4",
+      "name": "퓨어☆변신 포즈",
+      "hero": "다야_퓨어샤인",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.64
+        },
+        {
+          "k": "stack",
+          "id": "퓨어☆영역",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.48
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.64
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.64
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.64
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.16
+            },
+            {
+              "k": "stack",
+              "id": "퓨어☆영역",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

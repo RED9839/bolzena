@@ -1,0 +1,727 @@
+{
+  "heroes": [
+    {
+      "id": "리뉴아",
+      "name": "리뉴아",
+      "nature": "광기",
+      "race": "엘프",
+      "role": "딜러",
+      "style": "예약형",
+      "star": 3,
+      "hp": 720,
+      "atk": 146,
+      "def": 29,
+      "crit": 10,
+      "blurb": "규격에 딱 맞는 1초를 사랑하는 시간 여행자. 멈춰 버린 둠스데이 시계가 다 돌 때마다 정각에 적 전체를 치고 다시 감기며, 남은 AP 를 딱 맞춰 쓰면 시계가 빨리 돕니다.",
+      "keyword": {
+        "name": "둠스데이 시계",
+        "desc": "멸망 타이머가 멈춘 채 정각마다 울리는 시계",
+        "carrier": "self",
+        "cap": 2,
+        "reserve": true,
+        "decay": 1,
+        "rules": [
+          {
+            "name": "정각",
+            "when": {
+              "on": "stackGone",
+              "id": "둠스데이 시계",
+              "decay": true
+            },
+            "fx": [
+              {
+                "k": "dmg",
+                "ratio": 1.74,
+                "target": "allEnemies"
+              },
+              {
+                "k": "stack",
+                "id": "둠스데이 시계",
+                "v": 2
+              }
+            ]
+          },
+          {
+            "name": "째깍",
+            "when": {
+              "on": "hurt",
+              "pct": 0.07
+            },
+            "fx": [
+              {
+                "k": "hasten",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "우리들의 평화로운 시간",
+            "when": {
+              "on": "reserveFire"
+            },
+            "fx": [
+              {
+                "k": "dealtMod",
+                "v": 0.1,
+                "target": "allAllies"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "타임 브레이크",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.77,
+            "hits": 6,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "리뉴아_s1",
+        "리뉴아_s2",
+        "리뉴아_s3",
+        "리뉴아_u2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "리뉴아_s1",
+      "name": "시공 사격",
+      "hero": "리뉴아",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_s2",
+      "name": "시공 관통탄",
+      "hero": "리뉴아",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_s3",
+      "name": "방어 자세",
+      "hero": "리뉴아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_u2",
+      "name": "멈춰 버린 시계",
+      "hero": "리뉴아",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "둠스데이 시계",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "둠스데이 시계",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "둠스데이 시계",
+              "v": 2
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "둠스데이 시계",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 1.37,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "둠스데이 시계",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.63
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "둠스데이 시계",
+              "v": 2
+            },
+            {
+              "k": "gauge",
+              "v": 20
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_u1",
+      "name": "시공의 메아리",
+      "hero": "리뉴아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.63,
+          "target": "oneEnemy",
+          "hits": 5
+        },
+        {
+          "k": "dispel",
+          "n": 1
+        },
+        {
+          "k": "strip",
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.96,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "dispel",
+              "n": 1
+            },
+            {
+              "k": "strip",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.63,
+              "target": "allEnemies",
+              "hits": 5
+            },
+            {
+              "k": "dispel",
+              "n": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.03,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.84,
+              "target": "oneEnemy",
+              "hits": 5
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "dispel",
+                      "n": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.53,
+              "target": "oneEnemy",
+              "hits": 6
+            },
+            {
+              "k": "strip",
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_u3",
+      "name": "정지된 6초",
+      "hero": "리뉴아",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.56,
+          "target": "allEnemies",
+          "hits": 6
+        },
+        {
+          "k": "ripen",
+          "id": "둠스데이 시계",
+          "v": 0.25
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "리뉴아_u4",
+      "name": "오천 년 뒤의 편지",
+      "hero": "리뉴아",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "hasten",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "reserveFire"
+              },
+              "fx": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.87,
+                  "target": "allEnemies"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 1.56,
+                      "hits": 2,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "power": true
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 3
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "fx": [
+                    {
+                      "k": "empower",
+                      "ratio": 0.78
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "hasten",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 1.02,
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "gauge",
+                      "v": 5
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리뉴아_s4",
+      "name": "시계 조율",
+      "hero": "리뉴아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "둠스데이 시계",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "둠스데이 시계",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "둠스데이 시계",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "둠스데이 시계",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "둠스데이 시계",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "둠스데이 시계",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -9,7 +9,7 @@ namespace Bolzena.Core
     {
         public int V, Until, Uses;
         public string Owner, Who, Type, Tag;
-        public bool Unique, Basic;
+        public bool Unique, Basic, Token;
         public CostModRec Copy() => (CostModRec)MemberwiseClone();
     }
 
@@ -33,10 +33,11 @@ namespace Bolzena.Core
 
         // ── 카드 거르개 ──────────────────────────────────────────────
         /// <summary>효과 조각의 카드 거르개(who · type · unique · basic · tag)에 그 카드가 맞나. 거르개가 없으면 늘 맞다.</summary>
-        public bool CardMatch(string id, string who, string type, bool unique, bool basic, string tag, Unit owner)
+        public bool CardMatch(string id, string who, string type, bool unique, bool basic, string tag, Unit owner, bool token = false)
         {
             var c = CardOf(id);
             if (c == null) return false;
+            if (token && !c.Def.Token) return false;   // (엘다인 ▶E11) 생성 카드만
             if (type != null && c.Type != type) return false;
             if (who == "self" && (owner == null || c.Hero != owner.Key)) return false;
             if (who == "other" && (c.Hero == null || (owner != null && c.Hero == owner.Key))) return false;
@@ -46,21 +47,22 @@ namespace Bolzena.Core
             if (tag != null && !HasTagB(id, tag)) return false;
             return true;
         }
-        bool FxMatch(Fx f, string id, Unit owner) => CardMatch(id, f.Who, f.K == FxK.IfPrev ? null : f.Type, f.Unique, f.Basic, f.Tag, owner);
-        static bool HasFilter(Fx f) => f.Who != null || f.Type != null || f.Unique || f.Basic || f.Tag != null;
+        bool FxMatch(Fx f, string id, Unit owner) => CardMatch(id, f.Who, f.K == FxK.IfPrev ? null : f.Type, f.Unique, f.Basic, f.Tag, owner, f.Token)
+            && (f.MinCost <= 0 || (CardOf(id) is CardView mc && Math.Max(mc.Cost, mc.CountAs) >= f.MinCost));   // 비용 n 이상(엘다인 4차 요청 — 이드)
+        static bool HasFilter(Fx f) => f.Who != null || f.Type != null || f.Unique || f.Basic || f.Tag != null || f.Token || (f.MinCost > 0 && f.K != FxK.Empower);
 
         // ── 비용 증감 ─────────────────────────────────────────────────
         int CostModOf(string id)
         {
             int v = 0;
             foreach (var m in CostMods)
-                if (m.Until >= Turn && CardMatch(id, m.Who, m.Type, m.Unique, m.Basic, m.Tag, HeroUnit(m.Owner))) v += m.V;
+                if (m.Until >= Turn && CardMatch(id, m.Who, m.Type, m.Unique, m.Basic, m.Tag, HeroUnit(m.Owner), m.Token)) v += m.V;
             return v;
         }
         void UseCostMods(string id)
         {
             foreach (var m in CostMods.ToList())
-                if (m.Uses > 0 && m.Until >= Turn && CardMatch(id, m.Who, m.Type, m.Unique, m.Basic, m.Tag, HeroUnit(m.Owner)) && --m.Uses <= 0) CostMods.Remove(m);
+                if (m.Uses > 0 && m.Until >= Turn && CardMatch(id, m.Who, m.Type, m.Unique, m.Basic, m.Tag, HeroUnit(m.Owner), m.Token) && --m.Uses <= 0) CostMods.Remove(m);
             CostMods.RemoveAll(m => m.Until < Turn);
         }
 
@@ -81,6 +83,11 @@ namespace Bolzena.Core
                         var withC = foes.Select(e => (e, n: ActionCount(e) ?? 99)).ToList();
                         var pick = target == "nextEnemy" ? withC.OrderBy(x => x.n).ThenBy(x => x.e.Idx).FirstOrDefault() : withC.OrderByDescending(x => x.n == 99 ? -1 : x.n).ThenBy(x => x.e.Idx).FirstOrDefault();
                         return pick.e != null ? new List<Unit> { pick.e } : new List<Unit>();
+                    }
+                case "farEnemy":
+                    {   // 가장 먼 적(2026-10-09 깊이 시범 — 시온 · 실라 · 유미미 「가장 먼 적 저격」) — 뒤 줄(back) 우선, 같은 줄이면 가장 뒤 자리(Idx 큰 쪽)
+                        var t = foes.OrderByDescending(e => e.Row == "back" ? 1 : 0).ThenByDescending(e => e.Idx).FirstOrDefault();
+                        return t != null ? new List<Unit> { t } : new List<Unit>();
                     }
                 case "markedEnemy":
                     {   // 그 표식(id)을 가장 많이 든 적 — 없으면 고른 적
@@ -138,8 +145,14 @@ namespace Bolzena.Core
                         RunFx(c.Fx.Where(x => x.K != FxK.Recast).ToList(), c2);
                         return true;
                     }
+                case FxK.CostMod when f.Choose == "priciest":
+                    {   // 손의 가장 비싼 카드 한 장(거르개에 맞는 것) — 그 카드에 비용 ±(낼 때까지 · 엘다인 3차 ▶E45)
+                        var pick = Priciest(Hand.Where(id => FxMatch(f, id, owner) && !(CardOf(id)?.IsStatus ?? true) && !(CardOf(id)?.IsCurse ?? true)));
+                        if (pick != null) { AddCardSt(pick, "비용", f.IV); Say($"「{CardOf(pick).Name}」 — 비용 {(f.IV > 0 ? "+" : "")}{f.IV}"); CardCue(pick, "hand", "hand", "cost"); }
+                        return true;
+                    }
                 case FxK.CostMod:
-                    CostMods.Add(new CostModRec { V = f.IV, Until = Turn + f.TurnsOr1 - 1, Uses = Math.Max(0, f.N), Owner = owner?.Key ?? Acting, Who = f.Who, Type = f.Type, Tag = f.Tag, Unique = f.Unique, Basic = f.Basic });
+                    CostMods.Add(new CostModRec { V = f.IV, Until = Turn + f.TurnsOr1 - 1, Uses = Math.Max(0, f.N), Owner = owner?.Key ?? Acting, Who = f.Who, Type = f.Type, Tag = f.Tag, Unique = f.Unique, Basic = f.Basic, Token = f.Token });
                     Say($"비용 {(f.IV > 0 ? "+" : "")}{f.IV}{(f.N > 0 ? $" ({f.N}장)" : "")}");
                     return true;
                 case FxK.AddTag:
@@ -147,7 +160,7 @@ namespace Bolzena.Core
                     if (f.Id == Tag.WeakHit || f.Id == Tag.Weak) ctx.HitTags?.Add(Tag.Weak);
                     if (f.Id == Tag.Crush) ctx.HitTags?.Add(Tag.Crush);
                     return true;
-                case FxK.CutHit: CutNext = Math.Max(CutNext, f.V); Say($"다음 한 대 -{Num.Round(f.V * 100)}%"); return true;
+                case FxK.CutHit: CutHitFx(f, ctx); return true;   // 대상 · 일의 값(엘다인 3차 ▶E54~E56)
                 case FxK.ClearDebt:
                     if (ApJam > 0) { Say($"빚 탕감 — 다음 턴 AP -{ApJam} 이 사라진다"); ApJam = 0; DebtNow = 0; StatusCue(owner ?? PartyRep(), "빚 탕감", true); }
                     return true;
@@ -162,7 +175,7 @@ namespace Bolzena.Core
         bool KwTag(string id, string tag)
         {
             if (Kw.Count == 0) return false;
-            var c = Data.View(id, Flash.TryGetValue(id, out var n) ? n : 0);
+            var c = Blessed(id, Data.View(id, Flash.TryGetValue(id, out var n) ? n : 0));
             if (c?.Hero == null) return false;
             foreach (var kw in Kw.Values)
                 if (kw.Def.TagWhile == tag && kw.Owner == c.Hero && (c.Type == (kw.Def.TagType ?? "공격")) && StackOf(kw.Owner, kw.Id) > 0) return true;
@@ -182,6 +195,11 @@ namespace Bolzena.Core
         public int N;
         public string Name, Text, Shin, BlessName, BlessText;
         public bool Blessed => Shin != null;
+        /// <summary>그 신탁에 축복까지 얹은 모습 — 피해를 더하는 축복이면 스킬이 공격 카드로 보인다(GameData.WithBless).</summary>
+        public CardView View;
+        /// <summary>이 축복을 받으면 스킬이 공격 카드가 된다 — 고르기 창이 ATTACK_LINE 한 줄을 띄운다.</summary>
+        public bool ToAttack;
+        public const string ATTACK_LINE = "이 축복을 받으면 공격 카드가 됩니다";
 
         public static System.Collections.Generic.List<OracleOption> Of(GameData d, string cardId, System.Collections.Generic.IEnumerable<GlowPick> picks)
         {
@@ -193,9 +211,10 @@ namespace Bolzena.Core
                 if (p.N < 1 || p.N > c.Oracles.Count) continue;
                 var or = c.Oracles[p.N - 1];
                 var b = Battle.BlessOf(c, p.Shin);
+                var v0 = d.View(cardId, p.N); var v = GameData.WithBless(v0, b);
                 o.Add(new OracleOption
                 {
-                    N = p.N, Name = or.Name, Text = tx.Oracle(c, or), Shin = p.Shin,
+                    N = p.N, Name = or.Name, Text = tx.Oracle(c, or), Shin = p.Shin, View = v, ToAttack = v != v0,
                     BlessName = p.Shin == null ? null : b?.Name ?? R.DIVINE_NAME,
                     BlessText = p.Shin == null ? null : b != null ? tx.Bless(b) : (R.DIVINE_KO.TryGetValue(p.Shin, out var k) ? (k.Contains("—") ? k.Substring(k.IndexOf('—') + 1).Trim() : k) : p.Shin),
                 });

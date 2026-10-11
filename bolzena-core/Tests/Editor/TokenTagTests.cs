@@ -28,7 +28,7 @@ namespace Bolzena.Core.Tests
         {
             var d = K.Data(heroes: "[" + HERO + "]", cards: CARDS);
             var t = new CardText(d).Fx(d.Card("s_shot").Fx);
-            StringAssert.Contains("손의 「케이크」 카드 1장당", t);
+            StringAssert.Contains("손의 「케이크」 1장당", t);   // 2026-10-11 글 길이 — 카드 id 면 「카드」 없이
             StringAssert.Contains("손패의 「케이크」 카드 모두 소멸", t);
         }
     }

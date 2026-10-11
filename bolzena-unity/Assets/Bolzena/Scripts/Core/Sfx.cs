@@ -76,39 +76,55 @@ namespace Bolzena
         // 미리 불러 두기 — 첫 고학년에서 목소리 묶음을 처음 풀며 멈칫하지 않게
         // 목소리 묶음은 최근 사도 몇만 — 넘치면 비운다(싸움을 열 때 파티 것을 다시 채운다). 다 붙들면 사도가 바뀔 때마다 쌓였다
         const int VoiceKeep = 12;
+        static int played;   // 전투 목소리를 실제로 튼 수 — 받아지면 틀기(VoiceSource.Defer)용
         static void KeepVoices(Sfx me) { if (me.voices.Count >= VoiceKeep) me.voices.Clear(); }
 
         public static void Preload(string hero)
         {
             var me = Ensure();
-            if (!me.voices.ContainsKey(hero)) { KeepVoices(me); me.voices[hero] = Resources.LoadAll<AudioClip>("Voice/" + hero); }
-            foreach (var c in me.voices[hero]) c.LoadAudioData();
+            if (Bolzena.RunUI.VoiceSource.Layered) me.voices.Remove(hero);
+            if (!me.voices.ContainsKey(hero))
+            {
+                var got = Bolzena.RunUI.VoiceSource.Load(hero);   // 웹은 사도별 번들 — 받는 중이면 받기만 걸고 넘어간다(싸움 열기를 붙잡지 않는다)
+                if (!Bolzena.RunUI.VoiceSource.Pending(hero)) { KeepVoices(me); me.voices[hero] = got; }
+            }
+            if (me.voices.TryGetValue(hero, out var vs)) foreach (var c in vs) if (c != null) c.LoadAudioData();
             foreach (var c in Resources.LoadAll<AudioClip>("Sfx/hero/" + hero)) c.LoadAudioData();
         }
 
         // 사도 목소리 — 이름이 prefix 로 시작하는 것 중 하나(앞의 것이 없으면 다음 prefix)
-        public static void Voice(string hero, params string[] prefixes)
+        /// <summary>실제로 틀었으면 true(설정 「목소리」 0 이거나 파일이 없으면 false — 말풍선이 대신 뜬다).</summary>
+        public static bool Voice(string hero, params string[] prefixes)
         {
             var me = Ensure();
+            if (Bolzena.RunUI.VoiceSource.Layered) me.voices.Remove(hero);   // 웹 번들 층 — 늘 새로(내린 번들의 클립을 붙들지 않게)
             if (!me.voices.TryGetValue(hero, out var all))
             {
-                all = Resources.LoadAll<AudioClip>("Voice/" + hero);
-                KeepVoices(me);
-                me.voices[hero] = all;
+                all = Bolzena.RunUI.VoiceSource.Load(hero);
+                if (!Bolzena.RunUI.VoiceSource.Pending(hero)) { KeepVoices(me); me.voices[hero] = all; }
+            }
+            if (Bolzena.RunUI.VoiceSource.Pending(hero))
+            {
+                // 웹 — 아직 받는 중: 받아지면 바로 튼다(1.5초 안 · 그새 다른 전투 목소리가 없을 때만)
+                var ps = prefixes;
+                Bolzena.RunUI.VoiceSource.Defer("battle", hero, played, () => played, () => Voice(hero, ps));
+                return false;
             }
             foreach (var p in prefixes)
             {
                 var hits = new List<AudioClip>();
-                foreach (var c in all) if (c.name.StartsWith(p)) hits.Add(c);
+                foreach (var c in all) if (c != null && c.name.StartsWith(p)) hits.Add(c);
                 if (hits.Count == 0) continue;
                 me.voice.Stop();
                 me.voice.clip = hits[Random.Range(0, hits.Count)];
                 me.voice.volume = VoiceVol;
                 me.voice.Play();
+                played++;
                 OnPlayed?.Invoke("voice:" + hero + "/" + me.voice.clip.name);
-                return;
+                return VoiceVol > 0.001f;
             }
             OnPlayed?.Invoke("!voice:" + hero);
+            return false;
         }
     }
 }

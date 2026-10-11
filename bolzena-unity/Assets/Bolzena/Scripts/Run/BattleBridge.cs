@@ -44,6 +44,9 @@ namespace Bolzena
             CoreBattle.GearOf = k => { try { return port.GearOf(k); } catch (Exception) { return null; } };
             var t = port.OpenFight(hpx, dmgx, cb.CueSink);
             cb.Attach(t.B);
+            // 판 전체 전투 기록의 앞몫 — 이 싸움 전까지의 합을 베껴 둔다(싸움이 끝나면 AfterFight 가 판에 더하므로 열 때 값으로 고정)
+            cb.RunTally = new Dictionary<string, Bolzena.Core.HeroTally>();
+            if (port.S?.Tally != null) foreach (var kv in port.S.Tally) cb.RunTally[kv.Key] = kv.Value.Copy();
             Fight = new Pending { Port = port, Ticket = t, Battle = cb, Done = done };
             PlayRecord.FightSpeed = () => Fight != null && !finished && !Clock.Paused ? Clock.Speed : 0;   // 플레이 기록 — 전투 시간 · 2배속 몫
             // 이기면 판 화면의 「배경 없이 보상 열기」(Flow.RewardOverlay)를 전투 장면 위에 띄운다 — 판 자동 데모는 예전 길(보상 화면)로

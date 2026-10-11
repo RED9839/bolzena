@@ -81,7 +81,7 @@ namespace Bolzena.RunUI
                 // 이름판
                 var plate = Ui.Img(stage, Theme.S("pill_dark", 46), Color.white, "plate");
                 plate.rectTransform.At(0, 0, Theme.Gutter + 6, Theme.Gutter + 10, 430, 56);
-                var pt = Ui.Title(plate.transform, $"<size=68%><color={Theme.SubTag}>메인 사도</color></size>  {hero?.ko ?? "에르핀"}", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineLeft);
+                var pt = Ui.Title(plate.transform, $"<size=68%><color={Theme.SubTag}>메인 사도</color></size>  {hero?.ko ?? "에르핀(왕도)"}", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineLeft);
                 pt.rectTransform.Fill(26, 0, 10, 0);
                 pt.textWrappingMode = TextWrappingModes.NoWrap;
                 Tw.Rise(plate.rectTransform, 0.3f, 20, 0.4f, Vector2.down);
@@ -101,7 +101,7 @@ namespace Bolzena.RunUI
                     if (tap) tap.rectTransform.At(0.5f, 0, 40, 0, Stage.Size.y * 0.52f, Stage.Size.y * 0.89f);
                     if (touch) touch.Bind(sg, hero);
                     if (sg != null) { sg.color = new Color(1, 1, 1, 0); var ng = sg; Tw.Run(ng.rectTransform, 0.3f, t => { if (ng) ng.color = new Color(1, 1, 1, t); }, Tw.Linear, 0.12f); Tw.Rise(ng.rectTransform, 0.12f, 18, 0.35f); }
-                    pt.text = $"<size=68%><color={Theme.SubTag}>메인 사도</color></size>  {hero?.ko ?? "에르핀"}";
+                    pt.text = $"<size=68%><color={Theme.SubTag}>메인 사도</color></size>  {hero?.ko ?? "에르핀(왕도)"}";
                     bubble.Close();
                     bubble = HeroBubble.Show(stage, hero, lines[0], new Vector2(0, 1), new Vector2(70, -200), new Vector2(0, 1), 0, 0.25f, "lobby");
                 });
@@ -123,7 +123,7 @@ namespace Bolzena.RunUI
                         Confirm("지금 모험을 버리겠습니까?", "이어하던 모험은 사라집니다. 새 마을로 떠납니다.", "버리고 출발", () => { PlayRecord.Send(P.SavedRun(), "abandon"); RunPort.ClearSave(); NewAdventure(); }, true));
                 { var cs = CrayonStore.Save; var ct = CrayonStore.Table;
                   Stage.Hot["crayon"] = MenuItem(menu, Theme.BoardIcon, "교주 보드", $"크레파스 보드로 파티 영구 강화 · 칠한 단계 {ct.Cells.Where(x => !x.Blank).Sum(x => System.Math.Min(x.Levels, cs.LevelOf(x.Id)))}/{ct.Cells.Where(x => !x.Blank).Sum(x => x.Levels)}", Theme.Hex("FFB648"), CrayonScreen); }
-                Stage.Hot["dex"] = MenuItem(menu, Theme.S("ic_book"), "도감", $"사도 {Roster.All.Count}명 · 적 · 아티팩트 · 교주 카드", Theme.Hex("7FE0B4"), () => Dex(Lobby));
+                Stage.Hot["dex"] = MenuItem(menu, Theme.S("ic_book"), "도감", $"사도 {Roster.Players.Count()}명 · 적 · 아티팩트 · 교주 카드", Theme.Hex("7FE0B4"), () => Dex(Lobby));
                 Stage.Hot["settings"] = MenuItem(menu, Theme.S("ic_cog"), "설정", "소리 · 움직임 · 글자 · 화면", Theme.Hex("B9A8FF"), () => SettingsPanel(false));
 
                 int i = 0;

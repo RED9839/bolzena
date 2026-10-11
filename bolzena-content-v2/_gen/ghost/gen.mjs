@@ -1,3 +1,4 @@
+if (!process.env.BZ_OLD_GEN) { console.error("[중단] 옛 생성기입니다(2026-10-11 엘다인 리뉴얼). heroes/** 는 _gen/eldain 이 씁니다. 꼭 돌려야 하면 BZ_OLD_GEN=1 — 엘다인 파일을 덮어쓰니 주의."); process.exit(1); }
 // H5 — 유령 17명 생성기. node gen.mjs → C:\projects\bolzena-content-v2\heroes\유령\<사도키>.json
 import fs from 'fs';
 const REWORKED = JSON.parse(fs.readFileSync('C:/projects/bolzena-content-v2/_gen/rework/reworked.json', 'utf8')); // 리워크한 사도는 _gen/rework/rework.mjs 가 쓴다 — 여기서 덮어쓰지 않는다

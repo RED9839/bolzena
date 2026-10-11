@@ -108,7 +108,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("버팀: 턴 시작 시 파티 불굴이 2 이상이면 방어 100%", T.Passives(new List<PassiveRule> { r3 }));
             Assert.AreEqual("박자: 리듬이 5가 되면 드로우 1", T.Passives(new List<PassiveRule> { new PassiveRule { Name = "박자", When = new When { On = "rhythm", N = 5 }, Fx = L("{'k':'draw','v':1}") } }));
             var kw = new KeywordDef { Name = "이온화", Desc = "적에게 쌓는 전하", Carrier = "enemy", Cap = 5, Decay = 1, Per = new List<PerStat> { new PerStat { Stat = "taken", V = 0.05 } } };
-            Assert.AreEqual("적에게 쌓는 전하\n· 적에게 쌓임 · 적마다 최대 5\n· 「이온화」 1당 그 적의 받는 피해 +5%\n· 적의 차례가 끝나면 −1", T.Keyword(kw));
+            Assert.AreEqual("적에게 쌓는 전하\n· 적에게 거는 디버프 · 적마다 최대 5\n· 「이온화」 1당 그 적의 받는 피해 +5%\n· 적의 차례가 끝나면 −1", T.Keyword(kw));
             // 「자세히」 없앰(Docs/설명글.md) — Short 와 Detail 은 같은 글(수치 · 제한까지 다)
             Assert.AreEqual(T.Keyword(kw), T.Short(kw));
             Assert.AreEqual(T.Keyword(kw), T.Detail(kw));
@@ -130,20 +130,38 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(new[] { "고학년", "고유 효과", "패시브", "패시브" }, tr.Select(x => x.Kind).ToArray());
             Assert.AreEqual("게이지 200%", tr[0].Sub);
             Assert.AreEqual("공격으로 꽂는 깃발", tr[1].Sub);
-            Assert.AreEqual("· 적에게 쌓임 · 적마다 최대 3\n· 「깃발」이 있는 적은 아군 카드에 약점으로 맞음 — 카드 1장이 칠 때마다 −1", tr[1].Body);
+            Assert.AreEqual("· 적에게 거는 디버프(깃발이 전용) · 적마다 최대 3\n· 「깃발」이 있는 적은 아군 카드에 약점으로 맞음 — 카드 1장이 칠 때마다 −1", tr[1].Body);
             Assert.AreEqual("찜", tr[2].Name);
             Assert.AreEqual("· 자신의 공격 카드를 낼 때마다 그 적에게 「깃발」 1 (턴당 1회)\n· 「깃발」이 있는 적이 쓰러지면 드로우 1, AP +1 (턴당 1회)", tr[2].Body);
             Assert.AreEqual("따로", tr[3].Name);
             Assert.AreEqual("턴 시작 시 사기 1", tr[3].Body);
-            // 패시브가 없는 사도 — 패시브 칸에 「없음」
-            var d2 = K.Data(heroes: "[{id:'n', name:'무패', role:'딜러', row:'back', hp:500, atk:80, def:60, keyword:{name:'자원', cap:2}}]");
+            // 패시브가 없는 사도 — 고유 능력(keyword)이 있으면 패시브 칸을 두지 않는다(2026-10-10 패시브를 고유 능력으로 합침), 둘 다 없을 때만 「없음」
+            var d2 = K.Data(heroes: "[{id:'n', name:'무패', role:'딜러', row:'back', hp:500, atk:80, def:60, keyword:{name:'자원', cap:2}}, {id:'z', name:'빈칸', role:'딜러', row:'back', hp:500, atk:80, def:60}]");
             var tr2 = new CardText(d2).Traits(d2.Hero("n"));
-            Assert.AreEqual(CardText.NoPassive, tr2.Last().Name);
-            Assert.AreEqual("패시브", tr2.Last().Kind);
+            Assert.IsFalse(tr2.Any(x => x.Kind == "패시브"), "고유 능력이 있으면 패시브 칸 없음");
+            var tr3 = new CardText(d2).Traits(d2.Hero("z"));
+            Assert.AreEqual(CardText.NoPassive, tr3.Last().Name);
+            Assert.AreEqual("패시브", tr3.Last().Kind);
             // 낱말 판(Tips) 의 고유 효과도 같은 본문
             StringAssert.Contains(tr[1].Body, t.Tips()["깃발"]);
             // 엔진 키워드 글의 수치는 Rules.cs 값
-            StringAssert.Contains($"+{Num.Round(R.SV("사기") * 100)}%p", CardText.Tip("사기"));
+            StringAssert.Contains($"피해량 +{Num.Round(R.SV("사기") * 100)}%(합연산", CardText.Tip("사기"));   // 2026-10-10 카제나 표기 — 합연산은 「피해량 +x%」
+        }
+
+        /// <summary>(2026-10-11 「설명 충분하게 · 적에게 걸린 효과」) 고유 효과 칸 — 누구에게 붙는지 · 줄지 않는다는 것 · 얻는/쓰는 카드가 데이터에서 저절로.</summary>
+        [Test] public void 고유_효과_붙는_곳과_쓰는_카드()
+        {
+            var d = K.Data(heroes: "[{id:'mq', name:'수은이', role:'탱커', row:'front', hp:500, atk:80, def:60, keyword:{name:'젖음', carrier:'enemy', cap:5, per:[{stat:'taken', v:0.15, from:'owner'}]}}]",
+                cards: "[{id:'mq_a', name:'적시기', hero:'mq', cost:1, type:'스킬', fx:[{k:'stack', id:'젖음', v:1, target:'oneEnemy'}]}," +
+                       "{id:'mq_b', name:'짜내기', hero:'mq', cost:1, type:'공격', fx:[{k:'spend', id:'젖음', all:true}, {k:'perEvent', n:1}, {k:'dmg', ratio:0.5, target:'oneEnemy'}]}]");
+            var body = new CardText(d).Trait(d.Hero("mq"), d.Hero("mq").Keyword);
+            StringAssert.Contains("적에게 거는 디버프(수은이 전용) · 적마다 최대 5", body);
+            StringAssert.DoesNotContain("표식", body);
+            StringAssert.Contains("저절로 줄지 않음 · 그 적이 쓰러지면 사라짐", body);
+            StringAssert.DoesNotContain("얻는 카드 —", body);   // 2026-10-11 사용자 「얻는 카드 · 신탁 이런 거 없애 줘」 — 카드 목록 줄은 안 씀
+            StringAssert.DoesNotContain("쓰는 카드 —", body);
+            StringAssert.Contains("내 턴이 시작될 때마다 −1", CardText.Tip("약점 노출"));
+            StringAssert.Contains("냉정 사도의 카드", CardText.Tip("냉정 약점"));
         }
 
         [Test] public void 적의_수와_이벤트_결과()

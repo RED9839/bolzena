@@ -58,6 +58,8 @@ namespace Bolzena.EditorTools
         {
             var p = assetPath.Replace('\\', '/');
             if (p.StartsWith(WebBundleBuild.Stage + "/Spine/")) return "Assets/Bolzena/Resources/Spine/" + p.Substring(WebBundleBuild.Stage.Length + "/Spine/".Length);
+            if (p.StartsWith(WebBundleBuild.StageVoice + "/")) return "Assets/Bolzena/Resources/Voice/" + p.Substring(WebBundleBuild.StageVoice.Length + 1);
+            if (p.StartsWith(WebBundleBuild.StageOff + "/")) return "Assets/" + WebBundleBuild.OnName(p.Substring(WebBundleBuild.StageOff.Length + 1));
             if (p.StartsWith(WebBundleBuild.Stage + "/RunSpine/")) return "Assets/Resources/Spine/" + p.Substring(WebBundleBuild.Stage.Length + "/RunSpine/".Length);
             return p;
         }
@@ -133,7 +135,7 @@ namespace Bolzena.EditorTools
                     w.maxTextureSize = 1024;
                     break;
                 default:
-                    w.format = TextureImporterFormat.ASTC_6x6;
+                    w.format = BgAstc(p) ? TextureImporterFormat.ASTC_8x8 : TextureImporterFormat.ASTC_6x6;
                     // 미리 구운 정지 그림(runui SnapPrebake)은 폰에서 작게 — 카드 그림 448×640 → 358×512 · 목록 카드 256×368 → 178×256
                     //   (폰 화면의 목록 카드는 200px 남짓 · 크게 본 카드도 500px 남짓). 정지 그림 셋 합이 첫 로딩 +20MB 안에 들게
                     w.maxTextureSize = p.Contains("/RunArt/Snap/card/") ? 512 : p.Contains("/RunArt/Snap/list/") ? 256 : 2048;
@@ -142,6 +144,13 @@ namespace Bolzena.EditorTools
             ti.SetPlatformTextureSettings(w);
             WebMips(ti, k);
         }
+
+        /// <summary>배경(Bg · RunArt/Bg)은 폰 판에서 ASTC 8×8(2bpp) — 2048 폭 배경 39장이 6×6 으로 39MB(.data 풀린 · 받는 31MB)였다(perf_20261009).
+        /// 화면 전체에 깔리는 붓 그림이라 블록이 덜 보인다. 바꾸면 SwitchWebTextures 가 형식이 다른 것을 골라 다시 가져온다(AstcFormatOf).</summary>
+        internal static bool BgAstc(string p) => p.Contains("/Resources/Bg/") || p.Contains("/RunArt/Bg/");
+
+        /// <summary>폰(ASTC) 판에서 이 그림이 가져야 할 형식 이름의 앞머리(점검용 — 다르면 다시 가져온다). 모르면 null.</summary>
+        internal static string AstcFormatOf(string p, Kind k) => k == Kind.Res && BgAstc(p) ? "ASTC_8x8" : k == Kind.Res ? "ASTC_6x6" : null;
 
         static void WebMips(TextureImporter ti, Kind k)
         {

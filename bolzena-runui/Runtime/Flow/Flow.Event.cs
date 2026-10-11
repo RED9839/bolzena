@@ -697,7 +697,7 @@ namespace Bolzena.RunUI
                 "dupe" => "복제할 고유 카드를 고릅니다",
                 "card" => (p.Label ?? "카드") + " — 하나를 고릅니다",
                 "flash" => $"「{P.Data.Card(p.Offer?.CardId)?.Name}」 — 신탁 하나를 고릅니다",
-                "shinPick" => "축복을 얹을 카드를 고릅니다",
+                "shinPick" => "축복을 얹을 카드를 고릅니다 — 신탁도 무작위로 함께 붙습니다",
                 "gambleChoice" => "하나를 고릅니다",
                 _ => "고릅니다",
             };

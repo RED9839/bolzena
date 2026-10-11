@@ -236,7 +236,7 @@ namespace Bolzena.Core
             var o = new HashSet<string>();
             foreach (var r in h.Passives.Concat(h.AllKeywords.SelectMany(k => k.Rules)))
             {
-                var w = r.When; bool party = w.Who == "any" || w.Who == "other";
+                var w = r.When; bool party = w.Who == "any" || w.Who == "other" || w.By == "other";   // by other(엘다인 ▶E7) — 다른 아군의 효과로 버려짐
                 if (w.Tag != null) o.Add("tag:" + w.Tag);
                 if (party || w.On == "debuff" || w.On == "break" || w.On == "kill")
                     switch (w.On)

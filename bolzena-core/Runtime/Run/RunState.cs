@@ -68,6 +68,8 @@ namespace Bolzena.Core
         public int MindBreak;
         /// <summary>판 단위 사도 성장(growRun) — 사도 → 능력치(공격 · 방어 · 치명). 싸움마다 장비처럼 더한다.</summary>
         public Dictionary<string, Stats> Growth = new();
+        /// <summary>판 전체 전투 기록 — 사도 → 지금까지 끝낸 싸움들의 피해 · 실드 · 회복 합(Battle.Tally 를 AfterFight 가 더한다).</summary>
+        public Dictionary<string, HeroTally> Tally = new();
         /// <summary>카드 값(카드 인스턴스 카운터 — 소장 가치 · 충전 …) — 카드 id → 이름 → 값. 싸움을 넘어 남는다.</summary>
         public Dictionary<string, Dictionary<string, int>> CardVals = new();
         /// <summary>

@@ -6,73 +6,66 @@
       "nature": "냉정",
       "race": "엘프",
       "role": "탱커",
-      "style": "버티형",
       "star": 3,
-      "hp": 1040,
-      "atk": 90,
-      "def": 75,
+      "hp": 810,
+      "atk": 115,
+      "def": 48,
       "crit": 5,
-      "blurb": "세상 전부를 자기가 꾸는 꿈이라 여기는 영원살이. 나타가 막아 낸 충격이 경보로 쌓이고, 다섯이 차면 다음 한 수에 몰아 되받아칩니다. 쓰러질 고비는 꿈결이 한 번 막아 줍니다.",
+      "blurb": "모든 게 꿈이라 믿고 늘 눈을 감은 영원살이 막내 작은 언니. 무거운 카드가 나갈 때마다 손에 쥔 경계가 저절로 펼쳐지고, 쌓인 실드를 나타와 함께 들이받아 피해로 바꿉니다.",
       "keyword": {
-        "name": "나타 경보",
-        "desc": "나타가 막아 내며 세는 꿈속의 충격",
+        "name": "이드 더 이터널 불릿",
+        "desc": "꿈과 현실 사이에 겹겹이 쌓이는 꿈의 막",
         "carrier": "self",
-        "cap": 5,
+        "cap": 3,
         "per": [
           {
-            "stat": "guard",
-            "v": 0.03
+            "stat": "def",
+            "v": 0.1
           }
         ],
         "onMax": {
-          "empower": "next",
-          "ratio": 0.6,
+          "make": "이드_t1",
+          "n": 1,
           "consume": true
         }
       },
+      "keywords": [
+        {
+          "name": "나타",
+          "desc": "이드 곁을 지키는 나타 — 이드가 치는 실드가 두꺼워진다",
+          "carrier": "self",
+          "cap": 3,
+          "per": [
+            {
+              "stat": "guard",
+              "v": 0.05
+            }
+          ]
+        }
+      ],
       "passives": [
         {
-          "name": "함께 꾸는 꿈",
-          "when": {
-            "on": "guardSum"
-          },
-          "fx": [
-            {
-              "k": "stack",
-              "id": "나타 경보",
-              "v": 1,
-              "ofEvent": 0.012
-            }
-          ]
-        },
-        {
-          "name": "함께 꾸는 꿈",
-          "when": {
-            "on": "hurt",
-            "guarded": true
-          },
-          "fx": [
-            {
-              "k": "stack",
-              "id": "나타 경보",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "깨지 않은 꿈",
+          "name": "꿈에서 깨지 않았다",
           "when": {
             "on": "fightStart"
           },
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
+              "k": "stack",
+              "id": "이드 더 이터널 불릿",
               "v": 1
-            },
+            }
+          ]
+        },
+        {
+          "name": "꿈의 막",
+          "when": {
+            "on": "ult"
+          },
+          "fx": [
             {
               "k": "stack",
-              "id": "나타 경보",
+              "id": "이드 더 이터널 불릿",
               "v": 1
             }
           ]
@@ -83,29 +76,33 @@
         "cost": 250,
         "fx": [
           {
+            "k": "shield",
+            "ratio": 2.5
+          },
+          {
             "k": "dmg",
+            "ratio": 0.4,
+            "base": "def",
+            "target": "allEnemies",
+            "hits": 4
+          },
+          {
+            "k": "stack",
+            "id": "이드 더 이터널 불릿",
+            "v": 2
+          },
+          {
+            "k": "empower",
             "ratio": 0.3,
-            "hits": 4,
-            "target": "allEnemies"
-          },
-          {
-            "k": "status",
-            "id": "사기",
-            "v": 1
-          },
-          {
-            "k": "status",
-            "id": "둔화",
-            "v": 2,
-            "target": "allEnemies"
+            "who": "any"
           }
         ]
       },
       "starter": [
         "이드_s1",
-        "이드_s1",
         "이드_s2",
-        "이드_u2"
+        "이드_s3",
+        "이드_u1"
       ]
     }
   ],
@@ -119,7 +116,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 1,
           "base": "def",
           "target": "oneEnemy"
         }
@@ -127,6 +124,21 @@
     },
     {
       "id": "이드_s2",
+      "name": "몽중 연사",
+      "hero": "이드",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "이드_s3",
       "name": "나타 격벽",
       "hero": "이드",
       "cost": 1,
@@ -134,149 +146,152 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 2
+          "ratio": 1.4
         }
       ]
     },
     {
       "id": "이드_u1",
-      "name": "나타에게 먼저",
+      "name": "흐릿한 경계",
       "hero": "이드",
       "unique": true,
-      "cost": 1,
+      "cost": 2,
       "type": "스킬",
+      "tags": [
+        "천상",
+        "보존"
+      ],
       "fx": [
         {
           "k": "shield",
-          "ratio": 0.94
+          "ratio": 0.8
         },
         {
           "k": "stack",
-          "id": "나타 경보",
+          "id": "이드 더 이터널 불릿",
           "v": 1
         },
         {
-          "k": "perGuarded",
-          "per": 60
+          "k": "ifStack",
+          "id": "이드 더 이터널 불릿",
+          "n": 2
         },
         {
-          "k": "shield",
-          "ratio": 0.09
+          "k": "status",
+          "id": "회피",
+          "v": 1
         }
       ],
       "oracles": [
         {
           "name": "신탁 1",
-          "tags": [],
+          "tags": [
+            "천상",
+            "보존"
+          ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.27
+              "ratio": 2.4
             },
             {
-              "k": "stack",
-              "id": "나타 경보",
+              "k": "status",
+              "id": "회피",
               "v": 1
             },
             {
-              "k": "perGuarded",
-              "per": 60
-            },
-            {
-              "k": "shield",
-              "ratio": 0.12
+              "k": "stack",
+              "id": "이드 더 이터널 불릿",
+              "v": 1
             }
           ]
         },
         {
           "name": "신탁 2",
-          "cost": 0,
-          "tags": [],
+          "type": "공격",
+          "tags": [
+            "천상",
+            "보존"
+          ],
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.89
+              "k": "dmg",
+              "ratio": 1.4,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
               "k": "stack",
-              "id": "나타 경보",
+              "id": "이드 더 이터널 불릿",
               "v": 1
-            },
-            {
-              "k": "perGuarded",
-              "per": 60
-            },
-            {
-              "k": "shield",
-              "ratio": 0.09
             }
           ]
         },
         {
           "name": "신탁 3",
+          "tags": [
+            "개막",
+            "천상",
+            "보존"
+          ],
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.85
+              "k": "status",
+              "id": "절대 무적",
+              "v": 1
             },
             {
               "k": "stack",
-              "id": "나타 경보",
-              "v": 2
-            },
-            {
-              "k": "status",
-              "id": "반격",
+              "id": "이드 더 이터널 불릿",
               "v": 1
             }
           ]
         },
         {
           "name": "신탁 4",
-          "power": true,
+          "tags": [
+            "천상",
+            "보존"
+          ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.02
+              "ratio": 1.3
+            },
+            {
+              "k": "perPile",
+              "from": "hand"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
             },
             {
               "k": "stack",
-              "id": "나타 경보",
+              "id": "이드 더 이터널 불릿",
               "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "guardSum"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "나타 경보",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
             }
           ]
         },
         {
           "name": "신탁 5",
+          "tags": [
+            "천상",
+            "보존"
+          ],
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.44
+              "ratio": 1.2
+            },
+            {
+              "k": "status",
+              "id": "끈기",
+              "v": 1
             },
             {
               "k": "stack",
-              "id": "나타 경보",
-              "v": 2
-            },
-            {
-              "k": "discard",
+              "id": "이드 더 이터널 불릿",
               "v": 1
             }
           ]
@@ -296,7 +311,7 @@
           "fx": [
             {
               "k": "stack",
-              "id": "나타 경보",
+              "id": "이드 더 이터널 불릿",
               "v": 1
             }
           ]
@@ -305,24 +320,24 @@
     },
     {
       "id": "이드_u2",
-      "name": "전기로 지져 줘",
+      "name": "함께 꾸는 꿈",
       "hero": "이드",
       "unique": true,
       "cost": 1,
       "type": "스킬",
       "fx": [
         {
-          "k": "status",
-          "id": "반격",
-          "v": 1
-        },
-        {
-          "k": "stack",
-          "id": "나타 경보",
-          "v": 1
+          "k": "shield",
+          "ratio": 1
         },
         {
           "k": "draw",
+          "v": 1,
+          "tag": "천상"
+        },
+        {
+          "k": "stack",
+          "id": "나타",
           "v": 1
         }
       ],
@@ -331,214 +346,76 @@
           "name": "신탁 1",
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "나타 경보",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "신탁 2",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "신탁 3",
-          "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "나타 경보",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "신탁 4",
-          "power": true,
-          "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "hurt",
-                    "guarded": true
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "나타 경보",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "신탁 5",
-          "fx": [
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
-              "k": "stack",
-              "id": "나타 경보",
-              "v": 2
-            },
-            {
-              "k": "discard",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "이드_u3",
-      "name": "흐릿한 경계",
-      "hero": "이드",
-      "unique": true,
-      "cost": 2,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "shield",
-          "ratio": 1.7
-        },
-        {
-          "k": "status",
-          "id": "끈기",
-          "v": 1
-        }
-      ],
-      "oracles": [
-        {
-          "name": "신탁 1",
-          "tags": [],
-          "fx": [
-            {
               "k": "shield",
-              "ratio": 2.39
-            },
-            {
-              "k": "status",
-              "id": "끈기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "신탁 2",
-          "cost": 1,
-          "tags": [],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.62
-            },
-            {
-              "k": "status",
-              "id": "끈기",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "신탁 3",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.44
-            },
-            {
-              "k": "status",
-              "id": "끈기",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "나타 경보",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "신탁 4",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.36
-            },
-            {
-              "k": "status",
-              "id": "끈기",
-              "v": 1
+              "ratio": 1.8
             },
             {
               "k": "draw",
               "v": 1,
-              "who": "self",
-              "unique": true
+              "tag": "천상"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.4
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "minCost": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 2,
+          "tags": [
+            "천상"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "stack",
+              "id": "이드 더 이터널 불릿",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "perStack",
+              "id": "이드 더 이터널 불릿"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
             }
           ]
         },
         {
           "name": "신탁 5",
-          "tags": [],
           "fx": [
             {
-              "k": "shield",
-              "ratio": 2.71
-            },
-            {
               "k": "status",
-              "id": "끈기",
+              "id": "실드 보존",
               "v": 1
             },
             {
-              "k": "payHp",
-              "v": 40
+              "k": "shield",
+              "ratio": 1.1
             }
           ]
         }
@@ -550,14 +427,148 @@
         },
         {
           "name": "축복 2",
-          "kind": "defUp"
+          "kind": "cost"
         },
         {
           "name": "축복 3",
           "fx": [
             {
               "k": "stack",
-              "id": "나타 경보",
+              "id": "이드 더 이터널 불릿",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "이드_u3",
+      "name": "착한 마음씨 이드",
+      "hero": "이드",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.2
+        },
+        {
+          "k": "stack",
+          "id": "이드 더 이터널 불릿",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.3,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "천상",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "stack",
+              "id": "이드 더 이터널 불릿",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.2,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "이드 더 이터널 불릿",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.6,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "nextAp",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.2
+            },
+            {
+              "k": "stack",
+              "id": "이드 더 이터널 불릿",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.6,
+              "who": "other",
+              "minCost": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "ifShield"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "이드 더 이터널 불릿",
               "v": 1
             }
           ]
@@ -566,314 +577,126 @@
     },
     {
       "id": "이드_u4",
-      "name": "착한 마음씨 이드",
-      "hero": "이드",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "shield",
-          "ratio": 0.6
-        },
-        {
-          "k": "perStack",
-          "id": "나타 경보"
-        },
-        {
-          "k": "shield",
-          "ratio": 0.17
-        }
-      ],
-      "oracles": [
-        {
-          "name": "신탁 1",
-          "tags": [],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.81
-            },
-            {
-              "k": "perStack",
-              "id": "나타 경보"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.23
-            }
-          ]
-        },
-        {
-          "name": "신탁 2",
-          "cost": 0,
-          "tags": [],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.56
-            },
-            {
-              "k": "perStack",
-              "id": "나타 경보"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.16
-            }
-          ]
-        },
-        {
-          "name": "신탁 3",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.51
-            },
-            {
-              "k": "perStack",
-              "id": "나타 경보"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.15
-            },
-            {
-              "k": "stack",
-              "id": "나타 경보",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "신탁 4",
-          "tags": [],
-          "power": true,
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.44
-            },
-            {
-              "k": "perStack",
-              "id": "나타 경보"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.13
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "guardSum"
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.54
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "신탁 5",
-          "tags": [],
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.89
-            },
-            {
-              "k": "perStack",
-              "id": "나타 경보"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.26
-            },
-            {
-              "k": "discard",
-              "v": 1
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "축복 1",
-          "kind": "heal"
-        },
-        {
-          "name": "축복 2",
-          "kind": "ap"
-        },
-        {
-          "name": "축복 3",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "나타 경보",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "이드_u5",
       "name": "나타로 들이받기",
       "hero": "이드",
       "unique": true,
       "cost": 1,
       "type": "공격",
+      "tags": [
+        "보존"
+      ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.43,
+          "ratio": 0.6,
           "base": "def",
           "target": "oneEnemy"
         },
         {
-          "k": "perStack",
-          "id": "나타 경보"
+          "k": "spendShield",
+          "half": true
         },
         {
           "k": "dmg",
-          "ratio": 0.24,
-          "base": "def",
-          "target": "oneEnemy"
+          "ratio": 1,
+          "target": "oneEnemy",
+          "ofEvent": 1.2
         },
         {
-          "k": "spend",
-          "id": "나타 경보",
-          "all": true
+          "k": "when",
+          "on": "handEnd"
+        },
+        {
+          "k": "status",
+          "id": "실드 보존",
+          "v": 1
         }
       ],
       "oracles": [
         {
           "name": "신탁 1",
-          "tags": [],
+          "type": "스킬",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.58,
-              "base": "def",
-              "target": "oneEnemy"
+              "k": "status",
+              "id": "실드 보존",
+              "v": 1
             },
             {
-              "k": "perStack",
-              "id": "나타 경보"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.32,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "spend",
-              "id": "나타 경보",
-              "all": true
+              "k": "shield",
+              "ratio": 1
             }
           ]
         },
         {
           "name": "신탁 2",
-          "tags": [],
-          "power": true,
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.4,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "나타 경보"
+              "k": "spendShield",
+              "all": true
             },
             {
               "k": "dmg",
-              "ratio": 0.22,
-              "base": "def",
-              "target": "oneEnemy"
+              "ratio": 1,
+              "target": "allEnemies",
+              "ofEvent": 2
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "hurt",
-                    "guarded": true
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.18,
-                      "base": "def",
-                      "target": "oneEnemy"
-                    }
-                  ]
-                }
-              ]
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "status",
+              "id": "실드 보존",
+              "v": 1
             }
           ]
         },
         {
           "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.38,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "perStack",
-              "id": "나타 경보"
+              "k": "spendShield",
+              "half": true
             },
             {
               "k": "dmg",
-              "ratio": 0.17,
-              "base": "def",
-              "target": "allEnemies"
+              "ratio": 1,
+              "target": "oneEnemy",
+              "ofEvent": 1.5
             },
             {
-              "k": "spend",
-              "id": "나타 경보",
-              "all": true
+              "k": "stack",
+              "id": "이드 더 이터널 불릿",
+              "v": 1
             }
           ]
         },
         {
           "name": "신탁 4",
+          "cost": 2,
+          "tags": [
+            "천상"
+          ],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.38,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "perStack",
-              "id": "나타 경보"
+              "k": "spendShield",
+              "half": true
             },
             {
               "k": "dmg",
-              "ratio": 0.22,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
+              "ratio": 1,
+              "target": "oneEnemy",
+              "ofEvent": 2
             }
           ]
         },
@@ -885,25 +708,175 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.89,
+              "ratio": 1,
+              "target": "oneEnemy",
+              "ofEvent": 1,
+              "ofShield": true
+            },
+            {
+              "k": "nextAp",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "이드 더 이터널 불릿",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "이드_u5",
+      "name": "꿈속의 나타",
+      "hero": "이드",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "나타",
+          "v": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "perStack",
+          "id": "이드 더 이터널 불릿"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "base": "def",
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "이드 더 이터널 불릿"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
               "base": "def",
               "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "나타 경보"
+              "id": "이드 더 이터널 불릿"
             },
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.7,
               "base": "def",
               "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "천상",
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "base": "def",
+              "target": "allEnemies"
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
+              "k": "perStack",
+              "id": "이드 더 이터널 불릿"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.3
+            },
+            {
+              "k": "perStack",
+              "id": "이드 더 이터널 불릿"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "이드 더 이터널 불릿"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "base": "def",
+              "target": "allEnemies"
             }
           ]
         }
@@ -915,19 +888,46 @@
         },
         {
           "name": "축복 2",
-          "kind": "weakSpot"
+          "kind": "cost"
         },
         {
           "name": "축복 3",
           "fx": [
             {
               "k": "stack",
-              "id": "나타 경보",
+              "id": "이드 더 이터널 불릿",
               "v": 1
             }
           ]
         }
       ]
+    },
+    {
+      "hero": "이드",
+      "token": true,
+      "id": "이드_t1",
+      "name": "나타 레이저",
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.8,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "allEnemies",
+          "ofEvent": 0.2,
+          "ofShield": true
+        }
+      ],
+      "blurb": "나타가 모아 둔 꿈의 막을 한 번에 쏘아 보냅니다"
     }
   ]
 }

@@ -1,0 +1,773 @@
+{
+  "heroes": [
+    {
+      "id": "루드",
+      "name": "루드",
+      "nature": "활발",
+      "race": "용족",
+      "role": "탱커",
+      "style": "박자형",
+      "star": 3,
+      "hp": 950,
+      "atk": 101,
+      "def": 67,
+      "crit": 5,
+      "blurb": "무엇이든 운동으로 바꾸는 용족 서열 2위 헬창. 똑같은 동작을 잇달아 되풀이할 때마다 렙이 쌓이고, 네 번째 렙에 한 세트를 끝내며 다음 한 수에 힘을 싣습니다.",
+      "keyword": {
+        "name": "렙",
+        "desc": "같은 동작을 되풀이한 횟수",
+        "carrier": "self",
+        "cap": 4,
+        "per": [
+          {
+            "stat": "taken",
+            "v": -0.04
+          }
+        ],
+        "endClear": true,
+        "rules": [
+          {
+            "name": "포즈",
+            "when": {
+              "on": "play",
+              "repeat": true,
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "렙",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "단백질 보충",
+            "when": {
+              "on": "play",
+              "type": "공격"
+            },
+            "fx": [
+              {
+                "k": "shield",
+                "ratio": 0.24
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "임팩트 프레스",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.3,
+            "base": "def",
+            "target": "allEnemies",
+            "hits": 4
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "stack",
+            "id": "렙",
+            "v": 4
+          }
+        ]
+      },
+      "starter": [
+        "루드_s1",
+        "루드_s2",
+        "루드_s3",
+        "루드_u2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "루드_s1",
+      "name": "맨손 스쿼트 킥",
+      "hero": "루드",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "루드_s2",
+      "name": "코어 버티기",
+      "hero": "루드",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "루드_rep",
+      "name": "한 번 더!",
+      "hero": "루드",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸",
+        "천상"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ],
+      "blurb": "「마지막 한 번 더」 — 끝나지 않는 한 세트입니다"
+    },
+    {
+      "id": "루드_u2",
+      "name": "미숫가루 프로틴",
+      "hero": "루드",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "렙",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.06
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.57
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.73
+            },
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "make",
+              "id": "루드_rep",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "루드_u1",
+      "name": "한 세트 더!",
+      "hero": "루드",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.38,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "make",
+          "id": "루드_rep",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.56,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "루드_rep",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.63,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.84
+            },
+            {
+              "k": "make",
+              "id": "루드_rep",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.26,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "루드_rep",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.94,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "루드_rep",
+              "v": 2,
+              "owner": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.62,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "루드_rep",
+              "v": 4
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "루드_u4",
+      "name": "실피르보다 세게",
+      "hero": "루드",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.12,
+          "base": "def",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "렙",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.56,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "tags": [
+        "종극"
+      ],
+      "complete": true
+    },
+    {
+      "id": "루드_u3",
+      "name": "다야 님을 지켜라",
+      "hero": "루드",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.96
+        },
+        {
+          "k": "perStack",
+          "id": "렙",
+          "n": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 0.22
+        },
+        {
+          "k": "ifStack",
+          "id": "렙",
+          "n": 4
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.45
+            },
+            {
+              "k": "perStack",
+              "id": "렙",
+              "n": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.32
+            },
+            {
+              "k": "ifStack",
+              "id": "렙",
+              "n": 4
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.86
+            },
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "렙",
+              "n": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.38
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.36
+            },
+            {
+              "k": "heal",
+              "ratio": 0.6
+            },
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "perStack",
+                      "id": "렙"
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.64
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "루드_s3",
+      "name": "스쿼트 점프킥",
+      "hero": "루드",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "루드_s4",
+      "name": "한 렙 더",
+      "hero": "루드",
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        },
+        {
+          "k": "stack",
+          "id": "렙",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.01
+            },
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.07
+            },
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.27
+            },
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.62
+            },
+            {
+              "k": "stack",
+              "id": "렙",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_rudebook",
+      "name": "루드의 운동 교본",
+      "grade": "희귀",
+      "slot": "장신구",
+      "stats": {
+        "hp": 154
+      },
+      "effect": [
+        {
+          "name": "쉬는 것도 운동",
+          "when": {
+            "on": "turnEnd"
+          },
+          "conds": [
+            {
+              "c": "playedMin",
+              "n": 3
+            }
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
+            }
+          ]
+        }
+      ],
+      "affinity": "루드",
+      "affinityStats": {
+        "hp": 60,
+        "def": 5
+      },
+      "affinityEffect": [
+        {
+          "name": "포즈 뒤 스트레칭",
+          "when": {
+            "on": "stackReach",
+            "id": "렙",
+            "n": 4
+          },
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.5
+            }
+          ]
+        }
+      ],
+      "blurb": "「쉬는 것도 운동이다」 가 첫 장에 적힌 교본."
+    }
+  ]
+}

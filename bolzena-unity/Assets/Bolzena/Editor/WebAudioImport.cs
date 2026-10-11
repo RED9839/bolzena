@@ -11,16 +11,27 @@ namespace Bolzena.EditorTools
     public class WebAudioImport : AssetPostprocessor
     {
         public override int GetPostprocessOrder() => 1000;
-        public override uint GetVersion() => 1;   // 규칙이 바뀌면 올린다
+        public override uint GetVersion() => 3;   // 규칙이 바뀌면 올린다(3 = 아래 품질 낮춤 — 2 는 덮어쓰기만 걸어 웹 결과가 그대로였다)
+
+        // 2026-10-09(perf_20261009): 웹은 소리를 AAC(mp4)로 넣는데, 품질 0.6(BolzenaImport 기본)이 모노 166kbps 로 나와 목소리 · 사도 효과음이
+        //   .data 의 1/4(받는 크기 약 93MB)이었다. 웹만 낮춘다(PC · 폰 앱은 그대로) — 목소리 품질 0.3 · 22.05kHz, 사도 효과음 품질 0.4 · 44.1kHz(타격 고음 그대로).
+        const float VoiceQuality = 0.3f, HeroSfxQuality = 0.4f;
 
         void OnPreprocessAudio()
         {
-            var p = assetPath.Replace("\\", "/");
-            if (!p.Contains("/Resources/Voice/")) return;
+            var p = WebImport.Original(assetPath.Replace("\\", "/"));   // 웹 빌드 동안 옮겨 둔 목소리(WebBundleBuild.StageVoice)도 원래 자리 규칙대로
+            bool voice = p.Contains("/Resources/Voice/"), heroSfx = p.Contains("/Resources/Sfx/hero/");
+            if (!voice && !heroSfx) return;
             var ai = (AudioImporter)assetImporter;
             var w = ai.defaultSampleSettings;
-            w.loadType = AudioClipLoadType.CompressedInMemory;
+            if (voice) w.loadType = AudioClipLoadType.CompressedInMemory;   // 효과음은 타격 시점 때문에 DecompressOnLoad 그대로
+            w.quality = voice ? VoiceQuality : HeroSfxQuality;
+            // 웹 AAC 비트레이트는 품질만으로는 덜 준다(1.0 → 200kbps · 0.6 → 166kbps) — 목소리는 22.05kHz 로(말소리는 8kHz 아래가 거의 전부)
+            if (voice) { w.sampleRateSetting = AudioSampleRateSetting.OverrideSampleRate; w.sampleRateOverride = 22050; }
             ai.SetOverrideSampleSettings("WebGL", w);
+            // WebGL 덮어쓰기만으로는 웹 AAC 결과가 바뀌지 않았다(perf_20261009 1차 빌드: 166kbps 그대로) — 웹으로 가져올 때는 기본값 자체를 웹 값으로.
+            //   가져오기 결과는 플랫폼마다 따로 쌓이므로 PC · 폰 앱 결과는 그대로다(.meta 에도 저장하지 않는다)
+            if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.WebGL) ai.defaultSampleSettings = w;
         }
     }
 }

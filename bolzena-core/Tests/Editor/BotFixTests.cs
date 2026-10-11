@@ -92,15 +92,13 @@ namespace Bolzena.Core.Tests
         {
             var d = K.Data(heroes: "[{id:'w', name:'버팀이', role:'탱커', hp:1000, atk:100, def:50, passives:[{name:'위기 회복', when:{on:'lowHp', pct:0.3}, fx:[{k:'heal', ratio:6}]}]}]");
             var b = K.Fight(d, new[] { "w" }, new[] { "hitter" });
-            b.Pool.Hp = 350;
             var bot = new Bots(d);
+            b.Pool.Hp = 900; int high = bot.Incoming(b).hp; int dmg = 900 - high;   // 선을 안 넘으면 그대로 — 맞는 양
+            b.Pool.Hp = 350;
+            Assert.Less(350 - dmg, 300, "맞으면 30% 아래로");
+            Assert.AreEqual(350 - dmg + 300, bot.Incoming(b).hp, 1, "선을 넘어 내려가면 위기 회복 300(방어 50 × 6)을 더한다");
             b.Fired["w|0|f"] = 1;
-            int bare = bot.Incoming(b).hp;
-            Assert.Less(bare, 300, "맞으면 30% 아래로 — 이미 쓴 위기 패시브는 세지 않는다");
-            b.Fired.Clear();
-            Assert.AreEqual(bare + 300, bot.Incoming(b).hp, 1, "선을 넘어 내려가면 위기 회복 300(방어 50 × 6)을 더한다");
-            b.Pool.Hp = 900; int high = bot.Incoming(b).hp;
-            Assert.AreEqual(900 - (350 - bare), high, 1, "선을 안 넘으면 그대로");
+            Assert.AreEqual(350 - dmg + 300, bot.Incoming(b).hp, 1, "이미 쓴 적이 있어도 또 센다(2026-10-10 전투당 제한 없앰)");
             b.Pool.Hp = 900;
         }
     }

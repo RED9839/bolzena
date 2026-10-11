@@ -14,9 +14,13 @@ NATURES = ["순수", "냉정", "광기", "활발", "우울"]
 PARTY_ST = {"약화": "약화", "취약": "취약", "고통": "고통", "균열": "균열", "충격": "충격", "충격파": "충격", "손상": "손상", "표식": "취약", "그을림": "고통"}
 
 
+# 2026-10-11 엘다인 20명 전환 — 클론으로만 나오는 사도의 원본(카드 · 고학년)은 백업에 있다. 둘 다 읽는다(같은 id 면 heroes 가 이긴다)
+BENCH = r"C:\projects\_backup\heroes_non_eldain_20261011"
+
+
 def load():
     H, C = {}, {}
-    for f in sorted(glob.glob(os.path.join(ROOT, "heroes", "*", "*.json"))):
+    for f in sorted(glob.glob(os.path.join(BENCH, "heroes", "*", "*.json"))) + sorted(glob.glob(os.path.join(ROOT, "heroes", "*", "*.json"))):
         d = json.load(open(f, encoding="utf-8"))
         for h in d["heroes"]: H[h["id"]] = h
         for c in d.get("cards", []): C[c["id"]] = c

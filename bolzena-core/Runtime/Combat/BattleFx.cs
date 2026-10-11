@@ -45,6 +45,8 @@ namespace Bolzena.Core
         public string TransformTo;
         /// <summary>강인도 피해의 AP 단위 — 카드의 적힌 비용(X 면 낸 AP). 고학년은 2.</summary>
         public int Cost = 1;
+        /// <summary>강인도 단위를 따로 정할 때(고학년 — R.ToughUnitUlt). 0 이면 Cost 로.</summary>
+        public double ToughUnit;
         /// <summary>두 갈래 카드에서 고른 갈래(0 = 안 고름).</summary>
         public int Choice;
         /// <summary>v2 — 피해 · 실드 · 회복 배율(다시 내기 · 대신 발동 · 저절로 내기의 비율) · 배타 무작위 갈래 · 꺼낸 카드 · 덧붙인 태그.</summary>
@@ -60,13 +62,33 @@ namespace Bolzena.Core
         public int? SpendPick;
         /// <summary>(시범 16) 이 카드가 이번 턴 바로 앞 카드보다 비싸다(ifPricier).</summary>
         public bool Pricier;
+        /// <summary>(엘다인 ▶E32) 이번 한 번 망각 없이 사라진다(noForget).</summary>
+        public bool NoForget;
+        /// <summary>(엘다인 ▶E19) spend pick loop — 이어 쓸 고유 효과 · 상한(대) · 고른 뒤 남긴 몫.</summary>
+        public string LoopId;
+        public int LoopMax, LoopKeep;
+        /// <summary>(엘다인 ▶E17) 낸 뒤에 정할 카드 값(cardStatus set · half) — 카드가 다 돈 다음 PlayCard 가 적용한다.</summary>
+        public List<Fx> AfterSet;
+        /// <summary>(▶E66) 이 카드는 치명 확정 · (▶E74) 고른 단계(PlayOpts.Stage).</summary>
+        public bool ForceCrit;
+        public int? StagePick;
+        /// <summary>(엘다인 4차 ▶E77) 이 카드는 「n번째 이후」 조건이 선다(nthNext).</summary>
+        public bool NthForce;
+        /// <summary>(엘다인 4차 리뉴아) 이 카드를 낼 때의 비용(줄어든 값) — ifCost.</summary>
+        public int CostNow;
+        /// <summary>(우로스) 이번엔 짝 태세로 안 바뀐다(noToggle).</summary>
+        public bool NoToggle;
+        /// <summary>(엘다인 4차 요청 — 란) 이 표식이 있는 적을 치는 대는 치명 확정(critNext now foeStack).</summary>
+        public string CritFoe;
         public FxCtx Copy() { var c = (FxCtx)MemberwiseClone(); c.Toughed = null; return c; }
     }
 
     public sealed partial class Battle
     {
         const string RHYTHM_PER = "\u0000리듬", DISC_PER = "\u0000버림", PAID_PER = "\u0000치름", DEBUFF_PER = "\u0000흠", APLEFT_PER = "\u0000남은AP", TAG_PER = "\u0000태그",
-            GUARD_PER = "\u0000막음", OVERHEAL_PER = "\u0000넘침";
+            GUARD_PER = "\u0000막음", OVERHEAL_PER = "\u0000넘침", ANYHERO_PER = "\u0000아무동료";
+        /// <summary>그 아군 표시(carrier hero)가 파티에 붙은 겹 합(동료 누구에게든).</summary>
+        int AnyHeroStack(string id) { int n = 0; foreach (var u in Party) n += StackOf(u.Key, id); return n; }
 
         /// <summary>막아 낸 양(버티형 변환) — 적의 차례 중이면 이번 판 몫, 내 턴이면 지난 판 + 이번 판(즉시 행동) 몫.</summary>
         public int GuardedVal => FoeTurn ? GuardedNow : GuardedPrev + GuardedNow;
@@ -125,6 +147,9 @@ namespace Bolzena.Core
                 case "allEnemies": return foes;
                 case "topEnemy": return foes.OrderByDescending(e => e.Hp).ThenBy(e => e.Idx).Take(1).ToList();
                 case "lowEnemy": return foes.OrderBy(e => e.Hp).ThenBy(e => e.Idx).Take(1).ToList();
+                case "bigHitEnemy": { var bh = BigHitEnemy(); return bh != null ? new List<Unit> { bh } : new List<Unit>(); }
+                case "holder":   // 그 아군 표시(조각의 id)가 지금 붙은 동료 — 없으면 아무도(엘다인 4차 벨라 「존속」)
+                    { var hid = ctx.CurFx?.Id; return hid == null ? new List<Unit>() : allies.Where(u => StackOf(u.Key, hid) > 0).Take(1).ToList(); }   // 공격 예고가 가장 큰 적(엘다인 3차)
                 case "randomEnemy":
                     if (PreviewPick != null) return foes.Where(e => e.Idx == PreviewPick).Take(1).ToList();
                     return foes.Count > 0 ? new List<Unit> { foes[Rng.Int(foes.Count)] } : new List<Unit>();
@@ -177,6 +202,7 @@ namespace Bolzena.Core
         int PerCountRaw(FxCtx ctx, string id)
         {
             if (id == RHYTHM_PER) return St(Pool, R.RHYTHM);
+            if (id.StartsWith(ANYHERO_PER, StringComparison.Ordinal)) return AnyHeroStack(id.Substring(ANYHERO_PER.Length));
             if (id == DISC_PER) return ctx.Discarded;
             if (id == APLEFT_PER) return Ap;
             if (id.StartsWith(GUARD_PER, StringComparison.Ordinal)) return GuardedVal / Math.Max(1, int.Parse(id.Substring(GUARD_PER.Length)));
@@ -186,6 +212,7 @@ namespace Bolzena.Core
                 return OverhealSum(int.Parse(p[0]) / 100.0) / Math.Max(1, int.Parse(p[1]));
             }
             { int kc = KitCount(ctx, id); if (kc >= 0) return kc; }
+            { int ec = EldainCount(ctx, id); if (ec >= 0) return ec; }
             if (id.StartsWith(TAG_PER, StringComparison.Ordinal)) { var tg = id.Substring(TAG_PER.Length); return Hand.Count(h => HasTagB(h, tg)); }
             if (id.StartsWith(PAID_PER, StringComparison.Ordinal)) return PaidHp / System.Math.Max(1, int.Parse(id.Substring(PAID_PER.Length)));
             if (id == DEBUFF_PER) { var t = ctx.Holder != null && ctx.Holder.Side == Side.Enemy ? ctx.Holder : Resolve(ctx, "oneEnemy").FirstOrDefault(); return t != null ? DebuffKinds(t) : 0; }
@@ -204,9 +231,23 @@ namespace Bolzena.Core
 
         /// <summary>피해 한 대 — 스탯 × 배율(치명 · 축복 포함). 화면의 카드 면 숫자도 이것을 쓴다.</summary>
         public int HitAmount(Unit u, double ratio, bool shin = false, bool crit = false, string bas = null) =>
-            R.FinalDamage(bas == "def" ? R.DefDmgStat(AtkOf(u), DefOf(u)) : AtkOf(u), ratio, shin: shin, crit: crit, critX: u.Side == Side.Party ? CritDmgX : 0);
-        public int GuardAmount(Unit u, double ratio, string shin) => Math.Max(1, Num.Round(DefOf(u) * ratio * (shin == "guard" ? R.SHIN : 1) * Math.Max(0.1, 1 + StatMod(u, "guard"))));
-        public int HealAmount(Unit u, double ratio, string shin) => Math.Max(1, Num.Round(DefOf(u) * ratio * (shin == "heal" ? R.SHIN : 1) * Math.Max(0, 1 + StatMod(u, "heal"))));
+            R.FinalDamage(bas == "def" ? R.DefDmgStat(AtkOf(u), DefOf(u)) : AtkOf(u), ratio, shin: shin, crit: crit, critX: CritXOf(u));   // 파티 — 판 덤 × 치명 피해 상태(▶E83)
+        /// <summary>실드 · 회복의 바탕 방어력(2026-10-10 카제나식) — 기본 방어력(사도 데이터) + 추가 방어력(아티팩트 · 판 성장 · 교주 보드, Unit.GearAdd) × R.GUARD_EXTRA_K, 그다음 전투 중 「방어 +%」 를 곱한다.</summary>
+        int GuardDef(Unit u)
+        {
+            int extra = u.Side == Side.Party ? (u.GearAdd?.Def ?? 0) : 0;
+            return Math.Max(0, Num.Round(((u.Def - extra) + extra * R.GUARD_EXTRA_K) * (1 + StatMod(u, "def"))));
+        }
+        /// <summary>역할별 실드 · 회복 배율 — R.RoleGuard × 같은 역할 겹침(R.ROLE_DUP). 적은 1.</summary>
+        double RoleGuardOf(Unit u)
+        {
+            if (u.Side != Side.Party || u.Role == null) return 1;
+            double k = R.RoleGuard(u.Role);
+            if (R.ROLE_DUP > 0 && u.Role != "딜러") { int n = Party.Count(x => x.Role == u.Role); if (n > 1) k /= 1 + R.ROLE_DUP * (n - 1); }
+            return k;
+        }
+        public int GuardAmount(Unit u, double ratio, string shin) => Math.Max(1, Num.Round(GuardDef(u) * ratio * RoleGuardOf(u) * (shin == "guard" ? R.SHIN : 1) * Math.Max(0.1, 1 + StatMod(u, "guard"))));
+        public int HealAmount(Unit u, double ratio, string shin) => Math.Max(1, Num.Round(GuardDef(u) * ratio * RoleGuardOf(u) * (shin == "heal" ? R.SHIN : 1) * Math.Max(0, 1 + StatMod(u, "heal"))));
 
         /// <summary>효과 조각 목록을 돌린다(카드 · 신탁 · 축복 · 패시브 · 키워드 · 고학년 공용).</summary>
         void RunFx(List<Fx> list, FxCtx ctx)
@@ -248,11 +289,12 @@ namespace Bolzena.Core
                             bool has;
                             if (kw != null && kw.Carrier == "enemy") { var t = ctx.Holder != null && ctx.Holder.Side == Side.Enemy ? ctx.Holder : Resolve(ctx, "oneEnemy").FirstOrDefault(); has = t != null && St(t, f.Id) >= Math.Max(1, f.N) && (f.Max <= 0 || St(t, f.Id) <= f.Max); }
                             else if (kw != null && kw.Carrier == "ally") has = owner != null && St(owner, f.Id) > 0;
+                            else if (kw != null && kw.Carrier == "hero" && f.Who == "any") { int an = AnyHeroStack(f.Id); has = an >= Math.Max(1, f.N) && (f.Max <= 0 || an <= f.Max); }   // 동료 누구에게 붙어 있든(벨라 존속)
                             else has = owner != null && StackOf(owner.Key, f.Id) >= Math.Max(1, f.N) && (f.Max <= 0 || StackOf(owner.Key, f.Id) <= f.Max);
                             gate = f.Not ? !has : has;
                             break;
                         }
-                    case FxK.PerStack: ctx.PerStack = f.Id; ctx.PerEach = f.Each; ctx.PerMin = f.N; ctx.PerMax = f.Max; break;
+                    case FxK.PerStack: ctx.PerStack = f.Who == "any" ? ANYHERO_PER + f.Id : f.Id; ctx.PerEach = f.Each; ctx.PerMin = f.N; ctx.PerMax = f.Max; break;
                     // ── 운영 방식 계기(docs/19 §3) ──
                     case FxK.IfRepeat:   // 같은 카드 잇달아 — 박자형(서면 리듬 +1)
                         gate = ctx.Repeat;
@@ -268,11 +310,13 @@ namespace Bolzena.Core
                         { var t = Resolve(ctx, "oneEnemy").FirstOrDefault(); gate = t != null && Kw.Values.Any(k => k.Def.Hunt && St(t, k.Id) > 0); break; }
                     case FxK.IfDebuffs:                                                                  // 고른 적의 디버프가 N가지 이상 — 흠 세기
                         gate = DebuffKinds(Resolve(ctx, "oneEnemy").FirstOrDefault()) >= System.Math.Max(1, f.N); break;
-                    case FxK.PerDiscarded: ctx.PerStack = DISC_PER; break;
+                    case FxK.PerDiscarded: ctx.PerStack = DISC_PER; ctx.PerMin = f.N; ctx.PerMax = f.Max; break;   // n · max — 최소 · 최대(엘다인 3차)
                     case FxK.PerApLeft: ctx.PerStack = APLEFT_PER; break;
                     case FxK.PerGuarded: ctx.PerStack = GUARD_PER + (f.Per > 0 ? f.Per : 1); ctx.PerMax = f.Max; break;   // 막아 낸 양 per 당(1단계) · max — 최대(118명 3단계)
                     case FxK.PerOverheal: ctx.PerStack = OVERHEAL_PER + Num.Round(f.Pct * 100) + "|" + (f.Per > 0 ? f.Per : 1); ctx.PerMax = f.Max; break;   // 이번 판 넘친 회복 per 당(pct 면 그 선 넘은 몫)
-                    case FxK.Empower: EmpowerAdd(f.Who == "any" ? "*" : owner?.Key ?? "*", f.Ratio); break;
+                    case FxK.Empower:
+                        if (f.Who == "other") { EmpowerOtherAdd(owner, f.Ratio, f.MinCost); break; }   // 다른 아군의 다음(비용 minCost 이상) 카드(엘다인 4차 요청)
+                        EmpowerAdd(f.Who == "any" ? "*" : owner?.Key ?? "*", f.Ratio); break;
                     case FxK.IfHp: gate = (double)Pool.Hp / System.Math.Max(1, Pool.MaxHp) <= (f.Pct > 0 ? f.Pct : 0.5); if (f.Not) gate = !gate; break;
                     case FxK.Feed:   // 아군 키워드 +N — 가리킨 사도(기본 아군 전원)의 자기 주머니 키워드를 v 씩(모드 키워드는 빼고)
                         {
@@ -306,7 +350,7 @@ namespace Bolzena.Core
                         {
                             int dealt = DealtSeq == ActSeq ? DealtAct : 0;
                             int v = Math.Min(Num.Round(Pool.MaxHp * R.SV("흡수Max")), Num.Round(dealt * f.Ratio));
-                            if (v > 0 && !Pool.Dead) { int h0 = Pool.Hp; Pool.Hp = Math.Min(Pool.MaxHp, Pool.Hp + v); HealCue(PartyRep(owner), h0); Say($"피해 기반 회복 +{Pool.Hp - h0}"); }
+                            if (v > 0 && !Pool.Dead) { int h0 = Pool.Hp; Pool.Hp = Math.Min(Pool.MaxHp, Pool.Hp + v); HealCue(PartyRep(owner), h0); TallyHeal(owner, Pool.Hp - h0); Say($"피해 기반 회복 +{Pool.Hp - h0}"); }
                             break;
                         }
                     case FxK.Extra:                                                                     // 추가 공격 — 공격력(또는 방어 기반) × ratio, 탄성 · 「추가 공격하면」
@@ -337,7 +381,7 @@ namespace Bolzena.Core
                         if (f.IV < 0) { ApJam += -f.IV; Pay(ctx); } else ApCarry += f.IV;
                         Say($"다음 턴 AP {(f.IV > 0 ? "+" : "")}{f.IV}");
                         break;
-                    case FxK.Burn: BurnFx(f.All ? -1 : f.IV, f.Random, ctx); if (Over != null) return; break;
+                    case FxK.Burn: BurnFx(f.All ? -1 : f.IV, f.Random, ctx, HasFilter(f) ? f : null); if (Over != null) return; break;
                     case FxK.Reflect:                                                                    // 받은 피해의 N% 되돌리기 — 버팀
                         {
                             if (owner == null) break;
@@ -353,9 +397,12 @@ namespace Bolzena.Core
                         {
                             if (owner == null) break;
                             if (f.OfStack != null) ctx.EventV = PerCountRaw(ctx, f.OfStack);   // 저장한 값(겹) — ofEvent 와 같이
-                            if (f.OfEvent > 0)
+                            if (f.OfShield) ctx.EventV = PartyShield;   // (엘다인 ▶E1) 지금 파티 실드
+                            if (f.OfForm > 0) ctx.EventV = FormDealt(owner.Key);   // (엘다인 4차 ▶E76) 이번 변신 중 준 피해
+                            double ofEv = f.OfForm > 0 ? f.OfForm : f.OfEvent;
+                            if (ofEv > 0)
                             {   // 일의 값 × ofEvent 를 고정 피해로(넘친 치유 · 막아 낸 양 …)
-                                int ev = Math.Max(1, Num.Round(ctx.EventV * f.OfEvent * ctx.Scale));
+                                int ev = Math.Max(1, Num.Round(ctx.EventV * ofEv * ctx.Scale));
                                 foreach (var t in Resolve(ctx, f.Target ?? "oneEnemy")) { if (ctx.EventV > 0) Hurt(t, ev, new HurtOpts { From = owner, Fixed = true }); if (Over != null) return; }
                                 ctx.PerStack = null;
                                 break;
@@ -375,20 +422,26 @@ namespace Bolzena.Core
                             }
                             string dTarget = f.Target ?? "oneEnemy";
                             if (dTarget == "oneEnemy" && ctx.Card && ctx.Type == "공격" && Kw.Values.Any(k => k.Def.Spread && k.Owner == owner.Key && StackOf(owner.Key, k.Id) <= 0)) dTarget = "allEnemies";
-                            int hits = f.XHits ? ctx.X + (f.XStack != null ? StackOf(owner.Key, f.XStack) : 0) : f.HitsOr1;
+                            // hitsPer — 고유 효과 겹 + hitsAdd 회(엘다인 ▶E24)
+                            int hits = f.XHits ? ctx.X + (f.XStack != null ? StackOf(owner.Key, f.XStack) : 0) : f.HitsPer != null ? Math.Max(0, PerCountRaw(ctx, f.HitsPer) + f.HitsAdd) : f.HitsOr1;
                             if (ctx.PerStack != null) { hits *= PerCount(ctx, ctx.PerStack); ctx.PerStack = null; }
+                            // (엘다인 ▶E19) spend pick loop — 고른 만큼 친 뒤, 치는 동안 새로 얻은 겹(남겨 둔 몫 위)을 1씩 더 써서 이어 친다(합해 LoopMax 대까지)
+                            string loopId = ctx.LoopId; int loopMax = ctx.LoopMax, loopKeep = ctx.LoopKeep; ctx.LoopId = null;
+                            if (loopId != null) hits = Math.Min(hits, loopMax);
                             // 카드의 덤 배율 — 탐구심(이 카드) · 칼날 벼리기(공격 카드의 방어 기반) · 형상 강화(만든 카드)
                             double ck = 1;
                             if (ctx.Card && ctx.CardId != null) { int g = CardStOf(ctx.CardId, "탐구심"); if (g > 0) ck *= 1 + R.SV("탐구심") * g; }
                             if (f.Base == "def" && ctx.Type == "공격") ck *= 1 + R.StackEff("칼날 벼리기", St(owner, "칼날 벼리기"));
                             if (ctx.Made) ck *= 1 + R.StackEff("형상 강화", St(owner, "형상 강화"));
                             string brandId = ctx.CardId != null ? GameData.BaseId(ctx.CardId) : null;
+                            int killCap = f.KillMore ? (f.Max > 0 ? f.Max : KILL_MORE_MAX) : 0;   // (엘다인 4차 ▶E79) 처치하면 한 대 더
                             for (int i = 0; i < hits; i++)
                             {
+                                int alive0 = killCap > 0 ? AliveEnemies().Count : 0;
                                 foreach (var t in Resolve(ctx, dTarget))
                                 {
                                     double critPct = owner.Crit + StatMod(owner, "crit") * 100;
-                                    bool crit = !Preview && Rng.Next() * 100 < critPct;
+                                    bool crit = !Preview && (Rng.Next() * 100 < critPct || ctx.ForceCrit || (ctx.CritFoe != null && St(t, ctx.CritFoe) > 0));   // 치명 확정(▶E66) — 난수는 그대로 쓴다
                                     bool boost = ctx.Shin == "power" || (ctx.Shin == "weakSpot" && St(t, "취약") > 0);
                                     bool first = ctx.Card && t.Side == Side.Enemy && !(ctx.Toughed != null && ctx.Toughed.Contains(t));
                                     if (first) { CardHit(owner, t, ctx); if (t.Dead) continue; }
@@ -414,8 +467,36 @@ namespace Bolzena.Core
                                     else if (first) (ctx.Toughed ??= new HashSet<Unit>()).Add(t);
                                     if (ctx.Shin == "frost" && !t.Dead) AddStatus(t, "취약", 1, 1, null);
                                     if (first && ctx.Card && !t.Dead && MarkedWeak(t)) UseWeakMark(t);
+                                    // (엘다인 ▶E3) 맞은 적마다 — 한 대마다 그 적에게(쓰러졌으면 안 돈다)
+                                    if (f.HitFx != null && f.HitFx.Count > 0 && !t.Dead && Over == null)
+                                    {
+                                        var hc = ctx.Copy(); hc.TargetIdx = t.Idx; hc.Holder = t; hc.PerStack = null; hc.Toughed = ctx.Toughed;
+                                        RunFx(f.HitFx, hc);
+                                    }
+                                }
+                                if (killCap > 0 && hits < killCap && Over == null && AliveEnemies().Count < alive0)
+                                {   // (엘다인 4차 ▶E79) 이 대에 처치했으면 한 대 더(max 대까지)
+                                    hits++;
+                                    Say($"처치 — 한 대 더({hits}/{killCap})");
+                                }
+                                if (loopId != null && i == hits - 1 && hits < loopMax && Over == null && StackOf(owner.Key, loopId) > loopKeep)
+                                {
+                                    SpendFx(new Fx { K = FxK.Spend, Id = loopId, V = 1 }, new FxCtx { Owner = owner });
+                                    hits++;
+                                    Say($"「{loopId}」 — 이어 쏜다({hits}/{loopMax})");
                                 }
                             }
+                            // (아야) 아는 수를 하는 적은 knownHits 회 — 모자란 만큼 그 적에게 더 친다
+                            if (f.KnownHits > 1 && Over == null)
+                                foreach (var t in Resolve(ctx, dTarget).Where(x => x.Side == Side.Enemy && !x.Dead).ToList())
+                                {
+                                    if (!KnownFoe(owner, t, f.Once)) continue;
+                                    for (int j = hits; j < hits * f.KnownHits && !t.Dead && Over == null; j++)
+                                    {
+                                        bool kc = !Preview && Rng.Next() * 100 < owner.Crit + StatMod(owner, "crit") * 100;
+                                        Hurt(t, HitAmount(owner, f.Ratio * ctx.Scale * ck + (ctx.Card ? Morale() : 0), false, kc, f.Base), new HurtOpts { From = owner, Crit = kc, Tags = ctx.HitTags, Card = ctx.Card, Attack = ctx.Type == "공격" });
+                                    }
+                                }
                             break;
                         }
 
@@ -425,6 +506,7 @@ namespace Bolzena.Core
                         {
                             if (owner == null) break;
                             if (f.OfStack != null) ctx.EventV = PerCountRaw(ctx, f.OfStack);
+                            if (f.OfShield) ctx.EventV = PartyShield;   // (엘다인 ▶E1)
                             int k = 1;
                             if (ctx.PerStack != null) { k = PerCount(ctx, ctx.PerStack); ctx.PerStack = null; if (k == 0) break; }
                             double ratio = f.Ratio * k * ctx.Scale * (ctx.Made ? 1 + R.StackEff("형상 강화", St(owner, "형상 강화")) : 1);
@@ -435,9 +517,10 @@ namespace Bolzena.Core
                                 int v = f.Fixed || f.OfEvent > 0 ? v0 : ShieldGain(t, v0);
                                 if (t.Side == Side.Party && v > 0) ShieldBy = owner.Key;
                                 if (f.K == FxK.Block) t.Block += v; else t.Shield += v;
+                                if (t.Side == Side.Party) TallyShield(owner, v);   // 전투 기록 — 파티에 얹은 방어 · 실드
                                 GainCue(t, f.K, v);
                                 if (v > 0) Punish(t);
-                                if (v > 0 && t.Side == Side.Party && !t.Dead) Emit("guard", new EmitInfo { Who = t, Kind = f.K });
+                                if (v > 0 && t.Side == Side.Party && !t.Dead) Emit("guard", new EmitInfo { Who = t, Kind = f.K, Seq = ActSeq });
                             }
                             break;
                         }
@@ -453,9 +536,9 @@ namespace Bolzena.Core
                                 int over = Math.Max(0, h0 + v - t.MaxHp);
                                 HealCue(t, h0, over);
                                 if (t.Side == Side.Party && (double)h0 / Math.Max(1, t.MaxHp) < R.SV("부상") && (double)t.Hp / Math.Max(1, t.MaxHp) >= R.SV("부상")) Emit("unwound", new EmitInfo { By = Acting ?? owner.Key, Who = t });
-                                if (t.Side == Side.Party) { HealLog.Add(h0 + v); HealLog.Add(v); HealLog.Add(t.MaxHp); }
+                                if (t.Side == Side.Party) { HealLog.Add(h0 + v); HealLog.Add(v); HealLog.Add(t.MaxHp); SumHealed += Math.Min(v, Math.Max(0, t.MaxHp - h0)); TallyHeal(owner, Math.Min(v, Math.Max(0, t.MaxHp - h0))); }
                                 // 회복형 계기 — 넘친 회복(V). 규칙에 pct 가 있으면 「회복 뒤 HP 그 비율 이상 — 선을 넘은 몫」 으로 다시 잰다(Before = 회복 전 HP · After = 넘치기 전 HP · N = 회복량)
-                                if (t.Side == Side.Party && !t.Dead && Acting != null && v > 0) Emit("overheal", new EmitInfo { By = Acting, Who = t, V = over, Before = h0, After = h0 + v, N = v });
+                                if (t.Side == Side.Party && !t.Dead && Acting != null && v > 0) Emit("overheal", new EmitInfo { By = Acting, Who = t, V = over, Before = h0, After = h0 + v, N = v, Seq = ActSeq });
                             }
                             break;
                         }
@@ -489,10 +572,11 @@ namespace Bolzena.Core
                     // ── 자원 ──
                     case FxK.Draw:
                         if (HasFilter(f))
-                        {   // 거르개에 맞는 카드를 뽑을 더미 위에서부터(없으면 그만)
+                        {   // 거르개에 맞는 카드를 뽑을 더미 위에서부터 — 없으면 버린 카드를 섞어 넣고 한 번 더 찾는다(카제나 규칙 4 · 이번 턴에 낸 카드는 빼고)
                             for (int k = 0; k < Math.Max(1, f.IV); k++)
                             {
                                 int at = Draw.FindLastIndex(id => FxMatch(f, id, owner));
+                                if (at < 0 && Reshuffle()) { Emit("shuffle", new EmitInfo()); if (Over != null) return; at = Draw.FindLastIndex(id => FxMatch(f, id, owner)); }
                                 if (at < 0) break;
                                 var id = Draw[at]; Draw.RemoveAt(at); Draw.Add(id);
                                 DrawCards(1, true); if (Over != null) return;
@@ -502,14 +586,33 @@ namespace Bolzena.Core
                         break;
                     case FxK.Ap:
                         if (BoundBlocks(ctx)) { Say($"구속 — AP {(f.IV > 0 ? "+" : "")}{f.IV} 을 받지 않는다"); break; }
-                        if (f.IV > 0) GainAp(f.IV); else Ap = Math.Max(0, Ap + f.IV); break;
+                        if (f.IV > 0)
+                        {   // 멈춤 방지 — 효과로 얻는 AP 는 한 턴 AP_GAIN_CAP 까지(게임 규칙 아님 · 엘다인 3차 ▶E46)
+                            string ak = "apGain|" + Turn; int had = Counts.TryGetValue(ak, out var hv) ? hv : 0, give = Math.Min(f.IV, AP_GAIN_CAP - had);
+                            if (give < f.IV && capMeter && had < AP_GAIN_CAP + 1) { System.Threading.Interlocked.Increment(ref ApCapHits); }
+                            if (give <= 0) { Counts[ak] = AP_GAIN_CAP + 1; Say($"AP 얻기 한 턴 상한({AP_GAIN_CAP}) — 더 얻지 않는다"); break; }
+                            Counts[ak] = had + give; GainAp(give);
+                        }
+                        else Ap = Math.Max(0, Ap + f.IV); break;
                     case FxK.NextCheaper: NextCheaper += f.IV; break;
-                    case FxK.Gauge: Gauge = Num.Clamp(Gauge + f.IV, 0, R.GAUGE_MAX); break;
-                    case FxK.Discard: ctx.Discarded += DiscardFx(f.All ? -1 : f.IV, f.Random); if (Over != null) return; break;
-                    case FxK.Make: Make(f.Id, Math.Max(1, f.IV), owner, f.To, f.Owner); break;
+                    case FxK.Gauge: if (f.IV > 0 && GaugeLocked(owner?.Key)) { Say("게이지 잠금 — 오르지 않는다"); break; } Gauge = Num.Clamp(Gauge + f.IV, 0, R.GAUGE_MAX); break;
+                    case FxK.Discard: ctx.Discarded += DiscardFx(f.All ? -1 : f.IV, f.Random, HasFilter(f) ? f : null, owner); if (Over != null) return; break;
+                    case FxK.Make:
+                        {   // (엘다인 ▶E36) 앞에 비례(perEvent …)가 있으면 그 수만큼 — 0 이면 안 만든다
+                            int mn = Math.Max(1, f.IV);
+                            if (ctx.PerStack != null) { mn *= PerCount(ctx, ctx.PerStack); ctx.PerStack = null; if (mn <= 0) break; }
+                            Make(f.Id, mn, owner, f.To, f.Owner);
+                            break;
+                        }
 
                     // ── 상태 · 강인도 · 즉시 행동 ──
-                    case FxK.Tough: foreach (var t in Resolve(ctx, f.Target ?? "oneEnemy")) if (t.Side == Side.Enemy) ToughHit(t, f.V); break;
+                    case FxK.Tough:
+                        {   // 비례 뒤면 그 수만큼(엘다인 4차 — 아야 「만년설」 1개당 강인도 피해)
+                            double tv = f.V;
+                            if (ctx.PerStack != null) { tv *= PerCount(ctx, ctx.PerStack); ctx.PerStack = null; }
+                            if (tv > 0) foreach (var t in Resolve(ctx, f.Target ?? "oneEnemy")) if (t.Side == Side.Enemy) ToughHit(t, tv);
+                            break;
+                        }
                     case FxK.RushDown: foreach (var t in Resolve(ctx, f.Target ?? "oneEnemy")) if (t.Side == Side.Enemy) t.RushCnt -= f.IV; break;
                     case FxK.Status:
                         {
@@ -530,7 +633,32 @@ namespace Bolzena.Core
                         break;
 
                     // ── 키워드 · 공용 부품 ──
-                    case FxK.Stack: StackFx(f, ctx); break;
+                    case FxK.Stack:
+                        if (f.Pick && Kw.TryGetValue(f.Id, out var pkw) && pkw.Def.Cap > 0 && owner != null)
+                        {   // 단계 고르기(▶E74) — 고른 단계(없으면 다음 단계)로 정한다 · lock 이면 turns 턴 동안 고정
+                            int cur0 = StackOf(owner.Key, f.Id), cap0 = pkw.Def.Cap.Value;
+                            int to = ctx.StagePick is int sp && sp >= 1 && sp <= cap0 ? sp : cur0 % cap0 + 1;
+                            var pf = f.Copy(); pf.Pick = false; pf.Set = to; pf.Lock = false;
+                            Counts.Remove("lock|" + owner.Key + "|" + f.Id);
+                            StackFx(pf, ctx);
+                            if (f.Lock) Counts["lock|" + owner.Key + "|" + f.Id] = Turn + f.TurnsOr1;
+                            break;
+                        }
+                        if (f.Lock && owner != null && f.Set != null)
+                        {   // 정하고 고정(▶E74)
+                            Counts.Remove("lock|" + owner.Key + "|" + f.Id);
+                            var lf = f.Copy(); lf.Lock = false; StackFx(lf, ctx);
+                            Counts["lock|" + owner.Key + "|" + f.Id] = Turn + f.TurnsOr1;
+                            break;
+                        }
+                        if (ctx.PerStack != null && !f.Carry && f.Set == null)
+                        {   // 비례 뒤 쌓기 — 그 수 × v(엘다인 3차: 깎은 양 20당 「불꽃」 1)
+                            int pk = PerCount(ctx, ctx.PerStack); ctx.PerStack = null;
+                            if (pk <= 0) break;
+                            var sf = f.Copy(); sf.V = f.V * pk; StackFx(sf, ctx);
+                        }
+                        else StackFx(f, ctx);
+                        break;
                     case FxK.Cue: CueFx(f, ctx); break;
                     case FxK.Spend: SpendFx(f, ctx); break;
                     case FxK.SpendRhythm: RhythmAdd(f.All ? (int?)null : -f.IV); break;
@@ -548,7 +676,7 @@ namespace Bolzena.Core
                         break;
 
                     default:
-                        if (!FxV2(f, ctx, ref gate) && !FxKit(f, ctx, ref gate) && !FxForm(f, ctx) && !FxPower(f, ctx)) throw new InvalidOperationException($"모르는 효과 조각: {f.K}");
+                        if (!FxV2(f, ctx, ref gate) && !FxKit(f, ctx, ref gate) && !FxForm(f, ctx) && !FxPower(f, ctx) && !FxEldain(f, ctx, ref gate)) throw new InvalidOperationException($"모르는 효과 조각: {f.K}");
                         if (Over != null) return;
                         break;
                 }
@@ -564,7 +692,7 @@ namespace Bolzena.Core
             Say($"{t.Name}: 표식 — 덤 타격"); StatusCue(t, "표식!");
             int v = R.FinalDamage(AtkOf(owner), R.SV("표식") + Morale());
             Hurt(t, v, new HurtOpts { From = owner, Tags = ctx.HitTags, Card = true });
-            if (!t.Dead) ToughHit(t, R.ToughDmg(0, IsWeakHit(owner, t, ctx.HitTags), false));
+            if (!t.Dead) ToughHit(t, R.ToughExtra(IsWeakHit(owner, t, ctx.HitTags)));
             AfterExtra(owner);
         }
 
@@ -578,7 +706,9 @@ namespace Bolzena.Core
             if (!once) return false;
             bool weak = IsWeakHit(owner, t, ctx.HitTags);
             if (t.ToughMax > 0 && !t.Broken) { ToughHits++; if (weak) ToughWeakHits++; }
-            return ToughHit(t, R.ToughDmg(ctx.Cost, weak, dTarget == "allEnemies") + (glow ? R.TOUGH.Glow : 0), dying);
+            bool area = dTarget == "allEnemies" || dTarget != null && dTarget.StartsWith("random", StringComparison.Ordinal);   // 광역 · 논타겟 1/2
+            double td = ctx.ToughUnit > 0 ? R.ToughOf(ctx.ToughUnit, weak, area) : R.ToughDmg(ctx.Cost, weak, area);
+            return ToughHit(t, td + (glow ? R.TOUGH.Glow : 0), dying);
         }
 
         bool GlowUse()
@@ -598,7 +728,9 @@ namespace Bolzena.Core
             var c = Data.Card(cardId);
             if (c == null) { Say($"(만들 카드가 없다: {cardId})"); return; }
             // 만든 카드의 주인(1단계) — self(기본: 카드 데이터의 주인) · other(파티 차례로 만든 사도 다음 아군) · 사도 id. 주인이 바뀐 카드는 「카드@사도~」
-            string ok = ownerSpec == null || ownerSpec == "self" ? null : ownerSpec == "other" ? NextAlly(owner)?.Key : HeroUnit(ownerSpec) is Unit hu && !hu.Dead ? ownerSpec : null;
+            string ok = ownerSpec == null || ownerSpec == "self" ? null : ownerSpec == "other" ? NextAlly(owner)?.Key
+                : ownerSpec == "strongestAlly" ? AliveParty().OrderByDescending(AtkNow).ThenBy(u => u.Idx).FirstOrDefault()?.Key   // (엘다인 ▶E23) 공격력이 가장 높은 아군(자신 포함)
+                : HeroUnit(ownerSpec) is Unit hu && !hu.Dead ? ownerSpec : null;
             var made = (ok != null && ok != c.Hero ? GameData.WithOwner(c.Id, ok) : c.Id) + GameData.PLAIN;
             if (ok != null && ok != c.Hero) Say($"「{c.Name}」 — 주인 {HeroUnit(ok)?.Name}");
             for (int k = 0; k < n; k++)
@@ -678,6 +810,8 @@ namespace Bolzena.Core
                 if (id == "고통" && v > 0 && St(t, "고통 각인") > 0) n += (int)R.SV("고통 각인");
                 AddSt(t, id, n, SrcOf(by));
                 if ((id == "협공" || id == "반격") && by != null && by.Side == Side.Party) t.Body.Giver[id] = by.Idx;
+                // 지속 피해(고통 · 균열)를 건 사도 — 틱 피해의 약점은 그 사도 성격으로 본다(2026-10-10 카제나). 여럿이 쌓으면 마지막에 건 사도
+                if ((id == "고통" || id == "균열") && v > 0 && by != null && by.Side == Side.Party && t.Side == Side.Enemy) t.Body.Giver[id] = by.Idx;
                 if (R.IsUnitSt(id)) SetUnit(t, id, by != null && by.Side == Side.Party ? AtkNow(by) : t.Side == Side.Party && R.IsBadSt(id) ? R.FOE_DOT * EnemyDmgx : PartyAtk(null));
             }
             if (v > 0 && (id != R.STUN || t.Sealed)) StatusCue(t, id, t.Side == Side.Party);
@@ -717,15 +851,19 @@ namespace Bolzena.Core
 
         /// <summary>버리기 — 낸 사람이 고른 카드부터, 무작위면 무작위로, 고른 것이 없으면 손 끝에서부터. n &lt; 0 이면 전부.</summary>
         /// <summary>손패 소멸시키기 — 버리기처럼 고른 카드부터(PlayOpts.Discard), 이 전투에서 사라진다. 「카드가 소멸하면」 을 깨운다.</summary>
-        void BurnFx(int n, bool random, FxCtx ctx)
+        void BurnFx(int n, bool random, FxCtx ctx, Fx filter = null)
         {
-            int many = n < 0 ? Hand.Count : System.Math.Min(n, Hand.Count);
+            // 카드 거르개(엘다인 — 「손의 「마탄」 1장」) — 맞는 카드만 고르고 센다
+            bool Ok(string id) => filter == null || FxMatch(filter, id, ctx.Owner);
+            int fit = filter == null ? Hand.Count : Hand.Count(Ok);
+            int many = n < 0 ? fit : System.Math.Min(n, fit);
             var pick = !random ? discardPick : null;
             for (int i = 0; i < many && Hand.Count > 0; i++)
             {
                 int at = -1;
-                if (pick != null && pick.Count > 0) { at = Hand.IndexOf(pick[0]); pick.RemoveAt(0); }
-                if (at < 0) at = random ? Rng.Int(Hand.Count) : Hand.Count - 1;
+                while (at < 0 && pick != null && pick.Count > 0) { at = Hand.IndexOf(pick[0]); pick.RemoveAt(0); if (at >= 0 && !Ok(Hand[at])) at = -1; }
+                if (at < 0) at = PickAt(random, Ok);
+                if (at < 0) break;
                 var id = Hand[at]; Hand.RemoveAt(at);
                 Say($"「{CardOf(id).Name}」 — 태워 없앴다");
                 Exile(id, "hand", "burn");
@@ -735,16 +873,20 @@ namespace Bolzena.Core
         }
 
         /// <summary>버리기 — 버린 장수를 돌려준다.</summary>
-        int DiscardFx(int n, bool random)
+        int DiscardFx(int n, bool random, Fx filter = null, Unit owner = null)
         {
-            int many = n < 0 ? Hand.Count : Math.Min(n, Hand.Count);
+            // 카드 거르개(엘다인 — 「손의 「마탄」 모두 버림」) — 맞는 카드만 고르고 센다
+            bool Ok(string id) => filter == null || FxMatch(filter, id, owner);
+            int fit = filter == null ? Hand.Count : Hand.Count(Ok);
+            int many = n < 0 ? fit : Math.Min(n, fit);
             var pick = !random ? discardPick : null;
             var outs = new List<string>();
             for (int i = 0; i < many && Hand.Count > 0; i++)
             {
                 int at = -1;
-                if (pick != null && pick.Count > 0) { at = Hand.IndexOf(pick[0]); pick.RemoveAt(0); }
-                if (at < 0) at = random ? Rng.Int(Hand.Count) : Hand.Count - 1;
+                while (at < 0 && pick != null && pick.Count > 0) { at = Hand.IndexOf(pick[0]); pick.RemoveAt(0); if (at >= 0 && !Ok(Hand[at])) at = -1; }
+                if (at < 0) at = PickAt(random, Ok);
+                if (at < 0) break;
                 var id = Hand[at]; Hand.RemoveAt(at);
                 Discard.Add(id); outs.Add(id); CardCue(id, "hand", "discard", "discard");
             }
@@ -754,12 +896,27 @@ namespace Bolzena.Core
             {
                 if (CardOf(id) is CardView c && c.Fx.Any(f => f.K == FxK.When && f.On == "discard")) { CardWhen(id, "discard"); if (Over != null) return outs.Count; }
                 BlessDrop(id);
+                BulletDrop(id);
+                if (Over != null) return outs.Count;
                 Emit("discard", new EmitInfo { Hero = CardOf(id)?.Hero, By = Acting, Id = id });
                 if (Over != null) return outs.Count;
                 Resonance();
                 if (Over != null) return outs.Count;
             }
             return outs.Count;
+        }
+
+        /// <summary>버리기 · 태우기의 다음 자리 — 무작위면 맞는 카드 가운데 무작위, 아니면 손 끝에서부터 맞는 카드. 없으면 -1.</summary>
+        int PickAt(bool random, Func<string, bool> ok)
+        {
+            if (random)
+            {
+                var c = new List<int>();
+                for (int i = 0; i < Hand.Count; i++) if (ok(Hand[i])) c.Add(i);
+                return c.Count == 0 ? -1 : c[Rng.Int(c.Count)];
+            }
+            for (int i = Hand.Count - 1; i >= 0; i--) if (ok(Hand[i])) return i;
+            return -1;
         }
 
         /// <summary>대가를 치렀다 — 카드(한 번의 일) 하나에 한 번 「HP를 치르면」.</summary>
@@ -771,12 +928,27 @@ namespace Bolzena.Core
         }
 
         // ── 키워드 ─────────────────────────────────────────────────────
-        static readonly string[] FOE_T = { "oneEnemy", "allEnemies", "randomEnemy", "topEnemy", "lowEnemy" };
+        static readonly string[] FOE_T = { "oneEnemy", "allEnemies", "randomEnemy", "topEnemy", "lowEnemy", "farEnemy" };
 
         void StackFx(Fx f, FxCtx ctx)
         {
             var owner = ctx.Owner;
             if (owner == null) return;
+            if (StackLocked(owner.Key, f.Id)) { Say($"「{f.Id}」 — 고정돼 움직이지 않는다"); return; }   // (▶E74)
+            if (f.Carry)
+            {   // (엘다인 ▶E4) 표식 옮기기 — v 대신 일을 겪은(쓰러진) 적의 그 표식 겹
+                int n = ctx.Holder != null ? St(ctx.Holder, f.Id) : 0;
+                if (n <= 0) return;
+                f = f.Copy(); f.Carry = false; f.V = n;
+            }
+            if (f.Set != null)
+            {   // (엘다인 ▶E28) 그 값으로 정한다 — 지금 겹과의 차이만큼 쌓는다(최대 · 0 안으로). 자기 주머니(self) · 아군 표시(자신)
+                int cur = StackOf(owner.Key, f.Id);
+                int to = Math.Max(0, (int)f.Set.Value);
+                if (Kw.TryGetValue(f.Id, out var sk0) && sk0.Def.CapOrMode is int cp) to = Math.Min(to, cp);
+                if (to == cur) return;
+                f = f.Copy(); f.Set = null; f.V = to - cur;
+            }
             if (f.OfEvent > 0)
             {   // 일의 값을 저장 — 받은 피해 · 준 피해 × ofEvent 만큼(이드(재활) 꿈 · 키샤 공연)
                 int n = (int)Math.Floor(ctx.EventV * f.OfEvent);
@@ -789,6 +961,7 @@ namespace Bolzena.Core
             {   // 사도에게 붙는 사도 표시(지정 아군 · 제자 …) — 가리킨 사도마다 따로
                 foreach (var t in Resolve(ctx, f.Target ?? "self").Where(u => u.Side == Side.Party))
                 {
+                    if (kw.Def.Burn != null && t.Key == kw.Owner && f.IV > 0) { Say($"「{f.Id}」 — 주인 자신에게는 붙지 않는다"); continue; }   // 벨라 촛불은 동료에게만
                     // 한 번에 한 아군(hunt) — 새 아군에게 붙이면 다른 아군의 표시는 사라진다(옮겨 간다)
                     if (kw.Def.Hunt && f.IV > 0)
                         foreach (var o in Party)
@@ -834,7 +1007,13 @@ namespace Bolzena.Core
                     AddStack(owner.Key, f.Id, left);
                     int next = StackOf(owner.Key, f.Id);
                     got += next - before; peak = Math.Max(peak, next);
-                    StackChanged(owner.Key, f.Id, before, next, owner);
+                    if (f.IV > 0 && next < before && (kw?.Def.Wrap ?? false))
+                    {   // (엘다인 ▶E25 · E33) 순환이 한 바퀴 돌아 앞 단계로 — 「N이 되면」 이 그 단계 진입에도 돈다(앞을 0 으로 친다)
+                        StatusCue(owner, $"{f.Id} → {next}", true);
+                        Emit("stackReach", new EmitInfo { Id = f.Id, Before = 0, After = next, Owner = kw.Owner, Target = owner });
+                        if (Over == null && kw.Def.OnStage != null) StageFx(f.Id, next);
+                    }
+                    else StackChanged(owner.Key, f.Id, before, next, owner);
                     left -= next - before;
                     if (left <= 0 || next == before || StackOf(owner.Key, f.Id) >= next) break;
                 }
@@ -871,18 +1050,30 @@ namespace Bolzena.Core
         {
             var owner = ctx.Owner;
             if (owner == null) return;
+            if (!Kw.ContainsKey(f.Id ?? "") && R.ALL_ST.Contains(f.Id ?? ""))
+            {   // 상태 쓰기(엘다인 3차 — 비비 「반격을 모두 써서」) — 파티 상태(개인 층이면 그 사도), 쓴 수가 일의 값
+                var hold = R.IsHeroSt(f.Id) ? owner : Pool;
+                int have = St(hold, f.Id), take = f.All ? have : Math.Min(have, Math.Max(0, f.IV));
+                if (take > 0) { if (take >= have) DelSt(hold, f.Id); else AddSt(hold, f.Id, -take); Say($"{f.Id} {take} 을 쓴다"); }
+                ctx.EventV = take;
+                return;
+            }
             Kw.TryGetValue(f.Id, out var kw);
             if (kw != null && kw.Carrier == "hero")
             {   // 사도 표시 — 그 일을 겪은 아군(없으면 가리킨 사도 · 자신)에게서
-                var hs = ctx.Ally != null && f.Target == null ? new List<Unit> { ctx.Ally } : Resolve(ctx, f.Target ?? "self").Where(u => u.Side == Side.Party).ToList();
+                var hs = f.Who == "any" ? Party.Where(u => StackOf(u.Key, f.Id) > 0).ToList()   // 동료 누구에게 붙어 있든(벨라 존속)
+                    : ctx.Ally != null && f.Target == null ? new List<Unit> { ctx.Ally } : Resolve(ctx, f.Target ?? "self").Where(u => u.Side == Side.Party).ToList();
+                int spentAll = 0;
                 foreach (var t in hs)
                 {
                     int b0 = StackOf(t.Key, f.Id); if (b0 <= 0) continue;
+                    spentAll += Math.Min(b0, f.All ? b0 : f.IV);
                     AddStack(t.Key, f.Id, f.All ? -b0 : -f.IV);
                     MeterSpend(f.Id, b0 - StackOf(t.Key, f.Id));
                     StackChanged(kw.Owner, f.Id, b0, StackOf(t.Key, f.Id), t);
                     Emit("spend", new EmitInfo { Owner = kw.Owner, Id = f.Id, N = b0 - StackOf(t.Key, f.Id), By = Acting, Seq = ActSeq });
                 }
+                ctx.EventV = spentAll;   // 쓴 양이 일의 값(뒤 perEvent)
                 return;
             }
             if (kw != null && kw.Carrier != "self")
@@ -906,7 +1097,9 @@ namespace Bolzena.Core
                 int take = f.Pick ? (before <= 0 ? 0 : Math.Max(1, Math.Min(before, ctx.SpendPick ?? before))) : f.All ? before : f.IV;
                 AddStack(owner.Key, f.Id, -take);
                 int after2 = StackOf(owner.Key, f.Id);
-                if (f.Pick) ctx.EventV = before - after2;
+                if (f.Pick || f.All) ctx.EventV = before - after2;   // 쓴 양 = 일의 값(전부 써도 — 엘다인 3차)
+                if (f.Pick && owner.Key == TraceHero) { TraceAdd("pick"); if (after2 > 0) TraceAdd("pickPartial"); }   // (▶E30) 고른 만큼에서 전부가 아닌 수
+                if (f.Pick && f.Loop) { ctx.LoopId = f.Id; ctx.LoopMax = f.Max > 0 ? f.Max : 12; ctx.LoopKeep = after2; }   // (엘다인 ▶E19) 이어 쓰기 — 남겨 둔 몫 위로 새로 얻은 것만
                 MeterSpend(f.Id, before - after2);
                 StackChanged(owner.Key, f.Id, before, after2, owner);
                 if (before > after2) Emit("spend", new EmitInfo { Owner = Kw.TryGetValue(f.Id, out var sk) ? sk.Owner : owner.Key, Id = f.Id, N = before - after2, By = Acting, Seq = ActSeq });
@@ -941,6 +1134,8 @@ namespace Bolzena.Core
                 Emit("stackReach", new EmitInfo { Id = id, Before = before, After = after, Owner = ownerKey, Target = holder });
                 if (Kw.TryGetValue(id, out var kw) && kw.Def.Mode && before <= 0 && Over == null) KwSwitch(kw, holder);
                 if (kw != null && kw.Def.OnMax != null && Over == null) FormOnMax(kw, before, after);
+                if (Forms.Count > 0 && Over == null) FormStackMake(id, before, after);
+                if (Over == null && Kw.TryGetValue(id, out var sk2) && sk2.Def.OnStage != null) StageFx(id, after);   // 순환 칸 덤(▶E73)
             }
             else if (before > 0 && after <= 0) KwGone(id, Kw.TryGetValue(id, out var k2) ? k2.Owner : ownerKey, holder, false);
         }

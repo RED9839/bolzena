@@ -648,11 +648,21 @@ namespace Bolzena.View
                 case "기절": return "ic_star";
             }
             if (c.Kind == "power") return "ic_spark";   // 강화 칩 — 켜진 강화 카드
+            if (c.Kind == "form") return null;   // 변신 · 태세 — 이름 · 남은 턴 글로
             if (c.Kind == "key") return null;
             return c.Kind == "debuff" ? "ic_weak" : "ic_up";
         }
 
-        public static Color KindColor(string kind) => kind == "debuff" ? new Color(1f, 0.45f, 0.45f) : kind == "key" ? new Color(1f, 0.8f, 0.42f) : kind == "power" ? new Color(0.78f, 0.62f, 1f) : kind == "empower" ? Bolzena.UI.Tone.Emp : new Color(0.45f, 0.9f, 0.62f);
+        /// <summary>사도 고유 효과 칩의 짧은 이름 — 첫 낱말(4자까지, 길면 3자) · 한 글자만 보이면 무엇인지 몰랐다(2026-10-11 사용자 「적에게 걸린 효과가 안 나와 있음」). 전체 이름 · 풀이는 툴팁.</summary>
+        public static string ShortName(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return "";
+            var w = id.Split(' ')[0].Trim('「', '」', ',');
+            if (w.Length == 0) w = id;
+            return w.Length <= 4 ? w : w.Substring(0, 3);
+        }
+
+        public static Color KindColor(string kind) => kind == "debuff" ? new Color(1f, 0.45f, 0.45f) : kind == "key" ? new Color(1f, 0.8f, 0.42f) : kind == "power" ? new Color(0.78f, 0.62f, 1f) : kind == "empower" ? Bolzena.UI.Tone.Emp : kind == "form" ? new Color(0.95f, 0.81f, 0.48f) : new Color(0.45f, 0.9f, 0.62f);
 
         // 강화 칩 반짝임 — 강화가 새로 켜지거나 겹이 늘면(엔진 쪽지 powerOn 과 같은 때) 그 칩이 잠깐 빛난다
         readonly Dictionary<string, string> powerSeen = new Dictionary<string, string>();
@@ -701,9 +711,11 @@ namespace Bolzena.View
                 var icon = IconOf(c);
                 string label = c.Kind == "empower"
                     ? $"<size=80%>{c.Id}</size> <color={Bolzena.UI.Tone.EmpTag}>{c.Value}</color>"   // 다음 카드 강화 — 「다음 카드 강화 ×1.5」
+                    : c.Kind == "form"
+                    ? $"<color=#F2CF7A><size=80%>{c.Id}</size></color> " + (c.Turns > 0 ? $"{c.Turns}턴" : "<size=80%>계속</size>")   // 변신 · 태세 — 「성전 3턴」
                     : c.Kind == "power"
                     ? $"<size=80%>{c.Id}</size>" + (string.IsNullOrEmpty(c.Value) ? "" : $" ×{c.Value}")   // 강화 칩 — 카드 이름 · 겹
-                    : (icon == null ? $"<color=#{ColorUtility.ToHtmlStringRGB(Color.Lerp(Color.white, KindColor(c.Kind), 0.5f))}>{c.Id.Substring(0, 1)}</color> " : "") + c.Value + (c.Turns > 0 ? $"<size=70%><color=#9aa6c8>·{c.Turns}</color></size>" : "");
+                    : (icon == null ? $"<color=#{ColorUtility.ToHtmlStringRGB(Color.Lerp(Color.white, KindColor(c.Kind), 0.5f))}>{(c.Kind == "key" ? $"<size=80%>{ShortName(c.Id)}</size>" : c.Id.Substring(0, 1))}</color> " : "") + c.Value + (c.Turns > 0 ? $"<size=70%><color=#9aa6c8>·{c.Turns}</color></size>" : "");
                 var t = Make.Text("v", chip, label, Vector3.zero, size * 0.62f, order + 2, Color.white, TextAlignmentOptions.Left);
                 Make.Outline(t, 0.3f, Color.black);
                 t.ForceMeshUpdate();

@@ -97,7 +97,7 @@ namespace Bolzena.RunUI
                 var scont = Ui.Scroll(strip, out var ssr, true);
                 int sp = (int)((stripH - Theme.C(150, 124)) / 2);
                 Ui.Row(scont, 10, TextAnchor.MiddleLeft, new RectOffset(14, 14, sp, sp), false, false);
-                var shown = Roster.All.Where(h => (st.Nature == null || h.nature == st.Nature) && (st.Role == null || h.role == st.Role) && (!st.PlayableOnly || h.Playable))
+                var shown = Roster.Players.Where(h => (st.Nature == null || h.nature == st.Nature) && (st.Role == null || h.role == st.Role) && (!st.PlayableOnly || h.Playable))
                     .OrderByDescending(h => h.Playable).ThenBy(h => h.ko, StringComparer.Ordinal).ToList();
                 int gi = 0;
                 foreach (var h in shown) GridHero(scont, st, h, root, back, gi++);
@@ -127,7 +127,7 @@ namespace Bolzena.RunUI
                 grid.spacing = new Vector2(10, 10);
                 grid.padding = new RectOffset(16, 16, 16, 16);
                 grid.childAlignment = TextAnchor.UpperCenter;
-                var list = Roster.All.Where(h => (st.Nature == null || h.nature == st.Nature) && (st.Role == null || h.role == st.Role) && (!st.PlayableOnly || h.Playable))
+                var list = Roster.Players.Where(h => (st.Nature == null || h.nature == st.Nature) && (st.Role == null || h.role == st.Role) && (!st.PlayableOnly || h.Playable))
                     .OrderByDescending(h => h.Playable).ThenBy(h => h.ko, StringComparer.Ordinal).ToList();
                 int i = 0;
                 foreach (var h in list) GridHero(content, st, h, root, back, i++);
@@ -353,7 +353,8 @@ namespace Bolzena.RunUI
                     var picked = st.Slots.Where(k => k != null).Select(Roster.ByKey).ToList();
                     var nat = picked.Count == 0 ? "사도를 고르면 셋의 성격이 여기 뜹니다." : string.Join(" · ", picked.GroupBy(x => x.nature).Select(g => $"<color=#{ColorUtility.ToHtmlStringRGB(Theme.NatureOf(g.Key))}>{g.Key}</color> {g.Count()}"));
                     Ui.Text(box.transform, nat, 19, Theme.Ink).Pref(-1, 30);
-                    var deck = picked.Where(x => x.Playable).SelectMany(x => P.Data.Hero(x.CoreId).Starter).Select(id => P.Data.Card(id)?.Name ?? id);
+                    // 같은 카드 2장(가벼운 덱의 1코 기본 공격 — 2026-10-11)은 「이름 ×2」 로
+                    var deck = picked.Where(x => x.Playable).SelectMany(x => P.Data.Hero(x.CoreId).Starter).GroupBy(id => id).Select(g => (P.Data.Card(g.Key)?.Name ?? g.Key) + (g.Count() > 1 ? $" ×{g.Count()}" : ""));
                     Ui.Text(box.transform, picked.Count == 0 ? "사도마다 시작 카드 넉 장. 고유 카드는 싸우며 은총으로 얻습니다." : "시작 덱  " + string.Join(" · ", deck), 17, Theme.Sub).Pref(-1, 80);
                 }
                 return;
@@ -367,8 +368,7 @@ namespace Bolzena.RunUI
             nm.rectTransform.At(0, 1, fz + 18, -4, 320, 42);
             nm.enableAutoSizing = true; nm.fontSizeMin = 18; nm.fontSizeMax = Theme.FsXl;
             nm.textWrappingMode = TextWrappingModes.NoWrap;
-            string stars = new string('★', Mathf.Clamp(h.star, 1, 3));
-            var sub = Ui.Text(top, $"<color=#{ColorUtility.ToHtmlStringRGB(Theme.NatureOf(h.nature))}>{h.nature}</color> · {h.race} · {h.role}  <color={Theme.GoldTag}>{stars}</color>", Theme.FsSm, Theme.Sub);
+            var sub = Ui.Text(top, $"<color=#{ColorUtility.ToHtmlStringRGB(Theme.NatureOf(h.nature))}>{h.nature}</color> · {h.race} · {h.role}", Theme.FsSm, Theme.Sub);
             sub.rectTransform.At(0, 1, fz + 20, -48, 330, 26);
             sub.textWrappingMode = TextWrappingModes.NoWrap;
             var blurb = Ui.Text(box.transform, h.blurb ?? "", Theme.FsSm - 1, Theme.Sub, TextAlignmentOptions.TopLeft);
@@ -381,9 +381,11 @@ namespace Bolzena.RunUI
                 string body = "";
                 // 좁은 칸이라 이름만 — 글(수치 전부)은 아래 알약을 누르면 판으로(「자세히」 따로 없음 · core CardText.Traits)
                 foreach (var g in P.Text.Traits(d).GroupBy(x => x.Kind))
-                    body += $"<color=#F2CF7A>{g.Key}</color>  {string.Join(" · ", g.Select(x => $"「{x.Name}」"))}\n";
-                body += $"<color=#F2CF7A>시작 카드</color>  {string.Join(" · ", d.Starter.Select(id => P.Data.Card(id)?.Name ?? id))}\n";
-                body += $"<color=#F2CF7A>고유 카드</color>  {string.Join(" · ", P.Data.UniquesOf(d.Id).Where(u => !d.Starter.Contains(u)).Select(id => P.Data.Card(id)?.Name ?? id))}";
+                    body += $"<color=#F2CF7A>{(g.Key == "고유 효과" ? "고유 능력" : g.Key)}</color>  {string.Join(" · ", g.Select(x => $"「{x.Name}」"))}\n";
+                body += $"<color=#F2CF7A>시작 카드 {d.Starter.Count}장</color>  {string.Join(" · ", d.Starter.GroupBy(id => id).Select(g => (P.Data.Card(g.Key)?.Name ?? g.Key) + (g.Count() > 1 ? $" ×{g.Count()}" : "")))}\n";   // 같은 카드 2장은 「×2」
+                var basicsOut = P.Data.Cards.Values.Where(c => c.Hero == d.Id && !c.Unique && !c.Token && System.Text.RegularExpressions.Regex.IsMatch(c.Id, @"_s\d+$") && !d.Starter.Contains(c.Id)).Select(c => c.Name);   // 시작 덱에서 뺀 기본 카드 — 은총으로 드물게
+                if (basicsOut.Any()) body += $"<color=#F2CF7A>기본 카드(은총)</color>  {string.Join(" · ", basicsOut)}\n";
+                body += $"<color=#F2CF7A>은총 카드</color>  {string.Join(" · ", P.Data.UniquesOf(d.Id).Where(u => !d.Starter.Contains(u)).Select(id => P.Data.Card(id)?.Name ?? id))}";
                 var bt = Ui.Text(box.transform, body, Theme.FsSm, Theme.Ink, TextAlignmentOptions.TopLeft);
                 bt.Pref(-1, 120, -1, 1);
                 bt.enableAutoSizing = true; bt.fontSizeMin = 11; bt.fontSizeMax = Theme.FsSm;

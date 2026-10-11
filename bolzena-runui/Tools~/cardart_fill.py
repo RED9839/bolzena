@@ -14,18 +14,26 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import cardart_pool as P
 
+# 2026-10-11 사용자 「공격 카드인데 미니미, 스킬 카드인데 스탠딩이 많다」: 공격 = 스탠딩 · 싸우는 그림(장면) — SD 미니미(일정 · 초상) 안 씀,
+#   스킬 = SD 미니미 · 돕는 · 지키는 장면 — 스탠딩 · 싸우는 SD 안 씀, 강화 = 결의 · 변신(물건 · 어사이드). 목록에 없는 갈래는 고르지 않는다.
 PREF = {
-    "공격": ["btn", "cg", "story", "hilite", "theme", "rogue", "aside3", "aside2", "grad", "evicon", "schedule", "clone", "prop", "present", "aside1", "icon", "head", "stand_full", "stand_face"],
-    "스킬": ["story", "schedule", "cg", "hilite", "rogue", "aside2", "aside3", "present", "prop", "aside1", "evicon", "grad", "theme", "head", "icon", "clone", "stand_full", "stand_face", "btn"],
-    "강화": ["aside1", "prop", "present", "grad", "evicon", "aside2", "aside3", "story", "schedule", "cg", "hilite", "rogue", "theme", "head", "icon", "clone", "stand_face", "stand_full", "btn"],
+    "공격": ["stand_full", "cg", "hilite", "story", "btn", "theme", "rogue", "aside3", "aside2", "grad", "evicon", "prop", "present", "aside1"],
+    "스킬": ["story", "schedule", "cg", "hilite", "present", "prop", "aside2", "aside3", "aside1", "evicon", "rogue", "theme", "grad"],
+    "강화": ["aside1", "prop", "present", "grad", "evicon", "aside2", "aside3", "story", "cg", "hilite", "rogue", "theme"],
 }
+# 같은 사도의 기본 공격 두 번째 장(가벼운 덱 1코 · 1코, 무거운 덱 1코 · 2코) — 첫 장(스탠딩 상반신)과 다른 그림: 스탠딩 전신 · 싸우는 그림
+BASIC2 = ["btn", "stand_full", "hilite", "cg", "story", "theme", "rogue"]
 # 기본 카드(2026-10-09 전수 검토 「상반신 · 얼굴 확대가 사실상 같은 그림」): 한 사도에 스탠딩 상반신과 얼굴 확대를 같이 쓰지 않는다(take 가 막는다).
 #   공격 = 싸우는 SD · 스탠딩 상반신 · 하이라이트 · 만화 컷 / 방어 · 회복 = SD 일정 · 액자 · 하이라이트 · 전신 — 얼굴 확대는 다른 것이 하나도 없을 때만
 BASIC = {
     "공격": ["btn", "stand_card", "hilite", "cg", "theme", "story", "rogue", "stand_full", "clone", "icon", "head", "schedule", "aside3", "aside2", "grad", "present", "prop", "aside1", "stand_face"],
     "방어": ["schedule", "story", "hilite", "stand_full", "theme", "cg", "icon", "head", "rogue", "present", "prop", "aside1", "aside2", "aside3", "grad", "clone", "btn", "stand_card", "stand_face"],
 }
-TOKEN = ["aside1", "aside2", "aside3", "prop", "present", "evicon", "grad", "rogue", "story", "cg", "hilite", "schedule", "theme", "head", "icon", "clone", "stand_full", "btn", "stand_face", "stand_card"]
+# 생성 카드는 물건 · 아이콘 그림부터 — 종류 규칙(공격엔 미니미 없음 · 스킬엔 스탠딩 없음)은 PREF 와 같게
+TOKEN = {
+    "공격": ["aside3", "aside2", "evicon", "prop", "present", "aside1", "grad", "btn", "cg", "hilite", "story", "rogue", "theme"],
+    "스킬": ["aside1", "aside2", "aside3", "prop", "present", "evicon", "grad", "story", "schedule", "cg", "hilite", "rogue", "theme"],
+}
 # 이름에 물건 낱말이 있으면 물건 그림(애장품 · 선물)부터
 PROP_WORDS = re.compile(r"케이크|간식|과자|사탕|쿠키|빵|젤리|주스|우유|두유|차 |커피|도시락|밥|떡|꽃|책|편지|상자|선물|병|단지|인형|스티커|모자|가방|사과|당근|물고기|생선|메모|지도|깃펜|두루마리|열쇠|보석|돈|동전|금화|통조림|폭탄")
 C_DEFAULT = {"story": [4.3, 3.5, 0.6], "schedule": [5, 5.6, 0.6], "cg": [5, 5, 1.0]}
@@ -59,7 +67,7 @@ def rank(cid):
     p = picks.get(cid, {})
     if cid in P.LOW:
         return 0
-    if (p.get("file") or p.get("icon")) and not p.get("auto"):
+    if (p.get("file") or p.get("icon") or p.get("keep")) and not p.get("auto"):   # keep(옛 규칙 아이콘으로 둠)도 손 줄
         return 1
     if p.get("auto"):
         return 2
@@ -83,9 +91,11 @@ for hid, h in sorted(P.heroes().items()):
     # 1) 그대로 두는 것(고유 · 생성) — 순위가 높은 것이 먼저 자리를 잡는다
     sched = next((it["key"] for it in P.stock(art) if it["cat"] == "schedule"), None)
     used.add(P.ident(f"@stand/{art}/card"))
+    basic2 = []
     for cid in h["basic"]:
         c = h["cards"][cid]
         if c.get("type") == "공격":
+            # 2026-10-11 사용자: 기본 공격은 1코든 2코든 그 사도의 같은 그림 하나(가벼운 덱은 같은 카드 2장) — 두 번째 기본 공격도 스탠딩 그대로
             stats["기본 공격 = 스탠딩"] += 1
             continue
         if sched:
@@ -102,7 +112,13 @@ for hid, h in sorted(P.heroes().items()):
             keep[cid] = k   # 손으로 고른 고유 짝은 바꾸지 않는다 — 기본 스킬과 같은 그림이 된다(보고)
             overlap.append(cid)
             continue
-        if k is None or k.startswith("pic:") or (k in P.AVOID and cid not in P.LOW) or P.ident(k) in used or (k.endswith("/card") and cid in h["token"]):
+        typ = h["cards"][cid].get("type")
+        allow = (TOKEN if cid in h["token"] else PREF).get(typ, PREF["스킬"]) + ["adm"]
+        bad_kind = k is not None and not k.startswith("pic:") and cid not in P.LOW and P.cat_of(k) not in allow   # 종류에 안 맞는 그림(공격에 미니미 · 스킬에 스탠딩)
+        if bad_kind:
+            picks.pop(cid, None)
+        # 2026-10-11: 옛 규칙 아이콘(짝 표에 없는 카드 — rank 3)도 다시 고른다. 원작 그림(장면 · 물건)이 종류 규칙으로 먼저 가고, 아이콘은 그 뒤
+        if k is None or bad_kind or rank(cid) == 3 or k.startswith("pic:") or (k in P.AVOID and cid not in P.LOW) or P.ident(k) in used or (k.endswith("/card") and cid in h["token"]):
             need.append(cid)
             continue
         keep[cid] = k
@@ -112,20 +128,20 @@ for hid, h in sorted(P.heroes().items()):
 
     def take(cid, prefs, allow_card):
         c = h["cards"][cid]
-        if PROP_WORDS.search(c.get("name", "")):
+        if PROP_WORDS.search(c.get("name", "")) and prefs is not BASIC2:   # 기본 공격(인형 휘두르기 …)은 물건 그림으로 가지 않는다
             prefs = ["prop", "present"] + prefs
-        cands = [it for it in pool if P.ident(it["key"]) not in used and (allow_card or it["cat"] != "stand_card")
+        cands = [it for it in pool if it["cat"] in prefs and P.ident(it["key"]) not in used and (allow_card or it["cat"] != "stand_card")
                  and not (it["cat"] in ("stand_card", "stand_face") and ({f"@stand/{art}/card", f"@stand/{art}/face"} & used))]
         if not cands:
             return None
         rk = lambda it: (prefs.index(it["cat"]) if it["cat"] in prefs else 99, it["key"])
         return min(cands, key=rk)
 
-    fills = []
+    fills = [(cid, BASIC2, False) for cid in basic2]
     for cid in sorted([c for c in need if c in h["unique"]], key=order):
         fills.append((cid, PREF.get(h["cards"][cid].get("type"), PREF["스킬"]), False))
     for cid in sorted([c for c in need if c in h["token"]], key=order):
-        fills.append((cid, TOKEN, True))
+        fills.append((cid, TOKEN.get(h["cards"][cid].get("type"), TOKEN["스킬"]), False))
     for cid, prefs, allow_card in fills:
         it = take(cid, prefs, allow_card)
         c = h["cards"][cid]

@@ -1,0 +1,593 @@
+{
+ "마녀/마카샤": [
+  {
+   "name": "되감은 시계",
+   "when": {
+    "on": "break",
+    "who": "any"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "운명의 시계",
+     "v": 1,
+     "target": "topEnemy"
+    }
+   ]
+  },
+  {
+   "name": "번지는 결말",
+   "when": {
+    "on": "kill"
+   },
+   "fx": [
+    {
+     "k": "perStack",
+     "id": "운명의 시계",
+     "n": 1
+    },
+    {
+     "k": "dmg",
+     "ratio": 0.45,
+     "base": "def",
+     "target": "allEnemies"
+    }
+   ]
+  }
+ ],
+ "마녀/벨벳": [
+  {
+   "name": "스스로 지키는 힘",
+   "when": {
+    "on": "hurt"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "근력 강화",
+     "v": 1
+    },
+    {
+     "k": "gauge",
+     "v": 3
+    }
+   ]
+  },
+  {
+   "name": "근육 시범",
+   "when": {
+    "on": "break",
+    "who": "any"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "근력 강화",
+     "v": 1
+    },
+    {
+     "k": "gauge",
+     "v": 10
+    }
+   ]
+  }
+ ],
+ "마녀/아사나": [
+  {
+   "name": "시범 동작",
+   "when": {
+    "on": "play"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "시범 자세",
+     "v": 1
+    },
+    {
+     "k": "shield",
+     "ratio": 0.03
+    }
+   ]
+  },
+  {
+   "name": "심마체",
+   "when": {
+    "on": "play",
+    "who": "other"
+   },
+   "fx": [
+    {
+     "k": "ifStack",
+     "id": "시범 자세",
+     "n": 1
+    },
+    {
+     "k": "spend",
+     "id": "시범 자세",
+     "all": true
+    },
+    {
+     "k": "stack",
+     "id": "마력 호흡",
+     "v": 1
+    },
+    {
+     "k": "shield",
+     "ratio": 0.09
+    }
+   ]
+  }
+ ],
+ "수인/버터": [
+  {
+   "name": "참다 참다",
+   "when": {
+    "on": "blocked"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "옐로카드",
+     "v": 1
+    }
+   ]
+  },
+  {
+   "name": "만반잘부",
+   "when": {
+    "on": "crit"
+   },
+   "fx": [
+    {
+     "k": "empower",
+     "ratio": 0.2,
+     "who": "any"
+    }
+   ]
+  }
+ ],
+ "수인/티그": [
+  {
+   "name": "이어 베기",
+   "when": {
+    "on": "play",
+    "type": "공격"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "장작 패기",
+     "v": 1
+    },
+    {
+     "k": "ifStack",
+     "id": "장작 패기",
+     "n": 3
+    },
+    {
+     "k": "dmg",
+     "ratio": 0.26,
+     "target": "allEnemies"
+    }
+   ]
+  },
+  {
+   "name": "흐름 끊김",
+   "when": {
+    "on": "play",
+    "type": "스킬"
+   },
+   "fx": [
+    {
+     "k": "spend",
+     "id": "장작 패기",
+     "v": 2
+    }
+   ]
+  }
+ ],
+ "엘프/로네_시장": [
+  {
+   "name": "단골 배달",
+   "when": {
+    "on": "play",
+    "who": "other",
+    "type": "스킬"
+   },
+   "fx": [
+    {
+     "k": "make",
+     "id": "로네_시장_t1",
+     "v": 1
+    }
+   ]
+  },
+  {
+   "name": "먹지 못한 돈까스",
+   "when": {
+    "on": "exhaust"
+   },
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 0.3,
+     "target": "randomEnemy"
+    }
+   ]
+  }
+ ],
+ "엘프/아멜리아_R41": [
+  {
+   "name": "이 몸의 시제품",
+   "when": {
+    "on": "play",
+    "minCost": 1
+   },
+   "fx": [
+    {
+     "k": "make",
+     "id": "아멜리아_R41_t1",
+     "v": 1
+    }
+   ]
+  },
+  {
+   "name": "폐기 처분",
+   "when": {
+    "on": "exhaust"
+   },
+   "fx": [
+    {
+     "k": "draw",
+     "v": 1
+    },
+    {
+     "k": "shield",
+     "ratio": 0.06
+    }
+   ]
+  }
+ ],
+ "엘프/엘레나": [
+  {
+   "name": "드론 정비",
+   "when": {
+    "on": "play",
+    "type": "스킬"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "냥이 드론",
+     "v": 1
+    }
+   ]
+  },
+  {
+   "name": "맑은 눈의 엘레나",
+   "when": {
+    "on": "hit",
+    "who": "other"
+   },
+   "fx": [
+    {
+     "k": "ifFoe",
+     "id": "충격"
+    },
+    {
+     "k": "stack",
+     "id": "냥이 드론",
+     "v": 1
+    }
+   ]
+  }
+ ],
+ "엘프/이드_재활": [
+  {
+   "name": "꿈속의 아픔",
+   "when": {
+    "on": "hurt"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "악몽",
+     "v": 1
+    },
+    {
+     "k": "shield",
+     "ratio": 0.04
+    }
+   ]
+  },
+  {
+   "name": "환상의 짝꿍",
+   "when": {
+    "on": "play",
+    "type": "스킬",
+    "who": "other"
+   },
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 0.14
+    }
+   ]
+  }
+ ],
+ "엘프/칸나": [
+  {
+   "name": "반려 도장 쾅",
+   "when": {
+    "on": "reserveFire",
+    "who": "any"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "반려 도장",
+     "v": 1
+    },
+    {
+     "k": "stack",
+     "id": "포격 조준",
+     "v": 1,
+     "target": "topEnemy"
+    }
+   ]
+  },
+  {
+   "name": "명포수",
+   "when": {
+    "on": "fightStart"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "포격 조준",
+     "v": 2,
+     "target": "topEnemy"
+    }
+   ]
+  }
+ ],
+ "요정/샤샤": [
+  {
+   "name": "같이 마셔요",
+   "when": {
+    "on": "play",
+    "type": "공격",
+    "who": "any",
+    "every": 2
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "텀블러 수압",
+     "v": 1
+    }
+   ]
+  },
+  {
+   "name": "남겨 둔 물",
+   "when": {
+    "on": "break"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "텀블러 수압",
+     "v": 2
+    }
+   ]
+  }
+ ],
+ "요정/에르핀": [
+  {
+   "name": "케이크 주문",
+   "when": {
+    "on": "play",
+    "type": "공격",
+    "who": "any",
+    "every": 2
+   },
+   "fx": [
+    {
+     "k": "make",
+     "id": "에르핀_cake",
+     "v": 1
+    }
+   ]
+  },
+  {
+   "name": "배고프면 예민",
+   "when": {
+    "on": "always"
+   },
+   "conds": [
+    {
+     "c": "stack",
+     "id": "배부름",
+     "n": 1,
+     "not": true
+    }
+   ],
+   "fx": [
+    {
+     "k": "dealtMod",
+     "v": 0.2,
+     "target": "self"
+    }
+   ]
+  }
+ ],
+ "요정/캬롯": [
+  {
+   "name": "꼼꼼한 정원사",
+   "when": {
+    "on": "play",
+    "type": "공격"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "씨앗",
+     "v": 1,
+     "target": "strongestAlly"
+    }
+   ]
+  },
+  {
+   "name": "햇님이",
+   "when": {
+    "on": "reserveFire"
+   },
+   "fx": [
+    {
+     "k": "shield",
+     "ratio": 0.5
+    }
+   ]
+  }
+ ],
+ "용족/다야_퓨어샤인": [
+  {
+   "name": "퓨어☆포즈",
+   "when": {
+    "on": "play",
+    "who": "any",
+    "nth": 4
+   },
+   "fx": [
+    {
+     "k": "heal",
+     "ratio": 0.27
+    },
+    {
+     "k": "stack",
+     "id": "퓨어☆영역",
+     "v": 1
+    }
+   ]
+  },
+  {
+   "name": "반짝반짝 넘침",
+   "when": {
+    "on": "overheal",
+    "pct": 0.8
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "반짝임",
+     "v": 1
+    }
+   ]
+  }
+ ],
+ "유령/벨라": [
+  {
+   "name": "타오르는 존속",
+   "when": {
+    "on": "guardSum"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "존속",
+     "v": 1,
+     "ofEvent": 0.02
+    },
+    {
+     "k": "shield",
+     "ratio": 0.03
+    }
+   ]
+  },
+  {
+   "name": "우린 이미 완전한 존재들",
+   "when": {
+    "on": "always"
+   },
+   "conds": [
+    {
+     "c": "status",
+     "id": "끈기",
+     "n": 1
+    }
+   ],
+   "fx": [
+    {
+     "k": "dealtMod",
+     "v": 0.15,
+     "target": "allAllies",
+     "run": true
+    }
+   ]
+  }
+ ],
+ "유령/스피키_메이드": [
+  {
+   "name": "뭐든 빨아들이기",
+   "when": {
+    "on": "discard",
+    "who": "any"
+   },
+   "fx": [
+    {
+     "k": "stack",
+     "id": "잡동사니",
+     "v": 1
+    }
+   ]
+  },
+  {
+   "name": "자동 청소 모드에요오!",
+   "when": {
+    "on": "ult"
+   },
+   "fx": [
+    {
+     "k": "dealtMod",
+     "v": 0.15,
+     "target": "otherAllies"
+    }
+   ]
+  }
+ ],
+ "정령/아르코": [
+  {
+   "name": "엇박 따라 밟기",
+   "when": {
+    "on": "play",
+    "who": "other"
+   },
+   "fx": [
+    {
+     "k": "ifPrevSame",
+     "not": true
+    },
+    {
+     "k": "stack",
+     "id": "스텝",
+     "v": 1
+    }
+   ]
+  },
+  {
+   "name": "음파 스텝",
+   "when": {
+    "on": "play",
+    "type": "공격"
+   },
+   "fx": [
+    {
+     "k": "dmg",
+     "ratio": 0.44,
+     "target": "randomEnemy"
+    }
+   ]
+  }
+ ]
+}

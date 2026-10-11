@@ -1,0 +1,818 @@
+{
+ "$comment": "클론 보스로만 나오는 사도(2026-10-11 엘다인 20명 전환). 플레이어 사도 목록에는 없다 — 보스 클론(enemies.clone)이 쓰는 이름 · 종족 · 성격 · 성급 · 고학년과, 고학년 글에 필요한 고유 효과 · 변신 이름만. 사도 원본(카드 · 패시브 · 장비)은 C:/projects/_backup/heroes_non_eldain_20261011/heroes/<종족>/<id>.json. 되살리기: _measure/엘다인_전환/되살리기.md",
+ "cloneHeroes": [
+  {
+   "id": "그윈",
+   "name": "그윈",
+   "nature": "냉정",
+   "race": "수인",
+   "role": "서포터",
+   "style": "표적형",
+   "star": 3,
+   "hp": 650,
+   "atk": 100,
+   "def": 50,
+   "crit": 5,
+   "blurb": "얼음 대륙 글레이시아에서 동생 델리아와 함께 표류해 온 황제펭귄 탐험가.",
+   "keyword": {
+    "name": "깃발",
+    "desc": "먼저 찜한 적에게 꽂는 탐험 깃발",
+    "carrier": "enemy",
+    "cap": 3
+   },
+   "ult": {
+    "name": "극지귀가길",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "status",
+      "id": "둔화",
+      "v": 2,
+      "target": "allEnemies"
+     },
+     {
+      "k": "dmg",
+      "ratio": 0.3,
+      "target": "randomEnemy",
+      "hits": 4
+     },
+     {
+      "k": "stack",
+      "id": "깃발",
+      "v": 2,
+      "target": "markedEnemy"
+     }
+    ]
+   }
+  },
+  {
+   "id": "델리아",
+   "name": "델리아",
+   "nature": "순수",
+   "race": "수인",
+   "role": "딜러",
+   "style": "대가형",
+   "star": 3,
+   "hp": 650,
+   "atk": 140,
+   "def": 40,
+   "crit": 10,
+   "blurb": "언니 그윈을 따라 엘리아스 수인 마을에 자리 잡은 꼬마 펭귄.",
+   "keyword": {
+    "name": "수족열증",
+    "desc": "발끝부터 화끈거리는 열",
+    "carrier": "enemy",
+    "cap": 3
+   },
+   "ult": {
+    "name": "도와줘 친구들아!",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 1.3,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "기절",
+      "v": 1,
+      "target": "oneEnemy"
+     },
+     {
+      "k": "stack",
+      "id": "수족열증",
+      "v": 1,
+      "target": "allEnemies"
+     }
+    ]
+   }
+  },
+  {
+   "id": "디아나",
+   "name": "디아나",
+   "nature": "광기",
+   "race": "수인",
+   "role": "서포터",
+   "style": "회복형",
+   "star": 3,
+   "hp": 650,
+   "atk": 100,
+   "def": 50,
+   "crit": 5,
+   "blurb": "눈을 감은 채 웃는 수인 마을의 촌장이자 현자.",
+   "keyword": {
+    "name": "기혈",
+    "desc": "몸 안을 도는 은퇴한 무인의 기",
+    "carrier": "self",
+    "cap": 5
+   },
+   "ult": {
+    "name": "진정한 치료법",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.1,
+      "target": "allEnemies",
+      "hits": 4
+     },
+     {
+      "k": "status",
+      "id": "둔화",
+      "v": 2,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "기절",
+      "v": 1,
+      "target": "oneEnemy"
+     }
+    ]
+   }
+  },
+  {
+   "id": "루포",
+   "name": "루포",
+   "nature": "활발",
+   "race": "수인",
+   "role": "딜러",
+   "style": "계산형",
+   "star": 3,
+   "hp": 650,
+   "atk": 140,
+   "def": 40,
+   "crit": 10,
+   "blurb": "사료스탕스의 브레인이자 티그의 오른팔.",
+   "keyword": {
+    "name": "계획",
+    "desc": "루포 님의 치밀한 작전",
+    "carrier": "self",
+    "cap": 4
+   },
+   "ult": {
+    "name": "오의 여우회전!",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.15,
+      "target": "allEnemies",
+      "hits": 4
+     },
+     {
+      "k": "stack",
+      "id": "계획",
+      "v": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "리온",
+   "name": "리온",
+   "nature": "우울",
+   "race": "수인",
+   "role": "탱커",
+   "style": "버티형",
+   "star": 3,
+   "hp": 810,
+   "atk": 115,
+   "def": 48,
+   "crit": 5,
+   "blurb": "정의로운 히어로 「스핑크스」를 꿈꾸는 사자 수인.",
+   "keyword": {
+    "name": "유죄",
+    "desc": "리온이 내린 판결",
+    "carrier": "enemy",
+    "cap": 3
+   },
+   "ult": {
+    "name": "즉결심판",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "strip",
+      "target": "allEnemies"
+     },
+     {
+      "k": "dmg",
+      "ratio": 0.5,
+      "base": "def",
+      "target": "allEnemies",
+      "hits": 3
+     },
+     {
+      "k": "status",
+      "id": "취약",
+      "v": 1,
+      "target": "allEnemies"
+     }
+    ]
+   }
+  },
+  {
+   "id": "마고",
+   "name": "마고",
+   "nature": "순수",
+   "race": "수인",
+   "role": "서포터",
+   "style": "회복형",
+   "star": 2,
+   "hp": 590,
+   "atk": 86,
+   "def": 47,
+   "crit": 5,
+   "blurb": "동물 친구들을 돌보는 산양 목장주.",
+   "keyword": {
+    "name": "목장 친구",
+    "desc": "곁에 모여드는 작은 동물들",
+    "carrier": "self",
+    "cap": 4
+   },
+   "ult": {
+    "name": "메⋯에~류겐!",
+    "cost": 300,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 3,
+      "base": "def",
+      "target": "oneEnemy"
+     },
+     {
+      "k": "tough",
+      "v": 2
+     },
+     {
+      "k": "status",
+      "id": "기절",
+      "v": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "모모",
+   "name": "모모",
+   "nature": "활발",
+   "race": "수인",
+   "role": "딜러",
+   "style": "소환형",
+   "star": 3,
+   "hp": 650,
+   "atk": 140,
+   "def": 40,
+   "crit": 10,
+   "blurb": "닌자 만화에 푹 빠진 다람쥐 수인.",
+   "keyword": {
+    "name": "분신",
+    "desc": "따라 던지고 대신 맞는 람쥐 분신",
+    "carrier": "self",
+    "cap": 3
+   },
+   "ult": {
+    "name": "초살 람쥐썬더",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.6,
+      "target": "oneEnemy"
+     },
+     {
+      "k": "status",
+      "id": "충격",
+      "v": 2,
+      "target": "allEnemies"
+     },
+     {
+      "k": "stack",
+      "id": "분신",
+      "v": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "밍스",
+   "name": "밍스",
+   "nature": "활발",
+   "race": "수인",
+   "role": "딜러",
+   "style": "성장형",
+   "star": 1,
+   "hp": 490,
+   "atk": 115,
+   "def": 31,
+   "crit": 10,
+   "blurb": "촌장을 수백 번 졸라 교사가 된 늑대 수인.",
+   "keyword": {
+    "name": "졸업 미룸",
+    "desc": "제자를 붙잡아 두는 핑계",
+    "carrier": "self",
+    "cap": 3
+   },
+   "ult": {
+    "name": "교주의 천벌 - 밍스",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 4.5,
+      "target": "oneEnemy"
+     },
+     {
+      "k": "tough",
+      "v": 2
+     },
+     {
+      "k": "stack",
+      "id": "졸업 미룸",
+      "v": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "바나",
+   "name": "바나",
+   "nature": "활발",
+   "race": "수인",
+   "role": "서포터",
+   "style": "거드는 형",
+   "star": 2,
+   "hp": 590,
+   "atk": 86,
+   "def": 47,
+   "crit": 5,
+   "blurb": "영웅의 검을 만들겠다는 꿈을 품은 곱슬쥐 대장장이.",
+   "keyword": {
+    "name": "단조",
+    "desc": "두드려 벼리는 영웅의 검",
+    "carrier": "self",
+    "cap": 3
+   },
+   "ult": {
+    "name": "모루 탕탕이",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "status",
+      "id": "피해 감소",
+      "v": 3
+     },
+     {
+      "k": "shield",
+      "ratio": 1.8
+     },
+     {
+      "k": "stack",
+      "id": "단조",
+      "v": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "버터",
+   "name": "버터",
+   "nature": "활발",
+   "race": "수인",
+   "role": "딜러",
+   "style": "쌓고 고르기",
+   "star": 3,
+   "hp": 650,
+   "atk": 140,
+   "def": 40,
+   "crit": 10,
+   "blurb": "부탁은 거절 못 하는 골든 리트리버 수인. 친구를 친 녀석에게 옐로카드를 주고, 튕기는 짱돌은 경고받은 녀석에게 더 자주 날아가며, 카드가 넘치도록 쌓이면 웃음기가 싹 가십니다.",
+   "keyword": {
+    "name": "옐로카드",
+    "desc": "꾹 참는 부당한 대우",
+    "carrier": "self",
+    "cap": 4
+   },
+   "forms": [
+    {
+     "id": "버터_퇴장",
+     "name": "웃음기 없는 버터",
+     "turns": 2
+    }
+   ],
+   "ult": {
+    "name": "새쭁! 쓔튜라이크!",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 3.6,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "기절",
+      "v": 1
+     },
+     {
+      "k": "stack",
+      "id": "옐로카드",
+      "v": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "베니",
+   "name": "베니",
+   "nature": "활발",
+   "race": "수인",
+   "role": "딜러",
+   "style": "손 만들기형",
+   "star": 2,
+   "hp": 590,
+   "atk": 120,
+   "def": 38,
+   "crit": 10,
+   "blurb": "사료스탕스의 먹보 곰.",
+   "keyword": {
+    "name": "포만감",
+    "desc": "꿀 절인 생선으로 채운 배",
+    "carrier": "self",
+    "cap": 3
+   },
+   "ult": {
+    "name": "베니는 너희를 베어",
+    "cost": 300,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 1.7,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "기절",
+      "v": 1,
+      "target": "allEnemies"
+     }
+    ]
+   }
+  },
+  {
+   "id": "베니_베니",
+   "name": "베니(베니)",
+   "nature": "냉정",
+   "race": "수인",
+   "role": "딜러",
+   "style": "쌓고 고르기",
+   "star": 3,
+   "hp": 650,
+   "atk": 140,
+   "def": 40,
+   "crit": 10,
+   "blurb": "마녀 왕국 피난 시절을 거치며 철이 든 불곰 수인이자 사료스탕스 멤버.",
+   "keyword": {
+    "name": "꿀범벅",
+    "desc": "끈적하게 들러붙는 꿀",
+    "carrier": "enemy",
+    "cap": 6
+   },
+   "ult": {
+    "name": "베니는 꿀도 나눠",
+    "cost": 300,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 1.2,
+      "target": "oneEnemy"
+     },
+     {
+      "k": "perStack",
+      "id": "꿀범벅",
+      "n": 1
+     },
+     {
+      "k": "dmg",
+      "ratio": 0.3,
+      "target": "oneEnemy"
+     },
+     {
+      "k": "spend",
+      "id": "꿀범벅",
+      "all": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "슈로",
+   "name": "슈로",
+   "nature": "활발",
+   "race": "수인",
+   "role": "서포터",
+   "style": "거드는 형",
+   "star": 3,
+   "hp": 650,
+   "atk": 100,
+   "def": 50,
+   "crit": 5,
+   "blurb": "먼저 휘두르지 않는 검사. 검 끝으로 「검의 영역」 을 그어 그 안의 동료가 덜 다치고 더 세게 치게 하고, 칼을 맞댄 적과는 결투로 친구가 됩니다.",
+   "keyword": {
+    "name": "검의 영역",
+    "desc": "검 끝으로 그어 세운 둘레",
+    "carrier": "ally",
+    "cap": 3
+   },
+   "ult": {
+    "name": "종이 한 장 차이",
+    "cost": 150,
+    "fx": [
+     {
+      "k": "atkMod",
+      "v": 0.3,
+      "target": "self"
+     },
+     {
+      "k": "dmg",
+      "ratio": 0.2,
+      "target": "allEnemies",
+      "hits": 3
+     },
+     {
+      "k": "stack",
+      "id": "검의 영역",
+      "v": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "스패럿",
+   "name": "스패럿",
+   "nature": "순수",
+   "race": "수인",
+   "role": "서포터",
+   "style": "표적형",
+   "star": 3,
+   "hp": 650,
+   "atk": 100,
+   "def": 50,
+   "crit": 5,
+   "blurb": "권총을 찬 오색앵무 수인, 앵무 해적단 선장. 털어 온 노획물로 선원들을 먹여 살리고, 거친 해적의 언어로 적의 손발을 묶습니다.",
+   "keyword": {
+    "name": "노획물",
+    "desc": "배에 쌓아 두고 나눠 먹는 노획물",
+    "carrier": "self",
+    "cap": 5
+   },
+   "keywords": [
+    {
+     "name": "해적의 낙인",
+     "desc": "오늘 털기로 정한 놈의 표시",
+     "carrier": "enemy",
+     "cap": 3
+    }
+   ],
+   "ult": {
+    "name": "야아알~! 돌격!",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.7,
+      "target": "topEnemy"
+     },
+     {
+      "k": "dmg",
+      "ratio": 1.2,
+      "target": "allEnemies"
+     },
+     {
+      "k": "make",
+      "id": "스패럿_t1",
+      "v": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "유미미",
+   "name": "유미미",
+   "nature": "광기",
+   "race": "수인",
+   "role": "딜러",
+   "style": "아껴 두기형",
+   "star": 1,
+   "hp": 490,
+   "atk": 115,
+   "def": 31,
+   "crit": 10,
+   "blurb": "숲속에서 스스로 먹고사는 나른한 사냥꾼.",
+   "keyword": {
+    "name": "나른함",
+    "desc": "늘어진 채 겨누는 한 발",
+    "carrier": "self",
+    "cap": 3
+   },
+   "ult": {
+    "name": "교주의 천벌 - 유미미",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 4.6,
+      "target": "oneEnemy"
+     },
+     {
+      "k": "tough",
+      "v": 2
+     },
+     {
+      "k": "stack",
+      "id": "나른함",
+      "v": 3
+     }
+    ]
+   }
+  },
+  {
+   "id": "쵸피",
+   "name": "쵸피",
+   "nature": "우울",
+   "race": "수인",
+   "role": "딜러",
+   "style": "성장형",
+   "star": 1,
+   "hp": 490,
+   "atk": 115,
+   "def": 31,
+   "crit": 10,
+   "blurb": "사료스탕스의 티그를 동경해 최강의 전사를 꿈꾸며 매일 장작을 패는 꼬마 개 수인.",
+   "keyword": {
+    "name": "수련",
+    "desc": "하루도 거르지 않는 장작 패기",
+    "carrier": "self",
+    "cap": 4
+   },
+   "ult": {
+    "name": "교주의 천벌 - 쵸피",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 4.5,
+      "target": "oneEnemy"
+     },
+     {
+      "k": "tough",
+      "v": 2
+     },
+     {
+      "k": "stack",
+      "id": "수련",
+      "v": 3
+     }
+    ]
+   }
+  },
+  {
+   "id": "코미",
+   "name": "코미",
+   "nature": "우울",
+   "race": "수인",
+   "role": "탱커",
+   "style": "두 얼굴형",
+   "star": 3,
+   "hp": 810,
+   "atk": 115,
+   "def": 48,
+   "crit": 5,
+   "blurb": "잠이 최우선인 고양이 수인. 남긴 힘으로 자 두는 낮잠 동안 상처가 아물고, 엘프산 특제 사료를 먹으면 거대해져 베개를 휘두릅니다.",
+   "keyword": {
+    "name": "낮잠",
+    "desc": "일하지 않고 모아 둔 낮잠",
+    "carrier": "self",
+    "cap": 4
+   },
+   "forms": [
+    {
+     "id": "코미_잠",
+     "name": "쿨쿨 코미",
+     "turns": 1
+    },
+    {
+     "id": "코미_거대화",
+     "name": "거대화",
+     "turns": 2
+    }
+   ],
+   "ult": {
+    "name": "엘프산 특제 사료",
+    "cost": 300,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 1.5,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "기절",
+      "v": 1,
+      "target": "oneEnemy"
+     },
+     {
+      "k": "form",
+      "id": "코미_거대화"
+     }
+    ]
+   }
+  },
+  {
+   "id": "코미_수영복",
+   "name": "코미(수영복)",
+   "nature": "냉정",
+   "race": "수인",
+   "role": "서포터",
+   "style": "돈형",
+   "star": 3,
+   "hp": 650,
+   "atk": 100,
+   "def": 50,
+   "crit": 5,
+   "blurb": "여름에도 게으른 고양이 수인이지만 이번엔 돈 냄새를 맡았습니다.",
+   "keyword": {
+    "name": "주스 재고",
+    "desc": "수상한 재료로 만든 코미 주스",
+    "carrier": "self",
+    "cap": 4
+   },
+   "ult": {
+    "name": "풀장 후보지라구",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.1,
+      "target": "randomEnemy",
+      "hits": 3
+     },
+     {
+      "k": "status",
+      "id": "약화",
+      "v": 1,
+      "target": "allEnemies"
+     },
+     {
+      "k": "stack",
+      "id": "주스 재고",
+      "v": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "티그",
+   "name": "티그",
+   "nature": "활발",
+   "race": "수인",
+   "role": "딜러",
+   "style": "박자형",
+   "star": 3,
+   "hp": 650,
+   "atk": 140,
+   "def": 40,
+   "crit": 10,
+   "blurb": "수인 마을의 백호 검성이자 사료스탕스 대장.",
+   "keyword": {
+    "name": "장작 패기",
+    "desc": "끊김 없이 이어 휘두른 칼",
+    "carrier": "self",
+    "cap": 3
+   },
+   "ult": {
+    "name": "오버드라이브",
+    "cost": 150,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 1.1,
+      "target": "allEnemies"
+     },
+     {
+      "k": "atkMod",
+      "v": 0.15,
+      "target": "self"
+     },
+     {
+      "k": "stack",
+      "id": "장작 패기",
+      "v": 3
+     }
+    ]
+   }
+  }
+ ]
+}

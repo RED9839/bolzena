@@ -1,0 +1,947 @@
+{
+  "heroes": [
+    {
+      "id": "네르_빡침",
+      "name": "네르(빡침)",
+      "nature": "활발",
+      "race": "요정",
+      "role": "딜러",
+      "star": 3,
+      "hp": 650,
+      "atk": 140,
+      "def": 40,
+      "crit": 10,
+      "blurb": "여왕님을 지키려다 끝내 폭발한 사제장. 맞아 주며 쌓은 신앙으로 성전을 선포하면 벼락 · 참격 · 도끼창이 손에 들고, 적이 무너질 때마다 성전이 길어집니다.",
+      "keyword": {
+        "name": "꼬마 여왕님",
+        "desc": "여왕님을 지키려는 사제장의 신앙",
+        "carrier": "self",
+        "cap": 5
+      },
+      "keywords": [
+        {
+          "name": "교단의 휘장",
+          "desc": "여왕님을 대신해 맞아 주는 교단의 휘장",
+          "carrier": "self",
+          "cap": 2,
+          "decay": 1,
+          "rules": [
+            {
+              "name": "교단의 휘장",
+              "when": {
+                "on": "hurt",
+                "guarded": true
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "꼬마 여왕님",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "passives": [
+        {
+          "name": "가끔은 그리운 순간",
+          "when": {
+            "on": "formOn",
+            "id": "네르_빡침_성전"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "forms": [
+        {
+          "id": "네르_빡침_성전",
+          "name": "성전",
+          "desc": "본인은 성전, 다들 빡침이라 부르는 폭주 — 네르의 공격이 거세진다",
+          "stance": true,
+          "anim": "Idle_Change",
+          "turns": 3,
+          "bonus": [
+            {
+              "type": "공격",
+              "ratio": 2,
+              "fx": [
+                {
+                  "k": "tough",
+                  "v": 1
+                }
+              ]
+            }
+          ],
+          "passives": [
+            {
+              "name": "새로이 쌓아갈 추억",
+              "when": {
+                "on": "break",
+                "who": "any"
+              },
+              "fx": [
+                {
+                  "k": "formExtend",
+                  "id": "네르_빡침_성전",
+                  "v": 1,
+                  "max": 5
+                }
+              ]
+            },
+            {
+              "name": "심판의 벼락",
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "dmg",
+                  "ratio": 0.8,
+                  "target": "allEnemies"
+                },
+                {
+                  "k": "draw",
+                  "v": 1
+                }
+              ]
+            }
+          ],
+          "offExpire": [
+            {
+              "k": "nextAp",
+              "v": -1
+            },
+            {
+              "k": "spend",
+              "id": "꼬마 여왕님",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "교단의 심판",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "form",
+            "id": "네르_빡침_성전"
+          }
+        ]
+      },
+      "starter": [
+        "네르_빡침_s1",
+        "네르_빡침_s1",
+        "네르_빡침_s3",
+        "네르_빡침_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "네르_빡침_s1",
+      "name": "도끼창 휘두르기",
+      "hero": "네르_빡침",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "네르_빡침_s3",
+      "name": "사제장의 망토",
+      "hero": "네르_빡침",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "네르_빡침_u1",
+      "name": "교주님한테서 손 떼!",
+      "hero": "네르_빡침",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.6,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "꼬마 여왕님",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "needForm": "네르_빡침_성전",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies",
+              "ofForm": 0.1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 2
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "네르_빡침_u2",
+      "name": "교단의 휘장",
+      "hero": "네르_빡침",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "꼬마 여왕님",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "교단의 휘장",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "교단의 휘장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "교단의 휘장",
+              "v": 1
+            },
+            {
+              "k": "ifForm",
+              "id": "네르_빡침_성전"
+            },
+            {
+              "k": "formExtend",
+              "id": "네르_빡침_성전",
+              "v": 1,
+              "max": 5
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "교단의 휘장",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "꼬마 여왕님",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "교단의 휘장",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "교단의 휘장",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "basic": true
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "꼬마 여왕님",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "네르_빡침_u3",
+      "name": "벽돌 한 장",
+      "hero": "네르_빡침",
+      "unique": true,
+      "cost": 0,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.3,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "tough",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "ifBreak"
+            },
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "ifForm",
+              "id": "네르_빡침_성전"
+            },
+            {
+              "k": "ap",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.8,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "네르_빡침_u4",
+      "name": "성전 선포",
+      "hero": "네르_빡침",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.9,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "꼬마 여왕님",
+          "v": 2
+        },
+        {
+          "k": "ifStack",
+          "id": "꼬마 여왕님",
+          "n": 4
+        },
+        {
+          "k": "spend",
+          "id": "꼬마 여왕님",
+          "v": 4
+        },
+        {
+          "k": "form",
+          "id": "네르_빡침_성전"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "type": "스킬",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "꼬마 여왕님",
+              "n": 5
+            },
+            {
+              "k": "spend",
+              "id": "꼬마 여왕님",
+              "v": 5
+            },
+            {
+              "k": "empower",
+              "ratio": 0.6,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.5,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "꼬마 여왕님",
+              "n": 4
+            },
+            {
+              "k": "spend",
+              "id": "꼬마 여왕님",
+              "v": 4
+            },
+            {
+              "k": "form",
+              "id": "네르_빡침_성전"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 2
+            },
+            {
+              "k": "ifForm",
+              "id": "네르_빡침_성전"
+            },
+            {
+              "k": "formExtend",
+              "id": "네르_빡침_성전",
+              "v": 2,
+              "max": 5
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.9,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 2
+            },
+            {
+              "k": "ifStack",
+              "id": "꼬마 여왕님",
+              "n": 4
+            },
+            {
+              "k": "spend",
+              "id": "꼬마 여왕님",
+              "v": 4
+            },
+            {
+              "k": "form",
+              "id": "네르_빡침_성전"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "네르_빡침_u5",
+      "name": "가끔은 그리운 순간",
+      "hero": "네르_빡침",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "tough",
+          "v": 1
+        },
+        {
+          "k": "ifForm",
+          "id": "네르_빡침_성전"
+        },
+        {
+          "k": "status",
+          "id": "취약",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "ifForm",
+              "id": "네르_빡침_성전"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "교단의 휘장",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "꼬마 여왕님",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

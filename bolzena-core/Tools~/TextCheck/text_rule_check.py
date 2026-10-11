@@ -22,7 +22,7 @@ def tok_fx(f, out):
     elif k == 'status' and v and f.get('id'): out.append(f'{f["id"]} {num(v)}')
     if k == 'stack' and v and f.get('id'): out.append(f'「{f["id"]}」 {num(v)}')   # 2026-10-07 쌓는 수는 + 없이(「홀로그램」 2)
     if k == 'spend' and f.get('id'): out.append(('ALL', f['id']) if f.get('all') else f'「{f["id"]}」')
-    if k in ('dealtMod', 'takenMod', 'atkMod', 'defMod') and v is not None: out.append(f'{round(v * 100)}%')
+    if k in ('dealtMod', 'takenMod', 'atkMod', 'defMod') and v is not None: out.append(f'{abs(round(v * 100)) if k == "dealtMod" else round(v * 100)}%')
     if k == 'tough' and v: out.append(f'강인도 피해 {num(v)}')
     for t in f.get('then') or []: tok_fx(t, out)
 for f in sorted(glob.glob(ROOT + '/heroes/*/*.json')):
@@ -54,7 +54,8 @@ for f in sorted(glob.glob(ROOT + '/heroes/*/*.json')):
             if k.get('hunt'): need('한 번에 아군 1명에게만' if k.get('carrier') == 'hero' else '한 번에 적 1명에게만', f'「{k["name"]}」 hunt')
             if k.get('guard'): need('적의 공격 한 대', f'「{k["name"]}」 guard')
             for p in k.get('per') or []:
-                need(pct(p['ratio']) if p.get('stat') in ('dot', 'hot') else f'{round(p.get("v", 0) * 100)}%', f'「{k["name"]}」 per {p.get("stat")}')
+                # 주는 피해(dealt)는 곱연산 표기 「x% 증가 · 감소」(2026-10-10 카제나) — 부호 없이 수치만 본다
+                need(pct(p['ratio']) if p.get('stat') in ('dot', 'hot') else f'{abs(round(p.get("v", 0) * 100)) if p.get("stat") == "dealt" else round(p.get("v", 0) * 100)}%', f'「{k["name"]}」 per {p.get("stat")}')
             for r in k.get('rules') or []:
                 toks = []; [tok_fx(x, toks) for x in r.get('fx', [])]
                 for t in toks: need(t, f'「{k["name"]}」 규칙 「{r.get("name")}」')

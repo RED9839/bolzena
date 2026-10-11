@@ -1,0 +1,758 @@
+{
+  "heroes": [
+    {
+      "id": "마요_멋짐",
+      "name": "마요(멋짐)",
+      "nature": "순수",
+      "race": "요정",
+      "role": "딜러",
+      "style": "쌓고 고르기",
+      "star": 3,
+      "hp": 660,
+      "atk": 125,
+      "def": 32,
+      "crit": 10,
+      "blurb": "방구석 수집광이던 마요가 벨라 사건 때의 거짓말을 자책한 끝에, 교주에게 도움이 되겠다며 아끼던 수집품으로 무장했습니다. 모나티엄 경매장 방패를 던지고 은방울꽃 종을 울리며, \"~임\" 말투로 교주를 대놓고 \"최고 수집품\"이라 부릅니다.",
+      "keyword": {
+        "name": "자랑하고 싶음",
+        "desc": "멋지다는 말이 듣고 싶은 마음",
+        "carrier": "self",
+        "cap": 6,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.06
+          }
+        ],
+        "onMax": {
+          "make": "마요_멋짐_ten",
+          "consume": true
+        },
+        "rules": [
+          {
+            "name": "칭찬 요구",
+            "when": {
+              "on": "play",
+              "type": "스킬",
+              "who": "other"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "자랑하고 싶음",
+                "v": 1
+              },
+              {
+                "k": "empower",
+                "ratio": 0.2
+              }
+            ]
+          },
+          {
+            "name": "너도 자랑해",
+            "when": {
+              "on": "spend",
+              "id": "자랑하고 싶음"
+            },
+            "fx": [
+              {
+                "k": "empower",
+                "ratio": 0.2,
+                "who": "any"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "비장의 수단임",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.99,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "자랑하고 싶음",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "마요_멋짐_s1",
+        "마요_멋짐_s2",
+        "마요_멋짐_s3",
+        "마요_멋짐_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "마요_멋짐_s1",
+      "name": "방패 밀치기",
+      "hero": "마요_멋짐",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "마요_멋짐_s2",
+      "name": "방패 풀스윙",
+      "hero": "마요_멋짐",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "마요_멋짐_s3",
+      "name": "방어 자세",
+      "hero": "마요_멋짐",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "마요_멋짐_ten",
+      "name": "열 번 튕기는 방패",
+      "hero": "마요_멋짐",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.36,
+          "target": "randomEnemy",
+          "hits": 6
+        }
+      ],
+      "blurb": "모아 둔 자랑을 한꺼번에 — 경매장 방패가 적 사이를 마구 튕깁니다"
+    },
+    {
+      "id": "마요_멋짐_u1",
+      "name": "빨리 나 칭찬해줌.",
+      "hero": "마요_멋짐",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "자랑하고 싶음",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "자랑하고 싶음",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "자랑하고 싶음",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "자랑하고 싶음",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격",
+                    "who": "other"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "자랑하고 싶음",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "dealtMod",
+                      "v": 0.08,
+                      "target": "otherAllies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마요_멋짐_u3",
+      "name": "최강의 수집품임.",
+      "hero": "마요_멋짐",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "자랑하고 싶음",
+          "all": true
+        },
+        {
+          "k": "perEvent"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "randomEnemy"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "마요_멋짐_u5",
+      "name": "수집품 발동",
+      "hero": "마요_멋짐",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "자랑하고 싶음",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 2,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 3,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            },
+            {
+              "k": "ifStack",
+              "id": "자랑하고 싶음",
+              "n": 5
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 4
+            },
+            {
+              "k": "empower",
+              "ratio": 0.57
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 2
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "otherAllies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마요_멋짐_u2",
+      "name": "은방울꽃 종",
+      "hero": "마요_멋짐",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.49,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "자랑하고 싶음",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.24,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.34,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.79,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.61,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.37,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마요_멋짐_s4",
+      "name": "수집품 자랑",
+      "hero": "마요_멋짐",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "자랑하고 싶음",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "자랑하고 싶음",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

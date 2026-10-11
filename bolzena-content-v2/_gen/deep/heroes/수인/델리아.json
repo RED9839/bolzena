@@ -1,0 +1,646 @@
+{
+  "heroes": [
+    {
+      "id": "델리아",
+      "name": "델리아",
+      "nature": "순수",
+      "race": "수인",
+      "role": "딜러",
+      "style": "대가형",
+      "star": 3,
+      "hp": 900,
+      "atk": 119,
+      "def": 46,
+      "crit": 10,
+      "blurb": "언니 그윈을 따라 엘리아스 수인 마을에 자리 잡은 꼬마 펭귄.",
+      "keyword": {
+        "name": "수족열증",
+        "desc": "발끝부터 화끈거리는 열",
+        "carrier": "enemy",
+        "cap": 3,
+        "per": [
+          {
+            "stat": "dot",
+            "ratio": 0.1
+          },
+          {
+            "stat": "taken",
+            "v": 0.06,
+            "from": "owner"
+          }
+        ],
+        "rules": [
+          {
+            "name": "펭귄 탐험대",
+            "when": {
+              "on": "hit",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "수족열증",
+                "v": 1,
+                "target": "oneEnemy"
+              }
+            ]
+          },
+          {
+            "name": "이글루",
+            "when": {
+              "on": "lowHp",
+              "pct": 0.5
+            },
+            "fx": [
+              {
+                "k": "empower",
+                "ratio": 0.42
+              }
+            ]
+          },
+          {
+            "name": "선장님 몫",
+            "when": {
+              "on": "make",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "수족열증",
+                "v": 1,
+                "target": "randomEnemy"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "도와줘 친구들아!",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.46,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "stack",
+            "id": "수족열증",
+            "v": 1,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "델리아_s1",
+        "델리아_s2",
+        "델리아_s3",
+        "델리아_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "델리아_s1",
+      "name": "펭귄 박치기",
+      "hero": "델리아",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "델리아_s2",
+      "name": "대왕 펭귄 박치기",
+      "hero": "델리아",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "델리아_s3",
+      "name": "방어 자세",
+      "hero": "델리아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "델리아_u1",
+      "name": "델리아 화났어!",
+      "hero": "델리아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.71,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "수족열증",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.07,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.24,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.71,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "순수 약점",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.73,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "수족열증"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.77,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "델리아_u3",
+      "name": "이글루 배치기",
+      "hero": "델리아",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "payHp",
+          "v": 30
+        },
+        {
+          "k": "dmg",
+          "ratio": 3.04,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perPaid",
+          "per": 40
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.7,
+          "target": "oneEnemy"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "델리아_u2",
+      "name": "이글루 도망",
+      "hero": "델리아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "cleanse",
+          "v": 1
+        },
+        {
+          "k": "ifWounded"
+        },
+        {
+          "k": "empower",
+          "ratio": 0.75
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "empower",
+              "ratio": 1.13
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "empower",
+              "ratio": 0.93
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.75
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.87
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "cleanse",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "델리아_u4",
+      "name": "일어나! 탐험 가야지!",
+      "hero": "델리아",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "nextAp",
+          "v": -1
+        },
+        {
+          "k": "ap",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "nextAp",
+              "v": -1
+            },
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "nextAp",
+              "v": -1
+            },
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "payHp",
+              "v": 30
+            },
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "nextAp",
+              "v": -1
+            },
+            {
+              "k": "ap",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "델리아_s4",
+      "name": "발끝 화끈",
+      "hero": "델리아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "수족열증",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "empower",
+          "ratio": 0.3
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.45
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수족열증",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.35
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

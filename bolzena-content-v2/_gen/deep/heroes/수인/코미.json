@@ -1,0 +1,1031 @@
+{
+  "heroes": [
+    {
+      "id": "코미",
+      "name": "코미",
+      "nature": "우울",
+      "race": "수인",
+      "role": "탱커",
+      "style": "두 얼굴형",
+      "star": 3,
+      "hp": 1100,
+      "atk": 84,
+      "def": 70,
+      "crit": 5,
+      "blurb": "잠이 최우선인 고양이 수인. 남긴 힘으로 자 두는 낮잠 동안 상처가 아물고, 엘프산 특제 사료를 먹으면 거대해져 베개를 휘두릅니다.",
+      "keyword": {
+        "name": "낮잠",
+        "desc": "일하지 않고 모아 둔 낮잠",
+        "carrier": "self",
+        "cap": 4,
+        "per": [
+          {
+            "stat": "hot",
+            "ratio": 0.03
+          }
+        ],
+        "rules": [
+          {
+            "name": "쿨쿨",
+            "when": {
+              "on": "keepAp"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "낮잠",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "낮잠의 미학",
+            "when": {
+              "on": "foeActBefore",
+              "type": "공격"
+            },
+            "conds": [
+              {
+                "c": "stack",
+                "id": "낮잠",
+                "n": 1
+              }
+            ],
+            "fx": [
+              {
+                "k": "spend",
+                "id": "낮잠",
+                "v": 1
+              },
+              {
+                "k": "shield",
+                "ratio": 0.49
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "엘프산 특제 사료",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.5,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "form",
+            "id": "코미_거대화"
+          }
+        ]
+      },
+      "forms": [
+        {
+          "id": "코미_잠",
+          "name": "쿨쿨 코미",
+          "desc": "푹 잠든 코미 — 받는 피해가 줄고 낮잠이 쌓임",
+          "turns": 1,
+          "mods": {
+            "taken": -0.3
+          },
+          "passives": [
+            {
+              "name": "꿀잠",
+              "when": {
+                "on": "turnEnd"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "낮잠",
+                  "v": 1
+                }
+              ]
+            }
+          ],
+          "skin": null,
+          "anim": null
+        },
+        {
+          "id": "코미_거대화",
+          "name": "거대화",
+          "desc": "특제 사료를 먹고 거대해진 코미 — 냥펀치가 광역",
+          "turns": 2,
+          "mods": {
+            "dealt": 0.25
+          },
+          "cards": {
+            "코미_s1": "코미_f1"
+          },
+          "skin": null,
+          "anim": null,
+          "passives": [
+            {
+              "name": "깔아뭉개기",
+              "when": {
+                "on": "blocked"
+              },
+              "fx": [
+                {
+                  "k": "status",
+                  "id": "반격",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "starter": [
+        "코미_s1",
+        "코미_s2",
+        "코미_s3",
+        "코미_u4"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "코미_s1",
+      "name": "냥펀치",
+      "hero": "코미",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "코미_s2",
+      "name": "몸 말기",
+      "hero": "코미",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "코미_f1",
+      "name": "거대 냥펀치",
+      "hero": "코미",
+      "token": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.06,
+          "target": "allEnemies"
+        }
+      ],
+      "blurb": "거대해진 코미의 앞발입니다"
+    },
+    {
+      "id": "코미_u4",
+      "name": "엘프산 사료 한 그릇",
+      "hero": "코미",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "낮잠",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "keepAp"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "낮잠",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.77
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "낮잠",
+                      "v": 1
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.38
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "낮잠",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.5
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "낮잠",
+                      "v": 1
+                    },
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "keepAp"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "낮잠",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "코미_u1",
+      "name": "푹신푹신 타임",
+      "hero": "코미",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.14
+        },
+        {
+          "k": "cleanse",
+          "v": 1
+        },
+        {
+          "k": "form",
+          "id": "코미_잠"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.27
+            },
+            {
+              "k": "form",
+              "id": "코미_잠"
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.02
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.77
+            },
+            {
+              "k": "form",
+              "id": "코미_잠"
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.3
+            },
+            {
+              "k": "cleanse",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.77
+            },
+            {
+              "k": "form",
+              "id": "코미_잠"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "cleanse",
+                      "v": 1
+                    },
+                    {
+                      "k": "stack",
+                      "id": "낮잠",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "코미_u5",
+      "name": "엘프산 특제 사료",
+      "hero": "코미",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "낮잠"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.38,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "낮잠",
+          "v": 2
+        },
+        {
+          "k": "form",
+          "id": "코미_거대화"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낮잠"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.57,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "낮잠",
+              "v": 2
+            },
+            {
+              "k": "form",
+              "id": "코미_거대화"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낮잠",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.93,
+              "target": "oneEnemy",
+              "base": "def"
+            },
+            {
+              "k": "form",
+              "id": "코미_거대화"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낮잠",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.57,
+              "target": "allEnemies",
+              "base": "def"
+            },
+            {
+              "k": "form",
+              "id": "코미_거대화"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "form",
+              "id": "코미_거대화"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.59,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "낮잠",
+              "n": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.92
+            },
+            {
+              "k": "form",
+              "id": "코미_거대화"
+            },
+            {
+              "k": "draw",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "코미_u2",
+      "name": "코미버터의 낮잠시간",
+      "hero": "코미",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.02
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "낮잠",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.52
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.77
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 3
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.15,
+              "target": "otherAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.78
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "conds": [
+                    {
+                      "c": "stack",
+                      "id": "낮잠",
+                      "n": 1
+                    }
+                  ],
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.32
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.77
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "코미_s3",
+      "name": "냥냥펀치 연타",
+      "hero": "코미",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "코미_s4",
+      "name": "하품",
+      "hero": "코미",
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        },
+        {
+          "k": "stack",
+          "id": "낮잠",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.99
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.27
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.26
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.6
+            },
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "equips": [
+    {
+      "id": "eq_komipillow",
+      "name": "코미의 베개",
+      "grade": "희귀",
+      "slot": "방어구",
+      "stats": {
+        "hp": 141
+      },
+      "effect": [
+        {
+          "name": "기절하듯 낮잠",
+          "when": {
+            "on": "lowHp",
+            "pct": 0.3
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "초재생",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        }
+      ],
+      "affinity": "코미",
+      "affinityStats": {
+        "hp": 60,
+        "def": 5
+      },
+      "affinityEffect": [
+        {
+          "name": "베개 끌어안기",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "stack",
+              "id": "낮잠",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blurb": "어디서든 잠들 수 있는 베개. 쓰러지기 직전에도 푹 잡니다."
+    }
+  ]
+}

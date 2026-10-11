@@ -105,7 +105,7 @@ namespace Bolzena.RunUI
                 // 이 사도의 고유 효과 · 패시브 · 고학년 판(수치가 다 든 글 · 길면 스크롤). 창 위 오른쪽(칸 단추와 따로 눌린다)
                 if (P.Data.Hero(key) != null)
                 {
-                    var tc = TraitsChip(rt, key, "고유 효과", "traits");
+                    var tc = TraitsChip(rt, key, "고유 능력", "traits");
                     var trt = tc.GetComponent<RectTransform>(); trt.anchorMin = trt.anchorMax = trt.pivot = new Vector2(1, 1); trt.anchoredPosition = new Vector2(-16, -16);
                     Stage.Hot["owner.traits:" + key] = tc;
                 }

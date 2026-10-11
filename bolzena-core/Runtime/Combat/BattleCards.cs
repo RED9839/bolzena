@@ -25,10 +25,17 @@ namespace Bolzena.Core
             var v = Data.View(id, Flash.TryGetValue(id, out var n) ? n : 0, Party.Count > 0 ? Party[0].Key : null);   // 주인 없는 교주 카드(옛 저장)는 첫 사도의 카드
             // 결속 — 겹친 수가 3 이상이면 사도마다 정한 「강해진 카드」 의 모습
             if (v != null && Bond.Count > 0 && v.Def.BondCard != null && Bond.TryGetValue(id, out var b) && b >= 3) v = Data.View(v.Def.BondCard) ?? v;
+            // 축복 — 피해를 더하는 축복을 받은 스킬은 공격 카드(변신 덤의 종류 거르개도 이것을 보게 변신 앞에, 카드 바꾸기 뒤에 한 번 더)
+            v = Blessed(id, v);
             // 변신 — 그 사도가 변신 중이면 변신판 모습(카드 바꾸기 · 덤)
-            if (Forms.Count > 0) v = FormCard(id, v);
+            if (Forms.Count > 0) v = Blessed(id, FormCard(id, v));
+            if (stageOn != false && Kw.Count > 0) v = StageCard(id, v);   // 단계 카드 덤(▶E75)
             return v;
         }
+
+        /// <summary>그 카드(id)에 얹힌 그 카드만의 축복까지 본 모습 — 카드 종류는 늘 이것(CardOf)으로 읽는다.</summary>
+        CardView Blessed(string id, CardView v) =>
+            v == null || Shin.Count == 0 || !Shin.TryGetValue(id, out var sh) ? v : GameData.WithBless(v, BlessOf(Data.Card(id), sh));
 
         /// <summary>그 카드에 얹힌 그 카드만의 축복(shin = own · own1 · own2).</summary>
         public static BlessDef BlessOf(CardDef c, string shin)
@@ -47,7 +54,7 @@ namespace Bolzena.Core
             return b != null && b.Tags.Any(t => Tag.Parse(t).id == tag);
         }
         /// <summary>그 카드(손의 id)에 태그가 붙었나 — 카드 글의 태그 또는 고른 축복의 태그.</summary>
-        public bool HasTagB(string id, string tag) => (CardOf(id)?.HasTag(tag) ?? false) || BlessTag(id, tag) || KwTag(id, tag) || GameData.BaseId(id) == tag;   // 생성물 카드 id 도 갈래 태그로(perTag · 거르개 tag — 「케이크」 세기, 2026-10-07)
+        public bool HasTagB(string id, string tag) => (CardOf(id)?.HasTag(tag) ?? false) || BlessTag(id, tag) || KwTag(id, tag) || GameData.BaseId(id) == tag || (tag == Tag.Keep && KeepByVal(id));   // 붙은 동안 보존(엘다인 3차)   // 생성물 카드 id 도 갈래 태그로(perTag · 거르개 tag — 「케이크」 세기, 2026-10-07)
 
         HashSet<string> CardHitTags(string id, CardView c)
         {
@@ -83,37 +90,70 @@ namespace Bolzena.Core
             for (int i = 0; i < n; i++)
             {
                 if (Draw.Count == 0)
-                {
-                    if (Discard.Count == 0) break;
-                    Draw = Shuffle(Rng, Discard.ToList()); Discard.Clear(); CardCue(null, "discard", "draw", "shuffle");
+                {   // 섞기 — 이번 턴에 낸 카드는 돌아가지 않는다(버린 카드가 없으면 그만)
+                    if (!Reshuffle()) break;
                     Emit("shuffle", new EmitInfo()); if (Over != null) break;
+                    if (Draw.Count == 0) break;   // 「섞으면」 계기(우로스 「순환」 드로우 등)가 섞인 카드를 먼저 가져갔다 — 뽑을 게 없으면 못 뽑는다
                 }
                 var id = Draw[Draw.Count - 1]; Draw.RemoveAt(Draw.Count - 1);
                 Drawn++;
                 if (Hand.Count >= R.HAND_MAX) { Gone.Add(id); burned++; CardCue(id, "draw", "gone", "burn"); continue; }
                 Hand.Add(id); CardCue(id, "draw", "hand");
-                var c = CardOf(id);
-                // 빙결 — 뽑은 턴에는 낼 수 없다
-                if (CardStOf(id, "빙결") > 0) { DelCardSt(id, "빙결"); Frozen[id] = Turn; Say($"「{c?.Name}」 — 빙결(이번 턴 낼 수 없다)"); }
-                // 감응 — 뽑히면(턴 시작 뽑기 포함)
-                if (c != null && c.Fx.Any(f => f.K == FxK.When && f.On == "drawAny") && senseDepth < 3)
-                {
-                    senseDepth++;
-                    try { CardWhen(id, "drawAny"); } finally { senseDepth--; }
-                    if (Over != null) break;
-                }
-                Emit("drawn", new EmitInfo { Hero = c?.Hero, Id = id, Type = c?.Type, Tags = c?.Tags });
-                if (Over != null) break;
-                // 적이 끼워 넣은 상태 카드 · 저주는 턴 시작에 뽑혀도 돈다
-                if (c != null && (ability || c.IsStatus || c.IsCurse) && c.Fx.Any(f => f.K == FxK.When && f.On == "draw") && senseDepth < 3)
-                {
-                    senseDepth++;
-                    try { CardWhen(id, "draw"); } finally { senseDepth--; }
-                    if (Over != null) break;
-                }
+                if (!AfterDraw(id, ability)) break;
             }
             if (burned > 0) Say($"손이 가득 차 {burned}장이 사라졌다 (최대 {R.HAND_MAX}장)");
             MergePile(Hand, "hand");
+        }
+
+        /// <summary>드로우로 손에 막 들어온 카드 — 빙결 · 감응 · 「카드가 뽑히면」 · 영감. 뽑을 더미 → 손만 드로우다(생성 · 버린 더미에서 꺼내기는 아니다 — Docs/카드이동.md). 전투가 끝나면 false.</summary>
+        bool AfterDraw(string id, bool ability)
+        {
+            var c = CardOf(id);
+            // 빙결 — 뽑은 턴에는 낼 수 없다
+            if (CardStOf(id, "빙결") > 0) { DelCardSt(id, "빙결"); Frozen[id] = Turn; Say($"「{c?.Name}」 — 빙결(이번 턴 낼 수 없다)"); }
+            // 감응 — 드로우하면(턴 시작 드로우 · 효과 드로우 · 뽑을 더미에서 손으로 꺼내기)
+            if (c != null && c.Fx.Any(f => f.K == FxK.When && f.On == "drawAny") && senseDepth < 3)
+            {
+                senseDepth++;
+                try { CardWhen(id, "drawAny"); } finally { senseDepth--; }
+                if (Over != null) return false;
+            }
+            Emit("drawn", new EmitInfo { Hero = c?.Hero, Id = id, Type = c?.Type, Tags = c?.Tags });
+            if (Over != null) return false;
+            // 적이 끼워 넣은 상태 카드 · 저주는 턴 시작에 뽑혀도 돈다
+            if (c != null && (ability || c.IsStatus || c.IsCurse) && c.Fx.Any(f => f.K == FxK.When && f.On == "draw") && senseDepth < 3)
+            {
+                senseDepth++;
+                try { CardWhen(id, "draw"); } finally { senseDepth--; }
+                if (Over != null) return false;
+            }
+            return true;
+        }
+
+        /// <summary>버린 더미에서 이번 턴에 낸 카드(Used)의 자리 — 같은 이름은 뒤(나중에 들어온 것)부터 짝짓는다.</summary>
+        HashSet<int> UsedAt()
+        {
+            var at = new HashSet<int>();
+            if (Used.Count == 0) return at;
+            var left = new Dictionary<string, int>();
+            foreach (var u in Used) left[u] = (left.TryGetValue(u, out var n) ? n : 0) + 1;
+            for (int i = Discard.Count - 1; i >= 0; i--)
+                if (left.TryGetValue(Discard[i], out var n) && n > 0) { left[Discard[i]] = n - 1; at.Add(i); }
+            return at;
+        }
+
+        /// <summary>섞기 — 버린 카드를 뽑을 더미로 되돌려(남은 뽑을 더미와 함께) 섞는다. 이번 턴에 낸 카드는 버린 더미에 남는다(카제나 — 무한 순환 막기). 돌아온 카드가 없으면 false.</summary>
+        bool Reshuffle()
+        {
+            var used = UsedAt();
+            if (Discard.Count == 0 || used.Count >= Discard.Count) return false;
+            var free = new List<string>(Discard.Count - used.Count);
+            var stay = new List<string>(used.Count);
+            for (int i = 0; i < Discard.Count; i++) (used.Contains(i) ? stay : free).Add(Discard[i]);
+            Discard.Clear(); Discard.AddRange(stay);
+            Draw = Shuffle(Rng, Draw.Count == 0 ? free : Draw.Concat(free).ToList());
+            CardCue(null, "discard", "draw", "shuffle");
+            return true;
         }
 
         // ── 고학년 스킬 ────────────────────────────────────────────────
@@ -126,7 +166,8 @@ namespace Bolzena.Core
             if (u == null || u.Dead) return "나설 수 없습니다";
             var ult = UltOf(heroKey);
             if (ult == null) return "고학년 스킬이 없습니다";
-            if (Gauge < ult.Cost) return $"게이지가 모자랍니다 ({Gauge}% / {ult.Cost}%)";
+            int uc = UltCostOf(heroKey);   // 요구 게이지 증감(엘다인 4차 ▶E78)
+            if (Gauge < uc) return $"게이지가 모자랍니다 ({Gauge}% / {uc}%)";
             if (St(Pool, "정신 붕괴") > 0) return "정신 붕괴 — 고학년 스킬을 쓸 수 없습니다";
             return null;
         }
@@ -136,18 +177,19 @@ namespace Bolzena.Core
             var why = CanUlt(heroKey);
             if (why != null) return PlayResult.Fail(why);
             var ult = UltOf(heroKey);
-            Gauge -= ult.Cost;
+            int cost = UltCostOf(heroKey);
+            Gauge -= cost;
             LastUlt = heroKey;
             UltsUsed++; Tape?.Ult(this);
             var owner = HeroUnit(heroKey);
-            Say($"{owner.Name} 고학년 스킬 — {ult.Name} (게이지 {ult.Cost}%)");
+            Say($"{owner.Name} 고학년 스킬 — {ult.Name} (게이지 {cost}%)");
             Talk(owner, "ego");
             Cue("act", owner, new Cue { Anim = "ult", Name = ult.Name });
             var (prev, src0) = (Acting, ModSrc);
             Acting = heroKey; ModSrc = $"{owner.Name} 「{ult.Name}」";
             ActSeq = ++SeqN;
             var tags = new HashSet<string>();
-            RunFx(ult.Fx, new FxCtx { Owner = owner, TargetIdx = targetIdx, HitTags = tags, Card = true, Cost = 2 });
+            RunFx(ult.Fx, new FxCtx { Owner = owner, TargetIdx = targetIdx, HitTags = tags, Card = true, Cost = 2, ToughUnit = R.ToughUnitUlt(ult.Cost) });
             Acting = prev; ModSrc = src0;
             if (St(Pool, "계몽") > 0 && Over == null) { Say("계몽 — 드로우 1"); DrawCards(1); }
             Emit("ult", new EmitInfo { Hero = heroKey });
@@ -181,7 +223,7 @@ namespace Bolzena.Core
             if (FreeOnce.Contains(cardId) || GraceFree(cardId, handIdx)) return 0;
             int divine = ShinKind(Data.Card(cardId), ShinOf(cardId)) == "cost" ? 1 : 0;
             int lead = LeadOn.Contains(cardId) && PlayedThisTurn <= 0 ? 1 : 0;
-            int adj = (CardStOf(cardId, "침체") > 0 ? 1 : 0) + CardStOf(cardId, "비용") + (CostMods.Count > 0 ? CostModOf(cardId) : 0);   // 침체 +1 · 적이 바꾼 비용(착란 …)
+            int adj = (CardStOf(cardId, "침체") > 0 ? 1 : 0) + CardStOf(cardId, "비용") + (CostMods.Count > 0 ? CostModOf(cardId) : 0) + CardValueCost(cardId);   // 카드 값 1당 비용(엘다인 4차 리뉴아 「시간」)   // 침체 +1 · 적이 바꾼 비용(착란 …)
             return Math.Max(0, c.Cost - divine - lead - NextCheaper + adj);
         }
 
@@ -240,8 +282,12 @@ namespace Bolzena.Core
             }
             var owner = c.Hero != null ? HeroUnit(c.Hero) : null;
             if (c.Hero != null && (owner == null || owner.Dead)) return $"{Data.Hero(c.Hero)?.Name ?? c.Hero} — 나설 수 없습니다";
+            if (NeedFormWhy(c) is string nf) return $"「{nf}」 중에만 낼 수 있습니다";   // 태세일 때만 사용 가능(엘다인 4차)
             return null;
         }
+
+        /// <summary>연속(같은 성격) — 공명 성격 카드는 어느 성격과도 잇는다(엘다인 4차 D14 · ▶E84).</summary>
+        public static bool ChainNat(string prev, string nat) => nat != null && prev != null && (prev == nat || nat == "공명" || prev == "공명");
 
         /// <summary>손의 handIdx 번째 카드를 낸다. targetIdx — 적의 idx(아군을 고르는 카드면 사도 idx).</summary>
         public PlayResult PlayCard(int handIdx, int targetIdx, PlayOpts opts = null)
@@ -254,6 +300,7 @@ namespace Bolzena.Core
             if (why != null) return PlayResult.Fail(why);
 
             var c = CardOf(cardId);
+            TraceKeepPlay(cardId, c.Hero);   // 쥐고 넘긴 보존 카드를 냄 — 때가 맞았나(▶E87 측정)
             ActSeq = ++SeqN;
             PlaysTotal++;
             Tape?.Card(this, cardId);
@@ -282,13 +329,14 @@ namespace Bolzena.Core
             int playedBefore = PlayedThisTurn;
             string baseId = GameData.BaseId(cardId);
             bool repeat = PlayIds.Count > 0 && PlayIds[PlayIds.Count - 1] == baseId;
-            if (paid > 0) Gauge = Math.Min(R.GAUGE_MAX, Gauge + paid * R.GAUGE_PER_AP);
+            if (paid > 0 && !GaugeLocked(c.Hero)) Gauge = Math.Min(R.GAUGE_MAX, Gauge + paid * R.GAUGE_PER_AP);   // 게이지 잠금(엘다인 3차 ▶E51)
             NextCheaper = 0;
             FreeOnce.Remove(cardId);
             if (grace) { int left = (FreeTurn.TryGetValue(cardId, out var ft) ? ft : 1) - 1; if (left > 0) FreeTurn[cardId] = left; else FreeTurn.Remove(cardId); }
             Hand.RemoveAt(handIdx);
             CardCue(cardId, "hand", "play");
             discardPick = opts.Discard?.ToList();
+            spreadPick = opts.Spread?.ToList();
 
             var sh = ShinOf(cardId);
             var nat = owner != null ? NatureOf(owner) : null;
@@ -296,13 +344,18 @@ namespace Bolzena.Core
             var ctx = new FxCtx
             {
                 Owner = owner, TargetIdx = targetIdx, AllyIdx = opts.Ally, X = c.X ? paid : 0, Shin = ShinKind(Data.Card(cardId), sh),
-                HitTags = CardHitTags(cardId, c), Card = true, Type = c.Type, Chain = nat != null && PrevNat == nat, Tune = tune,
+                HitTags = CardHitTags(cardId, c), Card = true, Type = c.Type, Chain = ChainNat(PrevNat, nat), Tune = tune,
                 Link = c.Hero != null && last != null && last.Value.Item1 == c.Hero, Prev = last?.Item2,
                 Repeat = repeat, Held = held, PlayedBefore = playedBefore,
                 CardId = cardId, Made = GameData.IsPlain(cardId), Cost = c.X ? paid : c.Cost, Choice = opts.Choice ?? 0, Scale = opts.Scale ?? 1, SpendPick = opts.Spend, Pricier = pricier,
+                ForceCrit = !c.IsStatus && !c.IsCurse && UseCritNext(c.Hero), StagePick = opts.Stage,
+                NthForce = !c.IsStatus && !c.IsCurse && UseNthNext(c.Hero), CostNow = cost0,
+                CritFoe = c.Fx.FirstOrDefault(x => x.K == FxK.CritNext && x.Now && x.FoeStack != null)?.FoeStack,   // 그 표식 적이면 치명(카드 어디에 둬도 처음부터 — 엘다인 4차 요청)
             };
             // 다음 카드 강화(empower · onMax empower) — 그 사도 몫 · 파티 몫을 이 카드가 쓴다(상태 카드 · 저주는 안 쓴다)
             if (!c.IsStatus && !c.IsCurse && Counts.Count > 0 && EmpowerOf(c.Hero) > 0) ctx.Scale *= EmpowerUse(c.Hero);
+            // 다른 아군이 걸어 둔 다음 카드 강화(empower who other · minCost — 엘다인 4차 요청)
+            if (!c.IsStatus && !c.IsCurse && Counts.Count > 0) { int eo = EmpowerOther(c.Hero, c.X ? paid : Math.Max(c.Cost, c.CountAs), true); if (eo > 0) { ctx.Scale *= 1 + eo / 100.0; Say($"동료 강화 +{eo}% — 이 카드에"); } }
             bool sealedNow = HasTagB(cardId, Tag.Seal) && !Unsealed.Contains(cardId);
             bool blockedNow = CardStOf(cardId, "봉쇄") > 0;
             if (blockedNow) DelCardSt(cardId, "봉쇄");
@@ -313,7 +366,7 @@ namespace Bolzena.Core
             if (!opts.Auto && HasTagB(cardId, Tag.Connect))
             {
                 var drop = Hand.Where(id => id != cardId && HasTagB(id, Tag.Connect)).ToList();
-                if (drop.Count > 0) { foreach (var id in drop) { Hand.Remove(id); CardCue(id, "hand", "discard", "connect"); } Discard.AddRange(drop); Say($"연결 — {string.Join(" ", drop.Select(id => $"「{CardOf(id).Name}」"))} 버린다"); }
+                if (drop.Count > 0) { foreach (var id in drop) { Hand.Remove(id); CardCue(id, "hand", "discard", "connect"); } Discard.AddRange(drop); Say($"연결 — {string.Join(" ", drop.Select(id => $"「{CardOf(id).Name}」"))} 버린다"); foreach (var id in drop) { BulletDrop(id); if (Over != null) return new PlayResult { Ok = true }; } }
             }
             Say($"▶ {(owner != null ? owner.Name : "교주")} 「{c.Name}」{(paid > 0 ? $" (AP {paid})" : "")}{(opts.Auto ? " — 저절로" : "")}");
             PrevNat = nat;
@@ -323,6 +376,7 @@ namespace Bolzena.Core
             ModSrc = $"{(owner != null ? owner.Name + " " : "")}「{c.Name}」";
             Cue("act", owner, new Cue { Anim = c.Type == "공격" ? "attack" : "skill", CardId = cardId, Name = c.Name });
             KwWipe(c);
+            string formBefore = owner != null && Forms.TryGetValue(owner.Key, out var frb) ? frb.Id : null;   // 덤은 내는 순간의 태세(우로스 선 · 악)
             try
             {
                 // 독 — 이 카드를 내면 파티가 피해(실드 무시)
@@ -352,7 +406,8 @@ namespace Bolzena.Core
                     }
                 }
             }
-            finally { discardPick = null; }
+            finally { discardPick = null; spreadPick = null; }
+            if (formBefore != null && !mute) FormToggle(owner, ctx, formBefore);   // 자기 카드를 내면 짝 태세로(toggle)
 
             // 강화 카드 · 소멸 · 소멸 N · 회수
             bool exhausted = false;
@@ -374,21 +429,25 @@ namespace Bolzena.Core
             else if (ctx.TransformTo != null && Data.Card(ctx.TransformTo) != null)
             {   // 카드 바꾸기(이 카드) — 이 카드 대신 바뀐 카드가 버린 더미로(이 전투에서만)
                 var into = ctx.TransformTo + GameData.PLAIN;
-                CardCue(cardId, "play", "gone", "transform"); Discard.Add(into); CardCue(into, "new", "discard", "transform");
+                CardCue(cardId, "play", "gone", "transform"); Discard.Add(into); Used.Add(into); CardCue(into, "new", "discard", "transform");
                 Say($"「{c.Name}」 → 「{Data.Card(into).Name}」");
             }
             else if (spent || goneN || useN == 0 || BlessTag(cardId, Tag.Exhaust) || (owner != null && owner.Dead))
             {
                 bool ex = !spent && !(owner != null && owner.Dead);
-                if (ex) Exile(cardId, "play"); else { Gone.Add(cardId); CardCue(cardId, "play", "gone"); }
+                if (ex) Exile(cardId, "play", null, ctx.NoForget); else { Gone.Add(cardId); CardCue(cardId, "play", "gone"); }
                 if (goneN) Say($"「{c.Name}」 — {useN}번째, 소멸");
                 if (ex) exhausted = true;
             }
             else if (recallOk) { Recalled[cardId] = (Recalled.TryGetValue(cardId, out var r0) ? r0 : 0) + 1; Hand.Add(cardId); CardCue(cardId, "play", "hand", "recall"); Say($"회수 — 「{c.Name}」 손으로 돌아온다"); }
-            else { Discard.Add(cardId); CardCue(cardId, "play", "discard"); }
+            else { Discard.Add(cardId); Used.Add(cardId); CardCue(cardId, "play", "discard"); }   // 이번 턴에 낸 카드 — 이 턴의 섞기로는 돌아가지 않는다
             if (exhausted) Emit("exhaust", new EmitInfo { Hero = c.Hero, By = owner?.Key, Id = cardId });
             if (!mute && HasTagB(cardId, Tag.Echo)) Echo.Add((cardId, targetIdx));
             Bond.Remove(cardId); DelCardSt(cardId, "침체"); DelCardSt(cardId, "비용");
+            DropKeepVals(cardId);   // 붙은 동안 보존 — 낸 뒤 벗는다(엘다인 3차)
+            CardValueAfterPlay(cardId, c.Hero);   // 카드 값 키워드 reset play
+            NotePlayed(cardId);   // 받아 적기가 찾는 최근 카드(엘다인 3차)
+            if (ctx.AfterSet != null) foreach (var af in ctx.AfterSet) CardStatusSet(af, cardId);   // (엘다인 ▶E17) 낸 뒤 카드 값 정하기
             // 공용 축복 — 낼 때 붙는 것
             var sk = ctx.Shin;
             if (sk == "draw") DrawCards(1);
@@ -398,7 +457,10 @@ namespace Bolzena.Core
             if (c.Hero != null && owner != null) PlayedBy[owner.Key] = (PlayedBy.TryGetValue(owner.Key, out var pb) ? pb : 0) + 1;
             var tgt = Enemies.FirstOrDefault(e => e.Idx == targetIdx && !e.Dead);
             PlayTags.Add(c.Tags.Select(t => Tag.Parse(t).id).ToList());
-            Emit("play", new EmitInfo { Id = cardId, Hero = c.Hero, Actor = owner?.Key, Type = c.Type, Nth = PlayedThisTurn, Target = tgt, Cost = c.X ? paid : c.Cost, Sig = c.Signature, Repeat = repeat, Who = owner, Tags = c.Tags });
+            if (Over == null && c.Hero != null && !c.IsStatus && !c.IsCurse) CardValueAllyPlay(c.Hero);
+            if (Over == null && c.Hero != null && !c.IsStatus && !c.IsCurse && !mute) MarkBurn(c.Hero);   // 붙은 표시가 탐(벨라 존속의 촛불)
+            if (Over == null && !mute) ShieldLeftArm(c, owner, targetIdx);   // 낸 뒤 적 차례가 끝날 때 실드가 남았으면   // 아군이 카드를 냄 — 손의 그 사도 카드 값 +1(엘다인 4차)
+            Emit("play", new EmitInfo { Id = cardId, Hero = c.Hero, Actor = owner?.Key, Type = c.Type, Nth = PlayedThisTurn, Target = tgt, Cost = c.X ? paid : c.Cost, CostNow = c.X ? paid : cost0, Sig = c.Signature, Repeat = repeat, Who = owner, Tags = c.Tags, Chain = ctx.Chain, SameHero = ctx.Link });
             // 계산형 공용 계기 — 이 카드의 셈 조건이 섰으면 「셈이 맞으면」(카드가 다 끝난 뒤)
             if (ctx.Tallied && Over == null) Emit("tally", new EmitInfo { Id = cardId, Hero = c.Hero, By = owner?.Key, Target = tgt });
             Acting = null; ModSrc = null;
@@ -422,7 +484,7 @@ namespace Bolzena.Core
                 DiscardFx(1, true); CheckOver();
             }
             // 신속 — 이 카드는 적의 즉시 행동 셈을 늘리지 않는다
-            bool swift = HasTagB(cardId, Tag.Swift) || (ctx.ExtraTags?.Contains(Tag.Swift) ?? false);
+            bool swift = HasTagB(cardId, Tag.Swift) || (ctx.ExtraTags?.Contains(Tag.Swift) ?? false) || SwiftTurnOn;   // 이번 턴 남은 카드 신속(엘다인 4차 ▶E80)
             if (Over == null && !swift)
             {
                 RushEnemies(); CheckOver();
@@ -435,19 +497,30 @@ namespace Bolzena.Core
                     Hurt(PartyRep(owner), sv, new HurtOpts { Dot = true }); CheckOver();
                 }
             }
-            if (Over == null) HandAuto("play", new AutoInfo { Target = tgt, Hero = c.Hero, Cost = opts.Auto ? 0 : c.X ? paid : c.Cost });
+            // 천상 셈 — 저절로 나간 카드는 0(천상을 다시 깨우지 않는다), countAs 가 있으면 그 비용으로(엘다인 ▶E2)
+            if (Over == null) HandAuto("play", new AutoInfo { Target = tgt, Hero = c.Hero, Cost = opts.Auto ? 0 : c.X ? paid : Math.Max(c.Cost, c.CountAs) });
             if (Over == null && HasTagB(cardId, Tag.Finale)) { FinaleLock = true; Say($"「{c.Name}」 — 종극: 턴이 끝난다"); return new PlayResult { Ok = true, Finale = true }; }
             return new PlayResult { Ok = true };
         }
 
         /// <summary>이 카드를 내면 버릴 카드를 골라야 하나 — 고를 장수(무작위 · 전부 · 남은 손패가 모자라면 0).</summary>
+        /// <summary>버릴 카드로 고를 수 있나(거르개 — 화면 · 봇). 거르개가 없으면 늘 된다.</summary>
+        public bool DiscardFits(int handIdx, string candidate)
+        {
+            if (handIdx < 0 || handIdx >= Hand.Count) return false;
+            var c = CardOf(Hand[handIdx]);
+            var f = c?.Fx.FirstOrDefault(x => (x.K == FxK.Discard || x.K == FxK.Burn) && !x.Random && !x.All);
+            return f == null || !HasFilter(f) || FxMatch(f, candidate, c.Hero != null ? HeroUnit(c.Hero) : null);
+        }
+
         public int DiscardChoice(int handIdx)
         {
             if (handIdx < 0 || handIdx >= Hand.Count) return 0;
             var c = CardOf(Hand[handIdx]);
             var f = c?.Fx.FirstOrDefault(x => (x.K == FxK.Discard || x.K == FxK.Burn) && !x.Random && !x.All);
             if (f == null) return 0;
-            int rest = Hand.Count - 1;
+            // 카드 거르개가 있으면 맞는 카드만 센다(엘다인 — 「손의 「마탄」 1장」)
+            int rest = HasFilter(f) ? Hand.Where((id, i) => i != handIdx).Count(id => FxMatch(f, id, c.Hero != null ? HeroUnit(c.Hero) : null)) : Hand.Count - 1;
             return rest > f.IV ? f.IV : 0;
         }
 
@@ -463,7 +536,7 @@ namespace Bolzena.Core
                 var c = CardOf(id);
                 if (CostOf(id) > Ap || CanPlay(id) != null) { Say($"개막 「{c.Name}」 — AP 가 모자라 나가지 않는다"); continue; }
                 if (!Hand.Contains(id) && !Draw.Contains(id)) continue;   // 앞의 카드가 나가는 사이 자리를 떠났다
-                if (!Hand.Contains(id)) { Draw.RemoveAt(Draw.LastIndexOf(id)); Hand.Add(id); CardCue(id, "draw", "hand", "curtain"); }
+                if (!Hand.Contains(id)) { Draw.RemoveAt(Draw.LastIndexOf(id)); Hand.Add(id); CardCue(id, "draw", "hand", "curtain"); }   // 개막은 덱에서 바로 「사용」 — 드로우가 아니다(감응 없음)
                 Say($"개막! 「{c.Name}」 — 저절로");
                 Cue("auto", (c.Hero != null ? HeroUnit(c.Hero) : null) ?? AliveParty().FirstOrDefault(), new Cue { Tag = Tag.Curtain, Label = "개막!", Name = c.Name, CardId = id, Hero = c.Hero });
                 PlayCard(Hand.LastIndexOf(id), AliveEnemies().FirstOrDefault()?.Idx ?? 0, new PlayOpts { Auto = true, OpeningPlay = true });

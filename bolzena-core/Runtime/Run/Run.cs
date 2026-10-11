@@ -133,11 +133,12 @@ namespace Bolzena.Core
             "란", "디아나_왕년", "벨라", "죠안", "우로스",
             "티그_영웅", "네르_빡침", "요미" };
 
-        /// <summary>그 마을 종족에서 원래 성격이 nature 인 사도(엘다인 제외 · 바탕 이름마다 하나 — id 차례). floor 를 주면 그 층 보스 성급(StarFits)만.</summary>
+        /// <summary>그 마을 종족에서 원래 성격이 nature 인 사도(엘다인 제외 · 바탕 이름마다 하나 — id 차례). floor 를 주면 그 층 보스 성급(StarFits)만.
+        /// 후보는 플레이어 사도와 클론 전용 사도(GameData.CloneHeroes — 2026-10-11 엘다인 20명 전환 뒤 보스는 모두 여기서) 둘 다.</summary>
         public static List<string> CloneCandidates(GameData d, string village, string nature, int floor = -1)
         {
             if (village == null || !d.Villages.TryGetValue(village, out var v)) return new List<string>();
-            return d.Heroes.Values.Where(h => h.Race == v.Race && h.Nature == nature && !NO_CLONE.Contains(h.Id) && (floor < 0 || StarFits(floor, h.Star)))
+            return d.Heroes.Values.Concat(d.CloneHeroes.Values).Where(h => h.Race == v.Race && h.Nature == nature && !NO_CLONE.Contains(h.Id) && (floor < 0 || StarFits(floor, h.Star)))
                 .Select(h => h.Id).OrderBy(x => x, StringComparer.Ordinal).GroupBy(HeroBase).Select(g => g.First()).ToList();
         }
 
@@ -329,6 +330,9 @@ namespace Bolzena.Core
             }
             // 판 단위 성장 · 카드 값(카드 인스턴스 카운터 — 엔진 상태 말고 데이터가 지은 이름)
             foreach (var kv in b.GrowthGain) S.Growth[kv.Key] = (S.Growth.TryGetValue(kv.Key, out var g0) ? g0 : new Stats()) + kv.Value;
+            // 판 전체 전투 기록 — 이 싸움의 사도별 몫을 더한다
+            S.Tally ??= new Dictionary<string, HeroTally>();
+            foreach (var kv in b.Tally) { if (!S.Tally.TryGetValue(kv.Key, out var t)) S.Tally[kv.Key] = t = new HeroTally(); t.Add(kv.Value); }
             var vals = new Dictionary<string, Dictionary<string, int>>();
             foreach (var kv in b.CardSt)
             {
@@ -380,13 +384,15 @@ namespace Bolzena.Core
             string kind = FightKind;
             T Pick<T>(IList<T> a) => a[RndInt(a.Count)];
             var glow = new Dictionary<string, Glow>();
-            var heroes = S.Party.Where(k => UniquesLeft(k).Count > 0 && S.Deck.Any(id => Data.Card(id) is CardDef c && c.Hero == k && !c.Unique)).ToList();
+            var heroes = S.Party.Where(k => (UniquesLeft(k).Count > 0 || BasicsLeft(k).Count > 0) && S.Deck.Any(id => Data.Card(id) is CardDef c && c.Hero == k && !c.Unique)).ToList();
             void Grace(string k)
             {
                 var bases = S.Deck.Where(id => Data.Card(id) is CardDef c && c.Hero == k && !c.Unique && !GameData.IsCopy(id)).ToList();
                 if (bases.Count == 0) return;
                 var at = Pick(bases);
-                glow[at] = new Glow { Kind = "hero", Hero = k, Options = new List<string> { Pick(UniquesLeft(k)) } };
+                var uq = UniquesLeft(k); var bs = BasicsLeft(k);
+                bool basic = bs.Count > 0 && (uq.Count == 0 || Rnd() < R.GRACE_BASIC);   // 빠진 기본 카드는 고유 카드보다 낮은 확률로
+                glow[at] = new Glow { Kind = "hero", Hero = k, Options = new List<string> { basic ? Pick(bs) : Pick(uq) } };
             }
             foreach (var k in heroes) if (Rnd() < (R.EPI_HERO.TryGetValue(kind, out var p) ? p : 0)) Grace(k);
             if (heroes.Count > 0 && R.EPI_SURE_HERO.Contains(kind) && glow.Count == 0) Grace(Pick(heroes));
@@ -479,6 +485,10 @@ namespace Bolzena.Core
         }
 
         /// <summary>아직 얻을 수 있는 고유 카드 — 덱에 있는 것 · 빼 버린 것은 빠진다.</summary>
+        /// <summary>시작 덱에서 빠진 그 사도의 기본 카드(id 「사도_sN」) 가운데 덱에 없고 뺀 적 없는 것 — 은총으로 다시 얻는 길(2026-10-10 시작 덱 4장).</summary>
+        public List<string> BasicsLeft(string heroKey) => Data.Cards.Values
+            .Where(c => c.Hero == heroKey && !c.Unique && !c.Token && System.Text.RegularExpressions.Regex.IsMatch(c.Id, @"_s\d+$"))
+            .Select(c => c.Id).Where(id => !S.Deck.Any(x => GameData.NoInst(x) == id) && !S.Dropped.Contains(id)).OrderBy(x => x, StringComparer.Ordinal).ToList();
         public List<string> UniquesLeft(string heroKey) => Data.GraceUniquesOf(heroKey).Where(id => !S.Deck.Contains(id) && !S.Dropped.Contains(id)).ToList();
 
         void ForgetCard(string cardId)
@@ -496,7 +506,7 @@ namespace Bolzena.Core
             return outs;
         }
 
-        public CardView ViewOf(string id) => Data.View(id, S.Flash.TryGetValue(id, out var n) ? n : 0);
+        public CardView ViewOf(string id) => GameData.WithBless(Data.View(id, S.Flash.TryGetValue(id, out var n) ? n : 0), S.Shin.TryGetValue(id, out var sh) ? Battle.BlessOf(Data.Card(id), sh) : null);   // 피해를 더하는 축복을 받은 스킬은 공격 카드
         public bool OnlyCard(string id) => Data.Card(id) != null && ViewOf(id).IsOnly;
         public string PowerWhy(string cardId) => OnlyCard(cardId) && HasCard(cardId) ? "유일 — 덱에 한 장만 넣을 수 있습니다" : null;
 
@@ -534,6 +544,9 @@ namespace Bolzena.Core
             return c != null && !GameData.IsCopy(id) && (c.Unique || c.Neutral) && c.Oracles.Count == 5 && !S.Flash.ContainsKey(id) && !Data.View(id).IsTaboo;
         }).ToList();
 
+        /// <summary>휴식 수련(강화) 후보 — 신탁 후보에서 축복만 받은 카드도 뺀다(2026-10-09 사용자). 지금은 축복이 늘 신탁과 함께 붙어 FlashTargets 와 같지만, 옛 저장(축복만 있는 카드)용 안전장치.</summary>
+        public List<string> CampTargets() => FlashTargets().Where(id => !S.Shin.ContainsKey(id)).ToList();
+
         /// <summary>이 카드에 쓸모 있는 축복 — 그 카드만의 축복이 있으면 그것들, 없으면 공용 풀에서 쓸모 있는 것.</summary>
         public static List<string> DivineKindsFor(CardView c)
         {
@@ -549,9 +562,9 @@ namespace Bolzena.Core
             return kinds.Where(k => !ok.TryGetValue(k, out var v) || v).ToList();
         }
 
-        public FlashOffer OfferFlash()
+        public FlashOffer OfferFlash(bool camp = false)
         {
-            var able = FlashTargets();
+            var able = camp ? CampTargets() : FlashTargets();
             if (able.Count == 0) return null;
             var cardId = able[RndInt(able.Count)];
             return OfferOf(cardId);
@@ -618,7 +631,7 @@ namespace Bolzena.Core
         public CampState EnterCamp(string kind)
         {
             string key = $"{S.Floor}:{kind}{(S.Map?.At != null ? ":" + S.Map.At : "")}";
-            if (!S.Stops.ContainsKey(key)) { S.Stops[key] = ""; S.Camp = new CampState { Key = key, Train = OfferFlash() }; }
+            if (!S.Stops.ContainsKey(key)) { S.Stops[key] = ""; S.Camp = new CampState { Key = key, Train = OfferFlash(true) }; }
             return S.Camp;
         }
         bool CampUsed => S.Camp == null || !S.Stops.ContainsKey(S.Camp.Key) || S.Stops[S.Camp.Key] != "";
@@ -634,7 +647,7 @@ namespace Bolzena.Core
         /// <summary>수련할 카드를 골랐다 — 그 카드의 신탁 후보 무작위 셋(R.ORACLE_PICKS). 한 번 굴리면 캠프 상태에 남아 다시 열어도 같다.</summary>
         public FlashOffer CampOffer(string cardId)
         {
-            if (S.Camp == null || cardId == null || !FlashTargets().Contains(cardId)) return null;
+            if (S.Camp == null || cardId == null || !CampTargets().Contains(cardId)) return null;
             S.Camp.Offers ??= new();
             var o = S.Camp.Offers.Find(x => x.CardId == cardId);
             if (o == null) { o = OfferOf(cardId); S.Camp.Offers.Add(o); }
@@ -736,7 +749,7 @@ namespace Bolzena.Core
             S.Deck.RemoveAt(i);
             S.Removals++;
             S.Shop.RemoveUsed = true;
-            ForgetCard(cardId);
+            if (!S.Deck.Contains(cardId)) ForgetCard(cardId);   // 같은 카드가 덱에 더 있으면 그 신탁 · 축복 · 카드 값은 남긴다(같은 기본 카드 2장 — 2026-10-11)
             Pick("remove", null, null, cardId);
             return null;
         }

@@ -1,0 +1,730 @@
+{
+  "heroes": [
+    {
+      "id": "루포",
+      "name": "루포",
+      "nature": "활발",
+      "race": "수인",
+      "role": "딜러",
+      "style": "계산형",
+      "star": 3,
+      "hp": 570,
+      "atk": 135,
+      "def": 28,
+      "crit": 10,
+      "blurb": "사료스탕스의 브레인이자 티그의 오른팔.",
+      "keyword": {
+        "name": "계획",
+        "desc": "루포 님의 치밀한 작전",
+        "carrier": "self",
+        "cap": 4,
+        "onMax": {
+          "make": "루포_plan",
+          "consume": true
+        },
+        "rules": [
+          {
+            "name": "치밀한 계획",
+            "when": {
+              "on": "tally"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "계획",
+                "v": 1
+              },
+              {
+                "k": "ap",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "삼총사의 대모험",
+            "when": {
+              "on": "turnStart"
+            },
+            "fx": [
+              {
+                "k": "draw",
+                "v": 1,
+                "who": "other"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "오의 여우회전!",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.12,
+            "target": "allEnemies",
+            "hits": 4
+          },
+          {
+            "k": "stack",
+            "id": "계획",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "루포_s1",
+        "루포_s2",
+        "루포_s3",
+        "루포_u2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "루포_s1",
+      "name": "단검 찌르기",
+      "hero": "루포",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "루포_s2",
+      "name": "단검 급소 찌르기",
+      "hero": "루포",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "루포_s3",
+      "name": "방어 자세",
+      "hero": "루포",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "hero": "루포",
+      "token": true,
+      "id": "루포_memo",
+      "name": "작전 쪽지",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "계획",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "루포 님이 몰래 적어 둔 다음 수입니다."
+    },
+    {
+      "id": "루포_plan",
+      "name": "계획대로!",
+      "hero": "루포",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.24,
+          "target": "randomEnemy",
+          "hits": 4
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "blurb": "쪽지에 적어 둔 그대로 — 여우가 한 바퀴 돌며 베어 냅니다"
+    },
+    {
+      "id": "루포_u2",
+      "name": "작전 지도 펼치기",
+      "hero": "루포",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "계획",
+          "v": 1
+        },
+        {
+          "k": "make",
+          "id": "루포_memo",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 2
+            },
+            {
+              "k": "make",
+              "id": "루포_memo",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "make",
+              "id": "루포_memo",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "make",
+                    "who": "other"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "계획",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ],
+          "power": true
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 1
+            },
+            {
+              "k": "cardStatus",
+              "id": "비용",
+              "v": -1,
+              "to": "hand",
+              "n": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "루포_u1",
+      "name": "루포류 신속베기",
+      "hero": "루포",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "신속"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.18,
+          "target": "oneEnemy",
+          "hits": 3
+        },
+        {
+          "k": "status",
+          "id": "고통",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "계획",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.27,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.29,
+              "target": "oneEnemy",
+              "hits": 4
+            },
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "make",
+              "id": "루포_memo",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "신속"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "status",
+              "id": "고통",
+              "v": 3,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "루포_u4",
+      "name": "오의 여우 꼬리",
+      "hero": "루포",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.25,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifNth",
+          "n": 3
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.98,
+          "target": "oneEnemy"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "루포_u3",
+      "name": "눈속임 단검",
+      "hero": "루포",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.9,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifSpent",
+          "n": 3
+        },
+        {
+          "k": "stack",
+          "id": "계획",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.35,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifSpent",
+              "n": 3
+            },
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.22,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifSpent",
+              "n": 3
+            },
+            {
+              "k": "make",
+              "id": "루포_plan",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "루포_memo",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.71,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "루포_s4",
+      "name": "작전 구상",
+      "hero": "루포",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "계획",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "계획",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

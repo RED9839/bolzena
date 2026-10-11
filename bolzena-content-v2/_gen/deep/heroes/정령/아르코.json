@@ -1,0 +1,741 @@
+{
+  "heroes": [
+    {
+      "id": "아르코",
+      "name": "아르코",
+      "nature": "활발",
+      "role": "딜러",
+      "style": "박자형",
+      "star": 3,
+      "hp": 720,
+      "atk": 135,
+      "def": 28,
+      "crit": 10,
+      "blurb": "춤밖에 모르는 적포도 스트리트 댄서. 공격과 스킬을 엇박으로 바꿔 낼 때마다 스텝이 쌓이고 — 누구의 카드든 상관없습니다 — 세 번째 스텝에 브레이크가 터집니다. 같은 춤만 추면 지루해서 멈춥니다.",
+      "keyword": {
+        "name": "스텝",
+        "desc": "엇박으로 이어 밟은 스텝",
+        "carrier": "self",
+        "cap": 3,
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5,
+          "consume": true
+        },
+        "rules": [
+          {
+            "name": "엇박 따라 밟기",
+            "when": {
+              "on": "play",
+              "who": "other"
+            },
+            "fx": [
+              {
+                "k": "ifPrevSame",
+                "not": true
+              },
+              {
+                "k": "stack",
+                "id": "스텝",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "음파 스텝",
+            "when": {
+              "on": "play",
+              "type": "공격"
+            },
+            "fx": [
+              {
+                "k": "dmg",
+                "ratio": 0.44,
+                "target": "randomEnemy"
+              }
+            ]
+          },
+          {
+            "name": "댄스 쇼다운",
+            "when": {
+              "on": "play",
+              "who": "other",
+              "type": "스킬"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "스텝",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "퍼플 쇼츠",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.2,
+            "target": "topEnemy",
+            "hits": 4
+          },
+          {
+            "k": "status",
+            "id": "회피",
+            "v": 1
+          },
+          {
+            "k": "ifFoe",
+            "id": "hp",
+            "pct": 0.5
+          },
+          {
+            "k": "critMod",
+            "v": 1,
+            "target": "self"
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.8,
+            "target": "oneEnemy"
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "아르코_s1",
+        "아르코_s2",
+        "아르코_s3",
+        "아르코_u3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "아르코_s1",
+      "name": "스텝 킥",
+      "hero": "아르코",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "아르코_s2",
+      "name": "토네이도 킥",
+      "hero": "아르코",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "아르코_s3",
+      "name": "방어 자세",
+      "hero": "아르코",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "아르코_u3",
+      "name": "프리즈",
+      "hero": "아르코",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "스텝",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.6
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "회피",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아르코_u1",
+      "name": "정정당당 댄스배틀",
+      "hero": "아르코",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "strip",
+          "target": "oneEnemy"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.27,
+          "target": "allEnemies",
+          "hits": 3
+        },
+        {
+          "k": "ifPrevSame",
+          "not": true
+        },
+        {
+          "k": "stack",
+          "id": "스텝",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "strip",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "ifPrevSame",
+              "not": true
+            },
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy",
+              "hits": 3
+            },
+            {
+              "k": "ifPrevSame",
+              "not": true
+            },
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.38,
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "strip",
+              "target": "allEnemies"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.35,
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "allEnemies",
+              "hits": 3
+            },
+            {
+              "k": "ifPrevSame",
+              "not": true
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아르코_u2",
+      "name": "토네이도 스핀",
+      "hero": "아르코",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.88,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifNth",
+          "n": 3
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.37,
+          "target": "allEnemies"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "아르코_u4",
+      "name": "적포도 스트리트",
+      "hero": "아르코",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "play",
+                "who": "any"
+              },
+              "fx": [
+                {
+                  "k": "ifPrevSame",
+                  "not": true
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.38,
+                  "target": "randomEnemy"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "any"
+                  },
+                  "fx": [
+                    {
+                      "k": "ifPrevSame",
+                      "not": true
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.57,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "drawn",
+                    "who": "any"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.41,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ],
+          "power": true
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "스텝",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "who": "any"
+                  },
+                  "fx": [
+                    {
+                      "k": "ifPrevSame",
+                      "not": true
+                    },
+                    {
+                      "k": "dmg",
+                      "ratio": 0.54,
+                      "target": "randomEnemy"
+                    },
+                    {
+                      "k": "stack",
+                      "id": "스텝",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "협공",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "스킬",
+                    "who": "any"
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.45,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아르코_s4",
+      "name": "스텝 밟기",
+      "hero": "아르코",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "스텝",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "스텝",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

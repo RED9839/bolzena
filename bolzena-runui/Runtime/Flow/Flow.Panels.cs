@@ -100,7 +100,7 @@ namespace Bolzena.RunUI
             SetToggle(c, "화면 흔들림 끄기", "타격과 고학년 때 화면이 흔들리지 않습니다", Settings.NoShake, v => Settings.NoShake = v, "set.shake");
             SetToggle(c, "컷인 건너뛰기", "고학년 컷인 없이 바로 씁니다", Settings.SkipCutin, v => Settings.SkipCutin = v, "set.cutin");
             SetToggle(c, "고학년 짧게 보기", "끄면 모험에서 처음 쓸 때만 길게 봅니다", Settings.UltShort, v => Settings.UltShort = v, "set.ultshort");
-            SetToggle(c, "사도 말풍선", "보스 전투 시작과 전투 승리 때 사도가 한마디씩 합니다", Settings.HeroTalk, v => Settings.HeroTalk = v, "set.herotalk");
+            SetToggle(c, "사도 말풍선", "전투 중 내 차례에 한참 가만히 있으면 사도가 한마디씩 합니다", Settings.HeroTalk, v => Settings.HeroTalk = v, "set.herotalk");
         }
 
         // 화면 모드 한 줄 풀이 — 설명 칸에 한 줄로 들어가게 줄였다(DisplayOptions.ModeHint 는 전투 창이 쓴다)

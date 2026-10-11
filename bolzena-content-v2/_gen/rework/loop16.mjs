@@ -1,3 +1,4 @@
+if (!process.env.BZ_OLD_GEN) { console.error("[중단] 옛 생성기입니다(2026-10-11 엘다인 리뉴얼). heroes/** 는 _gen/eldain 이 씁니다. 꼭 돌려야 하면 BZ_OLD_GEN=1 — 엘다인 파일을 덮어쓰니 주의."); process.exit(1); }
 // 시범16 신탁 값어치 맞춤 — 주의가 없어질 때까지 그 신탁의 피해 · 실드 · 회복만 조금씩(boost_시범16.json). 「기본보다 낫지 않다」 · 「코스트를 올렸으면 1.6배」 둘 다
 import fs from 'fs'; import { execSync } from 'child_process';
 const BZ = 'C:/projects/bolzena-core/Tools~/Dev/bz.cmd', DATA = process.env.BZDATA || 'C:/projects/bolzena-content-v2';

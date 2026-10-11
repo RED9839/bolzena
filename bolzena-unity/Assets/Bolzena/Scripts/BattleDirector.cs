@@ -23,6 +23,8 @@ namespace Bolzena
         public readonly List<EnemyHud> EnemyHuds = new List<EnemyHud>();
         public HandView Hand;
         public PartyHud Hud;
+        /// <summary>전투 기록 표(전투 중 — 위 오른쪽 단추로 여닫는다) · 끝 자세의 요약(MeterPanel).</summary>
+        public MeterPanel Meter, MeterSummary;
         public bool WaitingInput { get; private set; }
         /// <summary>턴 종료를 누른 뒤 적 차례가 끝날 때까지(턴 종료 단추가 「적 차례」 로 잠긴다).</summary>
         public bool EnemyTurn { get; private set; }
@@ -333,8 +335,10 @@ namespace Bolzena
             Hand.AllyAt = HeroAt;
             Hand.CanPlay = c =>
             {
-                int idx = Hand.Cards.FindIndex(v => v.Info == c);
-                return idx >= 0 && Battle.CanPlay(idx, out _);
+                // 손패 Layout 이 매 프레임 카드마다 부른다 — FindIndex 람다(카드마다 클로저 할당) 대신 그냥 돈다(perf_20261009)
+                var cs = Hand.Cards;
+                for (int k = 0; k < cs.Count; k++) if (cs[k].Info == c) return Battle.CanPlay(k, out _);
+                return false;
             };
             Hand.WhyNot = i => Battle.CanPlay(i, out var why) ? null : why;
             using (Bolzena.RunUI.Hitch.Span("HUD 세우기")) Hud = PartyHud.Create(UiRoot, s);
@@ -345,6 +349,7 @@ namespace Bolzena
             Hud.OnHero = i => OpenHeroInfo(i, Hud.PortraitRect(i));
             Hud.OnParty = () => OpenParty(1);
             Hud.OnAuto = () => { Auto = !Auto; Hud.SetAuto(Auto); Sfx.Play("ui_click", 0.5f); };
+            Hud.OnMeter = ToggleMeter;
             Hud.SetSpeed(Clock.Speed);
         }
 
@@ -547,10 +552,12 @@ namespace Bolzena
                     if (Auto && Modal.Open == null && !Hand.HasSelection && (autoT += Time.unscaledDeltaTime) > 0.45f / Mathf.Max(1, Clock.Speed)) { request = AutoPick(); autoT = 0; if (request != null) break; }
                     if (Hand.Request != null) { request = (ReqKind.Card, Hand.Request.Value.hand, Hand.Request.Value.target); Hand.Request = null; }
                     else PollInput();
+                    IdleTick();
                     PaintPreview();
                     yield return null;
                 }
                 WaitingInput = false;
+                IdleClose();
                 Hand.Interactive = false;
                 ClearPreview();
                 SetUltSel(-1);
@@ -621,6 +628,7 @@ namespace Bolzena
             if (PointerInput.Key(Key.E)) { RequestEnd(); return; }
             if (PointerInput.Key(Key.A)) { OpenPile(0); return; }
             if (PointerInput.Key(Key.S)) { OpenPile(1); return; }
+            if (PointerInput.Key(Key.D)) { ToggleMeter(); return; }
             Key[] ultKeys = { Key.Z, Key.X, Key.C };
             for (int k = 0; k < ultKeys.Length && k < Hud.Ults.Count; k++) if (PointerInput.Key(ultKeys[k])) { TapUlt(k); return; }
             if (UltSel >= 0)
@@ -647,6 +655,7 @@ namespace Bolzena
             }
 
             if (!PointerInput.Tap || Hand.HasSelection || Hand.Hover >= 0) return;
+            if (Meter != null && Meter.Over(p)) return;   // 전투 기록 표 위 — 탭(알약)만, 싸움터로 넘기지 않는다
             if (Hud.OverEnd(p)) { Sfx.Play("ui_click", 0.6f); RequestEnd(); return; }
             for (int k = 0; k < Hud.Ults.Count; k++) if (Hud.Ults[k].Over(p)) { TapUlt(k); return; }
             int te = EnemyAt(p);
@@ -721,6 +730,17 @@ namespace Bolzena
         static Rect RectOf(Transform t, float d) { var s = d * Mathf.Abs(t.lossyScale.x); return new Rect(t.position.x - s / 2, t.position.y - s / 2, s, s); }
         public void OpenPause() { if (Modal.Open == null) InfoPanel.Pause(UiRoot, ToggleSpeed); }
 
+        /// <summary>전투 기록 표를 여닫는다 — 처음 열 때 짓고, 그 뒤로는 켜고 끄기만(고른 탭은 남는다).</summary>
+        public void ToggleMeter()
+        {
+            if (Over) return;
+            if (Meter == null) Meter = MeterPanel.Create(UiRoot, false);
+            else Meter.gameObject.SetActive(!Meter.gameObject.activeSelf);
+            if (Meter.gameObject.activeSelf) Meter.Set(Battle.Snapshot);
+            Hud.SetMeter(Meter.gameObject.activeSelf);
+            Emit(Meter.gameObject.activeSelf ? "meter_open" : "meter_close");
+        }
+
         // ── 미리보기 — 든 카드(고른 고학년)를 그 대상에게 내면 ──
         (int card, int aim, bool lifted, int ult, int ultAim) pvKey = (-9, -9, false, -9, -9);
 
@@ -787,7 +807,7 @@ namespace Bolzena
             Sfx.Play("battle_start", 0.6f);
             for (int i = 0; i < Heroes.Count; i++) StartCoroutine(RunIn(Heroes[i], Heroes[i].Home, 0.8f + i * 0.08f));
             yield return Clock.Wait(0.5f);
-            Sfx.Voice(Heroes[0].name.Replace("hero_", ""), "spawn");
+            spawnVoiced = Sfx.Voice(Heroes[0].name.Replace("hero_", ""), "spawn");
             yield return Clock.Wait(0.5f);
         }
 
@@ -921,6 +941,7 @@ namespace Bolzena
             }
             Hand.Sync(s.Hand);
             Hand.Layout();
+            if (Meter != null && Meter.gameObject.activeSelf) Meter.Set(s);   // 전투 기록 — 행동마다 새 값
         }
 
         IEnumerator Deal(List<CardInfo> cards)
@@ -1191,7 +1212,7 @@ namespace Bolzena
                     if (!Bolzena.RunUI.Settings.SkipCutin)
                     {
                         Sfx.Play("boss_entry", 0.8f);
-                        string hname = Look.Data.Hero(cdef.Clone)?.Name ?? b.Name;
+                        string hname = Look.Data.CloneHero(cdef.Clone)?.Name ?? b.Name;   // 클론 전용 사도(2026-10-11 엘다인 전환)도
                         yield return UltCutin.Play(ScreenRoot, Look.Hero(cdef.Clone).Art, "", hname, new Color(0.85f, 0.12f, 0.12f), true, "클론", 1.0f, true, "spawn");
                         Emit("clone_entry");
                     }
@@ -1397,13 +1418,18 @@ namespace Bolzena
             Hand.Hidden = true;
             yield return Clock.WaitU(0.6f);
             foreach (var h in Heroes) h.Loop(h.Resolve("Victory") ?? "Idle");
-            Sfx.Voice(Heroes[0].name.Replace("hero_", ""), "victory");
+            victoryHero = Heroes.Count > 0 ? Heroes[UnityEngine.Random.Range(0, Heroes.Count)] : null;   // 2026-10-09 승리 목소리는 편성 셋 중 무작위 한 명(사용자) — 예전엔 늘 맨 앞
+            victoryVoiced = victoryHero != null && Sfx.Voice(victoryHero.name.Replace("hero_", ""), "victory");
             yield return Banners.Victory(UiRoot);
             Emit("victory");
             yield return Clock.WaitU(1.4f);
             // 끝 자세 — 싸움터를 그대로 두고(사도는 대기 동작) 손패 · 전투 HUD 를 걷는다. 위 파티 HP 띠와 「BATTLE END」 칩만
             foreach (var h in Heroes) h.Idle();
             Hud.EndPose(true);
+            // 전투 기록 요약 — 전투 중 표는 걷고, 왼쪽 아래에 이번 싸움(판이면 판 전체 탭도) 요약 · 가장 많이 친 사도 강조
+            if (Meter != null) Meter.gameObject.SetActive(false);
+            MeterSummary = MeterPanel.Create(UiRoot, true);
+            MeterSummary.Set(Battle.Snapshot);
             // 승리 띠를 걷는다 — 끝 자세(싸움터만) 위에 보상 줄이 올라오게
             var vic = UiRoot.Find("Victory");
             if (vic != null) StartCoroutine(FadeOut(vic, 0.5f));

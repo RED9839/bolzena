@@ -290,7 +290,7 @@ namespace Bolzena.UI
                     foreach (var t in h.Traits)
                     {
                         if (t.Kind != kind) continue;
-                        if (!any) { st.Head(kind); any = true; }
+                        if (!any) { st.Head(kind == "고유 효과" ? "고유 능력" : kind); any = true; }
                         string stacks = kind == "고유 효과" && t.Name == h.KeywordName ? $"  <color={Tone.GoldTag}>{h.KeywordStacks}</color>" : "";
                         Entry(st, (kind == "고유 효과" ? $"<color={Tone.GoldTag}>「{t.Name}」</color>" : t.Name) + stacks, t.Sub, t.Body);
                     }

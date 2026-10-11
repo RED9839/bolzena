@@ -47,12 +47,17 @@ for b in sorted(BG):
     if os.path.exists(p):
         cp(p, f"{DST}/RunArt/Bg/{b}.jpg", (1920, 1080))
 
-# 사도 초상 — 135명(skin 빼고 기본 그림만)
+# 사도 초상 — 플레이어 · 클론 · NPC 사도(skin 빼고 기본 그림만). 2026-10-11 엘다인 20명 전환: 사도 갈래(hero_sets.py)로 거른다
 roster = json.load(open(os.path.join(DST, "RunUI", "roster.json"), encoding="utf-8"))["heroes"]
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import hero_sets
+KIND = hero_sets.kinds(roster)          # 그림 키 → P(플레이어) · C(클론 전용) · N(이벤트 NPC)
+CARD_KEEP = hero_sets.card_keep(roster, KIND)   # 카드 그림은 플레이어 사도 것만
+print("사도 갈래", {k: sum(1 for v in KIND.values() if v == k) for k in "PCN"})
 n = 0
 for h in roster:
     p = f"{SRC}/heroicons/{h['art']}.png"
-    if h.get("art") and os.path.exists(p):
+    if h.get("art") and h["art"] in KIND and os.path.exists(p):
         cp(p, f"{DST}/RunArt/Heroes/{h['art']}.png", (192, 192))
         n += 1
 print("초상", n)
@@ -114,7 +119,7 @@ for folder, art in [("리코타", "ricota"), ("캬롯", "kyarot"), ("시온더�
 # 이벤트 대상 · NPC(콘텐츠 events 의 npc · event_style 의 target) 스탠딩 — 원본 폴더 한글 이름 → 그림 키(roster.json art). SD 는 위 Spine/<한글 키> 로 이미 있다
 for folder, art in [("가비아", "gabia"), ("레이지", "lazy"), ("림", "rim"), ("마고", "mago"), ("멜루나", "meluna"), ("모모", "momo"), ("베니", "beni"),
                     ("셰럼", "sherum"), ("스피키", "speaki"), ("실라", "sylla"), ("아네트", "arnet"), ("알레트", "allet"), ("에슈르", "ashur"), ("오르", "orr"),
-                    ("유미미", "yumimi"), ("이프리트", "ifrit"), ("타이다", "taida"), ("티그", "tig"), ("폴랑", "polan"), ("프리클", "fricle"), ("힐데", "hilde"), ("셰이디", "shady")]:
+                    ("유미미", "yumimi"), ("이프리트", "ifrit"), ("타이다", "taida"), ("티그", "tig"), ("폴랑", "polan"), ("힐데", "hilde"), ("셰이디", "shady")]:   # 프리클은 2026-10-11 뺌(NPC · 클론 아님)
     p = f"{SRC}/spine/standing/{folder}"
     if os.path.isdir(p):
         spine(p, "st_" + art)
@@ -163,7 +168,7 @@ ns = 0
 for h in roster:
     art = h.get("art")
     src = next((f"{STAND}/{n}.webp" for n in (h["ko"], h["key"]) if os.path.exists(f"{STAND}/{n}.webp")), None)
-    if not art or not src:
+    if not art or not src or art not in KIND:   # 스탠딩 렌더 — 플레이어 · 클론(얼굴 대체) · NPC
         continue
     dst = f"{DST}/RunArt/Standing/{art}.png"
     if os.path.exists(dst):
@@ -196,7 +201,7 @@ print("스탠딩", ns, "새로 ·", len(meta), "명")
 from PIL import ImageFilter
 table = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Runtime", "Resources", "RunUI", "cardart.json"), encoding="utf-8"))["cards"]
 ni = 0
-for name in sorted(set(table.values())):
+for name in sorted(set(v for c, v in table.items() if CARD_KEEP(c))):   # 플레이어 사도 카드의 아이콘만
     # 「…__f」 = 좌우 뒤집기 · 「…__t」 = 뒤집기 + 금빛 틴트(한 사도 안에서 같은 아이콘이 겹칠 때 — Tools~/cardpic_dedupe.py)
     var = name[-3:] if name.endswith(("__f", "__t")) else ""
     src = f"{SRC}/skillicons/{name[:-3] if var else name}.png"
@@ -227,7 +232,7 @@ print("카드 아이콘", ni, "새로")
 #   사도 상세 「고학년」 칸이 RunArt/Skill/icon_graduateskill_<art> 를 쓴다(원 마스크로 오린다). 135명 모두 있다.
 #   ultimate_icon_common3 = 원작 공용 고학년 아이콘(에르핀 볼따구 · 케이크) — 사도 그림이 없을 때 대신 쓴다.
 ng = 0
-for name in [f"icon_graduateskill_{h['art']}" for h in roster if h.get("art")] + ["ultimate_icon_common3"]:
+for name in [f"icon_graduateskill_{h['art']}" for h in roster if KIND.get(h.get("art")) == "P"] + ["ultimate_icon_common3"]:   # 사도 상세 — 플레이어 사도만
     src, dst = f"{SRC}/skillicons/{name}.png", f"{DST}/RunArt/Skill/{name}.png"
     if os.path.exists(src) and not os.path.exists(dst):
         cp(src, dst)
@@ -245,7 +250,7 @@ objdir = f"{DST}/RunArt/CardObj"
 keep_old = os.environ.get("BOLZENA_KEEP_OLD_CARDPIC") == "1"
 want, objs = {}, {}
 for cid, p in cardpic.load().items():
-    if p.get("file"):
+    if p.get("file") and CARD_KEEP(cid):   # 플레이어 사도 카드만(빠진 사도의 그림은 아래 「지움」 이 정리한다)
         (objs if cardpic.is_obj(p) else want)[cardpic.name_of(p)] = p
         if keep_old and cardpic.is_obj(p):
             want[cardpic.name_of(p)] = p

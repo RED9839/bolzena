@@ -1,0 +1,607 @@
+{
+ "$comment": "클론 보스로만 나오는 사도(2026-10-11 엘다인 20명 전환). 플레이어 사도 목록에는 없다 — 보스 클론(enemies.clone)이 쓰는 이름 · 종족 · 성격 · 성급 · 고학년과, 고학년 글에 필요한 고유 효과 · 변신 이름만. 사도 원본(카드 · 패시브 · 장비)은 C:/projects/_backup/heroes_non_eldain_20261011/heroes/<종족>/<id>.json. 되살리기: _measure/엘다인_전환/되살리기.md",
+ "cloneHeroes": [
+  {
+   "id": "네티",
+   "name": "네티",
+   "nature": "광기",
+   "race": "용족",
+   "role": "탱커",
+   "style": "두 얼굴형",
+   "star": 3,
+   "hp": 810,
+   "atk": 115,
+   "def": 48,
+   "crit": 5,
+   "blurb": "유물만 보면 눈이 도는 도굴꾼 용족. 평소엔 아이들을 지키는 보모지만, 유물 냄새를 맡으면 집착에 빠져 드릴만 돌립니다. 자루가 차면 캐낸 광물을 나눠 줍니다.",
+   "keyword": {
+    "name": "발굴 자루",
+    "desc": "캐낸 것을 담아 두는 자루",
+    "carrier": "self",
+    "cap": 5
+   },
+   "forms": [
+    {
+     "id": "네티_집착",
+     "name": "유물 집착",
+     "turns": 2
+    }
+   ],
+   "ult": {
+    "name": "기가 드릴 차지",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.4,
+      "target": "allEnemies",
+      "hits": 4
+     },
+     {
+      "k": "stack",
+      "id": "발굴 자루",
+      "v": 3
+     },
+     {
+      "k": "form",
+      "id": "네티_집착"
+     }
+    ]
+   }
+  },
+  {
+   "id": "다야",
+   "name": "다야",
+   "nature": "순수",
+   "race": "용족",
+   "role": "딜러",
+   "style": "성장형",
+   "star": 3,
+   "hp": 650,
+   "atk": 140,
+   "def": 40,
+   "crit": 10,
+   "blurb": "완벽해지기를 꿈꾸는 노력파 다이아몬드 용족. 손에 쥔 카드를 갈고 닦아 광택을 올리면 그 카드가 판 내내 반짝이고, 쓰러뜨린 적마다 원석이 다시 솟습니다.",
+   "keyword": {
+    "name": "다이아 쓰라림",
+    "desc": "살갗에 박힌 다이아 조각",
+    "carrier": "enemy",
+    "cap": 3
+   },
+   "ult": {
+    "name": "다이아 브레…츄!",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 2,
+      "target": "allEnemies"
+     },
+     {
+      "k": "tough",
+      "v": 1,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "고통",
+      "v": 2,
+      "target": "allEnemies"
+     },
+     {
+      "k": "make",
+      "id": "다야_gem",
+      "v": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "다야_퓨어샤인",
+   "name": "다야(퓨어샤인)",
+   "nature": "광기",
+   "race": "용족",
+   "role": "서포터",
+   "style": "회복형",
+   "star": 3,
+   "hp": 650,
+   "atk": 100,
+   "def": 50,
+   "crit": 5,
+   "blurb": "마법 소녀로 변신한 다야. 변신이 부끄러워 누구보다 빨리 끝내고 싶습니다. 발밑의 영역이 파티를 아물리고, 넘친 빛은 반짝임으로 모여 파티의 다음 한 수를 빛냅니다.",
+   "keyword": {
+    "name": "퓨어☆영역",
+    "desc": "발밑에 펼친 반짝이는 마법진",
+    "carrier": "self",
+    "cap": 3
+   },
+   "keywords": [
+    {
+     "name": "반짝임",
+     "desc": "넘친 빛이 모인 반짝이",
+     "carrier": "self",
+     "cap": 4
+    }
+   ],
+   "ult": {
+    "name": "퓨어☆샤이닝 빔",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "shield",
+      "ratio": 1.2
+     },
+     {
+      "k": "status",
+      "id": "결의",
+      "v": 1
+     },
+     {
+      "k": "dmg",
+      "ratio": 0.3,
+      "target": "farEnemy"
+     },
+     {
+      "k": "status",
+      "id": "사기",
+      "v": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "루드",
+   "name": "루드",
+   "nature": "활발",
+   "race": "용족",
+   "role": "탱커",
+   "style": "박자형",
+   "star": 3,
+   "hp": 810,
+   "atk": 115,
+   "def": 48,
+   "crit": 5,
+   "blurb": "무엇이든 운동으로 바꾸는 용족 서열 2위 헬창. 똑같은 동작을 잇달아 되풀이할 때마다 렙이 쌓이고, 네 번째 렙에 한 세트를 끝내며 다음 한 수에 힘을 싣습니다.",
+   "keyword": {
+    "name": "렙",
+    "desc": "같은 동작을 되풀이한 횟수",
+    "carrier": "self",
+    "cap": 4
+   },
+   "ult": {
+    "name": "임팩트 프레스",
+    "cost": 300,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.3,
+      "base": "def",
+      "target": "allEnemies",
+      "hits": 4
+     },
+     {
+      "k": "status",
+      "id": "기절",
+      "v": 1,
+      "target": "oneEnemy"
+     },
+     {
+      "k": "stack",
+      "id": "렙",
+      "v": 4
+     }
+    ]
+   }
+  },
+  {
+   "id": "리츠",
+   "name": "리츠",
+   "nature": "광기",
+   "race": "용족",
+   "role": "딜러",
+   "style": "두 얼굴형",
+   "star": 3,
+   "hp": 650,
+   "atk": 140,
+   "def": 40,
+   "crit": 10,
+   "blurb": "소심하고 공손한 은둔 고수 용족. 먼저 맞기 전까진 몸을 사리며 파티를 감싸지만, 정당방위가 서면 버튼이 눌려 반말로 박살을 내고 — 다 털고 나면 간신히 이겼다며 돌아옵니다.",
+   "keyword": {
+    "name": "정당방위",
+    "desc": "먼저 맞아서 생긴 정당한 이유",
+    "carrier": "self",
+    "cap": 4
+   },
+   "forms": [
+    {
+     "id": "리츠_광전",
+     "name": "광전",
+     "turns": 2
+    }
+   ],
+   "ult": {
+    "name": "벼리기",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.5,
+      "target": "allEnemies",
+      "hits": 3
+     },
+     {
+      "k": "stack",
+      "id": "정당방위",
+      "v": 2
+     },
+     {
+      "k": "formEnd"
+     }
+    ]
+   }
+  },
+  {
+   "id": "시스트",
+   "name": "시스트",
+   "nature": "광기",
+   "race": "용족",
+   "role": "딜러",
+   "style": "돈형",
+   "star": 3,
+   "hp": 650,
+   "atk": 140,
+   "def": 40,
+   "crit": 10,
+   "blurb": "힘 대신 돈으로 가치를 증명하는 자수정의 용족 밀수꾼. 쓰러뜨리고 깨뜨리고 손패를 떨이로 넘겨 수수료를 벌고, 그 수수료로 4차원 바구니에서 특급 배송을 꺼냅니다.",
+   "keyword": {
+    "name": "수수료",
+    "desc": "거래마다 슬쩍 얹는 웃돈",
+    "carrier": "self",
+    "cap": 6
+   },
+   "ult": {
+    "name": "플렉스 건",
+    "cost": 150,
+    "fx": [
+     {
+      "k": "atkMod",
+      "v": 0.15,
+      "target": "self"
+     },
+     {
+      "k": "ap",
+      "v": 1
+     },
+     {
+      "k": "stack",
+      "id": "수수료",
+      "v": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "실피르",
+   "name": "실피르",
+   "nature": "우울",
+   "race": "용족",
+   "role": "딜러",
+   "style": "박자형",
+   "star": 2,
+   "hp": 590,
+   "atk": 120,
+   "def": 38,
+   "crit": 10,
+   "blurb": "루드에게 늘 한 끗 차로 지는 사파이어의 용족, 자칭 2인자. 첫 자리는 동료에게 내주고 둘째 자리에 날을 세웁니다 — 단검이 다섯 모이면 다음 한 수에 몰아 던집니다.",
+   "keyword": {
+    "name": "2인자의 단검",
+    "desc": "루드보다 하나 더 챙긴 단검",
+    "carrier": "self",
+    "cap": 5
+   },
+   "ult": {
+    "name": "킹갓zi존 실피르 어택",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.5,
+      "target": "randomEnemy",
+      "hits": 8
+     },
+     {
+      "k": "stack",
+      "id": "2인자의 단검",
+      "v": 2
+     },
+     {
+      "k": "status",
+      "id": "둔화",
+      "v": 1,
+      "target": "allEnemies"
+     }
+    ]
+   }
+  },
+  {
+   "id": "아네트",
+   "name": "아네트",
+   "nature": "광기",
+   "race": "용족",
+   "role": "서포터",
+   "style": "거드는 형",
+   "star": 3,
+   "hp": 650,
+   "atk": 100,
+   "def": 50,
+   "crit": 5,
+   "blurb": "결투를 붙이고 판정하는 구경꾼 석류석 용족. 아군 하나를 오늘의 MVP로 찍어 두면 MVP가 칠 때마다 관중석이 들끓고, 함성이 넷이면 파티의 다음 한 수가 한껏 달아오릅니다.",
+   "keyword": {
+    "name": "오늘의 MVP",
+    "desc": "아네트가 점찍은 오늘의 주인공",
+    "carrier": "hero",
+    "cap": 2
+   },
+   "keywords": [
+    {
+     "name": "관중 함성",
+     "desc": "MVP가 칠 때마다 터지는 관중석의 함성",
+     "carrier": "self",
+     "cap": 3
+    }
+   ],
+   "ult": {
+    "name": "편파 중계",
+    "cost": 250,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.3,
+      "target": "randomEnemy",
+      "hits": 5
+     },
+     {
+      "k": "status",
+      "id": "약화",
+      "v": 2,
+      "target": "topEnemy"
+     },
+     {
+      "k": "stack",
+      "id": "오늘의 MVP",
+      "v": 2,
+      "target": "strongestAlly"
+     }
+    ]
+   }
+  },
+  {
+   "id": "아라그니아",
+   "name": "아라그니아",
+   "nature": "냉정",
+   "race": "용족",
+   "role": "서포터",
+   "style": "아껴 두기형",
+   "star": 3,
+   "hp": 650,
+   "atk": 100,
+   "def": 50,
+   "crit": 5,
+   "blurb": "진주에서 태어난 해룡 여왕. 산호를 씹어 진주를 빚고 다친 백성에게 하나씩 날려 보냅니다. 다 내주지 않고 쥐어 둔 진주는 턴을 마칠 때 삼켜 단단한 껍질이 됩니다.",
+   "keyword": {
+    "name": "진주 구슬",
+    "desc": "다친 백성에게 날아가는 구슬",
+    "carrier": "self",
+    "cap": 6
+   },
+   "ult": {
+    "name": "파도 치는 피날레",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.3,
+      "target": "randomEnemy",
+      "hits": 3
+     },
+     {
+      "k": "status",
+      "id": "약화",
+      "v": 2,
+      "target": "allEnemies"
+     },
+     {
+      "k": "stack",
+      "id": "진주 구슬",
+      "v": 3
+     }
+    ]
+   }
+  },
+  {
+   "id": "오팔",
+   "name": "오팔",
+   "nature": "순수",
+   "race": "용족",
+   "role": "서포터",
+   "style": "박자형",
+   "star": 3,
+   "hp": 650,
+   "atk": 100,
+   "def": 50,
+   "crit": 5,
+   "blurb": "금방 울음을 터뜨리는 아기 오팔 용. 파티가 맞을 때마다 눈물이 맺히고, 셋이 차면 울음을 그치려 탭댄스를 춥니다. 이번 턴 셋째 자리를 오팔이 밟으면 보석 파편이 튀며 파티의 다음 한 수가 반짝입니다.",
+   "keyword": {
+    "name": "눈물 그렁",
+    "desc": "아무 이유로나 그렁그렁한 눈물",
+    "carrier": "self",
+    "cap": 3
+   },
+   "keywords": [
+    {
+     "name": "탭",
+     "desc": "이어 밟은 탭",
+     "carrier": "self",
+     "cap": 3
+    }
+   ],
+   "ult": {
+    "name": "오팔 파우더",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "shield",
+      "ratio": 2.2
+     },
+     {
+      "k": "status",
+      "id": "약화",
+      "v": 2,
+      "target": "allEnemies"
+     },
+     {
+      "k": "status",
+      "id": "둔화",
+      "v": 1,
+      "target": "allEnemies"
+     },
+     {
+      "k": "make",
+      "id": "오팔_tap",
+      "v": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "제이드",
+   "name": "제이드",
+   "nature": "냉정",
+   "race": "용족",
+   "role": "딜러",
+   "style": "손 만들기형",
+   "star": 3,
+   "hp": 650,
+   "atk": 140,
+   "def": 40,
+   "crit": 10,
+   "blurb": "절판 도서를 모으고 누구에게도 빌려주지 않는 비취의 용족 책벌레. 아끼는 책은 손에 쥔 채 베껴 쓴 필사본만 내놓고, 비취옥이 셋 차오르면 다음 한 수에 마법서가 펼쳐집니다.",
+   "keyword": {
+    "name": "비취옥",
+    "desc": "씹어 삼킨 옥돌의 마력",
+    "carrier": "self",
+    "cap": 3
+   },
+   "ult": {
+    "name": "게르마늄 탐지법",
+    "cost": 150,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.3,
+      "target": "allEnemies"
+     },
+     {
+      "k": "stack",
+      "id": "비취옥",
+      "v": 3
+     },
+     {
+      "k": "ap",
+      "v": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "키디언",
+   "name": "키디언",
+   "nature": "우울",
+   "race": "용족",
+   "role": "딜러",
+   "style": "격파형",
+   "star": 3,
+   "hp": 650,
+   "atk": 140,
+   "def": 40,
+   "crit": 10,
+   "blurb": "흑요석의 용족 닌자. 무너진 적의 틈에서, 가장 약한 적에게 그림자처럼 나타나 끊어 내고 — 끊을 때마다 별빛이 쌓여 다음 칼이 더 날카로워집니다.",
+   "keyword": {
+    "name": "별빛 조각",
+    "desc": "어둠 속에 모은 별빛",
+    "carrier": "self",
+    "cap": 4
+   },
+   "ult": {
+    "name": "쉐도우 다이브",
+    "cost": 150,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 1.3,
+      "target": "lowEnemy"
+     },
+     {
+      "k": "stack",
+      "id": "별빛 조각",
+      "v": 2
+     },
+     {
+      "k": "ifKill"
+     },
+     {
+      "k": "dmg",
+      "ratio": 1,
+      "target": "lowEnemy"
+     }
+    ]
+   }
+  },
+  {
+   "id": "피라",
+   "name": "피라",
+   "nature": "광기",
+   "race": "용족",
+   "role": "서포터",
+   "style": "돈형",
+   "star": 3,
+   "hp": 650,
+   "atk": 100,
+   "def": 50,
+   "crit": 5,
+   "blurb": "위조 금화를 끊고 진짜 화금석을 찾는 황철석의 용족 연금술사. 적에게 약점을 걸 때마다 수금해 부유함을 쌓고, 다섯이 차면 도금 명함을 찍어 냅니다. 쥐어 둔 부유함은 동료의 손끝을 금빛으로 달구고, 털면 도금 경품을 사 들입니다.",
+   "keyword": {
+    "name": "부유함",
+    "desc": "번쩍이는 금 부스러기",
+    "carrier": "self",
+    "cap": 5
+   },
+   "ult": {
+    "name": "피버☆타임이다!",
+    "cost": 200,
+    "fx": [
+     {
+      "k": "dmg",
+      "ratio": 0.4,
+      "target": "randomEnemy"
+     },
+     {
+      "k": "perStack",
+      "id": "부유함",
+      "n": 1
+     },
+     {
+      "k": "dmg",
+      "ratio": 0.7,
+      "target": "randomEnemy"
+     },
+     {
+      "k": "spend",
+      "id": "부유함",
+      "all": true
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -17,10 +17,28 @@ namespace Bolzena.Core
 
         List<string> PileOf(string name) => name switch { "draw" => Draw, "discard" => Discard, "gone" => Gone, "hand" => Hand, _ => Discard };
 
+        /// <summary>
+        /// perPile · ifPile 의 셈(2026-10-10 빌드 피드백 엔진 요청) — 더미(draw · discard · gone · hand) 장수에 더해
+        /// token(손의 생성 카드 장수) · broken(이번 전투 격파한 수) · drawn(이번 턴 뽑은 장수) · discards(이번 전투 버린 장수) · morale(파티 사기).
+        /// </summary>
+        public int PileCount(string name) => name switch
+        {
+            "token" => Hand.Count(h => Data.Card(GameData.BaseId(h))?.Token ?? false),
+            "broken" => Counts.TryGetValue(N_BROKEN, out var b) ? b : 0,
+            "drawn" => Counts.TryGetValue(N_DRAWN, out var dr) ? dr : 0,
+            "discards" => Counts.TryGetValue(N_DISCARD, out var ds) ? ds : 0,
+            "morale" => St(Pool, "사기"),
+            // 「더미|카드 거르개 태그」(엘다인 ▶E35 — 뽑을 더미의 「마탄」 수, 카드 id 도 태그로 센다)
+            _ when name.Contains("|") => PileOf(name.Substring(0, name.IndexOf('|'))).Count(id => HasTagB(id, name.Substring(name.IndexOf('|') + 1))),
+            _ => PileOf(name).Count,
+        };
+        /// <summary>이번 전투 격파 수 · 이번 턴 뽑은 장수 · 이번 전투 버린 장수(Counts — 판 복사 · 저장에 따라간다).</summary>
+        internal const string N_BROKEN = "n|broken", N_DRAWN = "n|drawnTurn", N_DISCARD = "n|discards";
+
         int KitCount(FxCtx ctx, string id)
         {
             if (id.StartsWith(PLAYED_PER, StringComparison.Ordinal)) { var tg = id.Substring(PLAYED_PER.Length); return tg.Length == 0 ? PlayTags.Count : PlayTags.Count(t => t.Contains(tg)); }
-            if (id.StartsWith(PILE_PER, StringComparison.Ordinal)) return PileOf(id.Substring(PILE_PER.Length)).Count;
+            if (id.StartsWith(PILE_PER, StringComparison.Ordinal)) return PileCount(id.Substring(PILE_PER.Length));
             if (id.StartsWith(CARDST_PER, StringComparison.Ordinal)) return CardStOf(ctx.CardId, id.Substring(CARDST_PER.Length));
             if (id.StartsWith(EVENT_PER, StringComparison.Ordinal)) return ctx.EventV / Math.Max(1, int.Parse(id.Substring(EVENT_PER.Length)));
             if (id.StartsWith(GONE_PER, StringComparison.Ordinal)) { var hk = id.Substring(GONE_PER.Length); return hk.Length == 0 ? GoneN : GoneOf(hk); }
@@ -91,6 +109,7 @@ namespace Bolzena.Core
                     if (t.Dead || Over != null) continue;
                     int v = HitAmount(who, f.Ratio + Morale(), bas: f.Base);
                     Hurt(t, v, new HurtOpts { From = who, Card = true });
+                    if (!t.Dead && Over == null) ToughHit(t, R.ToughExtra(IsWeakHit(who, t, null), (f.Target ?? "randomEnemy") == "allEnemies"));   // 소환물 공격 강인도(카제나 표 — 약점 0.5칸)
                 }
             Say($"「{kw.Id}」 {hits}대 — 따라 친다"); StatusCue(who, $"{kw.Id} ×{hits}", true);
             if (Over != null) return;
@@ -108,8 +127,10 @@ namespace Bolzena.Core
                 case FxK.IfChoice: gate = ctx.Choice == f.N; return true;
                 case FxK.IfRandom: gate = Rng.Next() < (f.Pct > 0 ? f.Pct : 0.5); return true;
                 case FxK.IfHand: gate = Hand.Count <= f.N; return true;
-                case FxK.IfPile: gate = PileOf(f.From ?? "discard").Count >= Math.Max(1, f.N); return true;
-                case FxK.IfNth: gate = ctx.PlayedBefore + 1 == f.N; return true;
+                case FxK.IfPile:
+                    if (f.From == "record") { gate = RecordsOf(owner?.Key).Count >= Math.Max(1, f.N); if (f.Not) gate = !gate; return true; }   // 받아 적은 쪽(엘다인 3차 — 죠안)
+                    gate = PileCount(f.From ?? "discard") >= Math.Max(1, f.N); return true;
+                case FxK.IfNth: gate = f.After ? ctx.PlayedBefore + 1 >= f.N || ctx.NthForce : ctx.PlayedBefore + 1 == f.N; if (f.Not) gate = !gate; return true;   // after — n번째 이후(엘다인 4차 ▶E77 · 정각)
                 case FxK.IfStreak:
                     {
                         int k = 0;
@@ -121,7 +142,9 @@ namespace Bolzena.Core
                 case FxK.IfFoe:
                     {
                         var t = Resolve(ctx, "oneEnemy").FirstOrDefault();
-                        gate = t != null && (f.Id switch
+                        if (f.HitsBy != null) { gate = t != null && owner != null && HitsBy(t, owner.Key) >= Math.Max(1, f.N); if (f.Not) gate = !gate; return true; }   // 이번 전투 그 적을 친 횟수(▶E71)
+                        gate = t != null && f.HpBelow > 0 && f.Id == null ? t.MaxHp > 0 && (double)t.Hp / t.MaxHp <= f.HpBelow   // hpBelow(엘다인 ▶E20) = id hp
+                            : t != null && (f.Id switch
                         {
                             "broken" => t.Broken,
                             "tough" => t.ToughMax > 0 && t.Tough / t.ToughMax <= (f.Pct > 0 ? f.Pct : 0.5),
@@ -130,6 +153,9 @@ namespace Bolzena.Core
                             // 2026-10-06 — 마무리(즉사의 턴제판): HP 비율 이하 · 보스가 아닌 적만
                             "hp" => t.MaxHp > 0 && (double)t.Hp / t.MaxHp <= (f.Pct > 0 ? f.Pct : 0.3),
                             "hpMob" => !t.Boss && t.MaxHp > 0 && (double)t.Hp / t.MaxHp <= (f.Pct > 0 ? f.Pct : 0.3),
+                            "alone" => AliveEnemies().Count == 1,   // 적이 하나뿐이면(엘다인 4차 요청 — 아야)
+                            "anyAttack" => AnyFoeAttack(),
+                            "known" => KnownFoe(owner, t, f.Once),   // 아는 수면(아야 만년설의 앎)   // 공격하려는 적이 하나라도 있으면(엘다인 4차 — 실비아 은분수)
                             // 그 상태가 걸린 적(감전 → 충격 …)
                             var st when R.ALL_ST.Contains(st) => St(t, st) > 0,
                             _ => false,
@@ -143,14 +169,19 @@ namespace Bolzena.Core
                 case FxK.IfPricier: gate = ctx.Card ? ctx.Pricier : Counts.TryGetValue("pricier", out var pv) && pv > 0; if (f.Not) gate = !gate; return true;
                 // 이번 전투에 그 고유 효과를 n 이상 쌓았으면(레비(졸업) 노력 결산 — 소모해도 줄지 않는 누적)
                 case FxK.IfGained: gate = owner != null && GainedOf(owner.Key, f.Id) >= Math.Max(1, f.N); if (f.Not) gate = !gate; return true;
-                case FxK.PerGone: ctx.PerStack = GONE_PER + (f.Who == "self" && owner != null ? owner.Key : ""); return true;
+                case FxK.PerGone:
+                    // turn(엘다인 ▶E34) — 이번 턴 사라진 것만(id 면 그 카드만)
+                    ctx.PerStack = f.Turn ? GONET_PER + (f.Id ?? "") : GONE_PER + (f.Who == "self" && owner != null ? owner.Key : ""); return true;
                 case FxK.Ripen: RipenFx(f, ctx); return true;
                 case FxK.Summon: SummonFx(f, ctx); return true;
                 // ── 비례 ──
                 case FxK.PerPlayed: ctx.PerStack = PLAYED_PER + (f.Id ?? ""); return true;
-                case FxK.PerPile: ctx.PerStack = PILE_PER + (f.From ?? "discard"); return true;
-                case FxK.PerCardSt: ctx.PerStack = CARDST_PER + f.Id; ctx.PerMin = f.N; ctx.PerMax = f.Max; return true;   // n · max — 최소 · 최대(시범 16 쵸피 「배움」 최소 3)
-                case FxK.PerEvent: ctx.PerStack = EVENT_PER + (f.Per > 0 ? f.Per : 1); return true;
+                case FxK.PerPile: ctx.PerStack = PILE_PER + (f.From ?? "discard") + (f.Tag != null ? "|" + f.Tag : ""); return true;
+                case FxK.PerCardSt:
+                    // from hand(엘다인 ▶E18) — 손의 카드 값 합(who self 면 자신의 카드만)
+                    ctx.PerStack = f.From == "hand" ? CSHAND_PER + (f.Who == "self" && owner != null ? owner.Key : "") + "|" + f.Id : CARDST_PER + f.Id;
+                    ctx.PerMin = f.N; ctx.PerMax = f.Max; return true;   // n · max — 최소 · 최대(시범 16 쵸피 「배움」 최소 3)
+                case FxK.PerEvent: ctx.PerStack = EVENT_PER + (f.Per > 0 ? f.Per : 1); ctx.PerMax = f.Max; return true;   // max — 최대 몇 번(엘다인 데이터)
                 // ── 예약 · 함정 ──
                 case FxK.Later:
                     Later.Add(new LaterRec { Turn = Turn + Math.Max(1, f.N), Owner = owner?.Key, Name = ModSrc, Target = ctx.TargetIdx, Fx = f.Then ?? new List<Fx>() });
@@ -168,17 +199,31 @@ namespace Bolzena.Core
                     return true;
                 // ── 카드 ──
                 case FxK.AutoPlay:
-                    for (int k = 0; k < f.NOr1 && Over == null; k++)
                     {
-                        var ok = Hand.Select((id, i) => (id, i)).Where(x => { var c = CardOf(x.id); return c != null && !c.IsStatus && !c.IsCurse && CanPlay(x.id, true) == null && (f.Id == null || c.HasTag(f.Id)) && FxMatch(f, x.id, owner); }).ToList();
+                    // all(엘다인 ▶E11) — 맞는 카드를 모두, 처음 손에 있던 것만(내는 동안 새로 생긴 카드는 빼고 · 손 장수가 상한)
+                    var first = f.All ? Hand.ToList() : null;
+                    int reps = f.All ? Hand.Count : f.NOr1;
+                    for (int k = 0; k < reps && Over == null; k++)
+                    {
+                        var ok = Hand.Select((id, i) => (id, i)).Where(x => { var c = CardOf(x.id); return c != null && (first == null || first.Contains(x.id)) && !c.IsStatus && !c.IsCurse && CanPlay(x.id, true) == null && (f.Id == null || c.HasTag(f.Id)) && FxMatch(f, x.id, owner); }).ToList();
                         var foes = AliveEnemies();
                         if (ok.Count == 0 || foes.Count == 0) break;
                         var pick = ok[Rng.Int(ok.Count)];
                         Say($"「{CardOf(pick.id).Name}」 — 저절로 나간다");
                         FreeOnce.Add(pick.id);
-                        if (!PlayCard(pick.i, foes[Rng.Int(foes.Count)].Idx, new PlayOpts { Auto = true, Scale = f.Ratio > 0 ? f.Ratio : 1 }).Ok) FreeOnce.Remove(pick.id);
+                        if (!PlayCard(pick.i, foes[Rng.Int(foes.Count)].Idx, new PlayOpts { Auto = true, Scale = f.Ratio > 0 ? f.Ratio : 1 }).Ok) { FreeOnce.Remove(pick.id); if (first != null) first.Remove(pick.id); }
+                        else if (first != null) first.Remove(pick.id);
                     }
                     return true;
+                    }
+                case FxK.CastOther when f.From == "last":
+                    {   // 이번 턴 바로 앞 다른 아군 카드를 다시(▶E70 — 그 주인 능력치로 · ratio)
+                        var id = LastOtherThisTurn(owner); if (id == null) return true;
+                        var cv = CardOf(id); var who = HeroUnit(cv.Hero); if (who == null || who.Dead) return true;
+                        Say($"「{cv.Name}」 — 다시"); StatusCue(owner ?? who, $"다시 「{cv.Name}」", true);
+                        RunFx(cv.Fx, new FxCtx { Owner = who, TargetIdx = ctx.TargetIdx, HitTags = CardHitTags(id, cv), Card = true, Type = cv.Type, CardId = id, Cost = cv.Cost, Scale = f.Ratio > 0 ? f.Ratio : 1 });
+                        return true;
+                    }
                 case FxK.CastOther:
                     {   // 손의 다른 사도 카드 하나의 효과를 대신 돌린다(카드는 손에 남는다 · 그 카드 주인의 능력치로)
                         var ok = Hand.Where(id => { var c = CardOf(id); return c != null && c.Hero != null && (owner == null || c.Hero != owner.Key) && HeroUnit(c.Hero) is Unit h && !h.Dead && (f.Id == null || c.Type == f.Id) && !c.Fx.Any(x => x.K == FxK.CastOther); }).ToList();   // 연쇄 상한(3단계) — 대신 발동 카드는 대신 발동하지 않는다(두 사도가 서로를 끝없이 부르던 것)
@@ -198,18 +243,28 @@ namespace Bolzena.Core
                             gk = $"gonePull|{owner?.Key ?? Acting}|{Turn}";
                             if (Counts.ContainsKey(gk)) { Say("소멸 더미 되살리기 — 이번 턴은 이미 했다(사도마다 턴에 한 번)"); return true; }
                         }
-                        var src = PileOf(f.From ?? "discard");
+                        // 출처(Docs/카드이동.md) — discard: 버린 더미 전부(카제나 「무덤」 · 이번 턴에 낸 카드 포함) · discarded: 버린 카드만(이번 턴에 낸 카드 빼고 · 카제나 「버린 카드에서」)
+                        // draw → 손은 드로우(감응 · 영감 · 「카드가 뽑히면」) — 고른 뒤 꺼내므로 없으면 섞지 않고 불발(카제나 규칙 6)
+                        string from = f.From ?? "discard", pileName = from == "discarded" ? "discard" : from;
+                        var src = PileOf(from);
                         if (gk != null && src.Count > 0) Counts[gk] = 1;
                         for (int k = 0; k < f.NOr1 && src.Count > 0; k++)
                         {
-                            var okIdx = Enumerable.Range(0, src.Count).Where(i => FxMatch(f, src[i], owner)).ToList();
+                            var used = src == Discard ? UsedAt() : null;
+                            var okIdx = Enumerable.Range(0, src.Count).Where(i => FxMatch(f, src[i], owner) && !(from == "discarded" && used.Contains(i))).ToList();
                             if (okIdx.Count == 0) break;
                             int at = f.At == "bottom" ? okIdx[0] : f.At == "random" ? okIdx[Rng.Int(okIdx.Count)] : okIdx[okIdx.Count - 1];
                             ctx.Pulled = src[at];
                             var id = src[at]; src.RemoveAt(at);
-                            if (f.To == "top") { Draw.Add(id); CardCue(id, f.From ?? "discard", "draw", "pull"); }
-                            else if (Hand.Count < R.HAND_MAX) { Hand.Add(id); CardCue(id, f.From ?? "discard", "hand", "pull"); }
-                            else { Discard.Add(id); CardCue(id, f.From ?? "discard", "discard", "pull"); }
+                            if (used != null && used.Contains(at)) Used.Remove(id);   // 이번 턴에 낸 카드를 무덤에서 꺼냈다
+                            if (f.To == "top") { Draw.Add(id); CardCue(id, pileName, "draw", "pull"); }
+                            else if (Hand.Count < R.HAND_MAX)
+                            {
+                                Hand.Add(id); CardCue(id, pileName, "hand", "pull");
+                                { var pc = CardOf(id); Emit("pulled", new EmitInfo { Id = id, Hero = pc?.Hero, Type = pc?.Type }); if (Over != null) return true; }
+                                if (from == "draw") { Drawn++; if (!AfterDraw(id, true)) return true; }
+                            }
+                            else { Discard.Add(id); CardCue(id, pileName, "discard", "pull"); }
                             Say($"「{CardOf(id)?.Name}」 — {(f.To == "top" ? "뽑을 더미 맨 위로" : "손으로")}");
                         }
                         MergePile(Hand, "hand");
@@ -350,9 +405,14 @@ namespace Bolzena.Core
             double v = 0;
             foreach (var kw in Kw.Values)
             {
-                if (kw.Carrier != "enemy" || kw.Owner != from.Key) continue;
+                if (kw.Carrier != "enemy") continue;
                 foreach (var p in kw.Def.Per)
-                    if (p.Stat == "taken" && p.From == "owner") { int n = St(to, kw.Id); v += n > 0 ? n * p.V : p.Else; }
+                {
+                    if (p.Stat != "taken") continue;
+                    // owner = 건 사도가 칠 때 · marked = 그 아군 표시(mark)가 붙은 아군이 칠 때(2026-10-11 실비아 「티파티」 ← 「티파티 초대장」)
+                    bool by = p.From == "owner" ? kw.Owner == from.Key : p.From == "marked" && p.Mark != null && StackOf(from.Key, p.Mark) > 0;
+                    if (by) { int n = St(to, kw.Id); v += n > 0 ? n * p.V : p.Else; }
+                }
             }
             return v;
         }
@@ -378,7 +438,12 @@ namespace Bolzena.Core
         }
 
         /// <summary>적 표식(weakens) — 걸린 적은 아군 카드가 약점 공격으로 친다.</summary>
-        bool MarkedWeak(Unit to) => to != null && to.Side == Side.Enemy && Kw.Values.Any(k => k.Def.Weakens && k.Carrier == "enemy" && St(to, k.Id) > 0);
+        bool MarkedWeak(Unit to)
+        {
+            if (to == null || to.Side != Side.Enemy) return false;
+            foreach (var k in Kw.Values) if (k.Def.Weakens && k.Carrier == "enemy" && St(to, k.Id) > 0) return true;
+            return false;
+        }
 
         void UseWeakMark(Unit t)
         {

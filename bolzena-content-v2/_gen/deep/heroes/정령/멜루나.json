@@ -1,0 +1,791 @@
+{
+  "heroes": [
+    {
+      "id": "멜루나",
+      "name": "멜루나",
+      "nature": "냉정",
+      "role": "서포터",
+      "style": "돈형",
+      "star": 3,
+      "hp": 530,
+      "atk": 86,
+      "def": 58,
+      "crit": 5,
+      "blurb": "법의 빈틈으로 회사를 굴리는 멜론 회장. 남긴 AP 와 처치로 주가를 올려 두면 파티가 덩달아 힘을 내고, 주가를 털어 머스크멜론을 사 들이면 — 손에 쥔 멜론만큼 멜론머스크 그룹이 커집니다.",
+      "keyword": {
+        "name": "주가",
+        "desc": "오르내리는 멜루 코퍼레이션 주가",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.06,
+            "who": "allies"
+          }
+        ],
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.4
+        },
+        "rules": [
+          {
+            "name": "이자 수익",
+            "when": {
+              "on": "keepAp"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "주가",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "멜론 플렉스",
+            "when": {
+              "on": "kill"
+            },
+            "fx": [
+              {
+                "k": "make",
+                "id": "멜루나_melon",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "멜론머스크 X",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.96,
+            "target": "allEnemies"
+          },
+          {
+            "k": "drain",
+            "ratio": 0.4
+          },
+          {
+            "k": "ap",
+            "v": 2
+          },
+          {
+            "k": "stack",
+            "id": "주가",
+            "v": 2
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "멜루나_s1",
+        "멜루나_s2",
+        "멜루나_s3",
+        "멜루나_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "멜루나_s1",
+      "name": "멜론 씨 튕기기",
+      "hero": "멜루나",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "멜루나_s2",
+      "name": "멜론 한 조각",
+      "hero": "멜루나",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "멜루나_melon",
+      "name": "머스크멜론",
+      "hero": "멜루나",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.32
+        },
+        {
+          "k": "status",
+          "id": "협공",
+          "v": 1
+        }
+      ],
+      "blurb": "머스크가 고른 잘 익은 멜론 한 통."
+    },
+    {
+      "id": "멜루나_u1",
+      "name": "장기 투자",
+      "hero": "멜루나",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "주가",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "저장",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "주가",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "주가",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "주가",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 1.68
+                    },
+                    {
+                      "k": "stack",
+                      "id": "주가",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "cost": 2,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "주가",
+                      "v": 1
+                    },
+                    {
+                      "k": "make",
+                      "id": "멜루나_melon",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "주가",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "멜루나_u2",
+      "name": "올 때 멜루나~",
+      "hero": "멜루나",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.43,
+          "target": "randomEnemy",
+          "hits": 2
+        },
+        {
+          "k": "drain",
+          "ratio": 0.4
+        },
+        {
+          "k": "make",
+          "id": "멜루나_melon",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.64,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "drain",
+              "ratio": 0.4
+            },
+            {
+              "k": "make",
+              "id": "멜루나_melon",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.55,
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
+              "k": "drain",
+              "ratio": 0.4
+            },
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.73,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "make",
+              "id": "멜루나_melon",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.08,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "drain",
+              "ratio": 0.5
+            },
+            {
+              "k": "make",
+              "id": "멜루나_melon",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "멜루나_u3",
+      "name": "멜론 씨 기관총",
+      "hero": "멜루나",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "주가"
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.25,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "주가",
+          "all": true
+        },
+        {
+          "k": "make",
+          "id": "멜루나_melon",
+          "v": 1
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "멜루나_u4",
+      "name": "멜론머스크 그룹",
+      "hero": "멜루나",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.96,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perTag",
+          "id": "멜루나_melon"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.54,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.44,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perTag",
+              "id": "멜루나_melon"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.83,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perTag",
+              "id": "멜루나_melon"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.42,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "make",
+              "id": "멜루나_melon",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 2.44
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "perTag",
+              "id": "멜루나_melon"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.13,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "hand",
+              "all": true,
+              "tag": "멜루나_melon"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "멜루나_s3",
+      "name": "멜론 씨 난사",
+      "hero": "멜루나",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "멜루나_s4",
+      "name": "주식 매수",
+      "hero": "멜루나",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 3.84
+        },
+        {
+          "k": "stack",
+          "id": "주가",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 5.76
+            },
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.84
+            },
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.84
+            },
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.84
+            },
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 5
+            },
+            {
+              "k": "stack",
+              "id": "주가",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

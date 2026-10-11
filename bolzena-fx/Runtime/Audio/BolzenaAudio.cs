@@ -255,7 +255,7 @@ namespace Bolzena.Fx
                 else if (x.Fade > 0 && dsp > x.End - x.Fade) k = Mathf.Clamp01((float)((x.End - dsp) / x.Fade));
                 x.Src.volume = Mathf.Min(1, x.Vol * SfxVolume) * k;
             }
-            all.RemoveAll(x => x.End <= dsp - 0.05);
+            for (int i = all.Count - 1; i >= 0; i--) if (all[i].End <= dsp - 0.05) all.RemoveAt(i);   // RemoveAll 람다는 dsp 를 잡아 매 프레임 할당했다(perf_20261009)
         }
 
         // ── 공용 갈래 ──

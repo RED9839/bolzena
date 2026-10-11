@@ -172,7 +172,7 @@ namespace Bolzena.Core.Tests
             K.E(b).Status["표식"] = 2;
             K.Play(b, "hit");
             Assert.AreEqual(800, K.Hp(b));
-            Assert.AreEqual(4 - 1.0 / 3 - 1.0 / 3, K.E(b).Tough, 1e-9, "카드 1/3칸 + 표식 추가 공격(0 비용 = 1코처럼) 1/3칸");
+            Assert.AreEqual(4 - 1.0 / 3 - R.ToughExtra(false), K.E(b).Tough, 1e-9, "카드 1/3칸 + 표식 추가 공격(카제나 표 — 약점 0.5 · 비약점 1/6)");
             Assert.AreEqual(1, b.St(K.E(b), "표식"));
         }
 

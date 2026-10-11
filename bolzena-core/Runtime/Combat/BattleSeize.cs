@@ -32,7 +32,7 @@ namespace Bolzena.Core
                 if (hand.Count > 0) { id = hand[Rng.Int(hand.Count)]; Hand.Remove(id); }
                 else
                 {
-                    if (Draw.Count == 0 && Discard.Count > 0) { Draw = Shuffle(Rng, Discard.ToList()); Discard.Clear(); CardCue(null, "discard", "draw", "shuffle"); }
+                    if (Draw.Count == 0) Reshuffle();   // 이번 턴에 낸 카드는 빼고
                     for (int i = Draw.Count - 1; i >= 0; i--) if (Ok(Draw[i])) { id = Draw[i]; Draw.RemoveAt(i); from = "draw"; break; }
                 }
                 if (id == null) break;

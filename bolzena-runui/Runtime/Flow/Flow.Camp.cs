@@ -79,7 +79,7 @@ namespace Bolzena.RunUI
             if (used == "rest") W.Select(rest, true);
             Stage.Hot["camp.rest"] = rest;
 
-            var targets = P.Run.FlashTargets();
+            var targets = P.Run.CampTargets();
             bool anyT = targets.Count > 0;
             bool mind = P.Run.MindBroken;
             string noTrain = mind ? "정신 붕괴 — 수련할 수 없습니다 · 쉬기만 고를 수 있습니다" : "신탁을 붙일 고유 카드가 없습니다 — 쉬기만 고를 수 있습니다";
@@ -119,7 +119,7 @@ namespace Bolzena.RunUI
         void TrainPick(RectTransform root, string kind, bool withShop)
         {
             if (OracleReveal.IsOpen || P.S.Camp == null) return;
-            var ids = P.Run.FlashTargets();
+            var ids = P.Run.CampTargets();
             if (ids.Count == 0) return;
             float mw = Mathf.Min(Theme.Compact ? 1240 : Mathf.Max(1240, 8 * (170 + 12) + 80), Stage.Size.x - 40);
             var (right, closeM, _) = Stage.ModalBox("trainpick", mw, Mathf.Min(680, Stage.Size.y - 24), "강화할 카드를 고릅니다", "신탁을 붙일 수 있는 카드 — 고르면 신탁 셋이 나옵니다", true, null, 0, false);

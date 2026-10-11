@@ -6,69 +6,72 @@
       "nature": "광기",
       "race": "용족",
       "role": "탱커",
-      "style": "거드는 형",
       "star": 3,
-      "hp": 1040,
-      "atk": 84,
-      "def": 79,
+      "hp": 810,
+      "atk": 115,
+      "def": 48,
       "crit": 5,
-      "blurb": "우아한 숙녀를 자처하는 은의 용족. 아군을 티파티 손님으로 들이면 손님이 스킬을 낼 때마다 은방울이 울려 적을 치고, 은방울이 셋 모이면 파티의 다음 한 수가 빛납니다.",
+      "blurb": "은빛 티파티의 주인. 장갑을 던져 결투 상대를 티파티에 붙들면 그 적은 무뎌지고, 초대장을 받은 손님들이 그 적을 더 아프게 칩니다.",
       "keyword": {
-        "name": "초청객",
-        "desc": "은석의 티파티에 들인 손님",
-        "carrier": "hero",
-        "cap": 1
+        "name": "티파티",
+        "desc": "장갑을 맞고 티파티에 붙들린 결투 상대",
+        "carrier": "enemy",
+        "cap": 1,
+        "hunt": true,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": -0.2
+          },
+          {
+            "stat": "taken",
+            "v": 0.3,
+            "from": "owner"
+          },
+          {
+            "stat": "taken",
+            "v": 0.3,
+            "from": "marked",
+            "mark": "티파티 초대장"
+          }
+        ]
       },
+      "keywords": [
+        {
+          "name": "티파티 초대장",
+          "desc": "실비아의 티파티에 초대받은 손님의 초대장",
+          "carrier": "hero",
+          "cap": 1,
+          "rules": [
+            {
+              "name": "숙녀의 환대",
+              "when": {
+                "on": "play",
+                "marked": "티파티 초대장",
+                "type": "공격",
+                "token": false
+              },
+              "fx": [
+                {
+                  "k": "shield",
+                  "ratio": 0.3
+                }
+              ]
+            }
+          ]
+        }
+      ],
       "passives": [
         {
-          "name": "그 어머니에 그 딸",
-          "when": {
-            "on": "play",
-            "marked": "초청객",
-            "type": "스킬"
-          },
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.27,
-              "base": "def",
-              "target": "randomEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "은방울",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "그 어머니에 그 딸",
-          "when": {
-            "on": "lowHp",
-            "pct": 0.4
-          },
-          "fx": [
-            {
-              "k": "cleanse",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 2.25
-            }
-          ]
-        },
-        {
-          "name": "티파티 초대",
+          "name": "은방울 보호막",
           "when": {
             "on": "fightStart"
           },
           "fx": [
             {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "strongestAlly"
+              "k": "status",
+              "id": "은방울",
+              "v": 2
             }
           ]
         }
@@ -79,56 +82,38 @@
         "fx": [
           {
             "k": "dmg",
-            "ratio": 0.6,
-            "target": "allEnemies",
-            "base": "def"
+            "ratio": 1.8,
+            "base": "def",
+            "target": "allEnemies"
           },
           {
             "k": "shield",
-            "ratio": 4
+            "ratio": 2.5
           },
           {
             "k": "status",
-            "id": "기절",
-            "v": 1
+            "id": "은방울",
+            "v": 2
           },
           {
-            "k": "ap",
-            "v": 1
+            "k": "gauge",
+            "v": 10,
+            "target": "allAllies"
           }
         ]
       },
       "starter": [
         "실비아_s1",
-        "실비아_s1",
         "실비아_s2",
+        "실비아_s3",
         "실비아_u1"
-      ],
-      "keywords": [
-        {
-          "name": "은방울",
-          "desc": "티파티에 울리는 은방울",
-          "carrier": "self",
-          "cap": 3,
-          "per": [
-            {
-              "stat": "guard",
-              "v": 0.05
-            }
-          ],
-          "onMax": {
-            "empower": "any",
-            "ratio": 0.4,
-            "consume": true
-          }
-        }
       ]
     }
   ],
   "cards": [
     {
       "id": "실비아_s1",
-      "name": "은빛 손짓",
+      "name": "부채 휘두르기",
       "hero": "실비아",
       "cost": 1,
       "type": "공격",
@@ -136,12 +121,28 @@
         {
           "k": "dmg",
           "ratio": 1,
+          "base": "def",
           "target": "oneEnemy"
         }
       ]
     },
     {
       "id": "실비아_s2",
+      "name": "부채 내려치기",
+      "hero": "실비아",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "실비아_s3",
       "name": "숙녀의 자세",
       "hero": "실비아",
       "cost": 1,
@@ -149,341 +150,13 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.5
+          "ratio": 1.4
         }
       ]
     },
     {
       "id": "실비아_u1",
-      "name": "초대장 건네기",
-      "hero": "실비아",
-      "unique": true,
-      "cost": 1,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "stack",
-          "id": "초청객",
-          "v": 1,
-          "target": "oneAlly"
-        },
-        {
-          "k": "shield",
-          "ratio": 1.26
-        }
-      ],
-      "oracles": [
-        {
-          "name": "신탁 1",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.62
-            }
-          ]
-        },
-        {
-          "name": "신탁 2",
-          "cost": 0,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.63
-            }
-          ]
-        },
-        {
-          "name": "신탁 3",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.08
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
-            }
-          ]
-        },
-        {
-          "name": "신탁 4",
-          "power": true,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.46
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "marked": "초청객",
-                    "type": "스킬"
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.24
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "신탁 5",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "shield",
-              "ratio": 1.08
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "실비아_u2",
-      "name": "궁극의 유희",
-      "hero": "실비아",
-      "unique": true,
-      "cost": 2,
-      "type": "스킬",
-      "fx": [
-        {
-          "k": "stack",
-          "id": "초청객",
-          "v": 1,
-          "target": "allAllies"
-        },
-        {
-          "k": "perStack",
-          "id": "은방울",
-          "n": 1
-        },
-        {
-          "k": "shield",
-          "ratio": 0.63
-        },
-        {
-          "k": "spend",
-          "id": "은방울",
-          "all": true
-        }
-      ],
-      "oracles": [
-        {
-          "name": "신탁 1",
-          "tags": [],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "allAllies"
-            },
-            {
-              "k": "perStack",
-              "id": "은방울",
-              "n": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.86
-            },
-            {
-              "k": "spend",
-              "id": "은방울",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "신탁 2",
-          "cost": 1,
-          "tags": [],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "allAllies"
-            },
-            {
-              "k": "perStack",
-              "id": "은방울",
-              "n": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.59
-            },
-            {
-              "k": "spend",
-              "id": "은방울",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "신탁 3",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "allAllies"
-            },
-            {
-              "k": "perStack",
-              "id": "은방울",
-              "n": 1
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.27,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "spend",
-              "id": "은방울",
-              "all": true
-            }
-          ]
-        },
-        {
-          "name": "신탁 4",
-          "tags": [],
-          "power": true,
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "allAllies"
-            },
-            {
-              "k": "perStack",
-              "id": "은방울",
-              "n": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.6
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "marked": "초청객",
-                    "type": "스킬"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "은방울",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "신탁 5",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "allAllies"
-            },
-            {
-              "k": "perStack",
-              "id": "은방울",
-              "n": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 0.59
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        }
-      ],
-      "blesses": [
-        {
-          "name": "축복 1",
-          "kind": "guard"
-        },
-        {
-          "name": "축복 2",
-          "kind": "ap"
-        },
-        {
-          "name": "축복 3",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "은방울",
-              "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "실비아_u3",
-      "name": "부채로 꾸짖기",
+      "name": "장갑 던지기",
       "hero": "실비아",
       "unique": true,
       "cost": 1,
@@ -491,49 +164,49 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.54,
+          "ratio": 1.1,
           "base": "def",
           "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "약화",
-          "v": 2
+          "k": "stack",
+          "id": "티파티",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.5
         }
       ],
       "oracles": [
         {
           "name": "신탁 1",
-          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.73,
+              "ratio": 1.6,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2
+              "k": "stack",
+              "id": "티파티",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 2",
+          "type": "스킬",
           "cost": 0,
-          "tags": [],
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 0.51,
-              "base": "def",
+              "k": "stack",
+              "id": "티파티",
+              "v": 1,
               "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 2
             }
           ]
         },
@@ -542,77 +215,58 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.45,
+              "ratio": 1.1,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "티파티",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
+              "id": "취약",
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 4",
-          "tags": [],
-          "power": true,
+          "tags": [
+            "회수 3"
+          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 1.1,
               "base": "def",
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "status",
-                      "id": "약화",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "stack",
+              "id": "티파티",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 5",
-          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.85,
+              "ratio": 2,
               "base": "def",
-              "target": "oneEnemy"
+              "target": "topEnemy"
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 2
-            },
-            {
-              "k": "discard",
-              "v": 1
+              "k": "stack",
+              "id": "티파티",
+              "v": 1,
+              "target": "topEnemy"
             }
           ]
         }
@@ -624,55 +278,45 @@
         },
         {
           "name": "축복 2",
-          "kind": "weakSpot"
+          "kind": "draw"
         },
         {
           "name": "축복 3",
           "fx": [
             {
               "k": "stack",
-              "id": "은방울",
-              "v": 1
+              "id": "티파티",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
       ]
     },
     {
-      "id": "실비아_u4",
-      "name": "티파티 준비",
+      "id": "실비아_u2",
+      "name": "초대장 건네기",
       "hero": "실비아",
       "unique": true,
-      "cost": 1,
-      "type": "강화",
+      "cost": 0,
+      "type": "스킬",
       "fx": [
         {
-          "k": "status",
-          "id": "결의",
-          "v": 1
+          "k": "stack",
+          "id": "티파티 초대장",
+          "v": 1,
+          "target": "oneAlly"
         },
         {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "play",
-                "marked": "초청객",
-                "type": "스킬"
-              },
-              "fx": [
-                {
-                  "k": "shield",
-                  "ratio": 0.32
-                },
-                {
-                  "k": "stack",
-                  "id": "은방울",
-                  "v": 1
-                }
-              ]
-            }
-          ]
+          "k": "costMod",
+          "v": -1,
+          "n": 1,
+          "who": "other",
+          "turns": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 1.2
         }
       ],
       "oracles": [
@@ -680,66 +324,192 @@
           "name": "신탁 1",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
               "v": 1
             },
+            {
+              "k": "shield",
+              "ratio": 1.4
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
             {
               "k": "stack",
-              "id": "은방울",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "otherAllies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
               "v": 1
             },
             {
-              "k": "power",
-              "rules": [
+              "k": "gauge",
+              "v": 30,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.4,
+              "who": "any"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "empower",
+              "ratio": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "실비아_u3",
+      "name": "궁극의 유희",
+      "hero": "실비아",
+      "unique": true,
+      "cost": 2,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "티파티 초대장",
+          "v": 1,
+          "target": "allAllies"
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "guardSum",
+                "n": 150
+              },
+              "fx": [
                 {
-                  "when": {
-                    "on": "play",
-                    "marked": "초청객",
-                    "type": "스킬"
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.36
-                    },
-                    {
-                      "k": "stack",
-                      "id": "은방울",
-                      "v": 1
-                    }
-                  ]
+                  "k": "ap",
+                  "v": 1
                 }
               ]
             }
           ]
         },
         {
-          "name": "신탁 2",
-          "cost": 0,
+          "k": "gaugeLock"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "allAllies"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "marked": "초청객",
-                    "type": "스킬"
+                    "on": "guardSum",
+                    "n": 60
                   },
                   "fx": [
                     {
-                      "k": "shield",
-                      "ratio": 0.27
-                    },
+                      "k": "ap",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "gaugeLock"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "otherAllies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guardSum",
+                    "n": 150
+                  },
+                  "fx": [
                     {
-                      "k": "stack",
-                      "id": "은방울",
+                      "k": "ap",
                       "v": 1
                     }
                   ]
@@ -752,38 +522,33 @@
           "name": "신탁 3",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
               "k": "stack",
-              "id": "초청객",
+              "id": "티파티 초대장",
               "v": 1,
-              "target": "oneAlly"
+              "target": "allAllies"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "marked": "초청객",
-                    "type": "스킬"
+                    "on": "guardSum",
+                    "n": 150
                   },
                   "fx": [
                     {
-                      "k": "shield",
-                      "ratio": 0.27
-                    },
-                    {
-                      "k": "stack",
-                      "id": "은방울",
+                      "k": "ap",
                       "v": 1
                     }
                   ]
                 }
               ]
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
@@ -791,34 +556,25 @@
           "name": "신탁 4",
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "allAllies"
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
+              "k": "gaugeLock"
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "marked": "초청객",
-                    "type": "스킬"
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
                       "k": "shield",
-                      "ratio": 0.32
-                    },
-                    {
-                      "k": "stack",
-                      "id": "은방울",
-                      "v": 1
+                      "ratio": 0.8
                     }
                   ]
                 }
@@ -833,36 +589,24 @@
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
-            },
-            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "marked": "초청객",
-                    "type": "스킬"
+                    "on": "guardSum",
+                    "n": 150
                   },
                   "fx": [
                     {
-                      "k": "shield",
-                      "ratio": 0.32
-                    },
-                    {
-                      "k": "stack",
-                      "id": "은방울",
-                      "v": 1
-                    },
-                    {
-                      "k": "draw",
+                      "k": "ap",
                       "v": 1
                     }
                   ]
                 }
               ]
+            },
+            {
+              "k": "gaugeLock"
             }
           ]
         }
@@ -870,7 +614,7 @@
       "blesses": [
         {
           "name": "축복 1",
-          "kind": "defUp"
+          "kind": "cost"
         },
         {
           "name": "축복 2",
@@ -881,123 +625,66 @@
           "fx": [
             {
               "k": "stack",
-              "id": "은방울",
-              "v": 1
+              "id": "티파티",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }
       ]
     },
     {
-      "id": "실비아_u5",
-      "name": "장갑 던지기",
+      "id": "실비아_u4",
+      "name": "은분수",
       "hero": "실비아",
       "unique": true,
-      "cost": 1,
+      "cost": 2,
       "type": "공격",
+      "tags": [
+        "보존"
+      ],
       "fx": [
         {
-          "k": "stack",
-          "id": "초청객",
-          "v": 1,
-          "target": "oneAlly"
+          "k": "dmg",
+          "ratio": 0.6,
+          "base": "def",
+          "target": "allEnemies"
         },
         {
-          "k": "dmg",
-          "ratio": 0.68,
-          "base": "def",
-          "target": "oneEnemy"
+          "k": "shield",
+          "ratio": 1.2
+        },
+        {
+          "k": "ifFoe",
+          "id": "anyAttack"
+        },
+        {
+          "k": "status",
+          "id": "은방울",
+          "v": 4
         }
       ],
       "oracles": [
         {
           "name": "신탁 1",
-          "tags": [],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.91,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "신탁 2",
-          "cost": 0,
-          "tags": [],
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.64,
-              "base": "def",
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "신탁 3",
-          "fx": [
-            {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.59,
-              "base": "def",
-              "target": "oneEnemy"
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "신탁 4",
-          "tags": [],
           "power": true,
           "fx": [
             {
-              "k": "stack",
-              "id": "초청객",
-              "v": 1,
-              "target": "oneAlly"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.44,
-              "base": "def",
-              "target": "oneEnemy"
+              "k": "shield",
+              "ratio": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "turnEnd"
                   },
                   "fx": [
                     {
-                      "k": "stack",
+                      "k": "status",
                       "id": "은방울",
-                      "v": 1
+                      "v": 2
                     }
                   ]
                 }
@@ -1006,24 +693,221 @@
           ]
         },
         {
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.8,
+              "base": "def",
+              "target": "markedEnemy",
+              "id": "티파티"
+            },
+            {
+              "k": "ifFoe",
+              "id": "anyAttack"
+            },
+            {
+              "k": "status",
+              "id": "은방울",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "gauge",
+              "v": 10,
+              "target": "allAllies"
+            },
+            {
+              "k": "ifFoe",
+              "id": "anyAttack"
+            },
+            {
+              "k": "status",
+              "id": "은방울",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "type": "스킬",
+          "cost": 1,
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "status",
+              "id": "은방울",
+              "v": 2
+            },
+            {
+              "k": "nextAp",
+              "v": 1
+            }
+          ]
+        },
+        {
           "name": "신탁 5",
-          "tags": [],
+          "type": "스킬",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.4
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
           "fx": [
             {
               "k": "stack",
-              "id": "초청객",
-              "v": 2,
-              "target": "oneAlly"
-            },
+              "id": "티파티",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "실비아_u5",
+      "name": "숙녀의 결투",
+      "hero": "실비아",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.2,
+          "base": "def",
+          "target": "markedEnemy",
+          "id": "티파티"
+        },
+        {
+          "k": "shield",
+          "ratio": 1.2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
             {
               "k": "dmg",
-              "ratio": 1.02,
+              "ratio": 2,
               "base": "def",
-              "target": "oneEnemy"
+              "target": "markedEnemy",
+              "id": "티파티"
             },
             {
-              "k": "discard",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "base": "def",
+              "target": "topEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "티파티",
+              "v": 1,
+              "target": "topEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "base": "def",
+              "target": "markedEnemy",
+              "id": "티파티"
+            },
+            {
+              "k": "stack",
+              "id": "티파티 초대장",
+              "v": 1,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "base": "def",
+              "target": "markedEnemy",
+              "id": "티파티"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "base": "def",
+              "target": "markedEnemy",
+              "id": "티파티"
             }
           ]
         }
@@ -1042,8 +926,9 @@
           "fx": [
             {
               "k": "stack",
-              "id": "은방울",
-              "v": 1
+              "id": "티파티",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         }

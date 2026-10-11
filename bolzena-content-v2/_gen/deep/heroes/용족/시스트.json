@@ -1,0 +1,796 @@
+{
+  "heroes": [
+    {
+      "id": "시스트",
+      "name": "시스트",
+      "nature": "광기",
+      "race": "용족",
+      "role": "딜러",
+      "style": "돈형",
+      "star": 3,
+      "hp": 580,
+      "atk": 125,
+      "def": 28,
+      "crit": 10,
+      "blurb": "힘 대신 돈으로 가치를 증명하는 자수정의 용족 밀수꾼. 쓰러뜨리고 깨뜨리고 손패를 떨이로 넘겨 수수료를 벌고, 그 수수료로 4차원 바구니에서 특급 배송을 꺼냅니다.",
+      "keyword": {
+        "name": "수수료",
+        "desc": "거래마다 슬쩍 얹는 웃돈",
+        "carrier": "self",
+        "cap": 6,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.1
+          }
+        ],
+        "rules": [
+          {
+            "name": "장사 수완",
+            "when": {
+              "on": "kill"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "수수료",
+                "v": 1
+              },
+              {
+                "k": "make",
+                "id": "시스트_express",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "떨이 수수료",
+            "when": {
+              "on": "exhaust",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "수수료",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "플렉스 건",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "atkMod",
+            "v": 0.15,
+            "target": "self"
+          },
+          {
+            "k": "ap",
+            "v": 1
+          },
+          {
+            "k": "stack",
+            "id": "수수료",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "시스트_s1",
+        "시스트_s2",
+        "시스트_s3",
+        "시스트_u4"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "시스트_s1",
+      "name": "한 발",
+      "hero": "시스트",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "시스트_s2",
+      "name": "방어 자세",
+      "hero": "시스트",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "시스트_express",
+      "name": "특급 배송",
+      "hero": "시스트",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.8,
+          "target": "lowEnemy"
+        },
+        {
+          "k": "ifKill"
+        },
+        {
+          "k": "stack",
+          "id": "수수료",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ]
+    },
+    {
+      "id": "시스트_u4",
+      "name": "장사천재 시스트",
+      "hero": "시스트",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "atkMod",
+          "v": 0.1,
+          "run": true,
+          "target": "self"
+        },
+        {
+          "k": "stack",
+          "id": "수수료",
+          "v": 2
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "kill"
+              },
+              "fx": [
+                {
+                  "k": "make",
+                  "id": "시스트_express",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.15,
+              "run": true,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "시스트_express",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.05,
+              "target": "self"
+            },
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "수수료",
+                      "v": 1
+                    },
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.1,
+              "target": "self"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "break"
+                  },
+                  "fx": [
+                    {
+                      "k": "make",
+                      "id": "시스트_express",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "수수료",
+                      "v": 1
+                    },
+                    {
+                      "k": "ifStack",
+                      "id": "수수료",
+                      "n": 6
+                    },
+                    {
+                      "k": "ap",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "power": true
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "atkMod",
+              "v": 0.08,
+              "target": "self"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "수수료",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "시스트_u1",
+      "name": "총알 배송",
+      "hero": "시스트",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 3.97,
+          "target": "lowEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "수수료",
+          "v": 1
+        },
+        {
+          "k": "ifKill"
+        },
+        {
+          "k": "make",
+          "id": "시스트_express",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 5.97,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 2
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "시스트_express",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "시스트_express",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 4.89,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 5.1,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "make",
+              "id": "시스트_express",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 4.81,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "시스트_u2",
+      "name": "떨이 판매",
+      "hero": "시스트",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "burn",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "수수료",
+          "v": 3
+        },
+        {
+          "k": "draw",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "burn",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 5
+            },
+            {
+              "k": "draw",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 4
+            },
+            {
+              "k": "make",
+              "id": "시스트_express",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 5
+            },
+            {
+              "k": "empower",
+              "ratio": 0.59
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 4
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "시스트_u3",
+      "name": "4차원 바구니",
+      "hero": "시스트",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.18,
+          "target": "allEnemies"
+        },
+        {
+          "k": "ifStack",
+          "id": "수수료",
+          "n": 3
+        },
+        {
+          "k": "spend",
+          "id": "수수료",
+          "v": 3
+        },
+        {
+          "k": "make",
+          "id": "시스트_express",
+          "v": 2
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "시스트_s3",
+      "name": "두 발",
+      "hero": "시스트",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "시스트_s4",
+      "name": "웃돈 얹기",
+      "hero": "시스트",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "수수료",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "수수료",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

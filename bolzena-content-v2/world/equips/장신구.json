@@ -46,30 +46,29 @@
             {
               "k": "healMod",
               "v": 0.4,
+              "target": "self",
               "run": true
             }
           ]
         },
         {
-          "name": "남는 불빛",
+          "name": "넘치는 불빛",
           "when": {
             "on": "overheal",
             "who": "any"
           },
-          "limit": {
-            "per": "turn",
-            "n": 1
-          },
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1,
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "randomEnemy",
+              "fixed": true,
               "ofEvent": 0.5
             }
           ]
         }
       ],
-      "blurb": "엘다인의 숲을 비추던 램프. 넘치는 온기는 막이 되어 남습니다."
+      "blurb": "엘다인의 숲을 비추던 램프. 넘치는 온기는 불빛이 되어 적을 태웁니다."
     },
     {
       "id": "eq_lifegem",
@@ -89,9 +88,8 @@
           },
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 3
+              "k": "heal",
+              "ratio": 1.5
             }
           ]
         }
@@ -130,14 +128,10 @@
             "type": "공격",
             "maxCost": 0
           },
-          "limit": {
-            "per": "turn",
-            "n": 2
-          },
           "fx": [
             {
               "k": "extra",
-              "ratio": 0.8,
+              "ratio": 0.6,
               "target": "oneEnemy"
             }
           ]
@@ -158,23 +152,20 @@
           "name": "멀리서 조준",
           "when": {
             "on": "play",
-            "type": "공격"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "type": "공격",
+            "every": 3
           },
           "fx": [
             {
               "k": "status",
-              "id": "표식",
+              "id": "약점 노출",
               "v": 1,
               "target": "oneEnemy"
             }
           ]
         }
       ],
-      "blurb": "장난감인데 멀리 있는 적일수록 잘 보입니다."
+      "blurb": "장난감인데 멀리 있는 적일수록 잘 보입니다. 약한 곳까지 다 보입니다."
     },
     {
       "id": "eq_volcanijuice",
@@ -189,23 +180,17 @@
         {
           "name": "과즙 코팅",
           "when": {
-            "on": "guard",
-            "kind": "shield"
-          },
-          "limit": {
-            "per": "fight",
-            "n": 3
+            "on": "turnStart"
           },
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.2
             }
           ]
         }
       ],
-      "blurb": "화산섬 과일을 짠 주스. 몸을 감싼 막이 더 단단해집니다."
+      "blurb": "화산섬 과일을 짠 주스. 몸을 감싼 막이 날마다 새로 돋습니다."
     },
     {
       "id": "eq_battery",
@@ -226,7 +211,7 @@
           "fx": [
             {
               "k": "extra",
-              "ratio": 2,
+              "ratio": 2.0,
               "target": "randomEnemy"
             }
           ]
@@ -249,10 +234,6 @@
           "when": {
             "on": "spend",
             "who": "any"
-          },
-          "limit": {
-            "per": "fight",
-            "n": 2
           },
           "fx": [
             {
@@ -281,14 +262,14 @@
           },
           "fx": [
             {
-              "k": "draw",
-              "v": 1,
-              "unique": true
+              "k": "status",
+              "id": "다음 턴 드로우",
+              "v": 1
             }
           ]
         }
       ],
-      "blurb": "전투 전에 가장 자신 있는 주문이 적힌 장을 펼쳐 둡니다."
+      "blurb": "전투 전에 다음 주문이 적힌 장을 펼쳐 둡니다."
     },
     {
       "id": "eq_goldcrown",
@@ -327,21 +308,19 @@
         {
           "name": "급소 복습",
           "when": {
-            "on": "crit"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "on": "fightStart"
           },
           "fx": [
             {
-              "k": "draw",
-              "v": 1
+              "k": "status",
+              "id": "약점 노출",
+              "v": 1,
+              "target": "randomEnemy"
             }
           ]
         }
       ],
-      "blurb": "급소 그림이 가득한 지침서."
+      "blurb": "급소 그림이 가득한 지침서. 첫 차례에는 어디를 쳐야 할지 다 압니다."
     },
     {
       "id": "eq_healpendant",
@@ -357,10 +336,6 @@
           "when": {
             "on": "play",
             "type": "공격"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
           },
           "fx": [
             {
@@ -384,18 +359,17 @@
         {
           "name": "향 피우기",
           "when": {
-            "on": "fightStart"
+            "on": "shieldBreak"
           },
           "fx": [
             {
-              "k": "status",
-              "id": "결의",
-              "v": 2
+              "k": "shield",
+              "ratio": 0.5
             }
           ]
         }
       ],
-      "blurb": "향 연기가 감싼 동안 막이 두꺼워집니다."
+      "blurb": "향 연기가 감싼 막은 깨져도 다시 피어오릅니다."
     },
     {
       "id": "eq_muffin",
@@ -412,10 +386,6 @@
             "on": "exhaust",
             "who": "any"
           },
-          "limit": {
-            "per": "fight",
-            "n": 1
-          },
           "fx": [
             {
               "k": "strip",
@@ -423,7 +393,7 @@
             },
             {
               "k": "extra",
-              "ratio": 1,
+              "ratio": 0.4,
               "target": "oneEnemy"
             }
           ]
@@ -444,10 +414,6 @@
           "name": "좋은 눈",
           "when": {
             "on": "crit"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
           },
           "fx": [
             {
@@ -471,23 +437,18 @@
         {
           "name": "빛나는 막",
           "when": {
-            "on": "guard",
-            "kind": "shield"
-          },
-          "limit": {
-            "per": "fight",
-            "n": 1
+            "on": "fightStart"
           },
           "fx": [
             {
               "k": "status",
-              "id": "결의",
+              "id": "결정화",
               "v": 1
             }
           ]
         }
       ],
-      "blurb": "머리 위에서 빛나며 막을 한 겹 더 두릅니다."
+      "blurb": "머리 위에서 빛나며 턴이 끝날 때마다 얇은 막을 한 겹 두릅니다."
     },
     {
       "id": "eq_diabracelet",
@@ -500,24 +461,25 @@
       },
       "effect": [
         {
-          "name": "깨지지 않는 돌",
+          "name": "겹쳐 박은 다이아",
           "when": {
-            "on": "shieldBreak"
-          },
-          "limit": {
-            "per": "fight",
-            "n": 1
+            "on": "play",
+            "tag": "결속",
+            "who": "any"
           },
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "draw",
               "v": 1
             }
           ]
         }
       ],
-      "blurb": "단단한 다이아를 박은 팔찌. 막이 깨져도 팔찌는 남습니다."
+      "blurb": "다이아 조각을 겹겹이 박은 팔찌. 조각이 겹친 카드를 낼 때마다 반짝 막이 섭니다."
     },
     {
       "id": "eq_greedring",
@@ -555,23 +517,26 @@
       },
       "effect": [
         {
-          "name": "우러러보기",
+          "name": "마지막 장면",
           "when": {
-            "on": "kill"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "on": "play",
+            "tag": "종극",
+            "who": "any"
           },
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.4
+              "ratio": 0.6
+            },
+            {
+              "k": "status",
+              "id": "다음 턴 드로우",
+              "v": 1
             }
           ]
         }
       ],
-      "blurb": "멋진 장면을 넣어 둘 액자. 한 놈 쓰러질 때마다 기운이 납니다."
+      "blurb": "멋진 장면을 넣어 둘 액자. 하루를 마치는 장면에서 모두 기운을 차립니다."
     },
     {
       "id": "eq_cutletpin",
@@ -586,18 +551,23 @@
         {
           "name": "배꼽시계",
           "when": {
-            "on": "fightStart"
+            "on": "play",
+            "tag": "주도",
+            "who": "any"
           },
           "fx": [
             {
-              "k": "status",
-              "id": "다음 턴 드로우",
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "nextCheaper",
               "v": 1
             }
           ]
         }
       ],
-      "blurb": "보기만 해도 배고파지는 머리핀. 다음 끼니 생각에 손이 빨라집니다."
+      "blurb": "보기만 해도 배고파지는 머리핀. 먼저 달려드는 손에 한 장이 더 붙고, 다음 손이 가벼워집니다."
     },
     {
       "id": "eq_thimble",
@@ -625,20 +595,15 @@
             "on": "play",
             "type": "스킬"
           },
-          "limit": {
-            "per": "turn",
-            "n": 1
-          },
           "fx": [
             {
-              "k": "extra",
-              "ratio": 0.3,
-              "target": "oneEnemy"
+              "k": "empower",
+              "ratio": 0.15
             }
           ]
         }
       ],
-      "blurb": "주문을 쓰고 나면 보석이 한 번 반짝입니다."
+      "blurb": "주문을 쓰고 나면 보석이 반짝여 다음 한 수를 거듭니다."
     },
     {
       "id": "eq_healinglamp",
@@ -658,6 +623,7 @@
             {
               "k": "healMod",
               "v": 0.15,
+              "target": "self",
               "run": true
             }
           ]
@@ -677,28 +643,17 @@
         {
           "name": "고양이 기운",
           "when": {
-            "on": "play",
-            "type": "공격"
-          },
-          "conds": [
-            {
-              "c": "firstTurn"
-            }
-          ],
-          "limit": {
-            "per": "fight",
-            "n": 1
+            "on": "fightStart"
           },
           "fx": [
             {
-              "k": "extra",
-              "ratio": 0.5,
-              "target": "oneEnemy"
+              "k": "empower",
+              "ratio": 0.5
             }
           ]
         }
       ],
-      "blurb": "고양이 발 모양 부적. 첫 공격에 기운을 싣습니다."
+      "blurb": "고양이 발 모양 부적. 첫 수에 기운을 싣습니다."
     }
   ]
 }

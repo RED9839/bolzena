@@ -1,0 +1,726 @@
+{
+  "heroes": [
+    {
+      "id": "티그_영웅",
+      "name": "티그(영웅)",
+      "nature": "광기",
+      "race": "수인",
+      "role": "딜러",
+      "style": "표적형",
+      "star": 3,
+      "hp": 830,
+      "atk": 156,
+      "def": 37,
+      "crit": 10,
+      "blurb": "\"허접\"이라며 날 세우던 수인 양아치가 디아나의 뒤를 이어 진짜 영웅이 된 모습.",
+      "keyword": {
+        "name": "영웅심",
+        "desc": "영웅의 길에서 솟는 용기",
+        "carrier": "self",
+        "cap": 3,
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.4
+        },
+        "rules": [
+          {
+            "name": "무용담",
+            "when": {
+              "on": "kill"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "영웅심",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "그 스승에 그 제자",
+            "when": {
+              "on": "break"
+            },
+            "fx": [
+              {
+                "k": "dealtMod",
+                "v": 0.1,
+                "target": "otherAllies"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "맹호류 결착",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.7,
+            "target": "allEnemies"
+          },
+          {
+            "k": "tough",
+            "v": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "ifFoe",
+            "id": "hp"
+          },
+          {
+            "k": "dmg",
+            "ratio": 1.35,
+            "target": "oneEnemy"
+          },
+          {
+            "k": "ifFoe",
+            "id": "hpMob"
+          },
+          {
+            "k": "dmg",
+            "ratio": 4.05,
+            "target": "oneEnemy"
+          }
+        ]
+      },
+      "starter": [
+        "티그_영웅_s1",
+        "티그_영웅_s2",
+        "티그_영웅_s3",
+        "티그_영웅_u2"
+      ],
+      "keywords": [
+        {
+          "name": "겨눈 칼끝",
+          "desc": "두 번 베어 끝낼 한 놈",
+          "carrier": "enemy",
+          "cap": 2,
+          "hunt": true,
+          "per": [
+            {
+              "stat": "taken",
+              "v": 0.08,
+              "from": "owner"
+            }
+          ],
+          "rules": [
+            {
+              "name": "두 번 베기",
+              "when": {
+                "on": "play",
+                "who": "any",
+                "chain": true
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "겨눈 칼끝",
+                  "v": 1,
+                  "target": "markedEnemy"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "티그_영웅_s1",
+      "name": "검 휘두르기",
+      "hero": "티그_영웅",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "티그_영웅_s2",
+      "name": "롱소드 내려치기",
+      "hero": "티그_영웅",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "티그_영웅_s3",
+      "name": "방어 자세",
+      "hero": "티그_영웅",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "티그_영웅_u2",
+      "name": "훈련의 성과",
+      "hero": "티그_영웅",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.22,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "겨눈 칼끝",
+          "v": 1
+        },
+        {
+          "k": "tough",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.83,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "겨눈 칼끝",
+              "v": 2
+            },
+            {
+              "k": "tough",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.64,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "겨눈 칼끝",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.42,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.64,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "겨눈 칼끝",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "티그_영웅_u1",
+      "name": "사슴류 베기",
+      "hero": "티그_영웅",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.62,
+          "target": "allEnemies",
+          "hits": 2
+        },
+        {
+          "k": "stack",
+          "id": "겨눈 칼끝",
+          "v": 1,
+          "target": "lowEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "영웅심",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.92,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "겨눈 칼끝",
+              "v": 2,
+              "target": "lowEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.27,
+              "target": "allEnemies",
+              "hits": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.14,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.64,
+              "target": "lowEnemy",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "겨눈 칼끝",
+              "v": 1,
+              "target": "lowEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.99,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "stack",
+              "id": "겨눈 칼끝",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "티그_영웅_u3",
+      "name": "영웅의 검",
+      "hero": "티그_영웅",
+      "unique": true,
+      "cost": 2,
+      "type": "공격",
+      "tags": [
+        "약점 공격"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 3.43,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "영웅심",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.81,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "영웅심",
+          "all": true
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "티그_영웅_u4",
+      "name": "영웅의 길",
+      "hero": "티그_영웅",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.11,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifStack",
+          "id": "겨눈 칼끝",
+          "n": 2
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.22,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifFoe",
+          "id": "hp",
+          "pct": 0.3
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.22,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.68,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "겨눈 칼끝",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.83,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifFoe",
+              "id": "hp",
+              "pct": 0.3
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.83,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.84,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "겨눈 칼끝",
+              "n": 2
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.85,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.78,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "겨눈 칼끝",
+              "n": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.13,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "티그_영웅_s4",
+      "name": "영웅의 각오",
+      "hero": "티그_영웅",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "영웅심",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "영웅심",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

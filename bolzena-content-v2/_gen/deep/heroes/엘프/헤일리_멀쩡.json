@@ -1,0 +1,752 @@
+{
+  "heroes": [
+    {
+      "id": "헤일리_멀쩡",
+      "name": "헤일리(멀쩡)",
+      "nature": "광기",
+      "race": "엘프",
+      "role": "탱커",
+      "style": "버티형",
+      "star": 3,
+      "hp": 950,
+      "atk": 84,
+      "def": 70,
+      "crit": 5,
+      "blurb": "망상에서 걸어 나와 진짜 전장을 지휘하는 헤일리. 공격을 다 막아 낼 때마다 훈장이 늘고, 훈장으로 동료의 족쇄를 끊거나 검을 휘두르며, 넷이 모이면 전함 보급이 파티의 다음 한 수를 받쳐 줍니다.",
+      "keyword": {
+        "name": "극복의 훈장",
+        "desc": "극복해 온 날의 훈장",
+        "carrier": "self",
+        "cap": 4,
+        "per": [
+          {
+            "stat": "taken",
+            "v": -0.04
+          }
+        ],
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.4,
+          "consume": true
+        },
+        "rules": [
+          {
+            "name": "다 막아 낸 전열",
+            "when": {
+              "on": "hurt",
+              "guarded": true
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "극복의 훈장",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "잊을 수 없는 기억",
+            "when": {
+              "on": "spend",
+              "id": "극복의 훈장"
+            },
+            "fx": [
+              {
+                "k": "cleanse",
+                "v": 1
+              },
+              {
+                "k": "shield",
+                "ratio": 0.25
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "전함 호출",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.38,
+            "hits": 5,
+            "base": "def",
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "사기",
+            "v": 1
+          },
+          {
+            "k": "stack",
+            "id": "극복의 훈장",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "헤일리_멀쩡_s1",
+        "헤일리_멀쩡_s2",
+        "헤일리_멀쩡_s3",
+        "헤일리_멀쩡_u3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "헤일리_멀쩡_s1",
+      "name": "군홧발",
+      "hero": "헤일리_멀쩡",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "헤일리_멀쩡_s2",
+      "name": "방진",
+      "hero": "헤일리_멀쩡",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "헤일리_멀쩡_u3",
+      "name": "전열 사수",
+      "hero": "헤일리_멀쩡",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "극복의 훈장",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "blocked"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "극복의 훈장",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "극복의 훈장",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "cleanse",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.86
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.36
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격",
+                    "every": 4
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "극복의 훈장",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "극복의 훈장",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "헤일리_멀쩡_u1",
+      "name": "나아가는 결의",
+      "hero": "헤일리_멀쩡",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.2,
+          "target": "allEnemies"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.57
+        },
+        {
+          "k": "stack",
+          "id": "극복의 훈장",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.31,
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.85
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.68,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.13
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.34
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.32,
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.81
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "헤일리_멀쩡_u4",
+      "name": "극복의 기록",
+      "hero": "헤일리_멀쩡",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "perPlayed"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.47
+        },
+        {
+          "k": "cleanse",
+          "v": 2
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "헤일리_멀쩡_u2",
+      "name": "무릎 꿇는 교섭",
+      "hero": "헤일리_멀쩡",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "cutHit",
+          "v": 0.5
+        },
+        {
+          "k": "stack",
+          "id": "극복의 훈장",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "cutHit",
+              "v": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "cutHit",
+              "v": 0.3
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "cutHit",
+              "v": 0.4
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "cutHit",
+              "v": 0.5
+            },
+            {
+              "k": "shield",
+              "ratio": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "헤일리_멀쩡_s3",
+      "name": "군홧발 짓밟기",
+      "hero": "헤일리_멀쩡",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "헤일리_멀쩡_s4",
+      "name": "훈장 닦기",
+      "hero": "헤일리_멀쩡",
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        },
+        {
+          "k": "stack",
+          "id": "극복의 훈장",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.99
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.13
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.27
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.6
+            },
+            {
+              "k": "stack",
+              "id": "극복의 훈장",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

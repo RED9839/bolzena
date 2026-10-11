@@ -33,7 +33,7 @@ namespace Bolzena.RunUI
             // 처음 카드를 누른다(사도 상세 카드 목록 → 카드 상세)
             var all = CardOrder.Sort(d.Hero(first.Hero).Starter, d, new[] { first.Hero }).Concat(CardOrder.Sort(d.UniquesOf(first.Hero), d, new[] { first.Hero })).ToList();
             int idx = all.IndexOf(first.Id);
-            var hot = f.Stage.Hot.Keys.FirstOrDefault(k => k == "detail.card고유 카드" + CardOrder.Sort(d.UniquesOf(first.Hero), d, new[] { first.Hero }).IndexOf(first.Id));
+            var hot = f.Stage.Hot.Keys.FirstOrDefault(k => k == "detail.card은총 카드" + CardOrder.Sort(d.UniquesOf(first.Hero), d, new[] { first.Hero }).IndexOf(first.Id));
             if (hot != null) yield return Press(hot, 1.2f); else { f.CardZoom(first.Id, all, idx); yield return Wait(1.2f); }
             Expect(f.Stage.Hot.ContainsKey("zoom.oracle"), "신탁 있는 카드 — 「신탁」 단추");
             Expect(!Texts().Any(t => t.Contains("겨우살이의 축복") || t.Contains("공용 축복")), "카드 상세에 받을 수 있는 축복 목록이 없다");

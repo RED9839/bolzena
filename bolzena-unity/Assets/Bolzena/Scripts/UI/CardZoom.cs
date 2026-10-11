@@ -73,7 +73,7 @@ namespace Bolzena.UI
             bool form = t.Kind == "form";   // 사도 변신(성전 모드 · 맨주먹 전성기 …)
             bool hero = form || (t.Kind == "kw" && !Terms.Words.ContainsKey(t.Word));   // 엔진 화면 낱말이 아닌 「X」 = 사도 고유 효과
             Color edge = bad ? Tone.Bad : isCard ? Tone.Sky : (hero || t.Kind == "flash") ? Tone.Gold : Tone.Edge;
-            string kind = form ? "변신" : hero ? "고유 효과" : isCard ? "카드" : t.Kind == "status" && bad ? "디버프" : null;
+            string kind = form ? "변신" : hero ? "고유 능력" : isCard ? "카드" : t.Kind == "status" && bad ? "디버프" : null;
             Color nameC = bad ? Tone.Bad : isCard ? Tone.Sky : Tone.Gold;
 
             // 머리줄 — 아이콘 + 이름

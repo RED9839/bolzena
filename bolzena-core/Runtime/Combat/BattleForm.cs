@@ -10,6 +10,10 @@ namespace Bolzena.Core
         public string Id;
         public int Left;
         public int Count;
+        /// <summary>(엘다인 ▶E26) formExtend 로 늘린 턴의 합 — 전체 길이 상한(max)을 잰다.</summary>
+        public int Ext;
+        /// <summary>(엘다인 4차 ▶E76) 이 변신에 든 뒤 그 사도가 준 피해 — 새로 들 때 0.</summary>
+        public int Dealt;
         public FormRt Copy() => (FormRt)MemberwiseClone();
     }
 
@@ -20,6 +24,8 @@ namespace Bolzena.Core
     {
         public string Hero, Id, Name, Skin, Anim;
         public int Left;
+        /// <summary>(엘다인 4차) 태세인가(변신 대신 「태세」 로 보인다) · 이번 턴 보존 중인가(formKeep).</summary>
+        public bool Stance, Kept;
         public bool UntilFightEnd => Left <= 0;
     }
 
@@ -46,7 +52,7 @@ namespace Bolzena.Core
         {
             if (heroKey == null || !Forms.TryGetValue(heroKey, out var fr)) return null;
             var fd = FormDefOf(heroKey);
-            return fd == null ? null : new FormView { Hero = heroKey, Id = fd.Id, Name = fd.Name, Skin = fd.Skin, Anim = fd.Anim, Left = fd.Turns > 0 ? fr.Left : 0 };
+            return fd == null ? null : new FormView { Hero = heroKey, Id = fd.Id, Name = fd.Name, Skin = fd.Skin, Anim = fd.Anim, Left = fd.Turns > 0 ? fr.Left : 0, Stance = fd.Stance, Kept = FormKept(heroKey) };
         }
 
         /// <summary>그 사도의 모습 키(스파인 스킨) — 변신 중이 아니면 null(기본 모습).</summary>
@@ -66,7 +72,7 @@ namespace Bolzena.Core
             if (v?.Hero == null || !Forms.TryGetValue(v.Hero, out var fr)) return v;
             var fd = FormDefOf(v.Hero);
             if (fd == null) return v;
-            var key = (v.Def.Id + "|" + id, v.FlashN, fd.Id);
+            var key = (v.Def.Id + "|" + id + "|" + v.Type, v.FlashN, fd.Id);   // 종류 — 전투 중 축복으로 공격 카드가 되면 다시 만든다
             if (formViews.TryGetValue(key, out var hit)) return hit;
             var o = v;
             if (fd.Cards != null && fd.Cards.TryGetValue(GameData.BaseId(id), out var into) && Data.Card(into) is CardDef nd)
@@ -111,7 +117,7 @@ namespace Bolzena.Core
             if (fd == null) return o;
             foreach (var id in Hand.Distinct())
             {
-                var v = Data.View(id, Flash.TryGetValue(id, out var n) ? n : 0, Party.Count > 0 ? Party[0].Key : null);
+                var v = Blessed(id, Data.View(id, Flash.TryGetValue(id, out var n) ? n : 0, Party.Count > 0 ? Party[0].Key : null));
                 if (v?.Hero != heroKey) continue;
                 var b = GameData.BaseId(id);
                 bool hit = (fd.Cards != null && fd.Cards.ContainsKey(b)) || (fd.Bonus ?? new List<FormBonus>()).Any(x => (x.Card == null || x.Card == b) && (x.Type == null || x.Type == v.Type) && (!x.Unique || v.Unique));
@@ -128,6 +134,10 @@ namespace Bolzena.Core
             {
                 case FxK.Form: if (owner != null && owner.Side == Side.Party && owner.BodyRef != null) EnterForm(owner, f.Id); return true;
                 case FxK.FormEnd: if (owner != null && owner.Side == Side.Party) EndForm(owner, "card"); return true;
+                case FxK.NoToggle: ctx.NoToggle = true; return true;   // 이번엔 짝 태세로 안 바뀜(우로스)
+                case FxK.FormKeep:   // n턴간 태세 보존(엘다인 4차 — 린 「흑운 심법」) — 그동안 풀리는 계기 · 시간으로 안 풀린다
+                    if (owner != null && owner.Side == Side.Party) { Counts["formKeep|" + owner.Key] = Turn + f.TurnsOr1; Say($"{owner.Name} — {f.TurnsOr1}턴간 {(FormDefOf(owner.Key)?.Name ?? "태세")} 보존"); StatusCue(owner, "태세 보존", true); }
+                    return true;
             }
             return false;
         }
@@ -141,7 +151,7 @@ namespace Bolzena.Core
             {
                 if (cur.Id == formId)
                 {
-                    cur.Left = fd.Turns; cur.Count = 0;
+                    cur.Left = fd.Turns; cur.Count = 0; cur.Ext = 0;
                     Say($"{owner.Name} — 「{fd.Name}」 지속이 처음으로{(fd.Turns > 0 ? $"({fd.Turns}턴)" : "")}");
                     Cue("formOn", owner, new Cue { Hero = owner.Key, Id = fd.Id, Name = fd.Name, Label = fd.Skin, T = fd.Anim, V = fd.Turns });
                     return;
@@ -153,6 +163,11 @@ namespace Bolzena.Core
             Say($"{owner.Name} — 변신 「{fd.Name}」{(fd.Turns > 0 ? $" ({fd.Turns}턴)" : " (전투 끝까지)")}");
             Cue("formOn", owner, new Cue { Hero = owner.Key, Id = fd.Id, Name = fd.Name, Label = fd.Skin, T = fd.Anim, V = fd.Turns });
             foreach (var id in FormHand(owner.Key, fd)) CardCue(id, "hand", "hand", "form");
+            // (엘다인 ▶E6) 드는 순간 변신 카드 · 계기 formOn(새로 들 때만 — 지속만 처음으로는 아니다)
+            if (fd.OnEnter != null && fd.OnEnter.Count > 0 && Over == null) RunPassive(owner, fd.OnEnter, new FxCtx { Owner = owner, TargetIdx = AliveEnemies().FirstOrDefault()?.Idx ?? 0 }, $"{owner.Name} · 「{fd.Name}」 듦");   // 드는 순간(엘다인 3차)
+            if (owner.Key == TraceHero) { TraceAdd("formIn"); TraceAdd("formInTurn:" + Turn); Counts["formAt|" + owner.Key] = Turn; }
+            FormMakeCards(owner, fd);
+            if (Over == null) Emit("formOn", new EmitInfo { Hero = owner.Key, Id = fd.Id, Who = owner });
         }
 
         /// <summary>변신을 푼다 — why: time(지속이 다함) · until(풀리는 계기) · card(효과 formEnd) · switch(다른 변신). off 효과가 돈다.</summary>
@@ -162,12 +177,17 @@ namespace Bolzena.Core
             var fd = FormDefOf(owner.Key);
             var changed = FormHand(owner.Key, fd);
             Forms.Remove(owner.Key);
+            if (owner.Key == TraceHero) { TraceAdd("formOff:" + why); if (Counts.TryGetValue("formAt|" + owner.Key, out var fa)) TraceAdd("formTurns", Turn - fa + 1); }
             string name = fd?.Name ?? "변신";
             Say($"{owner.Name} — 「{name}」 풀림");
             Cue("formOff", owner, new Cue { Hero = owner.Key, Id = fd?.Id, Name = name, Label = why });
             foreach (var id in changed) CardCue(id, "hand", "hand", "form");
             if (fd != null && fd.Off != null && fd.Off.Count > 0 && Over == null && !owner.Dead)
                 RunPassive(owner, fd.Off, new FxCtx { Owner = owner, TargetIdx = AliveEnemies().FirstOrDefault()?.Idx ?? 0 }, $"{owner.Name} · 「{name}」 풀림");
+            // (엘다인 ▶E22) 끝의 갈래 — 시간이 다 되면(반동) · 스스로 끝내면(보상)
+            var tail = fd == null ? null : why == "time" ? fd.OffExpire : why == "card" ? fd.OffEnd : null;
+            if (tail != null && tail.Count > 0 && Over == null && !owner.Dead)
+                RunPassive(owner, tail, new FxCtx { Owner = owner, TargetIdx = AliveEnemies().FirstOrDefault()?.Idx ?? 0 }, $"{owner.Name} · 「{name}」 {(why == "time" ? "시간이 다 됨" : "스스로 끝냄")}");
         }
 
         /// <summary>내 턴 시작 — 턴으로 재는 변신의 남은 턴을 1 줄이고 다하면 푼다.</summary>
@@ -198,6 +218,7 @@ namespace Bolzena.Core
                 var fd = FormDefOf(key);
                 if (fd == null) { Forms.Remove(key); continue; }
                 if (fd.Turns <= 0) continue;
+                if (FormKept(key)) continue;   // 보존 중엔 시간이 줄지 않는다
                 fr.Left--;
                 if (fr.Left <= 0) EndForm(HeroUnit(key), "time");
             }
@@ -213,6 +234,7 @@ namespace Bolzena.Core
                 var w = FormDefOf(key)?.Until;
                 var owner = HeroUnit(key);
                 if (w == null || owner == null || owner.Dead) continue;
+                if (FormKept(key)) continue;   // 보존 중엔 풀리는 계기가 안 든다(엘다인 4차 태세)
                 if (!Matches(owner, w, ev, info, null)) continue;
                 if (w.Every > 1 && ++fr.Count % w.Every != 0) continue;
                 EndForm(owner, "until");
@@ -225,6 +247,44 @@ namespace Bolzena.Core
             if (fd.Passives == null || fd.Passives.Count == 0) return null;
             if (!formRules.TryGetValue(fd.Id, out var l)) formRules[fd.Id] = l = fd.Passives.Select(r => new RuleRt { R = r, Form = fd.Id }).ToList();
             return l;
+        }
+
+        /// <summary>(우로스 선 · 악) 그 사도가 자기 카드를 낸 뒤 — 지금 태세에 toggle 이 있으면 짝 태세로(그 카드가 noToggle · 변신 · 해제를 했으면 안 바뀜).</summary>
+        void FormToggle(Unit owner, FxCtx ctx, string formBefore)
+        {
+            if (owner == null || ctx.NoToggle || Over != null || !Forms.TryGetValue(owner.Key, out var fr) || fr.Id != formBefore) return;
+            var fd = FormDefOf(owner.Key);
+            if (fd?.Toggle == null) return;
+            var to = Data.Hero(owner.Key)?.Forms?.FirstOrDefault(x => x.Id == fd.Toggle);
+            if (to == null) return;
+            Forms.Remove(owner.Key);   // 풀림 효과 · 계기 없이 갈아 든다(번갈아 드는 태세)
+            Forms[owner.Key] = new FormRt { Id = to.Id, Left = to.Turns };
+            Say($"{owner.Name} — 「{fd.Name}」 → 「{to.Name}」");
+            Cue("formOn", owner, new Cue { Hero = owner.Key, Id = to.Id, Name = to.Name, Label = to.Skin, T = to.Anim, V = to.Turns });
+            foreach (var id in FormHand(owner.Key, to)) CardCue(id, "hand", "hand", "form");
+            if (Over == null) Emit("formOn", new EmitInfo { Hero = owner.Key, Id = to.Id, Who = owner });
+            // 한 바퀴(시작 태세로 돌아옴 — 우로스 허물 → 본성 → 허물) — 계기 formLap
+            if (Over == null && to.Id == Data.Hero(owner.Key)?.StartForm) Emit("formLap", new EmitInfo { Hero = owner.Key, Id = to.Id, Who = owner });
+        }
+        /// <summary>전투 시작 태세(heroes startForm).</summary>
+        void StartForms()
+        {
+            foreach (var u in AliveParty().ToList())
+            {
+                var sf = Data.Hero(u.Key)?.StartForm;
+                if (sf != null && !Forms.ContainsKey(u.Key) && Over == null) EnterForm(u, sf);
+            }
+        }
+
+        /// <summary>그 사도의 태세(변신)가 보존 중인가(formKeep — 걸린 턴부터 turns 턴, 다음 내 턴 시작 전까지).</summary>
+        public bool FormKept(string heroKey) => heroKey != null && Counts.Count > 0 && Counts.TryGetValue("formKeep|" + heroKey, out var t) && t > Turn;
+        /// <summary>그 카드가 「그 변신 · 태세 중에만 사용 가능」 인데 지금 아니면 그 이름(되면 null).</summary>
+        public string NeedFormWhy(CardView c)
+        {
+            var need = c?.NeedForm;
+            if (need == null || c.Hero == null) return null;
+            if (Forms.TryGetValue(c.Hero, out var fr) && (need == "*" || fr.Id == need)) return null;
+            return need == "*" ? "변신" : Data.Hero(c.Hero)?.Forms?.FirstOrDefault(x => x.Id == need)?.Name ?? need;
         }
 
         /// <summary>변신의 능력치 증감(StatMod 가 더한다).</summary>

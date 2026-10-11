@@ -6,7 +6,7 @@
 본다:
   1) 로스터 사도가 모두 있나 · 표에만 있는 키(오타)
   2) 칸마다 줄 수 — lobby 4~6 · cheek 2 · tickle 2 · angry 2 · knock(꿀밤) 1~2 · pat 1~2 · party 1
-     판 진행 한마디(2026-10-09) — rest · shop · reward · victory · bossStart · lowhp · event 각 2~3
+     판 진행 한마디(2026-10-09) — rest · shop · reward · victory · bossStart · lowhp · event 각 2~3, idle(전투 중 가만있을 때) 3
   3) 줄 길이(36자 넘으면 경고) · 같은 줄 겹침
   4) 말 단계 — 반말(casual · royal) 사도 줄이 「요 · 니다 · 세요 · 죠 …」 로 끝나면 오류(0 이어야 한다).
      존댓말(polite) 사도는 존댓말 어미 비율이 70% 아래면 경고.
@@ -28,6 +28,7 @@ NAMES = "C:/projects/사도 데스크/prototype/data/names-ko.json"
 
 KINDS = {"lobby": (4, 6), "cheek": (2, 2), "tickle": (2, 2), "angry": (2, 2), "knock": (1, 2), "pat": (1, 2), "party": (1, 1)}
 RUN_KINDS = {k: (2, 3) for k in ("rest", "shop", "reward", "victory", "bossStart", "lowhp", "event")}   # 판 진행 한마디(2026-10-09)
+RUN_KINDS["idle"] = (3, 3)   # 전투 중 가만있을 때 혼잣말 · 재촉(2026-10-09 — 지금 화면에 뜨는 판 진행 말풍선은 이것뿐)
 KINDS.update(RUN_KINDS)
 POLITE_END_RE = re.compile(r"(요|세요|죠|지요|시오|십시오|소서|옵니다|사와요)$")
 

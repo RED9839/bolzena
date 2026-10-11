@@ -9,7 +9,8 @@ using UnityEngine.UI;
 
 namespace Bolzena.RunUI
 {
-    // 지도 — 웹판 ui.js mapScreen(docs/10-지도.md). 한 층은 출발(N-0)에서 보스(N-10)까지 열 줄, 줄마다 갈래가 1~4.
+    // 지도 — 웹판 ui.js mapScreen(docs/10-지도.md). 한 층은 출발(N-0)에서 보스(N-17, Core.R.FLOOR_NODES)까지 열일곱 줄, 줄마다 갈래가 1~4.
+    // 칸이 화면보다 길어 가로로 흐른다 — 끌기 · 휠(세로 휠이 가로로) · 지도가 설 때 지금 칸을 왼쪽 30% 로 따라간다(ScrollTo).
     // 왼쪽 → 오른쪽으로 나아가고, 파티(SD 셋)가 지금 칸에 선다. 갈 수 있는 칸은 숨쉬며 빛나고, 못 닿는 칸은 흐리다.
     // 웹판보다: 칸이 줄마다 차례로 튀어나오고, 길이 그어지고, 누르면 파티가 걸어가서 들어간다.
     public partial class Flow
@@ -37,7 +38,7 @@ namespace Bolzena.RunUI
             var v = P.VillageDef;
             var here2 = P.Here;
             W.StatusBar(root, this, true, true, true, $"{P.S.Floor + 1}층 · {P.Floor.Name}",
-                $"{v.Name} · {(here2 != null ? P.StageName(here2) : P.S.Floor + 1 + "-0")} / {P.S.Floor + 1}-10 · 빛나는 칸을 눌러 나아갑니다");
+                $"{v.Name} · {(here2 != null ? P.StageName(here2) : P.S.Floor + 1 + "-0")} / {P.S.Floor + 1}-{m.Rows.Count - 1} · 빛나는 칸을 눌러 나아갑니다");
             MapFoeNature(root);
 
             // 지도 칸 — 머리 띠(파티 알약 · 학년 카드 · 적 속성 알약, Theme.HudBottom) 와 범례(아래 64) 사이. 높이는 캔버스에 맞춘다(폰 720 · PC 900)

@@ -1,0 +1,836 @@
+{
+  "heroes": [
+    {
+      "id": "시저",
+      "name": "시저",
+      "nature": "냉정",
+      "role": "서포터",
+      "style": "예약형",
+      "star": 3,
+      "hp": 600,
+      "atk": 86,
+      "def": 60,
+      "crit": 5,
+      "blurb": "좋은 걸 맛보게 한 뒤 빼앗는 빌런 지망생. 적에게 단종 예고를 걸어 두면 두 차례 뒤 한정판이 사라지며 그 적이 절망하고, 그 전에 쓰러뜨리면 남은 몫만큼 파티가 기운을 차립니다.",
+      "keyword": {
+        "name": "단종 예고",
+        "desc": "두 차례 뒤 단종되는 한정판",
+        "carrier": "enemy",
+        "cap": 2,
+        "reserve": true,
+        "decay": 1,
+        "rules": [
+          {
+            "name": "단종",
+            "when": {
+              "on": "stackGone",
+              "id": "단종 예고",
+              "decay": true
+            },
+            "fx": [
+              {
+                "k": "dmg",
+                "ratio": 2.82,
+                "target": "oneEnemy"
+              },
+              {
+                "k": "status",
+                "id": "약화",
+                "v": 1,
+                "target": "oneEnemy"
+              },
+              {
+                "k": "status",
+                "id": "취약",
+                "v": 2,
+                "target": "oneEnemy"
+              }
+            ]
+          },
+          {
+            "name": "빌런의 수하",
+            "when": {
+              "on": "play",
+              "marked": "빌런의 수하"
+            },
+            "fx": [
+              {
+                "k": "heal",
+                "ratio": 0.14
+              }
+            ]
+          },
+          {
+            "name": "의외로 빌런이 이기는 전개",
+            "when": {
+              "on": "fightStart"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "단종 예고",
+                "v": 2,
+                "target": "topEnemy"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "가지치기",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.41,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "단종 예고",
+            "v": 1,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "시저_s1",
+        "시저_s2",
+        "시저_s3",
+        "시저_u1"
+      ],
+      "keywords": [
+        {
+          "name": "빌런의 수하",
+          "desc": "시저가 지정한 빌런의 수하",
+          "carrier": "hero",
+          "cap": 1
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "시저_s1",
+      "name": "싹둑",
+      "hero": "시저",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "시저_s2",
+      "name": "간식 나눠주기",
+      "hero": "시저",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "시저_u1",
+      "name": "한정판의 맛",
+      "hero": "시저",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "dealtMod",
+          "v": 0.2,
+          "target": "allAllies"
+        },
+        {
+          "k": "stack",
+          "id": "단종 예고",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.3,
+              "target": "allAllies"
+            },
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "hasten",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "allAllies"
+            },
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "reserveFire"
+                  },
+                  "fx": [
+                    {
+                      "k": "dealtMod",
+                      "v": 0.15,
+                      "target": "allAllies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "allAllies"
+            },
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "시저_u2",
+      "name": "보이는 실",
+      "hero": "시저",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.13,
+          "target": "oneEnemy",
+          "hits": 6
+        },
+        {
+          "k": "gauge",
+          "v": 8
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy",
+              "hits": 6
+            },
+            {
+              "k": "gauge",
+              "v": 12
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.15,
+              "target": "oneEnemy",
+              "hits": 6
+            },
+            {
+              "k": "rushDown",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.15,
+              "target": "oneEnemy",
+              "hits": 6
+            },
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.17,
+              "target": "oneEnemy",
+              "hits": 6
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "marked": "빌런의 수하"
+                  },
+                  "fx": [
+                    {
+                      "k": "gauge",
+                      "v": 4
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.18,
+              "target": "allEnemies",
+              "hits": 6
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "시저_u3",
+      "name": "싹둑싹둑",
+      "hero": "시저",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.42,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ripen",
+          "id": "단종 예고",
+          "v": 0.3
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.64,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ripen",
+              "id": "단종 예고",
+              "v": 0.3
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "단종 예고",
+              "v": 0.2
+            },
+            {
+              "k": "shield",
+              "ratio": 2.56
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.42,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ripen",
+              "id": "단종 예고",
+              "v": 0.3,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.16,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "ripen",
+              "id": "단종 예고",
+              "v": 0.3
+            },
+            {
+              "k": "dispel",
+              "n": 1
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "시저_u4",
+      "name": "빌런의 품격",
+      "hero": "시저",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "빌런의 수하",
+          "v": 1,
+          "target": "oneAlly"
+        },
+        {
+          "k": "heal",
+          "ratio": 2.24
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빌런의 수하",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "heal",
+              "ratio": 3.4
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빌런의 수하",
+              "v": 1,
+              "target": "strongestAlly"
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.2,
+              "target": "strongestAlly"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.34
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빌런의 수하",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "heal",
+              "ratio": 2.2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "marked": "빌런의 수하"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.92
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "빌런의 수하",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 1.34
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.88
+            },
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "시저_s3",
+      "name": "가위 난도질",
+      "hero": "시저",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "시저_s4",
+      "name": "단종 공지",
+      "hero": "시저",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2.24
+        },
+        {
+          "k": "stack",
+          "id": "단종 예고",
+          "v": 2,
+          "target": "oneEnemy"
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.4
+            },
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.24
+            },
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.24
+            },
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.24
+            },
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.92
+            },
+            {
+              "k": "stack",
+              "id": "단종 예고",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

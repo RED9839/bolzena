@@ -105,16 +105,21 @@ namespace Bolzena.Core
         /// <summary>상태 겹마다 건 쪽 — 상태 id → 건 쪽(hero:키 · enemy:Idx · gear:키 · neutral · event) → 겹. 화면은 Battle.StatusViews 로 읽는다.</summary>
         public Dictionary<string, Dictionary<string, int>> Src = new();
 
-        public Unit Clone()
+        public Unit Clone() => Clone(true);
+
+        /// <summary>src = false 면 상태를 건 쪽 기록(Src — 화면 풀이 전용)을 빈 것으로(봇이 뜨는 판 — Battle.Clone 참고).</summary>
+        internal Unit Clone(bool src)
         {
             var u = (Unit)MemberwiseClone();
             u.Brand = new HashSet<string>(Brand);
             u.Giver = new Dictionary<string, int>(Giver);
-            u.Traps = Traps.ConvertAll(x => x.Copy());
-            u.Src = Src.ToDictionary(kv => kv.Key, kv => new Dictionary<string, int>(kv.Value));
+            u.Traps = new List<LaterRec>(Traps.Count);
+            foreach (var x in Traps) u.Traps.Add(x.Copy());
+            u.Src = src ? Battle.Deep(Src) : new Dictionary<string, Dictionary<string, int>>();   // LINQ 없이(봇이 수마다 복사 — 2026-10-09)
             u.BodyRef = null;
             u.Status = new Dictionary<string, int>(Status);
-            u.Mods = Mods.ConvertAll(m => m.Copy());
+            u.Mods = new List<Mod>(Mods.Count);
+            foreach (var m in Mods) u.Mods.Add(m.Copy());
             u.DotU = new Dictionary<string, int>(DotU);
             u.StUse = new Dictionary<string, int>(StUse);
             u.Hist = new List<string>(Hist);

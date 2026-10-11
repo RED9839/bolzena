@@ -13,6 +13,9 @@ namespace Bolzena.Core.Tests
     /// </summary>
     public static class K
     {
+        // 첫 수 약점 노출(R.OPEN_EXPOSE, 2026-10-10)은 시험에서 끈다 — 시험은 성격 · 약점을 하나씩 따로 본다(켜는 시험은 KarzenaRuleTests)
+        // 역할별 실드 · 회복 배율(R.ROLE_GUARD, 2026-10-10)도 시험에서는 1 — 시험 사도 'a' 가 탱커라 실드 수치 시험이 배율과 섞이지 않게(켜는 시험은 KarzenaRuleTests)
+        static K() { R.OPEN_EXPOSE = 0; foreach (var k in R.ROLE_GUARD.Keys.ToList()) R.ROLE_GUARD[k] = 1; R.ROLE_DUP = 0; }
         public const string HEROES = @"[
  {id:'a', name:'가', role:'탱커', row:'front', hp:1000, atk:100, def:50, crit:0},
  {id:'b', name:'나', role:'서포터', row:'mid', hp:800, atk:80, def:40, crit:0},
@@ -57,7 +60,22 @@ namespace Bolzena.Core.Tests
         }
 
         public static Unit E(Battle b, int i = 0) => b.Enemies[i];
+        public static List<Unit> Enemies(Battle b) => b.Enemies;
         public static int Hp(Battle b, int i = 0) => b.Enemies[i].Hp;
+
+        /// <summary>
+        /// 실제 콘텐츠(bolzena-content-v2)에 콘텐츠에서 빠진 사도 하나를 얹은 것 — 2026-10-11 엘다인 20명 전환으로 사도 원본은 백업(heroes_non_eldain_20261011)에 있다.
+        /// 콘텐츠나 백업이 없으면 시험을 건너뛴다. 클론 전용 사도(cloneHeroes)와 id 가 같아도 플레이어 사도가 먼저다(GameData.CloneHero).
+        /// </summary>
+        public static GameData ContentWithBenched(string heroId)
+        {
+            string dir = new[] { "../bolzena-content-v2", "../../bolzena-content-v2", "C:/projects/bolzena-content-v2" }.FirstOrDefault(Directory.Exists);
+            if (dir == null) Assert.Ignore("bolzena-content-v2 가 없다");
+            const string bench = "C:/projects/_backup/heroes_non_eldain_20261011/heroes";
+            string file = Directory.Exists(bench) ? Directory.GetFiles(bench, heroId + ".json", SearchOption.AllDirectories).FirstOrDefault() : null;
+            if (file == null) Assert.Ignore($"{heroId} 는 콘텐츠에서 빠졌고 백업({bench})에도 없다");
+            return GameData.FromFolders(new[] { dir, file });
+        }
 
         /// <summary>샘플 콘텐츠(Data/Sample).</summary>
         public static GameData Sample()

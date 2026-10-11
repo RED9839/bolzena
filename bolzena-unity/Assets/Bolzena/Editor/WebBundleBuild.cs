@@ -19,6 +19,10 @@ namespace Bolzena.EditorTools
         const string RunSpineRes = "Assets/Resources/Spine";
         const string StageSpine = Stage + "/Spine";
         const string StageRun = Stage + "/RunSpine";
+        // 웹에서 빼기만 하는 것(번들 없이 · 늘 — 2026-10-09 perf_20261009): Off/<Assets/ 뒤 경로> 로 옮긴다(WebImport.Original 이 되돌려 읽는다).
+        //   경로 속 「Resources」 폴더 이름은 「_Res」 로 바꿔 둔다 — 이름이 Resources 인 폴더는 어디 있든 유니티가 Resources 로 친다(첫 시도에서 그대로 들어갔다)
+        public const string StageOff = Stage + "/Off";
+        const string ExcludeList = "Tools/web_exclude.txt";
         const string Moves = "Library/BolzenaWebStage_moves.txt";   // 옮긴 것(돌려놓기용) — 원래 자리 \t 옮긴 자리. 애셋이 아니게 Library 에
 
         // 기본은 끔(2026-10-06): 유니티 6 WebGL 번들은 LZMA 를 주어도 LZ4HC 로 나오고, Pages 가 번들 파일에 gzip 을 씌우지 않아
@@ -63,6 +67,112 @@ namespace Bolzena.EditorTools
             Debug.Log($"[Bundles] Resources 밖으로 — {log.Count}건");
         }
 
+        /// <summary>「Resources」 폴더 이름을 「_Res」 로(옮긴 자리) · 거꾸로(원래 자리).</summary>
+        public static string OffName(string rel) => string.Join("/", rel.Split('/').Select(x => x == "Resources" ? "_Res" : x));
+        public static string OnName(string rel) => string.Join("/", rel.Split('/').Select(x => x == "_Res" ? "Resources" : x));
+
+        // ── 목소리 번들(2026-10-10 C안 — 런타임 WebVoice) ──
+        //   Resources/Voice 를 웹 빌드 동안 Stage/Voice 로 옮겨 .data 에서 빼고, 사도 폴더마다 압축 없는 번들(AAC 라 LZ4 · gzip 이득이 4% 남짓)과 voice.json 을 만든다.
+        //   BOLZENA_WEB_VOICE=0 이면 하지 않는다(예전처럼 .data 에).
+        public const string StageVoice = Stage + "/Voice";
+        const string VoiceRes = "Assets/Bolzena/Resources/Voice";
+        public static bool VoiceEnabled => System.Environment.GetEnvironmentVariable("BOLZENA_WEB_VOICE") != "0";
+
+        public static void VoiceOut()
+        {
+            if (!VoiceEnabled || !AssetDatabase.IsValidFolder(VoiceRes) || AssetDatabase.IsValidFolder(StageVoice)) return;
+            var log = File.Exists(Moves) ? File.ReadAllLines(Moves).ToList() : new List<string>();
+            Folder(Stage);
+            try { Move(VoiceRes, StageVoice, log); }
+            finally { File.WriteAllLines(Moves, log); }
+            AssetDatabase.SaveAssets();
+            Debug.Log("[WebVoice] 목소리를 .data 에서 뺌 → " + StageVoice);
+        }
+
+        [System.Serializable] class VEntry { public string art; public string file; public string hash; public long size; }
+        [System.Serializable] class VManifest { public string version; public VEntry[] voices; }
+
+        /// <summary>옮겨 둔 목소리로 사도별 번들을 만든다 — outDir(WebBuild/Voice)에 voice_<키>.bundle · voice.json.</summary>
+        public static bool BuildVoices(string outDir)
+        {
+            if (!AssetDatabase.IsValidFolder(StageVoice)) { Debug.Log("[WebVoice] 옮긴 목소리 없음 — 번들 안 만듦"); return true; }
+            var builds = new List<AssetBundleBuild>();
+            var artOf = new Dictionary<string, string>();
+            foreach (var d in AssetDatabase.GetSubFolders(StageVoice).OrderBy(x => x, System.StringComparer.Ordinal))
+            {
+                var art = Path.GetFileName(d);
+                var files = Directory.GetFiles(d).Where(f => !f.EndsWith(".meta")).Select(f => f.Replace('\\', '/')).OrderBy(f => f, System.StringComparer.Ordinal).ToArray();
+                if (files.Length == 0) continue;
+                var bn = "voice_" + art.ToLowerInvariant();
+                artOf[bn] = art;
+                builds.Add(new AssetBundleBuild { assetBundleName = bn, assetNames = files });
+            }
+            if (Directory.Exists(outDir)) Directory.Delete(outDir, true);
+            Directory.CreateDirectory(outDir);
+            float t0 = Time.realtimeSinceStartup;
+            var man = BuildPipeline.BuildAssetBundles(outDir, builds.ToArray(), BuildAssetBundleOptions.UncompressedAssetBundle | BuildAssetBundleOptions.StrictMode, BuildTarget.WebGL);
+            if (man == null) { Debug.LogError("[WebVoice] 목소리 번들 빌드 실패"); return false; }
+            var list = new List<VEntry>();
+            foreach (var bn in man.GetAllAssetBundles().OrderBy(x => x, System.StringComparer.Ordinal))
+            {
+                var file = bn + ".bundle";
+                File.Move(Path.Combine(outDir, bn), Path.Combine(outDir, file));
+                list.Add(new VEntry { art = artOf[bn], file = file, hash = man.GetAssetBundleHash(bn).ToString(), size = new FileInfo(Path.Combine(outDir, file)).Length });
+            }
+            foreach (var f in Directory.GetFiles(outDir, "*.manifest")) File.Delete(f);
+            var index = Path.Combine(outDir, Path.GetFileName(outDir));
+            if (File.Exists(index)) File.Delete(index);
+            File.WriteAllText(Path.Combine(outDir, "voice.json"), JsonUtility.ToJson(new VManifest { version = System.DateTime.Now.ToString("yyyyMMddHHmm"), voices = list.ToArray() }, true));
+            Debug.Log($"[WebVoice] 목소리 번들 {list.Count}개 · {list.Sum(x => x.size) / 1e6:F1}MB · 가장 큰 것 {list.Max(x => x.size) / 1e6:F2}MB · {Time.realtimeSinceStartup - t0:F0}s");
+            return true;
+        }
+
+        static bool Exists(string p) => AssetDatabase.IsValidFolder(p) || !string.IsNullOrEmpty(AssetDatabase.AssetPathToGUID(p, AssetPathToGUIDOptions.OnlyExistingAssets));
+
+        /// <summary>
+        /// 웹 빌드에서 빼기(번들과 상관없이 늘) — 판에서 안 쓰는데 Resources 에 있어 .data 에 들어가던 것을 Resources 밖(StageOff)으로 옮긴다. 원본은 지우지 않는다.
+        ///   ① Assets/Resources/Spine/st_* 중 같은 이름이 Assets/Bolzena/Resources/Spine 에 있는 것(판 화면 사본 — 같은 Resources 경로라 하나만 읽힌다)
+        ///   ② Tools/web_exclude.txt 목록(안 쓰는 적 스파인 · 겹친 글꼴). 콘텐츠(CoreDataPack)에 그 이름이 나오면 빼지 않고 경고한다.
+        /// </summary>
+        public static void ExcludeOut()
+        {
+            var log = File.Exists(Moves) ? File.ReadAllLines(Moves).ToList() : new List<string>();
+            int n0 = log.Count;
+            var pack = "Assets/Resources/CoreDataPack.json";
+            var core = File.Exists(pack) ? File.ReadAllText(pack).ToLowerInvariant() : "";
+            void Off(string from)
+            {
+                var to = StageOff + "/" + OffName(from.Substring("Assets/".Length));
+                Folder(Path.GetDirectoryName(to).Replace('\\', '/'));
+                Move(from, to, log);
+            }
+            try
+            {
+                if (AssetDatabase.IsValidFolder(RunSpineRes) && AssetDatabase.IsValidFolder(SpineRes))
+                    foreach (var d in AssetDatabase.GetSubFolders(RunSpineRes))
+                    {
+                        var name = Path.GetFileName(d);
+                        if (name.StartsWith("st_") && AssetDatabase.IsValidFolder(SpineRes + "/" + name)) Off(d);
+                    }
+                if (File.Exists(ExcludeList))
+                    foreach (var raw in File.ReadAllLines(ExcludeList))
+                    {
+                        var line = raw.Split('#')[0].Trim();
+                        if (line.Length == 0 || !Exists(line)) continue;
+                        var token = Path.GetFileNameWithoutExtension(line).ToLowerInvariant();
+                        if (System.Text.RegularExpressions.Regex.IsMatch(core, "(?<![a-z0-9_])" + System.Text.RegularExpressions.Regex.Escape(token) + "(?![a-z0-9_])"))
+                        {
+                            Debug.LogWarning($"[WebOff] 콘텐츠에 「{token}」 이 나온다 — 빼지 않는다: {line}");
+                            continue;
+                        }
+                        Off(line);
+                    }
+            }
+            finally { File.WriteAllLines(Moves, log); }
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[WebOff] 웹 빌드에서 뺌 — {log.Count - n0}건(→ {StageOff})");
+        }
+
         /// <summary>옮긴 것을 제자리로(빌드 뒤 · 다음 Setup 첫머리). 남은 것이 없으면 아무것도 안 한다.</summary>
         public static void Restore()
         {
@@ -73,7 +183,7 @@ namespace Bolzena.EditorTools
                 foreach (var line in File.ReadAllLines(Moves).Reverse())
                 {
                     var p = line.Split('\t');
-                    if (p.Length != 2 || !AssetDatabase.IsValidFolder(p[1])) continue;
+                    if (p.Length != 2 || !Exists(p[1])) continue;
                     var err = AssetDatabase.MoveAsset(p[1], p[0]);
                     if (!string.IsNullOrEmpty(err)) throw new System.Exception($"[Bundles] 돌려놓기 실패 {p[1]} → {p[0]}: {err}");
                     n++;
@@ -87,7 +197,9 @@ namespace Bolzena.EditorTools
                     var to = RunSpineRes + "/" + Path.GetFileName(d);
                     if (!AssetDatabase.IsValidFolder(to)) { AssetDatabase.MoveAsset(d, to); n++; }
                 }
-            bool empty = !AssetDatabase.IsValidFolder(StageSpine) && (!AssetDatabase.IsValidFolder(StageRun) || AssetDatabase.GetSubFolders(StageRun).Length == 0);
+            if (AssetDatabase.IsValidFolder(StageVoice) && !AssetDatabase.IsValidFolder(VoiceRes)) { AssetDatabase.MoveAsset(StageVoice, VoiceRes); n++; }
+            bool offEmpty = !Directory.Exists(StageOff) || !Directory.EnumerateFiles(StageOff, "*", SearchOption.AllDirectories).Any(f => !f.EndsWith(".meta"));
+            bool empty = offEmpty && !AssetDatabase.IsValidFolder(StageVoice) && !AssetDatabase.IsValidFolder(StageSpine) && (!AssetDatabase.IsValidFolder(StageRun) || AssetDatabase.GetSubFolders(StageRun).Length == 0);
             if (empty)
             {
                 if (File.Exists(Moves)) File.Delete(Moves);

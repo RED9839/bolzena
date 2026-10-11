@@ -1,0 +1,93 @@
+// 란 — 딜러 · 순수 · 수인. 설계: _measure/엘다인_엔진/01_사도별.md §13 (4차 10-11 — 사냥감 확정 치명 · 규칙은 「동료 약화 → 표식」 · 가벼운 덱)
+// 엔진: 「행복한 아기 늑대」(늑대 표식)를 카드로 깔아 턴 끝마다 물어뜯고(★ 키워드) → 「사랑니 발도술」 이 표식 1개당 베고 표식을 하나 더 건다(터뜨리고 다시 걸기 — 원작 보강 10-11).
+// 받는 고리는 동료의 약화(우로스 I45)로 좁혔다. 사냥감(발톱)은 쓰러지면 가장 약한 적에게 옮겨 간다.
+import { hero, dmg, ddmg, shield, heal, stack, spend, make, draw, discard, status, empower, ifStack, power, rule } from '../lib.mjs';
+
+const H = '란', W = '행복한 아기 늑대', P = '늑대 야수의 발톱';
+const wolf = (v = 1, target = 'oneEnemy') => stack(W, v, { target });
+const prey = (target = 'oneEnemy') => stack(P, 1, { target });
+const crit = { k: 'critNext', now: true, foeStack: P };   // 사냥감이면 이 카드 치명 확정(엔진 요청 — 조건 없이 그 적만 보는 꼴)
+
+export default hero({
+  id: H, name: '란', nature: '순수', race: '수인', role: '딜러', star: 3,
+  blurb: '요도 「사랑니」 를 찬 아기 늑대 검사. 「행복한 아기 늑대」 를 붙여 두면 턴 끝마다 물어뜯고, 늑대가 붙은 적은 사랑니가 깊게 벱니다. 벤 자리엔 늑대가 다시 붙습니다.',
+  keyword: {
+    name: W, desc: '적에게 새겨 두는 아기 늑대의 이빨 자국', carrier: 'enemy', cap: 4,
+    per: [{ stat: 'dot', ratio: 0.5 }],   // 10-11 밸런스 40→50%
+    rules: [{ name: '함께 속죄하는 벗', when: { on: 'debuff', who: 'other', id: '약화' }, fx: [wolf(2)] }],
+  },
+  keywords: [{
+    // 4차 덧붙임(사용자 10-11): 3겹까지 쌓이는 사냥감 — 1겹당 란에게 받는 피해 +15% · 쓰러지면 가장 약한 적에게 겹째로(늑대 표식은 파티가 거는 지속 피해, 발톱은 란만의 사냥감 강화)
+    name: P, desc: '란이 노리는 사냥감 — 쓰러지면 가장 약한 적에게 겹째로', carrier: 'enemy', cap: 3, hunt: true, huntCarry: 'lowEnemy',
+    per: [{ stat: 'taken', v: 0.2, from: 'owner' }],   // 10-11 밸런스 15→20%
+  }],
+  // 사용자 10-11: 20명 모두 고유 능력 2개
+  passives: [
+    { name: '란과 벗님들', when: { on: 'huntDown' }, fx: [draw(1)] },   // 사냥감이 쓰러지면 드로우 1
+  ],   // 「란과 벗님들」(처치하면 가장 약한 적 약점 노출)은 자동 규칙 하나(E62)라 발도술 ③ 신탁으로 옮겼다
+  ult: { name: '몰이 사냥', cost: 250, fx: [dmg(1.1, 'oneEnemy', { hits: 4 }), { k: 'ifKill' }, dmg(1.1, 'oneEnemy', { hits: 4 })] },
+}, {
+  basicNames: ['발도', '쾌속 발도', '칼집 막기'], deck: 'light',
+  uniques: [
+    { // 시동
+      name: '아랑의 여유', cost: 1, type: '공격',
+      fx: [dmg(1.2, 'allEnemies'), wolf(1, 'allEnemies'), prey()],   // 10-11 밸런스(사용자 「다 해 줘」)
+      oracles: [
+        { fx: [dmg(1, 'allEnemies'), wolf(2, 'allEnemies'), prey()] },
+        { type: '스킬', cost: 0, fx: [wolf(1, 'allEnemies')] },
+        { fx: [dmg(1, 'allEnemies'), wolf(1, 'allEnemies'), status('약화', 1, { target: 'allEnemies' })] },
+        { fx: [dmg(2.2), wolf(2)] },
+        { fx: [dmg(1, 'allEnemies'), wolf(1, 'allEnemies'), wolf(2)] },
+      ],
+      blesses: ['power', 'draw', [wolf(1)]],
+    },
+    {
+      name: '투구꽃 독', cost: 0, type: '스킬',
+      fx: [wolf(2), status('고통', 2, { target: 'oneEnemy' })],
+      oracles: [
+        { fx: [wolf(3), status('고통', 2, { target: 'oneEnemy' })] },
+        { fx: [wolf(1, 'allEnemies'), status('고통', 1, { target: 'allEnemies' })] },
+        { fx: [wolf(2), status('약화', 2, { target: 'oneEnemy' })] },
+        { cost: 1, fx: [wolf(2), draw(2)] },
+        { fx: [status('고통', 2, { target: 'oneEnemy' }), draw(1, { who: 'other' })] },
+      ],
+      blesses: ['draw', 'ap', [wolf(1)]],
+    },
+    {
+      name: '날선 늑대의 발톱', cost: 1, type: '공격',
+      fx: [crit, dmg(2.5)],   // 10-11 밸런스(사용자 「다 해 줘」)
+      oracles: [
+        { fx: [crit, dmg(2.4)] },
+        { fx: [crit, dmg(1.8), { k: 'perStack', id: W }, dmg(0.3)] },
+        { fx: [{ k: 'perStack', id: W, each: true, max: 1 }, dmg(1.1, 'allEnemies')] },
+        { cost: 0, tags: ['소멸'], fx: [{ k: 'ifStack', id: P, n: 1 }, dmg(1.7), { k: 'ifKill' }, { k: 'ap', v: 1 }] },
+        { fx: [crit, dmg(1.8), wolf(1)] },
+      ],
+      blesses: ['power', 'cost', [wolf(1)]],
+    },
+    { // 마무리 — 표식 1개당(최소 1회) 베고 표식 +1(남는다)
+      name: '사랑니 발도술', cost: 1, type: '공격',
+      fx: [{ k: 'perStack', id: W, n: 1 }, dmg(2.1), wolf(1)],   // 10-11 밸런스(사용자 「다 해 줘」)
+      oracles: [
+        { power: true, fx: [wolf(1), power([rule({ on: 'stackReach', id: W, n: 4 }, [status('약점 노출', 1, { target: 'oneEnemy' })])])] },
+        { fx: [{ k: 'spend', id: W, v: 3 }, dmg(2.1, 'oneEnemy', { hits: 3 })] },
+        { fx: [{ k: 'perStack', id: W, n: 1 }, dmg(1.8), { k: 'ifKill' }, status('약점 노출', 1, { target: 'lowEnemy' })] },   // 「란과 벗님들」
+        { fx: [{ k: 'perStack', id: W, n: 1 }, dmg(1.8), status('약점 노출', 1, { target: 'oneEnemy' })] },
+        { cost: 0, tags: ['소멸'], fx: [{ k: 'perStack', id: W, n: 1 }, dmg(1.1)] },
+      ],
+      blesses: ['power', 'cost', [wolf(1)]],
+    },
+    { // 4차 8장 — 굴리기(어사이드 「란과 벗님들」): 표식을 걸고 동료 다음 카드를 키운다
+      name: '란과 벗님들', cost: 0, type: '스킬',
+      fx: [wolf(1), prey(), empower(0.3, { who: 'other' })],
+      oracles: [
+        { fx: [wolf(1), empower(0.5, { who: 'other' })] },
+        { fx: [wolf(1, 'allEnemies')] },
+        { fx: [prey(), prey()] },
+        { fx: [wolf(1), draw(1, { who: 'other' })] },
+        { fx: [status('약화', 1, { target: 'oneEnemy' }), wolf(1)] },
+      ],
+      blesses: ['draw', 'cost', [wolf(1)]],
+    },
+  ],
+});

@@ -1,0 +1,823 @@
+{
+  "heroes": [
+    {
+      "id": "마리",
+      "name": "마리",
+      "nature": "활발",
+      "race": "요정",
+      "role": "딜러",
+      "style": "예약형",
+      "star": 2,
+      "hp": 590,
+      "atk": 125,
+      "def": 27,
+      "crit": 10,
+      "blurb": "왕국 하나쯤 날려 버릴 폭탄도 만드는 천재 폭파 전문가이자, 과거엔 「황금손」이라 불린 좀도둑. 이제는 도둑이 아닌 모험가로 인정받고 싶은데, 도무지 존재감이 없습니다.",
+      "keyword": {
+        "name": "묻은 폭탄",
+        "desc": "곳곳에 묻어 둔 빨간 막대기",
+        "carrier": "self",
+        "cap": 8,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.03
+          }
+        ],
+        "rules": [
+          {
+            "name": "저도 여기 있어요!",
+            "when": {
+              "on": "spend",
+              "id": "묻은 폭탄",
+              "n": 4
+            },
+            "fx": [
+              {
+                "k": "empower",
+                "ratio": 0.3,
+                "who": "any"
+              }
+            ]
+          },
+          {
+            "name": "황금손 마리",
+            "when": {
+              "on": "kill",
+              "mine": true
+            },
+            "fx": [
+              {
+                "k": "make",
+                "id": "마리_bomb",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "강화 폭탄",
+            "when": {
+              "on": "play",
+              "type": "공격"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "묻은 폭탄",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "발파 합니다!",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "stack",
+            "id": "묻은 폭탄",
+            "v": 4
+          },
+          {
+            "k": "perStack",
+            "id": "묻은 폭탄",
+            "n": 1
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.69,
+            "target": "allEnemies"
+          },
+          {
+            "k": "spend",
+            "id": "묻은 폭탄",
+            "all": true
+          }
+        ]
+      },
+      "starter": [
+        "마리_s1",
+        "마리_s2",
+        "마리_s3",
+        "마리_u3"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "마리_s1",
+      "name": "폭죽 던지기",
+      "hero": "마리",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "마리_s2",
+      "name": "왕폭죽 던지기",
+      "hero": "마리",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "마리_s3",
+      "name": "방어 자세",
+      "hero": "마리",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "마리_bomb",
+      "name": "특제 폭탄",
+      "hero": "마리",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.59,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "묻은 폭탄",
+          "v": 1
+        }
+      ],
+      "blurb": "황금손이 직접 만든 특제 폭탄입니다"
+    },
+    {
+      "id": "마리_u3",
+      "name": "빨간 막대기 묻기",
+      "hero": "마리",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "묻은 폭탄",
+          "v": 3
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 5
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "묻은 폭탄",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 3
+            },
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 1,
+              "owner": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "later",
+              "n": 2,
+              "then": [
+                {
+                  "k": "dmg",
+                  "ratio": 3.39,
+                  "target": "allEnemies"
+                }
+              ]
+            },
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 3
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마리_u1",
+      "name": "폭탄 배달 왔어용~",
+      "hero": "마리",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.64,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "잔불",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "묻은 폭탄",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.46,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "잔불",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.27,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "잔불",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.03,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "묻은 폭탄",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.97,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "make",
+              "id": "마리_bomb",
+              "v": 4
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마리_u2",
+      "name": "기폭 스위치",
+      "hero": "마리",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "묻은 폭탄",
+          "n": 1,
+          "each": false
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.95,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "묻은 폭탄",
+          "all": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "묻은 폭탄",
+              "n": 1,
+              "each": false
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.42,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "묻은 폭탄",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "묻은 폭탄",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.94,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "묻은 폭탄",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "묻은 폭탄",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.13,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "묻은 폭탄",
+              "v": 4
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "묻은 폭탄",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.03,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "묻은 폭탄",
+              "all": true
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "묻은 폭탄",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.95,
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "묻은 폭탄",
+              "all": true
+            },
+            {
+              "k": "status",
+              "id": "잔불",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마리_u4",
+      "name": "숨겨 둔 한 방",
+      "hero": "마리",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "payHp",
+          "v": 40
+        },
+        {
+          "k": "perPlayed"
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.22,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "payHp",
+              "v": 40
+            },
+            {
+              "k": "perPlayed"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.85,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "payHp",
+              "v": 60
+            },
+            {
+              "k": "perPlayed"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.52,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "payHp",
+              "v": 40
+            },
+            {
+              "k": "perPlayed"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.28,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perPlayed"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.37,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "payHp",
+              "v": 80
+            },
+            {
+              "k": "perPlayed"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.67,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "마리_s4",
+      "name": "폭탄 묻기",
+      "hero": "마리",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "묻은 폭탄",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "묻은 폭탄",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

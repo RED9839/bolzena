@@ -262,13 +262,13 @@ namespace Bolzena.Core.Tests
         [Test] public void 카드_글()
         {
             var t = new CardText(Data());
-            StringAssert.Contains("바로 앞 카드보다 비싸면", t.Fx(new List<Fx> { new Fx { K = FxK.IfPricier }, new Fx { K = FxK.Draw, V = 1 } }));
+            StringAssert.Contains("바로 앞 카드의 비용을 넘으면", t.Fx(new List<Fx> { new Fx { K = FxK.IfPricier }, new Fx { K = FxK.Draw, V = 1 } }));
             StringAssert.Contains("자신의 공격 카드를 3장째 잇달아", t.Fx(new List<Fx> { new Fx { K = FxK.IfStreak, N = 3, Type = "공격" }, new Fx { K = FxK.Draw, V = 1 } }));
             StringAssert.Contains("소멸한 자신의 카드 1장당", t.Fx(new List<Fx> { new Fx { K = FxK.PerGone, Who = "self" }, new Fx { K = FxK.Dmg, Ratio = 0.3, Target = "oneEnemy" } }));
             StringAssert.Contains("엘리트 · 보스를 처치하면", t.Fx(new List<Fx> { new Fx { K = FxK.IfKill, Id = "elite" }, new Fx { K = FxK.Draw, V = 1 } }));
             StringAssert.Contains("이번 전투에 쌓은", t.Fx(new List<Fx> { new Fx { K = FxK.IfGained, Id = "주머니", N = 5 }, new Fx { K = FxK.Draw, V = 1 } }));
             StringAssert.Contains("지금 터뜨림", t.Fx(new List<Fx> { new Fx { K = FxK.Ripen, Id = "시계", V = 0.25 } }));
-            StringAssert.Contains("따라 침", t.Fx(new List<Fx> { new Fx { K = FxK.Summon, Id = "벌", Ratio = 0.3 } }));
+            StringAssert.Contains("「벌」 1개당", t.Fx(new List<Fx> { new Fx { K = FxK.Summon, Id = "벌", Ratio = 0.3 } }));   // 2026-10-11 글 길이 — 「따라 침:」 · 상한은 툴팁
             Assert.AreEqual("「벌」이 하나 사라지면", t.WhenText(new When { On = "summonAct", Id = "벌", Kind = "lost" }));
         }
     }

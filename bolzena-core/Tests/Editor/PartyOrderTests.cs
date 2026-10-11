@@ -47,9 +47,9 @@ namespace Bolzena.Core.Tests
         {
             var d = K.Data(heroes: STAGED, cards: "[{id:'stc', name:'넘기기', hero:'st', cost:0, type:'스킬', fx:[{k:'stack', id:'모습', v:1}, {k:'ifStack', id:'모습', n:3, max:3}, {k:'draw', v:1}]}]");
             var tx = new CardText(d);
-            StringAssert.Contains("「모습」이 축복이면", tx.Card(d.Card("stc")));
+            StringAssert.Contains("축복이면", tx.Card(d.Card("stc")));   // 2026-10-11 — 단계 이름만(「양산이면」)
             var sheet = tx.HeroShort(d.Hero("st"));
-            StringAssert.Contains("「모습」이 심판이면", sheet);
+            StringAssert.Contains("심판이면", sheet);
             StringAssert.Contains("꿈결 → 심판 → 축복 → 다시 꿈결", sheet);
             Assert.IsFalse(Validator.Check(d).Errors.Any(e => e.Contains("사도 st")));
         }

@@ -1,0 +1,949 @@
+{
+  "heroes": [
+    {
+      "id": "디아나_왕년",
+      "name": "디아나(왕년)",
+      "nature": "냉정",
+      "race": "수인",
+      "role": "딜러",
+      "style": "두 얼굴형",
+      "star": 3,
+      "hp": 850,
+      "atk": 156,
+      "def": 37,
+      "crit": 10,
+      "blurb": "우로스를 쓰러뜨리기 직전, 한창때의 디아나가 벨벳이 찢은 책에서 튀어나온 모습.",
+      "keyword": {
+        "name": "갈라진 땅",
+        "desc": "도끼가 갈라 놓은 적의 발밑",
+        "carrier": "enemy",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "taken",
+            "v": 0.05
+          }
+        ],
+        "rules": [
+          {
+            "name": "단순하게",
+            "when": {
+              "on": "play",
+              "type": "공격"
+            },
+            "fx": [
+              {
+                "k": "ifHand",
+                "n": 1
+              },
+              {
+                "k": "stack",
+                "id": "연격",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "휴식이 필요해",
+            "when": {
+              "on": "lowHp",
+              "pct": 0.3
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "연격",
+                "v": 4
+              },
+              {
+                "k": "empower",
+                "ratio": 0.24
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "부수기",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.11,
+            "target": "allEnemies"
+          },
+          {
+            "k": "form",
+            "id": "디아나_왕년_맨주먹"
+          }
+        ]
+      },
+      "forms": [
+        {
+          "id": "디아나_왕년_맨주먹",
+          "name": "맨주먹",
+          "desc": "도끼를 부순 한창때의 맨주먹 — 잃은 HP를 조금씩 되찾음",
+          "turns": 4,
+          "cards": {
+            "디아나_왕년_s1": "디아나_왕년_f1",
+            "디아나_왕년_u1": "디아나_왕년_f2"
+          },
+          "passives": [
+            {
+              "name": "되찾는 숨",
+              "when": {
+                "on": "turnEnd"
+              },
+              "fx": [
+                {
+                  "k": "heal",
+                  "ratio": 0.21
+                }
+              ]
+            }
+          ],
+          "off": [
+            {
+              "k": "stack",
+              "id": "연격",
+              "v": 1
+            }
+          ],
+          "skin": null,
+          "anim": "Idle_Change"
+        }
+      ],
+      "starter": [
+        "디아나_왕년_s1",
+        "디아나_왕년_s2",
+        "디아나_왕년_s3",
+        "디아나_왕년_u1"
+      ],
+      "keywords": [
+        {
+          "name": "연격",
+          "desc": "맨주먹으로 잇는 주먹질",
+          "carrier": "self",
+          "cap": 6,
+          "per": [
+            {
+              "stat": "dealt",
+              "v": 0.04
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "디아나_왕년_s1",
+      "name": "도끼질",
+      "hero": "디아나_왕년",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_s2",
+      "name": "도끼 내려찍기",
+      "hero": "디아나_왕년",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_s3",
+      "name": "방어 자세",
+      "hero": "디아나_왕년",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_f1",
+      "name": "맨주먹 연타",
+      "hero": "디아나_왕년",
+      "token": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.69,
+          "target": "oneEnemy",
+          "hits": 2
+        },
+        {
+          "k": "stack",
+          "id": "연격",
+          "v": 1
+        }
+      ],
+      "blurb": "맨주먹의 기본 공격 — 두 번 치고 연격을 잇습니다"
+    },
+    {
+      "id": "디아나_왕년_f2",
+      "name": "도끼 되찾기",
+      "hero": "디아나_왕년",
+      "token": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "perStack",
+          "id": "연격",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.63,
+          "target": "allEnemies"
+        },
+        {
+          "k": "spend",
+          "id": "연격",
+          "all": true
+        },
+        {
+          "k": "formEnd"
+        }
+      ],
+      "blurb": "맨주먹의 「찢기」 — 쌓은 주먹질을 땅에 쏟고 도끼를 다시 쥡니다"
+    },
+    {
+      "id": "디아나_왕년_u1",
+      "name": "찢기",
+      "hero": "디아나_왕년",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.16,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "갈라진 땅",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.74,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.73,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 3,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.99,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "갈라진 땅",
+                      "v": 1,
+                      "target": "allEnemies"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.05,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "연격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_u2",
+      "name": "귀찮아, 단순하게",
+      "hero": "디아나_왕년",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "discard",
+          "v": 1
+        },
+        {
+          "k": "stack",
+          "id": "연격",
+          "v": 2
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "연격",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "discard",
+              "all": true
+            },
+            {
+              "k": "perDiscarded"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.59,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "연격",
+              "v": 4
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "연격",
+              "v": 5
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "discard",
+                    "who": "any"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "연격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "discard",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "연격",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_u3",
+      "name": "도끼 부수기",
+      "hero": "디아나_왕년",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "ifPrevSame"
+        },
+        {
+          "k": "dmg",
+          "ratio": 3.68,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "form",
+          "id": "디아나_왕년_맨주먹"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "ifPrevSame"
+            },
+            {
+              "k": "dmg",
+              "ratio": 5.52,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "form",
+              "id": "디아나_왕년_맨주먹"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "ifPrevSame"
+            },
+            {
+              "k": "dmg",
+              "ratio": 3.05,
+              "target": "allEnemies"
+            },
+            {
+              "k": "form",
+              "id": "디아나_왕년_맨주먹"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "ifPrevSame"
+            },
+            {
+              "k": "dmg",
+              "ratio": 4.51,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
+            },
+            {
+              "k": "form",
+              "id": "디아나_왕년_맨주먹"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "ifPrevSame"
+            },
+            {
+              "k": "dmg",
+              "ratio": 3.89,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "form",
+              "id": "디아나_왕년_맨주먹"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "연격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "form",
+              "id": "디아나_왕년_맨주먹"
+            },
+            {
+              "k": "stack",
+              "id": "연격",
+              "v": 4
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_u4",
+      "name": "바위 던지기",
+      "hero": "디아나_왕년",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.89,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "status",
+          "id": "기절",
+          "v": 1,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.84,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "소멸"
+          ],
+          "cost": 2,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.52,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "topEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.68,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "소멸"
+          ],
+          "power": true,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.95,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt",
+                    "guarded": true
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 1.74,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "연격",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.89,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "기절",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "tags": [
+            "보존"
+          ]
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "디아나_왕년_s4",
+      "name": "땅 구르기",
+      "hero": "디아나_왕년",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "갈라진 땅",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "empower",
+          "ratio": 0.3
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.45
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "갈라진 땅",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.35
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

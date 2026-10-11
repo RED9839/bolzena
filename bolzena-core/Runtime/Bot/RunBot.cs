@@ -98,6 +98,13 @@ namespace Bolzena.Core
         }
 
         // ── 장비 ──
+        /// <summary>
+        /// (2026-10-10 장비 리뉴얼) 숙련 봇이 셀 장비 규칙 — 태그 계기(「열정」 · 「회수」 · 「결속」 · 「주도」 · 「종극」 카드를 낼 때마다 …)는
+        /// 파티 사도 카드가 그 태그를 낼 때(gives 에 「tag:이름」)만 센다. gives 가 없으면(초보 봇) 다 센다.
+        /// </summary>
+        public static List<PassiveRule> FitGear(HashSet<string> gives, List<PassiveRule> rules)
+            => gives == null ? rules : rules.Where(r => r.When?.Tag == null || gives.Contains("tag:" + Tag.Parse(r.When.Tag).id)).ToList();
+
         public double GearScore(Run run, string id, string k)
         {
             if (id == null) return 0;
@@ -105,7 +112,8 @@ namespace Bolzena.Core
             double atkW = role == "딜러" ? 3 : role == "서포터" ? 1.8 : 1.4;
             double v = (s.Hp * 0.3 + s.Atk * atkW + s.Def * (role == "탱커" ? 2.2 : role == "서포터" ? 2 : 1)) / K + s.Crit * 0.25;
             // 효과 몫 — 한 싸움 값어치(CardValue.GearWorth, 1코 카드 ≈ 1.5) × GEAR_EFF. 옛 「효과가 있으면 +4 · 애착 +5」 를 효과 크기로(2026-10-07)
-            if (e.Effect.Count > 0) v += Math.Min(GEAR_EFF_CAP, Math.Max(1, GEAR_EFF * CardValue.GearWorth(e.Effect)));
+            var eff = FitGear(plan?.Gives, e.Effect);
+            if (eff.Count > 0) v += Math.Min(GEAR_EFF_CAP, Math.Max(1, GEAR_EFF * CardValue.GearWorth(eff)));
             if (e.Affinity == k && e.AffinityEffect.Count > 0) v += Math.Min(GEAR_EFF_CAP, Math.Max(2, GEAR_EFF * CardValue.GearWorth(e.AffinityEffect)));
             if (plan != null) v += 1.5 * plan.GearHits(e);   // 숙련 — 파티 축에 맞는 효과
             return v;

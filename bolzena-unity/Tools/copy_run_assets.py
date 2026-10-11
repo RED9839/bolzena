@@ -1,6 +1,8 @@
 # 한 판(판 화면 + 전투)에 쓰는 원작 에셋을 더 복사한다(원본은 읽기만 · 복사본은 gitignore).
 #   python Tools/copy_run_assets.py
-# 1) 사도 135명의 전투 SD 스파인(spine/ingame/<웹판 키> → Resources/Spine/<그림 키>) · 초상 · 스킬 아이콘(카드 그림)
+# 2026-10-11 엘다인 20명 전환 — 사도마다 갈래(runui Tools~/hero_sets.py: P 플레이어 · C 클론 전용 · N 이벤트 NPC)로 거른다:
+#   P 는 전부 · C 는 SD · 스탠딩 스파인 · 초상 · 고학년 목소리(등장 · 고학년 컷인)만 · N 은 SD · 스탠딩 스파인만. 갈래 없는 사도는 복사하지 않는다.
+# 1) 사도의 전투 SD 스파인(spine/ingame/<웹판 키> → Resources/Spine/<그림 키>) · 초상 · 스킬 아이콘(카드 그림)
 # 2) 원작 적 스파인 전부(spine/enemy/<이름> → Resources/Spine/<이름>)
 # 3) 판 화면(com.bolzena.runui) — 사도 표(roster.json, 웹판에서 뽑음) · 배경 · 아이콘 · 미니미 · 스탠딩(로비 · 상점 · NPC)
 #    · 사도 스탠딩 렌더(RunArt/Standing — 상세 · 목록 · 시작 카드) · 고유 카드 아이콘(RunArt/Skill — runui cardart.json 표)
@@ -71,9 +73,9 @@ def touch_voices(fs):
     # 로비 사도 만지기(runui Flow/LobbyTouch) — 사도마다 한 줄씩만(웹 크기): 볼 당기기 touch1 · 간지럼 ticklestart1 · 화냄 anger1
     #   기본 옷 것만(_skin 꼬리 제외). 없으면 비슷한 것(touch → tickleduring → no)
     out = []
-    #   2026-10-09: 꿀밤 dutchrubend1 · 쓰다듬기 touch2 도(LobbyTouch 가 먼저 찾는다)
+    #   2026-10-09: 꿀밤 dutchrubend1 → dutchrubend2(이어서) · 쓰다듬기 touch2 도(LobbyTouch 가 먼저 찾는다)
     for want, alt in (("touch1.ogg", "touch"), ("ticklestart1.ogg", "tickleduring"), ("anger1.ogg", "no"),
-                      ("dutchrubend1.ogg", "dutchrub"), ("touch2.ogg", "touch")):
+                      ("dutchrubend1.ogg", "dutchrub"), ("dutchrubend2.ogg", "dutchrubend2"), ("touch2.ogg", "touch")):
         if want in fs:
             out.append(want)
         else:
@@ -88,11 +90,15 @@ def main():
     if not os.path.exists(ROSTER):
         subprocess.run(["node", os.path.join(RUNUI, "Tools~", "build_roster.mjs"), ROSTER.replace("\\", "/")], check=True)
     roster = json.load(open(ROSTER, encoding="utf-8"))["heroes"]
+    sys.path.insert(0, os.path.join(RUNUI, "Tools~"))
+    import hero_sets
+    kind = hero_sets.kinds(roster)
+    print("사도 갈래", {k: sum(1 for v in kind.values() if v == k) for k in "PCN"})
 
     jobs = []
     for h in roster:
         art = h.get("art")
-        if art:
+        if art in kind:
             jobs.append((f"{SRC}/spine/ingame/{h['key']}", art))
     # 1-c) 스탠딩 스파인 135명(spine/standing/<그림 키 · 웹판 키 · 한글 이름> → Resources/Spine/st_<그림 키>) — 고학년 컷인 · 사도 화면이 실제로 재생한다
     #   (Normal 스킨 · Idle_1 — 덧스킨은 입히지 않는다). 폴더 이름이 한글인 사도가 많다
@@ -101,7 +107,7 @@ def main():
     for h in roster:
         art = h.get("art")
         src = next((n for n in (art, h["key"], h["ko"]) if n and n in have), None)
-        if art and src:
+        if art in kind and src:
             jobs.append((f"{sroot}/{src}", "st_" + art))
     for e in os.listdir(f"{SRC}/spine/enemy"):
         jobs.append((f"{SRC}/spine/enemy/{e}", e))
@@ -115,9 +121,11 @@ def main():
     n = 0
     for h in roster:
         art = h.get("art")
-        if not art:
+        if kind.get(art) not in ("P", "C"):
             continue
-        cp(f"{SRC}/heroicons/{art}.png", f"{DST}/Art/{art}.png", (256, 256))
+        cp(f"{SRC}/heroicons/{art}.png", f"{DST}/Art/{art}.png", (256, 256))   # 초상 — 클론 의도 칸 얼굴 · 컷인 대체도
+        if kind[art] != "P":
+            continue
         for ic in [f"icon_admissionskill_{art}", f"icon_graduateskill_{art}", f"aside_skill_{art}_1", f"aside_skill_{art}_2", f"aside_skill_{art}_3"]:
             cp(f"{SRC}/skillicons/{ic}.png", f"{DST}/Art/{ic}.png")
         n += 1
@@ -128,10 +136,10 @@ def main():
     ajobs = []
     for h in roster:
         art = h.get("art")
-        if not art:
+        if kind.get(art) not in ("P", "C"):
             continue
         sd, vd = f"{SRC}/sfx/hero/{art}", f"{SRC}/voice/{art}"
-        if os.path.isdir(sd):
+        if kind[art] == "P" and os.path.isdir(sd):   # 사도 효과음은 파티 사도만(클론은 안 쓴다)
             fs = [f for f in os.listdir(sd) if f.endswith(".ogg")]
             # 원작 파일 이름이 틀린 사도(마리 maire_ultimate…) — 키 이름으로 바로잡는다
             ult = [f for f in fs if "_ultimate" in f]
@@ -144,6 +152,8 @@ def main():
             fs = [f for f in os.listdir(vd) if f.endswith(".ogg")]
             # 고학년 목소리가 없는 사도(디아나) — 외침(shout)으로 대신(컷인이 ultimate → shout 순으로 찾는다)
             pick = [f for f in fs if f.startswith("ultimate")] or [f for f in fs if f.startswith("shout")]
+            if kind[art] != "P":   # 클론 전용 — 고학년 컷인 목소리만
+                fs = []
             # 편성에서 사도를 칸에 넣을 때의 말(runui Kit/HeroVoice — 웹판 party-screen 의 decksetting → greeting)
             pick += [f for f in fs if f.startswith("decksetting")] or [f for f in fs if f.startswith("greeting")]
             pick += touch_voices(fs)

@@ -1,0 +1,741 @@
+{
+  "heroes": [
+    {
+      "id": "벨벳",
+      "name": "벨벳",
+      "nature": "냉정",
+      "race": "마녀",
+      "role": "탱커",
+      "style": "격파형",
+      "star": 3,
+      "hp": 980,
+      "atk": 84,
+      "def": 64,
+      "crit": 5,
+      "blurb": "근력 강화 마법 하나로 고위 마녀가 된 근육파. HP를 깎아 근육에 붓고, 불어난 근육으로 맞고 때립니다.",
+      "keyword": {
+        "name": "근력 강화",
+        "desc": "근력 강화 마법으로 불어난 근육",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "taken",
+            "v": -0.04
+          }
+        ],
+        "rules": [
+          {
+            "name": "스스로 지키는 힘",
+            "when": {
+              "on": "hurt"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "근력 강화",
+                "v": 1
+              },
+              {
+                "k": "gauge",
+                "v": 3
+              }
+            ]
+          },
+          {
+            "name": "근육 시범",
+            "when": {
+              "on": "break",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "근력 강화",
+                "v": 1
+              },
+              {
+                "k": "gauge",
+                "v": 10
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "마법: 원심 분리",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.26,
+            "base": "def",
+            "target": "allEnemies",
+            "hits": 3
+          },
+          {
+            "k": "tough",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "근력 강화",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "벨벳_s1",
+        "벨벳_s2",
+        "벨벳_s3",
+        "벨벳_u2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "벨벳_s1",
+      "name": "도끼 내리찍기",
+      "hero": "벨벳",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "벨벳_s2",
+      "name": "이두근 가드",
+      "hero": "벨벳",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "벨벳_u2",
+      "name": "그냥 다 덤벼!",
+      "hero": "벨벳",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        },
+        {
+          "k": "status",
+          "id": "반격",
+          "v": 2
+        },
+        {
+          "k": "status",
+          "id": "피해 감소",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.01
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.17
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.5
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.47
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            },
+            {
+              "k": "gauge",
+              "v": 15
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "벨벳_u3",
+      "name": "원심 분리 펀치",
+      "hero": "벨벳",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "분쇄"
+      ],
+      "fx": [
+        {
+          "k": "ifStack",
+          "id": "근력 강화",
+          "n": 3
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.53,
+          "base": "def",
+          "target": "allEnemies"
+        },
+        {
+          "k": "tough",
+          "v": 1,
+          "target": "allEnemies"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "벨벳_u1",
+      "name": "이두근 펌핑",
+      "hero": "벨벳",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "근력 강화",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 0.47
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "근력 강화",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.69
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "근력 강화",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 4
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.23
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "근력 강화",
+                      "v": 2
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.4
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "break"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "근력 강화",
+                      "v": 3
+                    },
+                    {
+                      "k": "gauge",
+                      "v": 10
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.47
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "근력 강화",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "벨벳_u5",
+      "name": "솔즙 무료 나눔",
+      "hero": "벨벳",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.39
+        },
+        {
+          "k": "stack",
+          "id": "근력 강화",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.59
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 0.37
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.5
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.08
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 4
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "cleanse",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "벨벳_s3",
+      "name": "도끼 풀스윙",
+      "hero": "벨벳",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "벨벳_s4",
+      "name": "근육 펌핑",
+      "hero": "벨벳",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.77
+        },
+        {
+          "k": "stack",
+          "id": "근력 강화",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.16
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.77
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.77
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.77
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.01
+            },
+            {
+              "k": "stack",
+              "id": "근력 강화",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -112,7 +112,7 @@ namespace Bolzena.RunUI
             if (d < 20 * k) d = 65 * k;
             g.u = Mathf.Max(d, 60 * k);
             g.eyeY = g.neckY + d;
-            g.browY = g.neckY + d + 0.6f * g.u;
+            g.browY = g.neckY + d + 0.3f * g.u;   // 눈 바로 위 — 이마 · 앞머리부터 머리(예전 0.6u 는 이마가 얼굴로 잡혔다)
             if (pat != null && ball != null && pat.WorldY > ball.WorldY) g.browY = Mathf.Min(g.browY, pat.WorldY - 0.1f * (pat.WorldY - ball.WorldY));
             // 얼굴 가운데 — 두 볼 뼈 사이(없으면 머리 x · 목과 눈 사이)
             if (ballL != null && ballR != null) { g.faceX = (ballL.WorldX + ballR.WorldX) / 2; g.faceY = (ballL.WorldY + ballR.WorldY) / 2; }
@@ -126,6 +126,61 @@ namespace Bolzena.RunUI
             return g;
         }
 
+        // 머리 그림의 범위 — 눈 높이 위에 있는 보이는 그림(영역 · 메시) 꼭짓점의 위끝 · 가로 범위. 모자 · 귀 · 뿔 · 머리카락 그대로.
+        //   가로는 머리 가운데 ±(0.8~2.6)u 로 묶고, 위로는 정수리 본(Character_Pat) 위로도 그림이 있는 곳까지만 + 0.1u 여유.
+        readonly float[] vbuf = new float[2048];
+        public struct HeadBox { public float x0, x1, top, bottom; }
+        public HeadBox HeadBoxNow() => HeadBoxOf(G());
+        HeadBox HeadBoxOf(Geo g)
+        {
+            float lo = g.eyeY - 0.15f * g.u, top = g.browY, x0 = float.MaxValue, x1 = float.MinValue;
+            if (Sg != null)
+                foreach (var sl in Sg.Skeleton.DrawOrder)
+                {
+                    var at = sl.Attachment;
+                    if (at == null || sl.A < 0.05f || !sl.Bone.Active) continue;
+                    int n;
+                    if (at is Spine.RegionAttachment ra) { ra.ComputeWorldVertices(sl, vbuf, 0, 2); n = 8; }
+                    else if (at is Spine.MeshAttachment ma) { n = ma.WorldVerticesLength; if (n > vbuf.Length) continue; ma.ComputeWorldVertices(sl, 0, n, vbuf, 0, 2); }
+                    else continue;
+                    for (int i = 0; i < n; i += 2)
+                    {
+                        float x = vbuf[i], y = vbuf[i + 1];
+                        if (y < lo || Mathf.Abs(x - g.headX) > 2.6f * g.u) continue;
+                        if (y > top) top = y;
+                        if (x < x0) x0 = x;
+                        if (x > x1) x1 = x;
+                    }
+                }
+            if (x0 > x1) { x0 = g.headX - 1.2f * g.u; x1 = g.headX + 1.2f * g.u; }
+            float cx = g.headX;
+            x0 = Mathf.Clamp(x0, cx - 2.6f * g.u, cx - 0.8f * g.u); x1 = Mathf.Clamp(x1, cx + 0.8f * g.u, cx + 2.6f * g.u);
+            return new HeadBox { x0 = x0, x1 = x1, top = top + 0.1f * g.u, bottom = g.browY };
+        }
+        /// <summary>점검 — 머리 판정 상자와 그려진 그림(보이는 영역 · 메시 전체)의 위끝 · 눈 · 예전 이마선(u 단위, 목 기준 아님: 정수리 상자 위끝 − 그림 위끝).</summary>
+        public string AuditHead(out float over, out float legacyBrowAboveTop)
+        {
+            var g = G(); var hb = HeadBoxOf(g);
+            float skTop = float.MinValue;
+            foreach (var sl in Sg.Skeleton.DrawOrder)
+            {
+                var at = sl.Attachment;
+                if (at == null || sl.A < 0.05f || !sl.Bone.Active) continue;
+                int n;
+                if (at is Spine.RegionAttachment ra) { ra.ComputeWorldVertices(sl, vbuf, 0, 2); n = 8; }
+                else if (at is Spine.MeshAttachment ma) { n = ma.WorldVerticesLength; if (n > vbuf.Length) continue; ma.ComputeWorldVertices(sl, 0, n, vbuf, 0, 2); }
+                else continue;
+                for (int i = 1; i < n; i += 2) if (vbuf[i] > skTop) skTop = vbuf[i];
+            }
+            over = (hb.top - skTop) / g.u;
+            float oldBrow = g.neckY + (g.eyeY - g.neckY) + 0.6f * g.u;
+            if (pat != null && ball != null && pat.WorldY > ball.WorldY) oldBrow = Mathf.Min(oldBrow, pat.WorldY - 0.1f * (pat.WorldY - ball.WorldY));
+            legacyBrowAboveTop = (oldBrow - skTop) / g.u;
+            return $"u={g.u / Sc:0}px 눈={(g.eyeY - g.neckY) / g.u:0.00}u 머리상자 아래={(hb.bottom - g.eyeY) / g.u:0.00}u(눈 위) 높이={(hb.top - hb.bottom) / g.u:0.00}u 폭={(hb.x1 - hb.x0) / g.u:0.00}u 그림위끝=상자−{over:0.00}u 예전이마선−그림위끝={legacyBrowAboveTop:0.00}u";
+        }
+
+        bool InHead(Geo g, Vector2 p) { var b = HeadBoxOf(g); return p.y <= b.top && p.x >= b.x0 && p.x <= b.x1; }
+
         /// <summary>그 자리(스켈레톤 단위)가 어디인가 — cheek(볼 장치 쪽 얼굴) · face(반대쪽 얼굴) · body(몸통) · head(이마 위) · out.</summary>
         string ZoneAt(Vector2 p)
         {
@@ -134,7 +189,7 @@ namespace Bolzena.RunUI
             float dx = Mathf.Abs(p.x - g.faceX);
             // 얼굴 — 볼 장치가 있는 쪽 절반(가운데에서 조금 넘어까지)만 볼 당기기, 반대쪽은 톡
             if (p.y >= g.neckY - 0.25f * g.u && p.y <= g.browY && dx <= 1.9f * g.u) return (p.x - g.faceX) * g.side >= -0.2f * g.u ? "cheek" : "face";
-            if (p.y > g.browY && Mathf.Abs(p.x - g.headX) <= 2.6f * g.u) return "head";
+            if (p.y > g.browY && InHead(g, p)) return "head";
             float bx = Mathf.Abs(p.x - g.tx);
             if (p.y < g.neckY - 0.25f * g.u && p.y >= g.ty - 2.6f * g.u && bx <= 2.6f * g.u) return "body";
             return "out";
@@ -162,12 +217,14 @@ namespace Bolzena.RunUI
             var g = G();
             Vector2 sk = z == "cheek" ? new Vector2(g.bx + g.side * ox * g.u, g.by + oy * g.u)   // ox + = 얼굴 바깥쪽
                 : z == "body" ? new Vector2(g.tx + ox * g.u, g.ty + oy * g.u)
-                : new Vector2(g.headX + ox * g.u, g.browY + (0.8f + oy) * g.u);
+                : HeadPoint(g, ox, oy);
             var w = Sg.rectTransform.TransformPoint(sk * MeshK);
             var cv = Sg.canvas;
             var cam = cv != null && cv.renderMode != RenderMode.ScreenSpaceOverlay ? cv.worldCamera : null;
             return RectTransformUtility.WorldToScreenPoint(cam, w);
         }
+
+        Vector2 HeadPoint(Geo g, float ox, float oy) { var b = HeadBoxOf(g); return new Vector2(g.headX + ox * g.u, Mathf.Lerp(b.bottom, b.top, 0.5f) + oy * g.u); }
 
         /// <summary>볼 장치가 얼굴 가운데의 어느 쪽인가(화면 x 부호 — 바깥으로 끌 방향).</summary>
         public float Side => Sg != null ? G().side : -1;
@@ -239,8 +296,7 @@ namespace Bolzena.RunUI
                 var te = Play("Touch_End", false);
                 if (te != null) te.MixDuration = 0.22f;   // 볼 제약이 한 번에 꺼지지 않게 — 늘어난 볼이 튕기며(감쇠 진동) 돌아오는 게 보이게
                 AddIdle();
-                Say?.Invoke(Line("cheek"));
-                HeroVoice.Speak(Hero, "touch1", "touch");
+                if (!HeroVoice.Speak(Hero, "touch1", "touch")) Say?.Invoke(Line("cheek"));
                 Last = "cheek_end";
                 return;
             }
@@ -269,8 +325,7 @@ namespace Bolzena.RunUI
             if (a1 == null) a1 = Play("Smash_End", false);
             if (a1 != null && Sg != null && Sg.Skeleton.Data.FindAnimation("Smash_End_2") != null) Sg.AnimationState.AddAnimation(0, "Smash_End_2", false, 0);
             AddIdle();
-            Say?.Invoke(Line("knock"));
-            HeroVoice.Speak(Hero, "dutchrubend", "anger", "no");
+            if (!HeroVoice.SpeakSeq(Hero, new[] { "dutchrubend1", "dutchrubend2" }, "dutchrubend", "anger", "no")) Say?.Invoke(Line("knock"));   // 원작처럼 1 → 2 이어서
             Last = "knock";
         }
 
@@ -286,8 +341,7 @@ namespace Bolzena.RunUI
             if (Play("Pat_End", false) == null) Play("Happy_1", false);
             AddIdle();
             annoy = Mathf.Max(0, annoy - 1f);
-            Say?.Invoke(Line("pat"));
-            HeroVoice.Speak(Hero, "touch2", "pat", "joy");
+            if (!HeroVoice.Speak(Hero, "touch2", "pat", "joy")) Say?.Invoke(Line("pat"));
             Last = "pat_end";
         }
 
@@ -295,16 +349,14 @@ namespace Bolzena.RunUI
         {
             mode = Mode.Tickle; tickleT = 0;
             Play("Tickle_Idle_1", true);
-            Say?.Invoke(Line("tickle"));
-            HeroVoice.Speak(Hero, "ticklestart", "tickleduring", "joy");
+            if (!HeroVoice.Speak(Hero, "ticklestart", "tickleduring", "joy")) Say?.Invoke(Line("tickle"));
             Last = "tickle";
         }
 
         void Angry(bool fromTickle)
         {
             Play("Angry_1", false); AddIdle();
-            Say?.Invoke(Line("angry"));
-            HeroVoice.Speak(Hero, "anger", "no");
+            if (!HeroVoice.Speak(Hero, "anger", "no")) Say?.Invoke(Line("angry"));
             annoy = 1.5f; cheekCount = 0;
             sulkUntil = Time.unscaledTime + 1.6f;   // 잠깐 삐져서 받지 않는다
             Last = "angry";
@@ -425,6 +477,8 @@ namespace Bolzena.RunUI
             Box(Mathf.Min(c0, c1), g.neckY - 0.25f * g.u, Mathf.Max(c0, c1), g.browY, new Color(1f, 0.35f, 0.5f, 0.3f));
             float f0 = g.faceX - 0.2f * g.u * g.side, f1 = g.faceX - 1.9f * g.u * g.side;
             Box(Mathf.Min(f0, f1), g.neckY - 0.25f * g.u, Mathf.Max(f0, f1), g.browY, new Color(1f, 1f, 1f, 0.18f));
+            var hb = HeadBoxOf(g);
+            Box(hb.x0, hb.bottom, hb.x1, hb.top, new Color(0.4f, 1f, 0.4f, 0.28f));
             Box(g.tx - 2.6f * g.u, g.ty - 2.6f * g.u, g.tx + 2.6f * g.u, g.neckY - 0.25f * g.u, new Color(0.3f, 0.8f, 1f, 0.22f));
             Box(g.faceX - 0.12f * g.u, g.faceY - 0.12f * g.u, g.faceX + 0.12f * g.u, g.faceY + 0.12f * g.u, new Color(1, 0, 0, 0.9f));
             if (ball != null) Box(ball.WorldX - 0.1f * g.u, ball.WorldY - 0.1f * g.u, ball.WorldX + 0.1f * g.u, ball.WorldY + 0.1f * g.u, new Color(1, 1, 0, 0.95f));

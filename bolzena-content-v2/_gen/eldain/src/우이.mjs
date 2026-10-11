@@ -1,0 +1,97 @@
+// 우이 — 서포터 · 활발 · 정령. 설계: _measure/엘다인_엔진/01_사도별.md §7 (4차 10-11 — 누구의 넘친 회복이든 저금 · 개굴비 연쇄 · 혓바닥은 해제 + 넘친 회복 비례(X 는 에르핀 소유))
+// 엔진: 아군 회복이 넘치면 「언해피 우이」(웃음 저금)가 쌓이고 → 저금을 깨 AP 를 되돌리거나 동료의 가장 비싼 카드 비용을 깎고 → 개굴비는 연쇄로 다음 턴 한 번 더.
+// 자동 규칙은 「넘치는 웃음」(회복이 넘치면 +1, 카드 한 장에 한 번) 하나.
+import { hero, dmg, ddmg, shield, heal, stack, spend, make, draw, discard, status, empower, ifStack, power, rule } from '../lib.mjs';
+
+const H = '우이', K = '언해피 우이', R = `${H}_t1`;
+const S = (v = 1, x) => stack(K, v, x);
+const rain = (v = 1, x) => make(R, v, x);
+const brk = (n) => [ifStack(K, n), spend(K, n)];   // 저금 n 을 깨면
+const OT = { who: 'other' };
+const clean = (v) => ({ k: 'cleanse', v });
+const over = { k: 'perOverheal', per: 20 };   // 이번 판 넘친 회복 20당
+const cheap = (v, x) => ({ k: 'costMod', v, n: 1, turns: 1, choose: 'priciest', ...x });
+
+export default hero({
+  id: H, name: '우이', nature: '활발', race: '정령', role: '서포터', star: 3,
+  blurb: '행복을 지키려는 영원살이 막내. 넘치게 고친 웃음은 저금통에 모아 두었다가, 깨서 동료가 큰 카드를 낼 수 있게 숨을 돌려 줍니다.',
+  keyword: {
+    name: K, desc: '넘치는 웃음을 모아 두는 저금통', carrier: 'self', cap: 3,
+    rules: [{ name: '넘치는 웃음', when: { on: 'overheal', who: 'any', once: true }, fx: [S(1)] }],   // 넘치면 저금 +1(AP 쪽은 부탁해 · 장화로)
+  },
+  // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
+  keywords: [{ name: '에루의 우비', desc: '에루가 접어 준 우비 — 턴이 끝날 때마다 파티를 덮어 준다', carrier: 'self', cap: 3, per: [{ stat: 'hot', ratio: 0.15 }] }],   // 10-11 밸런스(서포터 하향 뒤 48.8%) 10→15%
+  // 사용자 10-11: 20명 모두 고유 능력 2개
+  passives: [
+    { name: '긍정왕 우이', when: { on: 'turnStart' }, conds: [{ c: 'hp', pct: 0.5 }], fx: [heal(0.7)] },   // 파티 HP 50% 이하면 매 턴 회복
+  ],
+  // 원작 보강(10-11 검토): 고학년이 무작위 적 행동을 늦춘다
+  ult: { name: '말하는대로!', cost: 200, fx: [heal(2), { k: 'cleanse', v: 3 }, { k: 'ap', v: 2 }, status('둔화', 1, { target: 'oneEnemy' }), S(1)] },
+}, {
+  basicNames: ['빗방울', '이슬 튕기기', '보슬보슬'], heal: true, deck: 'light', starter: true,
+  uniques: [
+    { // 시동(은총으로)
+      name: '개굴비 내리기', cost: 1, type: '스킬',
+      fx: [heal(1), rain(1)],
+      oracles: [
+        { fx: [heal(2.4), rain(1)] },
+        { fx: [rain(2)] },
+        { fx: [heal(1.6), rain(1), S(1)] },
+        { cost: 0, tags: ['증발'], fx: [heal(1)] },
+        { fx: [{ k: 'nextCheaper', v: 1 }, rain(1)] },
+      ],
+      blesses: ['heal', 'draw', [S(1)]],
+    },
+    {
+      name: '우비 접어 주기', cost: 0, type: '스킬',
+      fx: [draw(1), stack('에루의 우비', 1), ...brk(1), { k: 'ap', v: 1 }],
+      oracles: [
+        { tags: ['소멸'], fx: [draw(2), ...brk(1), { k: 'ap', v: 1 }] },
+        { tags: ['소멸'], fx: [draw(1), ...brk(1), { k: 'nextAp', v: 2 }] },
+        { tags: ['소멸'], fx: [{ k: 'payHpPct', v: 0.05 }, { k: 'ap', v: 1 }] },
+        { tags: ['소멸'], fx: [...brk(2), { k: 'ap', v: 2 }] },
+        { fx: [draw(1), ...brk(1), { k: 'gauge', v: 20, target: 'otherAllies' }] },
+      ],
+      blesses: ['draw', 'heal', [S(1)]],
+    },
+    {
+      name: '에루야, 부탁해!', cost: 1, type: '스킬',
+      fx: [cheap(-1, OT), ...brk(2), cheap(-1)],
+      oracles: [
+        { fx: [cheap(-2, OT), ...brk(1), cheap(-1)] },
+        { cost: 0, fx: [...brk(2), cheap(-1, OT), draw(1)] },
+        { fx: [...brk(1), cheap(-1, OT), empower(0.3, { who: 'any' })] },
+        { fx: [empower(0.6, { who: 'any' }), draw(1)] },
+        { fx: [cheap(-1), S(1)] },
+      ],
+      blesses: ['cost', 'draw', [S(1)]],
+    },
+    { // 마무리 — 원작 강화 공격(에루 혓바닥 — 해로운 효과 해제) · 이번 턴 넘친 회복 비례
+      name: '에루 혓바닥', cost: 1, type: '공격',
+      fx: [dmg(1.2), clean(1), over, dmg(0.1)],
+      oracles: [
+        { type: '스킬', fx: [heal(1), clean(2)] },
+        { fx: [dmg(0.5, 'allEnemies'), over, dmg(0.05, 'allEnemies')] },
+        { type: '스킬', fx: [clean(1), draw(1, { who: 'other' }), { k: 'ap', v: 1 }] },
+        { fx: [dmg(0.8), clean(1), { k: 'perStack', id: K }, dmg(0.8)] },
+        { fx: [dmg(0.8), clean(1), ...brk(1), { k: 'nextAp', v: 1 }] },
+      ],
+      blesses: ['power', 'draw', [S(1)]],
+    },
+    { // 4차 8장 — 굴리기(어사이드 「장화 신은 우이」): 개굴비를 더 부르고 저금으로 한 장 더
+      name: '장화 신은 우이', cost: 0, type: '스킬',
+      fx: [rain(1), ...brk(2), { k: 'nextAp', v: 1 }],   // 저금 2 → 동료 다음 턴 AP
+      oracles: [
+        { fx: [rain(1), ...brk(1), rain(2)] },
+        { fx: [rain(1), draw(1, { who: 'other' })] },
+        { fx: [heal(0.8), S(1)] },
+        { fx: [rain(1), ...brk(1), empower(0.3, { who: 'other' })] },
+        { fx: [rain(1), { k: 'gauge', v: 10, target: 'otherAllies' }] },
+      ],
+      blesses: ['heal', 'draw', [S(1)]],
+    },
+  ],
+  tokens: [
+    { id: R, name: '개굴비', cost: 0, type: '스킬', tags: ['연쇄', '소멸'], fx: [heal(0.6)], blurb: '에루가 부르는 개구리 비' },
+  ],
+});

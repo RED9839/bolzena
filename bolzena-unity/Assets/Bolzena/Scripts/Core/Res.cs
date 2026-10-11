@@ -15,7 +15,7 @@ namespace Bolzena
         // 무거운 것(사도 · 적 · 스탠딩 스파인, 사도 · 적 제 소리, 사도 그림)은 최근에 쓴 것만 붙든다 — 다 붙들면 싸움마다 새 적 · 새 사도가
         //   쌓여(2026-10-06 고학년 점검 135판: 객체 1,682 → 12,875) 장면을 바꿀 때마다 정리(UnloadUnusedAssets)가 길어졌다.
         //   밀려난 것은 사전에서만 뺀다 — 아직 화면에 있으면 그대로 살고, 아무도 안 쓰면 다음 장면 정리 때 풀린다. 다시 부르면 새로 읽는다.
-        public const int SpineKeep = 24, HeavyKeep = 160;
+        public const int SpineKeep = 24, HeavyKeep = 160;   // 폰만 절반으로 해 봤으나(perf_20261009) WASM 최고치는 그대로고 싸움 열기 때 다시 읽기만 늘어 되돌렸다
         static readonly LinkedList<string> spineOrder = new LinkedList<string>(), heavyOrder = new LinkedList<string>();
         static readonly Dictionary<string, LinkedListNode<string>> order = new Dictionary<string, LinkedListNode<string>>();
 
@@ -90,7 +90,8 @@ namespace Bolzena
             get
             {
                 if (font != null) return font;
-                var ttf = Resources.Load<Font>("Fonts/Jua-Regular");
+                // 같은 파일이 runui 에 있다 — 그쪽을 먼저(웹 빌드는 이쪽 사본을 뺀다 · Tools/web_exclude.txt). 못 찾으면 진짜 null 이라 ?? 가 맞다
+                var ttf = Resources.Load<Font>("RunUI/Fonts/Jua-Regular") ?? Resources.Load<Font>("Fonts/Jua-Regular");
                 font = TMP_FontAsset.CreateFontAsset(ttf, 72, 9, UnityEngine.TextCore.LowLevel.GlyphRenderMode.SDFAA, 2048, 2048,
                     AtlasPopulationMode.Dynamic, true);
                 font.name = "Jua SDF (runtime)";

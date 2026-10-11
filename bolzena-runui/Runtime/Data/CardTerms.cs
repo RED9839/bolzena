@@ -60,7 +60,7 @@ namespace Bolzena.RunUI
                     if (k.Name == name) return new Term { Name = name, Body = WithSub(k.Desc, t.Trait(h, k)), Hero = true, Owner = h.Name };
                 // 변신(2026-10-07 「성전 모드 · 맨주먹 전성기가 뭔지 안 나온다」) — 부제 = desc, 본문 = core CardText.FormBody(규칙에서)
                 foreach (var fm in h.Forms ?? new List<FormDef>())
-                    if (fm.Name == name) return new Term { Name = name, Body = WithSub(fm.Desc, t.FormBody(fm)), Hero = true, Owner = h.Name, Kind = $"변신 · {h.Name}" };
+                    if (fm.Name == name) return new Term { Name = name, Body = WithSub(fm.Desc, t.FormBody(fm)), Hero = true, Owner = h.Name, Kind = $"{(fm.Stance ? "태세" : "변신")} · {h.Name}" };   // 태세(엘다인 4차 — 린 흑운태세 꼴)
             }
             if (Tips(t).TryGetValue(name, out var tip)) return new Term { Name = name, Body = tip, Bad = R.IsBadSt(name) };
             return null;
@@ -190,7 +190,9 @@ namespace Bolzena.RunUI
             var spans = new List<(int at, int len, int idx)>();
             foreach (var (term, idx) in terms.Select((x, i) => (x, i)).OrderByDescending(p => p.x.Name.Length))
             {
+                // 링크는 처음 한 번만 걸되, 같은 이름이 또 나오는 자리도 모두 막는다 — 안 막으면 두 번째 「늑대 표식」 속 「표식」 에 짧은 낱말이 걸린다(2026-10-10)
                 int from = 0;
+                bool linked = false;
                 while (true)
                 {
                     int at = text.IndexOf(term.Name, from, StringComparison.Ordinal);
@@ -199,9 +201,8 @@ namespace Bolzena.RunUI
                     for (int j = at; j < at + term.Name.Length; j++) if (!free[j]) { ok = false; break; }
                     if (ok)
                     {
-                        spans.Add((at, term.Name.Length, idx));
+                        if (!linked) { spans.Add((at, term.Name.Length, idx)); linked = true; }
                         for (int j = at; j < at + term.Name.Length; j++) free[j] = false;
-                        break;
                     }
                     from = at + 1;
                 }

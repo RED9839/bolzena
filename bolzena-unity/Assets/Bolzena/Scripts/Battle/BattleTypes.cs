@@ -47,6 +47,8 @@ namespace Bolzena.Battle
         public string Text;             // 풀이(툴팁 · 정보 창) — 수치 · 지속이 다 든 한 가지 글(엔진 키워드 = CardText.TIPS, 고유 효과 = CardText.Trait)
         /// <summary>이 상태를 건 사도(화면 키 — 초상). 엔진이 아직 안 내면 null — 정보 창은 초상 없이 그린다.</summary>
         public List<string> From;
+        /// <summary>변신 · 태세 칩(엔진 FormOf) — 파티 칩 줄에 「이름 남은 턴」 으로도 띄운다(2026-10-11 사용자 「변신 지속시간 몇 턴 남았는지」). 그 사도 키.</summary>
+        public string FormOf;
     }
 
     // 카드 한 장의 모습 — 화면이 그리는 데 필요한 것
@@ -194,6 +196,16 @@ namespace Bolzena.Battle
         public List<CardInfo> GonePile { get => gonePile ??= PileSource?.Invoke(2) ?? new List<CardInfo>(); set => gonePile = value; }
         public List<StatusChip> PartyChips = new List<StatusChip>();
         public bool Over, Won;
+        /// <summary>전투 기록(사도별 피해 · 실드 · 회복) — 이번 싸움. MeterRun 은 판 전체(지난 싸움들 + 이번 싸움, 판에서 연 싸움만 — 아니면 null).</summary>
+        public List<MeterRow> Meter = new List<MeterRow>();
+        public List<MeterRow> MeterRun;
+    }
+
+    // 전투 기록 한 줄(core Battle.Tally) — Key 는 그림 키(초상), Id 는 사도 id. 피해 = 적에게 실제로 깎인 HP + 벗긴 실드(넘친 피해 빼고) · 실드 = 얹은 방어 · 실드 · 회복 = 실제로 채운 HP
+    public class MeterRow
+    {
+        public string Key, Id, Name;
+        public int Dealt, Shield, Heal;
     }
 
     // 미리보기 — 카드(고학년)를 그 대상에게 내면

@@ -70,6 +70,7 @@ namespace Bolzena.Core
             foreach (var k in h.AllKeywords) if (k.Name != null) o.Add("kw:" + k.Name);
             foreach (var r in h.Passives) foreach (var c in r.Conds) if (c.C == "stack" && c.Id != null) o.Add("kw:" + c.Id);
             foreach (var c in d.Cards.Values.Where(c => c.Hero == h.Id)) o.UnionWith(FxHears(c.Fx, c.Tags));
+            if (d.Cards.Values.Any(c => c.Hero == h.Id && c.Tags.Any(t => Tag.Parse(t).id == Tag.Heaven))) o.Add("ev:cost2");   // 천상 — 파티의 비용 2 이상 카드를 듣는다
             return o;
         }
 
@@ -124,6 +125,8 @@ namespace Bolzena.Core
                     case FxK.IfBreak: o.Add("ev:break"); break;
                     case FxK.IfFoe: if (f.Id == "broken") o.Add("ev:break"); else if (f.Id != null) o.Add("st:" + f.Id); break;
                     case FxK.IfShield: if (!f.Not) o.Add("ev:guard"); break;
+                    case FxK.SpendShield: case FxK.PerShield: o.Add("ev:guard"); break;   // (엘다인) 실드를 헐거나 비례 — 실드 공급과 맞물린다
+                    case FxK.Dmg: if (f.OfShield) o.Add("ev:guard"); break;
                     case FxK.When: if (f.On == "passion") o.Add("tag:" + Tag.Passion); break;
                 }
                 if (f.Rules != null)
@@ -153,6 +156,7 @@ namespace Bolzena.Core
         {
             var o = FxGives(c.Fx);
             foreach (var t in c.Tags) o.Add("tag:" + Tag.Parse(t).id);
+            if (!c.X && Math.Max(c.Cost, c.CountAs) >= 2) o.Add("ev:cost2");   // (엘다인) 천상을 깨우는 비용 2 이상
             return o;
         }
 

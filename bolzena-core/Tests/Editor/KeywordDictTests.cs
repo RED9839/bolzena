@@ -134,11 +134,19 @@ namespace Bolzena.Core.Tests
         }
 
         // ── 이로운 효과 ────────────────────────────────────────────────
-        [Test] public void 불굴은_취약과_합연산()
+        // 2026-10-10 사용자 「카제나 피해 공식」 — 취약은 받는 피해 묶음(합연산) 밖에서 ×1.5 따로 곱한다(옛 합연산 1 + 0.5 − 0.2 = 1.3)
+        [Test] public void 취약은_불굴과_따로_곱한다()
         {
             var b = K.Fight("hitter"); b.Pool.Status["불굴"] = 1; b.Pool.Status["취약"] = 1;
             b.EndTurn();
-            Assert.AreEqual(870, b.Pool.Hp, "100 × (1 + 0.5 - 0.2)");
+            Assert.AreEqual(1000 - 120, b.Pool.Hp, "100 × (1 − 0.2) × 1.5");
+        }
+
+        [Test] public void 취약과_피해_감소는_곱하고_피해_감소와_불굴은_더한다()
+        {
+            var b = K.Fight("hitter"); b.Pool.Status["불굴"] = 1; b.Pool.Status["피해 감소"] = 1; b.Pool.Status["취약"] = 1;
+            b.EndTurn();
+            Assert.AreEqual(1000 - Num.Round(100 * (1 - 0.15 - 0.2) * 1.5), b.Pool.Hp, "100 × (1 − 0.15 − 0.2) × 1.5(엔진과 같은 차례로 셈)");
         }
 
         [Test] public void 협공은_협공을_건_사도의_공격력_100퍼센트()
@@ -366,10 +374,26 @@ namespace Bolzena.Core.Tests
 
         [Test] public void 적의_독_손_희귀종()
         {
-            var d = D(enemies: "[{id:'rp', name:'독쟁이', hp:1000, intents:[{t:'jam', v:0, rush:0}], rare:[{id:'poisonHand'}]}]");
-            var b = K.Fight(d, new[] { "a" }, new[] { "rp" }, st => st.Deck = new List<string> { "hit", "hit", "hit", "zero", "zero", "zero" });
-            Assert.AreEqual(2, b.CardSt.Count(kv => kv.Value.ContainsKey("독")), "손 2장에 독");
-            Assert.AreEqual(20, b.CardStOf("hit", "독"), "바탕 20 × 층 배율");
+            R.FOE_RARE = true;   // 희귀종은 2026-10-10 부터 기본 끔 — 스위치를 켠 동작만 본다
+            try
+            {
+                var d = D(enemies: "[{id:'rp', name:'독쟁이', hp:1000, intents:[{t:'jam', v:0, rush:0}], rare:[{id:'poisonHand'}]}]");
+                var b = K.Fight(d, new[] { "a" }, new[] { "rp" }, st => st.Deck = new List<string> { "hit", "hit", "hit", "zero", "zero", "zero" });
+                Assert.AreEqual(2, b.CardSt.Count(kv => kv.Value.ContainsKey("독")), "손 2장에 독");
+                Assert.AreEqual(20, b.CardStOf("hit", "독"), "바탕 20 × 층 배율");
+            }
+            finally { R.FOE_RARE = false; }
+        }
+
+        [Test] public void 희귀종은_기본으로_꺼져_있다()
+        {
+            Assert.IsFalse(R.FOE_RARE, "사용자 2026-10-10 — 엘리트 희귀종 대신 기믹");
+            var d = D(enemies: "[{id:'rp2', name:'독쟁이2', hp:1000, intents:[{t:'jam', v:0, rush:0}], rare:[{id:'poisonHand'}, {id:'toughGuard'}]}]");
+            var b = K.Fight(d, new[] { "a" }, new[] { "rp2" }, st => st.Deck = new List<string> { "hit", "hit", "hit", "zero", "zero", "zero" });
+            Assert.AreEqual(0, b.CardSt.Count(kv => kv.Value.ContainsKey("독")), "독 희귀종이 안 붙는다");
+            K.Hand(b, "hit"); K.Play(b, "hit");
+            Assert.AreEqual(4 - 1.0 / 3, K.E(b).Tough, 1e-9, "받는 강인도 -20% 도 안 붙는다");
+            StringAssert.DoesNotContain("희귀종", new CardText(d).Enemy(d.Enemy("rp2")));
         }
 
         // ── 적 효과 틀 ────────────────────────────────────────────────
@@ -444,9 +468,14 @@ namespace Bolzena.Core.Tests
 
         [Test] public void 받는_강인도_피해_20퍼센트_덜_희귀종()
         {
-            var b = K.Fight(D(enemies: "[{id:'tg', name:'단단', hp:1000, intents:[{t:'jam', v:0, rush:0}], rare:[{id:'toughGuard'}]}]"), new[] { "a" }, new[] { "tg" }); K.Hand(b, "hit");
-            K.Play(b, "hit");
-            Assert.AreEqual(4 - 0.8 / 3, K.E(b).Tough, 1e-9);
+            R.FOE_RARE = true;
+            try
+            {
+                var b = K.Fight(D(enemies: "[{id:'tg', name:'단단', hp:1000, intents:[{t:'jam', v:0, rush:0}], rare:[{id:'toughGuard'}]}]"), new[] { "a" }, new[] { "tg" }); K.Hand(b, "hit");
+                K.Play(b, "hit");
+                Assert.AreEqual(4 - 0.8 / 3, K.E(b).Tough, 1e-9);
+            }
+            finally { R.FOE_RARE = false; }
         }
 
         // ── 사도 고유 효과 틀 ──────────────────────────────────────────
@@ -573,7 +602,7 @@ namespace Bolzena.Core.Tests
                 cards: "[{id:'cc', name:'칩', hero:'p', cost:1, type:'공격', tags:['보존', '소멸 2'], fx:[{k:'status', id:'사기', v:1}, {k:'stack', id:'초침', v:1}, {k:'ifKill'}, {k:'ap', v:1}]}]");
             var t = new CardText(d);
             var tips = t.Tips();
-            StringAssert.Contains("째깍째깍", tips["초침"]); StringAssert.Contains("20%p", tips["사기"]);
+            StringAssert.Contains("째깍째깍", tips["초침"]); StringAssert.Contains("피해량 +20%", tips["사기"]);
             CollectionAssert.AreEqual(new[] { "보존", "소멸", "사기", "초침", "처치" }, t.Chips(d.View("cc")));
             Assert.AreEqual("보존. 소멸 2.\n사기 1, 「초침」 1\n처치: AP +1", t.Card(d.Card("cc")));
             StringAssert.Contains("뽑을 더미 맨 위", CardText.Tip("망각"));
@@ -609,7 +638,7 @@ namespace Bolzena.Core.Tests
         {
             var d = K.Sample(); var t = new CardText(d);
             var s = t.Enemy(d.Enemy("fairy_knight"));
-            StringAssert.Contains("벌침: 공격이 아닌 카드에 약이 오른다. 1개당 주는 피해 +10%. 공격이 아닌 카드를 낼 때마다 +1. 3이 되면 즉시: 공격 150", s);
+            StringAssert.Contains("벌침: 공격이 아닌 카드에 약이 오른다. 1개당 주는 피해 10% 증가. 공격이 아닌 카드를 낼 때마다 +1. 3이 되면 즉시: 공격 150", s);
             StringAssert.Contains("마지막 침: 쓰러질 때 파티 취약 +2", s);
         }
 

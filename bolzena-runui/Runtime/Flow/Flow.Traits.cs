@@ -30,9 +30,19 @@ namespace Bolzena.RunUI
                     Name = t.Name,
                     Body = CardTerms.WithSub(t.Kind == "고학년" ? null : t.Sub, t.Body),
                     Hero = t.Kind == "고유 효과",
-                    Kind = t.Kind == "고학년" ? $"고학년 · {t.Sub}" : t.Kind,
+                    Kind = t.Kind == "고학년" ? $"고학년 · {t.Sub}" : t.Kind + CarrierWord(t.Keyword),
                 });
             return o;
+        }
+
+        /// <summary>고유 효과가 붙는 곳 — 적에게 거는 표식 · 아군에게 붙이는 표시면 「 · 적에게 붙음」 · 「 · 아군에게 붙음」(자기 자원이면 빈 글).</summary>
+        static string CarrierWord(Core.KeywordDef k) => k == null ? "" : k.Carrier == "enemy" ? " · 적에게 붙음" : k.Carrier == "hero" || k.Carrier == "ally" ? " · 아군에게 붙음" : "";
+
+        /// <summary>사도 상세 고유 능력 이름 옆 작은 꼬리표(적에게 붙음 = 붉게).</summary>
+        static string CarrierTag(Core.KeywordDef k)
+        {
+            var w = CarrierWord(k);
+            return w.Length == 0 ? "" : $"  <size=70%><color={(k.Carrier == "enemy" ? CardTerms.BadHex : Theme.SubTag)}>{w.Substring(3)}</color></size>";
         }
 
         /// <summary>anchor 옆에 낱말 판 여럿을 세로로 띄운다.</summary>

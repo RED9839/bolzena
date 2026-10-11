@@ -1,0 +1,769 @@
+{
+  "heroes": [
+    {
+      "id": "리온",
+      "name": "리온",
+      "nature": "우울",
+      "race": "수인",
+      "role": "탱커",
+      "style": "버티형",
+      "star": 3,
+      "hp": 900,
+      "atk": 84,
+      "def": 70,
+      "crit": 5,
+      "blurb": "정의로운 히어로 「스핑크스」를 꿈꾸는 사자 수인.",
+      "keyword": {
+        "name": "유죄",
+        "desc": "리온이 내린 판결",
+        "carrier": "enemy",
+        "cap": 3,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": -0.07
+          }
+        ],
+        "rules": [
+          {
+            "name": "판결봉",
+            "when": {
+              "on": "break",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "유죄",
+                "v": 2,
+                "target": "oneEnemy"
+              }
+            ]
+          },
+          {
+            "name": "히어로 꿈나무",
+            "when": {
+              "on": "hit",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "ifStack",
+                "id": "유죄",
+                "n": 1
+              },
+              {
+                "k": "heal",
+                "ratio": 0.18
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "즉결심판",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "strip",
+            "target": "allEnemies"
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.6,
+            "base": "def",
+            "target": "allEnemies",
+            "hits": 3
+          },
+          {
+            "k": "status",
+            "id": "취약",
+            "v": 1,
+            "target": "allEnemies"
+          }
+        ]
+      },
+      "starter": [
+        "리온_s1",
+        "리온_s2",
+        "리온_s3",
+        "리온_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "리온_s1",
+      "name": "판결봉 휘두르기",
+      "hero": "리온",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리온_s2",
+      "name": "히어로 가드",
+      "hero": "리온",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "리온_u1",
+      "name": "유죄 선언",
+      "hero": "리온",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "유죄",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "shield",
+          "ratio": 1.21
+        },
+        {
+          "k": "ifWounded"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.94
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.81
+            },
+            {
+              "k": "ifWounded"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.4
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.12
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 1.35
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "유죄",
+                      "v": 1,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리온_u2",
+      "name": "이의 있음!",
+      "hero": "리온",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        },
+        {
+          "k": "stack",
+          "id": "유죄",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.99
+            },
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.78
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "유죄",
+                      "v": 3,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.64
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.22
+            },
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리온_u3",
+      "name": "도장 낙하",
+      "hero": "리온",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "ifStack",
+          "id": "유죄",
+          "n": 3
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.57,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "리온_u4",
+      "name": "라이온 시그널",
+      "hero": "리온",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "fx": [
+        {
+          "k": "status",
+          "id": "결의",
+          "v": 1
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "blocked"
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "유죄",
+                  "v": 1,
+                  "target": "oneEnemy"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "유죄",
+                      "v": 2,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "유죄",
+                      "v": 1,
+                      "target": "topEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.09
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "hurt"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.22
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "유죄",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.33
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "결의",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.54
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "리온_s3",
+      "name": "판결봉 내려치기",
+      "hero": "리온",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "리온_s4",
+      "name": "유죄 선고",
+      "hero": "리온",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.8
+        },
+        {
+          "k": "stack",
+          "id": "유죄",
+          "v": 2,
+          "target": "oneEnemy"
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.21
+            },
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 3,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.8
+            },
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.04
+            },
+            {
+              "k": "stack",
+              "id": "유죄",
+              "v": 2,
+              "target": "oneEnemy"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

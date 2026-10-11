@@ -1,0 +1,651 @@
+{
+  "heroes": [
+    {
+      "id": "우이",
+      "name": "우이",
+      "nature": "활발",
+      "role": "서포터",
+      "style": "손 만들기형",
+      "star": 3,
+      "hp": 660,
+      "atk": 86,
+      "def": 63,
+      "crit": 5,
+      "blurb": "바라는 것을 현실로 만드는 이슬비 정령. 개굴비를 손에 지어 하나씩 내리거나 쌓아 두었다 합창으로 쏟고, 지을 때마다 차오른 행복이 다섯이면 동료의 다음 한 수에 웃음을 실어 줍니다.",
+      "keyword": {
+        "name": "행복 지수",
+        "desc": "바라는 걸 지을 때마다 차오르는 웃음",
+        "carrier": "self",
+        "cap": 5,
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.4,
+          "consume": true
+        },
+        "rules": [
+          {
+            "name": "에루의 우산",
+            "when": {
+              "on": "turnStart"
+            },
+            "fx": [
+              {
+                "k": "make",
+                "id": "우이_t1",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "행복 전파",
+            "when": {
+              "on": "overheal"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "행복 지수",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "말하는대로!",
+        "cost": 250,
+        "fx": [
+          {
+            "k": "cleanse",
+            "v": 3
+          },
+          {
+            "k": "heal",
+            "ratio": 1.44
+          },
+          {
+            "k": "status",
+            "id": "면역",
+            "v": 1
+          }
+        ]
+      },
+      "race": "정령",
+      "starter": [
+        "우이_s1",
+        "우이_s2",
+        "우이_s3",
+        "우이_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "우이_s1",
+      "name": "빗방울",
+      "hero": "우이",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "우이_s2",
+      "name": "보슬보슬",
+      "hero": "우이",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "우이_t1",
+      "name": "개굴비",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.36
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.22,
+          "target": "allEnemies"
+        }
+      ],
+      "blurb": "개구리 우산 아래로 내리는 다정한 비.",
+      "hero": "우이",
+      "token": true
+    },
+    {
+      "id": "우이_u1",
+      "name": "개굴비 내리기",
+      "hero": "우이",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "우이_t1",
+          "v": 2
+        },
+        {
+          "k": "heal",
+          "ratio": 1.44
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 3
+            },
+            {
+              "k": "heal",
+              "ratio": 2.16
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.86
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 2,
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 5
+            },
+            {
+              "k": "heal",
+              "ratio": 0.86
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "행복 지수",
+              "v": 3
+            },
+            {
+              "k": "heal",
+              "ratio": 0.86
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 2
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "우이_u3",
+      "name": "개굴개굴 합창",
+      "hero": "우이",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.42,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perTag",
+          "id": "우이_t1"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.18,
+          "target": "allEnemies"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "우이_u4",
+      "name": "에루와 단짝",
+      "hero": "우이",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "우이_t1",
+          "v": 1
+        },
+        {
+          "k": "perTag",
+          "id": "우이_t1"
+        },
+        {
+          "k": "heal",
+          "ratio": 0.44
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 2
+            },
+            {
+              "k": "perTag",
+              "id": "우이_t1"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.64
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "행복 지수",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 0.26
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "perTag",
+              "id": "우이_t1"
+            },
+            {
+              "k": "heal",
+              "ratio": 0.56
+            },
+            {
+              "k": "stack",
+              "id": "행복 지수",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.26
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 1.16
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "우이_u5",
+      "name": "선생님한테 고자질",
+      "hero": "우이",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "우이_t1",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "행복 지수",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 0.88
+            },
+            {
+              "k": "stack",
+              "id": "행복 지수",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 5
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "우이_t1",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "우이_s3",
+      "name": "소나기",
+      "hero": "우이",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "우이_s4",
+      "name": "행복 나누기",
+      "hero": "우이",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.6
+        },
+        {
+          "k": "stack",
+          "id": "행복 지수",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.88
+            },
+            {
+              "k": "stack",
+              "id": "행복 지수",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.6
+            },
+            {
+              "k": "stack",
+              "id": "행복 지수",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.6
+            },
+            {
+              "k": "stack",
+              "id": "행복 지수",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.6
+            },
+            {
+              "k": "stack",
+              "id": "행복 지수",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.36
+            },
+            {
+              "k": "stack",
+              "id": "행복 지수",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

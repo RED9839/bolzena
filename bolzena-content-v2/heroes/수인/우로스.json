@@ -6,139 +6,121 @@
       "nature": "공명",
       "race": "수인",
       "role": "서포터",
-      "style": "거드는 형",
       "star": 3,
-      "hp": 610,
+      "hp": 650,
       "atk": 95,
-      "def": 61,
+      "def": 46,
       "crit": 5,
-      "blurb": "몸과 힘은 옛 지배자 우로스, 마음은 비늘 수인 슈로입니다. 더미가 한 바퀴 돌 때마다 지배의 영역이 넓어지고, 그 위의 아군은 모두 힘을 나눠 받습니다.",
+      "blurb": "백사당의 수호자. 돕는 허물과 압도하는 본성이 번갈아 깨어나며 순환을 돌리고, 쌓인 순환은 파티를 북돋거나 거대한 뱀이 되어 한꺼번에 쏟아집니다.",
       "keyword": {
-        "name": "지배의 영역",
-        "desc": "가장 강한 자의 힘을 나누는 영역",
+        "name": "순환",
+        "desc": "우로스 카드를 낼 때마다 허물 ↔ 본성이 바뀌고, 허물 → 본성 → 허물로 한 바퀴 돌면 +1(비수는 태세를 안 바꿈)",
         "carrier": "self",
         "cap": 3,
-        "decay": 1,
         "per": [
           {
             "stat": "atk",
-            "v": 0.06,
+            "v": 0.05,
             "who": "allies"
-          }
-        ],
-        "rules": [
-          {
-            "name": "영역 전개",
-            "when": {
-              "on": "fightStart"
-            },
-            "fx": [
-              {
-                "k": "stack",
-                "id": "지배의 영역",
-                "v": 1
-              }
-            ]
-          },
-          {
-            "name": "내 마음의 등대",
-            "when": {
-              "on": "stackOver",
-              "id": "지배의 영역"
-            },
-            "fx": [
-              {
-                "k": "empower",
-                "ratio": 0.2,
-                "who": "any"
-              }
-            ]
-          },
-          {
-            "name": "패왕의 귀환",
-            "when": {
-              "on": "stackGone",
-              "id": "지배의 영역",
-              "decay": true
-            },
-            "fx": [
-              {
-                "k": "empower",
-                "ratio": 0.4
-              }
-            ]
           }
         ]
       },
+      "keywords": [
+        {
+          "name": "영역 위",
+          "desc": "우로스가 영역 위에 세운 동료 — 그 동료의 피해가 커진다",
+          "carrier": "hero",
+          "cap": 1,
+          "hunt": true,
+          "per": [
+            {
+              "stat": "dealt",
+              "v": 0.1,
+              "who": "holder"
+            }
+          ]
+        }
+      ],
       "passives": [
         {
           "name": "순환",
           "when": {
-            "on": "shuffle"
-          },
-          "limit": {
-            "per": "fight",
-            "n": 3
+            "on": "formLap"
           },
           "fx": [
             {
               "k": "stack",
-              "id": "지배의 영역",
-              "v": 2
+              "id": "순환",
+              "v": 1
             },
             {
-              "k": "draw",
+              "k": "ap",
               "v": 1
             }
           ]
         },
         {
-          "name": "변치 않는 것",
+          "name": "한 바퀴의 끝",
           "when": {
-            "on": "lowHp",
-            "pct": 0.3
+            "on": "stackReach",
+            "id": "순환",
+            "n": 3
           },
           "fx": [
             {
-              "k": "cleanse",
-              "v": 1
-            },
-            {
               "k": "status",
-              "id": "피해 감소",
-              "v": 2
+              "id": "사기",
+              "v": 1
             }
           ]
         }
       ],
+      "forms": [
+        {
+          "id": "우로스_허물",
+          "name": "허물",
+          "desc": "벗어 놓은 내면(슈로) — 돕는 얼굴(우로스 카드를 내면 본성으로)",
+          "stance": true,
+          "toggle": "우로스_본성"
+        },
+        {
+          "id": "우로스_본성",
+          "name": "본성",
+          "desc": "타락한 뱀 — 압도하는 얼굴(우로스 카드를 내면 허물로)",
+          "stance": true,
+          "toggle": "우로스_허물"
+        }
+      ],
       "ult": {
         "name": "압도",
-        "cost": 250,
+        "cost": 300,
         "fx": [
           {
             "k": "dmg",
-            "ratio": 0.9,
+            "ratio": 0.8,
             "target": "allEnemies",
             "hits": 2
           },
           {
-            "k": "status",
-            "id": "피해 감소",
-            "v": 2
+            "k": "stack",
+            "id": "순환",
+            "v": 3
           },
           {
             "k": "stack",
-            "id": "지배의 영역",
-            "v": 3
+            "id": "영역 위",
+            "v": 1,
+            "target": "oneAlly"
           }
         ]
       },
       "starter": [
         "우로스_s1",
-        "우로스_s1",
         "우로스_s2",
-        "우로스_u3"
-      ]
+        "우로스_s3",
+        "우로스_u1"
+      ],
+      "startForm": "우로스_허물"
     }
   ],
   "cards": [
@@ -158,6 +140,20 @@
     },
     {
       "id": "우로스_s2",
+      "name": "백사 일섬",
+      "hero": "우로스",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "우로스_s3",
       "name": "슈로의 인사",
       "hero": "우로스",
       "cost": 1,
@@ -165,69 +161,95 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.5
+          "ratio": 1.4
         }
       ]
     },
     {
       "id": "우로스_u1",
-      "name": "순환의 고리",
+      "name": "지배의 영역",
       "hero": "우로스",
       "unique": true,
       "cost": 1,
       "type": "스킬",
       "fx": [
         {
-          "k": "discard",
-          "v": 2
-        },
-        {
-          "k": "draw",
-          "v": 3
-        },
-        {
           "k": "stack",
-          "id": "지배의 영역",
-          "v": 1
+          "id": "영역 위",
+          "v": 1,
+          "target": "oneAlly"
+        },
+        {
+          "k": "ifForm",
+          "id": "우로스_허물"
+        },
+        {
+          "k": "shield",
+          "ratio": 0.8
+        },
+        {
+          "k": "ifForm",
+          "id": "우로스_본성"
+        },
+        {
+          "k": "empower",
+          "ratio": 0.3,
+          "who": "other"
         }
       ],
       "oracles": [
         {
           "name": "신탁 1",
-          "tags": [],
           "fx": [
             {
-              "k": "discard",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 3
-            },
-            {
               "k": "stack",
-              "id": "지배의 영역",
-              "v": 2
+              "id": "영역 위",
+              "v": 1,
+              "target": "oneAlly"
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_허물"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_본성"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.4,
+              "who": "other"
             }
           ]
         },
         {
           "name": "신탁 2",
-          "cost": 0,
-          "tags": [],
           "fx": [
             {
-              "k": "discard",
-              "v": 2
+              "k": "stack",
+              "id": "영역 위",
+              "v": 1,
+              "target": "oneAlly"
             },
             {
               "k": "draw",
-              "v": 3
+              "v": 1
             },
             {
-              "k": "stack",
-              "id": "지배의 영역",
-              "v": 1
+              "k": "noToggle"
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_본성"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.2,
+              "who": "other"
             }
           ]
         },
@@ -235,63 +257,85 @@
           "name": "신탁 3",
           "fx": [
             {
-              "k": "draw",
-              "v": 3
+              "k": "stack",
+              "id": "영역 위",
+              "v": 1,
+              "target": "oneAlly"
             },
             {
-              "k": "stack",
-              "id": "지배의 영역",
+              "k": "ifForm",
+              "id": "우로스_허물"
+            },
+            {
+              "k": "draw",
               "v": 1
             },
             {
-              "k": "shield",
-              "ratio": 0.68
+              "k": "ifForm",
+              "id": "우로스_본성"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3,
+              "who": "other"
             }
           ]
         },
         {
           "name": "신탁 4",
-          "power": true,
           "fx": [
             {
-              "k": "draw",
-              "v": 3
+              "k": "stack",
+              "id": "영역 위",
+              "v": 1,
+              "target": "oneAlly"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "shuffle"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지배의 영역",
-                      "v": 2
-                    },
-                    {
-                      "k": "empower",
-                      "ratio": 0.3,
-                      "who": "any"
-                    }
-                  ]
-                }
-              ]
+              "k": "perStack",
+              "id": "순환"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.7
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_본성"
+            },
+            {
+              "k": "takenMod",
+              "v": 0.1,
+              "turns": 2,
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 5",
+          "cost": 0,
           "fx": [
             {
-              "k": "draw",
-              "v": 3
+              "k": "stack",
+              "id": "영역 위",
+              "v": 1,
+              "target": "oneAlly"
             },
             {
-              "k": "stack",
-              "id": "지배의 영역",
-              "v": 2
+              "k": "ifForm",
+              "id": "우로스_허물"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.6
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_본성"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.2,
+              "who": "other"
             }
           ]
         }
@@ -310,7 +354,7 @@
           "fx": [
             {
               "k": "stack",
-              "id": "지배의 영역",
+              "id": "순환",
               "v": 1
             }
           ]
@@ -319,7 +363,197 @@
     },
     {
       "id": "우로스_u2",
-      "name": "마음이 비수가 되어",
+      "name": "백사당 순찰",
+      "hero": "우로스",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "ifForm",
+          "id": "우로스_허물"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        },
+        {
+          "k": "ifForm",
+          "id": "우로스_본성"
+        },
+        {
+          "k": "takenMod",
+          "v": 0.1,
+          "turns": 2,
+          "target": "oneEnemy"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_허물"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_본성"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "noToggle"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "type": "공격",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_허물"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_본성"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_허물"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_본성"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_허물"
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_본성"
+            },
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "순환",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "우로스_u3",
+      "name": "백사당의 죽도",
       "hero": "우로스",
       "unique": true,
       "cost": 1,
@@ -327,165 +561,162 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.26,
-          "target": "randomEnemy",
-          "hits": 2
+          "ratio": 1,
+          "target": "oneEnemy"
         },
         {
           "k": "perStack",
-          "id": "지배의 영역"
+          "id": "순환"
         },
         {
           "k": "dmg",
-          "ratio": 0.26,
-          "target": "randomEnemy"
+          "ratio": 0.3,
+          "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "취약",
-          "v": 1,
-          "target": "allEnemies"
+          "k": "ifForm",
+          "id": "우로스_본성"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.6,
+          "target": "oneEnemy"
         }
       ],
       "oracles": [
         {
           "name": "신탁 1",
-          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.35,
-              "target": "randomEnemy",
-              "hits": 2
+              "ratio": 1.2,
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "지배의 영역"
+              "id": "순환"
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
-              "target": "randomEnemy"
+              "ratio": 0.4,
+              "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "ifForm",
+              "id": "우로스_본성"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 2",
-          "cost": 0,
-          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.24,
-              "target": "randomEnemy",
-              "hits": 2
+              "ratio": 1.2,
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "지배의 영역"
+              "id": "순환"
             },
             {
               "k": "dmg",
-              "ratio": 0.24,
-              "target": "randomEnemy"
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_허물"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perStack",
+              "id": "순환"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_본성"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.8,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perStack",
+              "id": "순환"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_본성"
             },
             {
               "k": "status",
-              "id": "취약",
+              "id": "약화",
               "v": 1,
               "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "신탁 3",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "randomEnemy",
-              "hits": 2
-            },
-            {
-              "k": "perStack",
-              "id": "지배의 영역"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.35,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "stack",
-              "id": "지배의 영역",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "신탁 4",
-          "tags": [],
-          "power": true,
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 0.24,
-              "target": "randomEnemy",
-              "hits": 2
-            },
-            {
-              "k": "perStack",
-              "id": "지배의 영역"
-            },
-            {
-              "k": "dmg",
-              "ratio": 0.24,
-              "target": "randomEnemy"
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "dmg",
-                      "ratio": 0.26,
-                      "target": "randomEnemy",
-                      "hits": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
           "name": "신탁 5",
-          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.46,
-              "target": "randomEnemy",
-              "hits": 2
+              "ratio": 1.4,
+              "target": "oneEnemy"
             },
             {
               "k": "perStack",
-              "id": "지배의 영역"
+              "id": "순환"
             },
             {
               "k": "dmg",
-              "ratio": 0.46,
-              "target": "randomEnemy"
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "noToggle"
             }
           ]
         }
@@ -497,214 +728,15 @@
         },
         {
           "name": "축복 2",
-          "kind": "weakSpot"
+          "kind": "cost"
         },
         {
           "name": "축복 3",
           "fx": [
             {
               "k": "stack",
-              "id": "지배의 영역",
+              "id": "순환",
               "v": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "우로스_u3",
-      "name": "세계수의 보물 파괴",
-      "hero": "우로스",
-      "unique": true,
-      "cost": 1,
-      "type": "강화",
-      "tags": [
-        "개전"
-      ],
-      "fx": [
-        {
-          "k": "status",
-          "id": "협공",
-          "v": 1
-        },
-        {
-          "k": "power",
-          "rules": [
-            {
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "지배의 영역",
-                  "v": 1
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "oracles": [
-        {
-          "name": "신탁 1",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "지배의 영역",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지배의 영역",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "신탁 2",
-          "cost": 0,
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지배의 영역",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "신탁 3",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "지배의 영역",
-              "v": 1
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "play",
-                    "who": "other",
-                    "type": "공격"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지배의 영역",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "신탁 4",
-          "tags": [
-            "개전"
-          ],
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 1
-            },
-            {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지배의 영역",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "신탁 5",
-          "tags": [],
-          "fx": [
-            {
-              "k": "status",
-              "id": "협공",
-              "v": 2
-            },
-            {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "stack",
-                      "id": "지배의 영역",
-                      "v": 1
-                    }
-                  ]
-                }
-              ]
             }
           ]
         }
@@ -720,160 +752,184 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.85,
+          "ratio": 1,
           "target": "allEnemies"
         },
         {
-          "k": "perStack",
-          "id": "지배의 영역"
+          "k": "ifForm",
+          "id": "우로스_본성"
         },
         {
           "k": "dmg",
-          "ratio": 0.26,
+          "ratio": 0.4,
           "target": "allEnemies"
         },
         {
+          "k": "ifStack",
+          "id": "순환",
+          "n": 3
+        },
+        {
           "k": "spend",
-          "id": "지배의 영역",
-          "all": true
+          "id": "순환",
+          "v": 3
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.6,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
         {
           "name": "신탁 1",
-          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.15,
+              "ratio": 2,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "지배의 영역"
+              "k": "ifForm",
+              "id": "우로스_본성"
             },
             {
               "k": "dmg",
-              "ratio": 0.35,
+              "ratio": 0.7,
               "target": "allEnemies"
             },
             {
+              "k": "ifStack",
+              "id": "순환",
+              "n": 3
+            },
+            {
               "k": "spend",
-              "id": "지배의 영역",
-              "all": true
+              "id": "순환",
+              "v": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.9,
+              "target": "allEnemies"
             }
           ]
         },
         {
           "name": "신탁 2",
-          "cost": 1,
-          "tags": [],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.81,
-              "target": "allEnemies"
+              "ratio": 2,
+              "target": "oneEnemy"
             },
             {
-              "k": "perStack",
-              "id": "지배의 영역"
+              "k": "ifForm",
+              "id": "우로스_본성"
             },
             {
               "k": "dmg",
-              "ratio": 0.24,
-              "target": "allEnemies"
+              "ratio": 0.8,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "순환",
+              "n": 3
             },
             {
               "k": "spend",
-              "id": "지배의 영역",
-              "all": true
+              "id": "순환",
+              "v": 3
+            },
+            {
+              "k": "dmg",
+              "ratio": 3.2,
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 3",
+          "type": "스킬",
           "fx": [
             {
-              "k": "dmg",
-              "ratio": 1.41,
-              "target": "oneEnemy"
+              "k": "shield",
+              "ratio": 0.8
             },
             {
-              "k": "perStack",
-              "id": "지배의 영역"
+              "k": "ifStack",
+              "id": "순환",
+              "n": 3
             },
             {
-              "k": "dmg",
-              "ratio": 0.4,
-              "target": "oneEnemy"
+              "k": "spend",
+              "id": "순환",
+              "v": 3
             },
             {
-              "k": "draw",
-              "v": 1,
-              "who": "self",
-              "unique": true
+              "k": "shield",
+              "ratio": 1.6
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
             }
           ]
         },
         {
           "name": "신탁 4",
+          "cost": 1,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.87,
+              "ratio": 0.6,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "지배의 영역"
+              "k": "ifStack",
+              "id": "순환",
+              "n": 3
+            },
+            {
+              "k": "spend",
+              "id": "순환",
+              "v": 3
             },
             {
               "k": "dmg",
-              "ratio": 0.26,
+              "ratio": 1.2,
               "target": "allEnemies"
-            },
-            {
-              "k": "empower",
-              "ratio": 0.4,
-              "who": "any"
             }
           ]
         },
         {
           "name": "신탁 5",
-          "power": true,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.87,
+              "ratio": 0.8,
               "target": "allEnemies"
             },
             {
-              "k": "perStack",
-              "id": "지배의 영역"
+              "k": "ifStack",
+              "id": "순환",
+              "n": 3
+            },
+            {
+              "k": "spend",
+              "id": "순환",
+              "v": 3
             },
             {
               "k": "dmg",
-              "ratio": 0.24,
+              "ratio": 1.2,
               "target": "allEnemies"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "spend",
-                    "id": "지배의 영역"
-                  },
-                  "fx": [
-                    {
-                      "k": "empower",
-                      "ratio": 0.3,
-                      "who": "any"
-                    }
-                  ]
-                }
-              ]
+              "k": "nextAp",
+              "v": 1
             }
           ]
         }
@@ -885,14 +941,14 @@
         },
         {
           "name": "축복 2",
-          "kind": "ap"
+          "kind": "cost"
         },
         {
           "name": "축복 3",
           "fx": [
             {
               "k": "stack",
-              "id": "지배의 영역",
+              "id": "순환",
               "v": 1
             }
           ]
@@ -901,55 +957,67 @@
     },
     {
       "id": "우로스_u5",
-      "name": "똬리 틀기",
+      "name": "백사의 비수",
       "hero": "우로스",
       "unique": true,
       "cost": 0,
-      "type": "스킬",
+      "type": "공격",
       "fx": [
         {
-          "k": "stack",
-          "id": "지배의 영역",
-          "v": 1
+          "k": "dmg",
+          "ratio": 0.4,
+          "target": "randomEnemy",
+          "hits": 2
         },
         {
-          "k": "empower",
-          "ratio": 0.25,
-          "who": "any"
+          "k": "noToggle"
         }
       ],
       "oracles": [
         {
           "name": "신탁 1",
-          "tags": [],
           "fx": [
             {
-              "k": "stack",
-              "id": "지배의 영역",
-              "v": 2
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "randomEnemy",
+              "hits": 2
             },
             {
-              "k": "empower",
-              "ratio": 0.25,
-              "who": "any"
+              "k": "noToggle"
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_본성"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "randomEnemy"
             }
           ]
         },
         {
           "name": "신탁 2",
-          "tags": [
-            "신속"
-          ],
           "fx": [
             {
-              "k": "stack",
-              "id": "지배의 영역",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "randomEnemy",
+              "hits": 2
             },
             {
-              "k": "empower",
-              "ratio": 0.25,
-              "who": "any"
+              "k": "noToggle"
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_본성"
+            },
+            {
+              "k": "takenMod",
+              "v": 0.1,
+              "turns": 2,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -957,46 +1025,46 @@
           "name": "신탁 3",
           "fx": [
             {
-              "k": "stack",
-              "id": "지배의 영역",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "randomEnemy",
+              "hits": 2
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "noToggle"
+            },
+            {
+              "k": "ifForm",
+              "id": "우로스_허물"
+            },
+            {
+              "k": "stack",
+              "id": "영역 위",
+              "v": 1,
+              "target": "oneAlly"
             }
           ]
         },
         {
           "name": "신탁 4",
-          "power": true,
           "fx": [
             {
-              "k": "stack",
-              "id": "지배의 영역",
-              "v": 1
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "randomEnemy",
+              "hits": 2
             },
             {
-              "k": "empower",
+              "k": "perStack",
+              "id": "순환"
+            },
+            {
+              "k": "dmg",
               "ratio": 0.15,
-              "who": "any"
+              "target": "randomEnemy"
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "empower",
-                      "ratio": 0.15,
-                      "who": "any"
-                    }
-                  ]
-                }
-              ]
+              "k": "noToggle"
             }
           ]
         },
@@ -1004,18 +1072,13 @@
           "name": "신탁 5",
           "fx": [
             {
-              "k": "stack",
-              "id": "지배의 영역",
-              "v": 2
-            },
-            {
-              "k": "empower",
+              "k": "dmg",
               "ratio": 0.4,
-              "who": "any"
+              "target": "randomEnemy",
+              "hits": 3
             },
             {
-              "k": "discard",
-              "v": 1
+              "k": "noToggle"
             }
           ]
         }
@@ -1023,20 +1086,18 @@
       "blesses": [
         {
           "name": "축복 1",
-          "kind": "draw"
+          "kind": "power"
         },
         {
           "name": "축복 2",
-          "tags": [
-            "보존"
-          ]
+          "kind": "draw"
         },
         {
           "name": "축복 3",
           "fx": [
             {
               "k": "stack",
-              "id": "지배의 영역",
+              "id": "순환",
               "v": 1
             }
           ]

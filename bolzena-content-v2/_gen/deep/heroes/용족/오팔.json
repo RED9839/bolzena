@@ -1,0 +1,750 @@
+{
+  "heroes": [
+    {
+      "id": "오팔",
+      "name": "오팔",
+      "nature": "순수",
+      "race": "용족",
+      "role": "서포터",
+      "style": "박자형",
+      "star": 3,
+      "hp": 660,
+      "atk": 75,
+      "def": 60,
+      "crit": 5,
+      "blurb": "금방 울음을 터뜨리는 아기 오팔 용. 파티가 맞을 때마다 눈물이 맺히고, 셋이 차면 울음을 그치려 탭댄스를 춥니다. 이번 턴 셋째 자리를 오팔이 밟으면 보석 파편이 튀며 파티의 다음 한 수가 반짝입니다.",
+      "keyword": {
+        "name": "눈물 그렁",
+        "desc": "아무 이유로나 그렁그렁한 눈물",
+        "carrier": "self",
+        "cap": 3,
+        "onMax": {
+          "make": "오팔_tap",
+          "consume": true
+        },
+        "rules": [
+          {
+            "name": "울먹울먹",
+            "when": {
+              "on": "hurt"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "눈물 그렁",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "오팔을 칭찬합니다!",
+            "when": {
+              "on": "play",
+              "type": "스킬",
+              "who": "other",
+              "minCost": 1
+            },
+            "fx": [
+              {
+                "k": "heal",
+                "ratio": 0.12
+              },
+              {
+                "k": "stack",
+                "id": "탭",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "오팔 파우더",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "shield",
+            "ratio": 1.93
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "둔화",
+            "v": 1,
+            "target": "allEnemies"
+          },
+          {
+            "k": "make",
+            "id": "오팔_tap",
+            "v": 1
+          }
+        ]
+      },
+      "starter": [
+        "오팔_s1",
+        "오팔_s2",
+        "오팔_s3",
+        "오팔_u4"
+      ],
+      "keywords": [
+        {
+          "name": "탭",
+          "desc": "이어 밟은 탭",
+          "carrier": "self",
+          "cap": 3,
+          "rules": [
+            {
+              "name": "깨지는 보석",
+              "when": {
+                "on": "stackOver",
+                "id": "탭"
+              },
+              "fx": [
+                {
+                  "k": "spend",
+                  "id": "탭",
+                  "all": true
+                },
+                {
+                  "k": "make",
+                  "id": "오팔_gem",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "오팔_s1",
+      "name": "양산 휘두르기",
+      "hero": "오팔",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "오팔_s2",
+      "name": "반짝 양산",
+      "hero": "오팔",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "오팔_tap",
+      "name": "탭댄스",
+      "hero": "오팔",
+      "token": true,
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸",
+        "축복"
+      ],
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 0.19
+        },
+        {
+          "k": "stack",
+          "id": "탭",
+          "v": 1
+        }
+      ],
+      "blurb": "슬픔을 쫓는 탭댄스입니다"
+    },
+    {
+      "id": "오팔_gem",
+      "name": "깨진 보석",
+      "hero": "오팔",
+      "token": true,
+      "cost": 0,
+      "type": "공격",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.39,
+          "target": "allEnemies"
+        },
+        {
+          "k": "empower",
+          "ratio": 0.2,
+          "who": "any"
+        }
+      ],
+      "blurb": "셋째 탭에 깨진 보석 파편입니다"
+    },
+    {
+      "id": "오팔_u4",
+      "name": "반짝이는 모든 것들",
+      "hero": "오팔",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "make",
+          "id": "오팔_tap",
+          "v": 2
+        },
+        {
+          "k": "shield",
+          "ratio": 1.24
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "make",
+              "id": "오팔_tap",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 1.84
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "make",
+              "id": "오팔_tap",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.74
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "make",
+              "id": "오팔_tap",
+              "v": 6
+            },
+            {
+              "k": "shield",
+              "ratio": 0.74
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "make",
+              "id": "오팔_tap",
+              "v": 3
+            },
+            {
+              "k": "heal",
+              "ratio": 1.64
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "탭",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 4.56
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "오팔_u3",
+      "name": "보석 던지기",
+      "hero": "오팔",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.55,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "perStack",
+          "id": "탭",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.22,
+          "target": "allEnemies"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "탭",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "오팔_u2",
+      "name": "가십 드래곤",
+      "hero": "오팔",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "dealtMod",
+          "v": 0.2,
+          "target": "strongestAlly",
+          "turns": 2
+        },
+        {
+          "k": "heal",
+          "ratio": 1.56
+        },
+        {
+          "k": "stack",
+          "id": "탭",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.3,
+              "target": "strongestAlly",
+              "turns": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 2.32
+            },
+            {
+              "k": "stack",
+              "id": "탭",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.15,
+              "target": "allAllies",
+              "turns": 2
+            },
+            {
+              "k": "heal",
+              "ratio": 1.84
+            },
+            {
+              "k": "stack",
+              "id": "탭",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 4.92
+            },
+            {
+              "k": "stack",
+              "id": "눈물 그렁",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "탭",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dealtMod",
+              "v": 0.25,
+              "target": "strongestAlly",
+              "turns": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "heal",
+              "ratio": 0.94
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "power": true,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 1.24
+            },
+            {
+              "k": "stack",
+              "id": "탭",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "heal",
+                      "ratio": 0.48
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "탭",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "오팔_u1",
+      "name": "선배님~!",
+      "hero": "오팔",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 3.08
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        },
+        {
+          "k": "stack",
+          "id": "탭",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 4.64
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "탭",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 5.8
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.36
+            },
+            {
+              "k": "make",
+              "id": "오팔_tap",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 4.6
+            },
+            {
+              "k": "draw",
+              "v": 2,
+              "who": "other"
+            },
+            {
+              "k": "cleanse",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.32
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "탭",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "tags": [
+        "축복"
+      ]
+    },
+    {
+      "id": "오팔_s3",
+      "name": "양산 내려치기",
+      "hero": "오팔",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "오팔_s4",
+      "name": "울먹울먹",
+      "hero": "오팔",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.76
+        },
+        {
+          "k": "stack",
+          "id": "눈물 그렁",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 4.16
+            },
+            {
+              "k": "stack",
+              "id": "눈물 그렁",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.76
+            },
+            {
+              "k": "stack",
+              "id": "눈물 그렁",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.76
+            },
+            {
+              "k": "stack",
+              "id": "눈물 그렁",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.76
+            },
+            {
+              "k": "stack",
+              "id": "눈물 그렁",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.6
+            },
+            {
+              "k": "stack",
+              "id": "눈물 그렁",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

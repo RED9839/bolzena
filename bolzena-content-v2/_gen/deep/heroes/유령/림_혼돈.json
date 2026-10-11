@@ -1,0 +1,801 @@
+{
+  "heroes": [
+    {
+      "id": "림_혼돈",
+      "name": "림(혼돈)",
+      "nature": "광기",
+      "race": "유령",
+      "role": "딜러",
+      "style": "소멸형",
+      "star": 3,
+      "hp": 580,
+      "atk": 145,
+      "def": 25,
+      "crit": 10,
+      "blurb": "혼돈의 빈자리를 대신 떠안은 질서의 유령. 동료가 버린 카드를 떠맡아 치울수록 혼돈이 차오르고, 다 차면 다음 한 수가 크게 넘쳐흐릅니다. 차원의 눈을 열면 한동안 낫이 차원 너머까지 닿습니다.",
+      "keyword": {
+        "name": "혼돈",
+        "desc": "억지로 떠안은 어설픈 혼돈",
+        "carrier": "self",
+        "cap": 5,
+        "per": [
+          {
+            "stat": "dealt",
+            "v": 0.06
+          }
+        ],
+        "onMax": {
+          "empower": "next",
+          "ratio": 0.5,
+          "consume": true
+        },
+        "rules": [
+          {
+            "name": "떠맡은 뒤처리",
+            "when": {
+              "on": "discard",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "혼돈",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "어엿한 혼돈",
+            "when": {
+              "on": "spend",
+              "id": "혼돈"
+            },
+            "fx": [
+              {
+                "k": "empower",
+                "ratio": 0.2
+              }
+            ]
+          },
+          {
+            "name": "뒤처리 정리",
+            "when": {
+              "on": "exhaust",
+              "who": "any"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "혼돈",
+                "v": 1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "차원의 눈",
+        "cost": 150,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 2.6,
+            "target": "randomEnemy"
+          },
+          {
+            "k": "status",
+            "id": "기절",
+            "v": 1,
+            "target": "randomEnemy"
+          },
+          {
+            "k": "stack",
+            "id": "혼돈",
+            "v": 2
+          },
+          {
+            "k": "form",
+            "id": "림_혼돈_강화공격"
+          }
+        ]
+      },
+      "starter": [
+        "림_혼돈_s1",
+        "림_혼돈_s2",
+        "림_혼돈_s3",
+        "림_혼돈_u5"
+      ],
+      "forms": [
+        {
+          "id": "림_혼돈_강화공격",
+          "name": "차원 너머의 낫",
+          "desc": "차원의 눈을 연 뒤 한동안 모든 공격이 강화 공격",
+          "turns": 2,
+          "bonus": [
+            {
+              "type": "공격",
+              "ratio": 1.25
+            }
+          ],
+          "skin": null,
+          "anim": null
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "림_혼돈_s1",
+      "name": "혼돈의 낫",
+      "hero": "림_혼돈",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_s2",
+      "name": "방어 자세",
+      "hero": "림_혼돈",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_s3",
+      "name": "혼돈의 대낫",
+      "hero": "림_혼돈",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_u5",
+      "name": "남은 음식 떠맡기",
+      "hero": "림_혼돈",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "exileFrom",
+          "from": "discard",
+          "n": 1,
+          "who": "other"
+        },
+        {
+          "k": "stack",
+          "id": "혼돈",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.39
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 2,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_u1",
+      "name": "혼돈에 이끌림",
+      "hero": "림_혼돈",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.17,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "혼돈",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.76,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.73,
+              "target": "allEnemies"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.37,
+              "target": "allEnemies"
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.73,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_u4",
+      "name": "꿀밤",
+      "hero": "림_혼돈",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.84,
+          "target": "allEnemies"
+        },
+        {
+          "k": "perGone"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.2,
+          "target": "allEnemies"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.24,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perGone"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "perGone"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.41,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.16,
+              "target": "allEnemies"
+            },
+            {
+              "k": "perGone"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.33,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "perGone"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.72,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "혼돈"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.75,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "혼돈",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_u3",
+      "name": "무서워하십시오!",
+      "hero": "림_혼돈",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 2,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "exileFrom",
+          "from": "discard",
+          "n": 2,
+          "who": "other"
+        },
+        {
+          "k": "stack",
+          "id": "혼돈",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 3,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 2,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "exhaust",
+                    "who": "any"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "혼돈",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "power": true
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "rushDown",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 3,
+              "who": "other"
+            },
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "림_혼돈_s4",
+      "name": "혼돈 끌어안기",
+      "hero": "림_혼돈",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "혼돈",
+          "v": 1
+        },
+        {
+          "k": "empower",
+          "ratio": 0.36
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            },
+            {
+              "k": "empower",
+              "ratio": 0.54
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.36
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "혼돈",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.47
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

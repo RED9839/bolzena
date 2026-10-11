@@ -13,35 +13,31 @@
         {
           "name": "말랑 완충",
           "when": {
-            "on": "turnStart"
+            "on": "fightStart"
           },
           "fx": [
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.8
             }
           ]
         },
         {
           "name": "눌린 자국",
           "when": {
-            "on": "shieldBreak"
-          },
-          "limit": {
-            "per": "fight",
-            "n": 3
+            "on": "lowHp",
+            "pct": 0.5
           },
           "fx": [
             {
               "k": "status",
-              "id": "결정화",
-              "v": 1
+              "id": "피해 감소",
+              "v": 2
             }
           ]
         }
       ],
-      "blurb": "무엇이든 말랑하게 받아 내는 조끼. 눌린 자리는 더 단단해집니다."
+      "blurb": "무엇이든 말랑하게 받아 내는 조끼. 많이 눌릴수록 더 말랑하게 받아 냅니다."
     },
     {
       "id": "eq_growpotion",
@@ -59,9 +55,8 @@
           },
           "fx": [
             {
-              "k": "status",
-              "id": "초재생",
-              "v": 1
+              "k": "shield",
+              "ratio": 1.2
             }
           ]
         },
@@ -122,15 +117,21 @@
           "when": {
             "on": "turnEnd"
           },
+          "conds": [
+            {
+              "c": "guarded",
+              "not": true
+            }
+          ],
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.3
+              "ratio": 0.35
             }
           ]
         }
       ],
-      "blurb": "어깨에 얹은 축복이 쉬지 않고 상처를 돌봅니다."
+      "blurb": "어깨에 얹은 축복. 막 없이 버틴 날이면 쉬지 않고 상처를 돌봅니다."
     },
     {
       "id": "eq_safetybelt",
@@ -174,10 +175,6 @@
           "name": "비늘 세우기",
           "when": {
             "on": "blocked"
-          },
-          "limit": {
-            "per": "fight",
-            "n": 1
           },
           "fx": [
             {
@@ -227,35 +224,21 @@
       },
       "effect": [
         {
-          "name": "튕겨 내기",
+          "name": "튕겨 돌아오기",
           "when": {
-            "on": "turnStart"
-          },
-          "conds": [
-            {
-              "c": "status",
-              "id": "약화",
-              "n": 1
-            }
-          ],
-          "limit": {
-            "per": "fight",
-            "n": 2
+            "on": "play",
+            "tag": "회수",
+            "who": "any"
           },
           "fx": [
             {
-              "k": "cleanse",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "shield",
+              "ratio": 0.8
             }
           ]
         }
       ],
-      "blurb": "몸이 굳으면 고무처럼 튕겨 풀어 줍니다."
+      "blurb": "고무처럼 늘어나는 건틀릿. 손으로 돌아오는 카드를 낼 때마다 튕겨 막아 줍니다."
     },
     {
       "id": "eq_madmask",
@@ -275,7 +258,7 @@
           "fx": [
             {
               "k": "reflect",
-              "ratio": 0.3
+              "ratio": 0.2
             }
           ]
         }
@@ -296,10 +279,6 @@
           "when": {
             "on": "hurt",
             "pct": 0.1
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
           },
           "fx": [
             {
@@ -363,22 +342,17 @@
         {
           "name": "한 겹 더",
           "when": {
-            "on": "guard",
-            "kind": "shield"
-          },
-          "limit": {
-            "per": "turn",
-            "n": 1
+            "on": "fightStart"
           },
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.3
+              "ratio": 0.8
             }
           ]
         }
       ],
-      "blurb": "택배 상자를 겹겹이 댄 갑옷. 막을 치면 상자가 한 겹 더 받쳐 줍니다."
+      "blurb": "택배 상자를 겹겹이 댄 갑옷. 전투가 시작되면 상자 한 겹이 먼저 받쳐 줍니다."
     },
     {
       "id": "eq_wraprobe",

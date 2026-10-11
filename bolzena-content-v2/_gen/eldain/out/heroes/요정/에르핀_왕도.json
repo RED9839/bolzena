@@ -1,0 +1,781 @@
+{
+  "heroes": [
+    {
+      "id": "에르핀_왕도",
+      "name": "에르핀(왕도)",
+      "nature": "순수",
+      "race": "요정",
+      "role": "딜러",
+      "star": 3,
+      "hp": 650,
+      "atk": 140,
+      "def": 40,
+      "crit": 10,
+      "blurb": "요정 왕국의 여왕이 된 에르핀. 남은 왕마력을 마력 난타로 모두 쏟아붓고, 적이 쓰러질 때마다 한 발 더 — 부지런한 여왕은 쓰러뜨린 만큼 숨을 돌립니다.",
+      "keyword": {
+        "name": "축복의 왕관",
+        "desc": "여왕이 씌워 준 왕관 — 쓴 동료의 공격력이 오른다",
+        "carrier": "hero",
+        "cap": 1,
+        "hunt": true,
+        "per": [
+          {
+            "stat": "atk",
+            "v": 0.1,
+            "who": "holder"
+          }
+        ]
+      },
+      "keywords": [
+        {
+          "name": "왕마력",
+          "desc": "여왕의 왕마력 — 왕마력탄에 마력탄이 줄줄이 따라붙는다",
+          "carrier": "self",
+          "cap": 5
+        }
+      ],
+      "passives": [
+        {
+          "name": "모두를 위한 배려",
+          "when": {
+            "on": "fightStart"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "여왕의 의지",
+          "when": {
+            "on": "kill",
+            "who": "any"
+          },
+          "fx": [
+            {
+              "k": "empower",
+              "ratio": 0.2
+            }
+          ]
+        }
+      ],
+      "ult": {
+        "name": "에르피엔 펀치",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.4,
+            "target": "oneEnemy",
+            "hits": 8
+          },
+          {
+            "k": "status",
+            "id": "근면",
+            "v": 1
+          },
+          {
+            "k": "dealtMod",
+            "v": 0.2,
+            "target": "allAllies"
+          }
+        ]
+      },
+      "starter": [
+        "에르핀_왕도_s1",
+        "에르핀_왕도_s1",
+        "에르핀_왕도_s3",
+        "에르핀_왕도_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "에르핀_왕도_s1",
+      "name": "마력탄",
+      "hero": "에르핀_왕도",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "에르핀_왕도_s3",
+      "name": "왕관 방패",
+      "hero": "에르핀_왕도",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "에르핀_왕도_u1",
+      "name": "축복의 왕관",
+      "hero": "에르핀_왕도",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "status",
+          "id": "근면",
+          "v": 1
+        },
+        {
+          "k": "draw",
+          "v": 2
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "power": true,
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "근면",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "status",
+              "id": "저장",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에르핀_왕도_u2",
+      "name": "에르피엔 왕마력탄",
+      "hero": "에르핀_왕도",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "tags": [
+        "약점 공격"
+      ],
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 4,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.3,
+          "target": "randomEnemy",
+          "hitsPer": "왕마력"
+        },
+        {
+          "k": "stack",
+          "id": "왕마력",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.6,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "약점 공격",
+            "회수 3"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 3.2,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.8,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "tags": [
+            "약점 공격",
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "약점 공격"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 4.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifKill"
+            },
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에르핀_왕도_u3",
+      "name": "반쪽 빵",
+      "hero": "에르핀_왕도",
+      "unique": true,
+      "cost": 0,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "empower",
+          "ratio": 1,
+          "who": "other"
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "empower",
+              "ratio": 1.2,
+              "who": "other"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "gauge",
+              "v": 20,
+              "target": "oneAlly"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "make",
+              "id": "에르핀_왕도_t1",
+              "v": 1,
+              "owner": "other"
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "empower",
+              "ratio": 0.3,
+              "who": "other"
+            },
+            {
+              "k": "nextAp",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "ap"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에르핀_왕도_u4",
+      "name": "마력 난타",
+      "hero": "에르핀_왕도",
+      "unique": true,
+      "cost": 0,
+      "x": true,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1.4,
+          "target": "randomEnemy"
+        },
+        {
+          "k": "dmg",
+          "ratio": 1.4,
+          "target": "randomEnemy",
+          "xHits": true,
+          "killMore": true
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "power": true,
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "kill",
+                    "mine": true
+                  },
+                  "fx": [
+                    {
+                      "k": "dmg",
+                      "ratio": 0.5,
+                      "target": "randomEnemy"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy",
+              "xHits": true,
+              "killMore": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "randomEnemy",
+              "hits": 2
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "randomEnemy",
+              "xHits": true,
+              "killMore": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1.9,
+              "target": "randomEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.4,
+              "target": "randomEnemy",
+              "xHits": true,
+              "killMore": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "소멸"
+          ],
+          "fx": [
+            {
+              "k": "status",
+              "id": "면역",
+              "v": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 2,
+              "target": "randomEnemy",
+              "xHits": true,
+              "killMore": true
+            },
+            {
+              "k": "nextAp",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "에르핀_왕도_u5",
+      "name": "모두를 위한 배려",
+      "hero": "에르핀_왕도",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "stack",
+          "id": "축복의 왕관",
+          "v": 1,
+          "target": "oneAlly"
+        },
+        {
+          "k": "draw",
+          "v": 1,
+          "who": "other"
+        },
+        {
+          "k": "empower",
+          "ratio": 0.5,
+          "who": "other"
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "status",
+              "id": "면역",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.5,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "draw",
+              "v": 1,
+              "who": "other"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.2,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "status",
+              "id": "면역",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "사기",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "gauge",
+              "v": 20,
+              "target": "otherAllies"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3,
+              "who": "other"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "status",
+              "id": "근면",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "hero": "에르핀_왕도",
+      "token": true,
+      "id": "에르핀_왕도_t1",
+      "name": "반쪽 빵",
+      "cost": 0,
+      "type": "스킬",
+      "tags": [
+        "소멸"
+      ],
+      "fx": [
+        {
+          "k": "empower",
+          "ratio": 0.5
+        }
+      ],
+      "blurb": "하나 남은 빵을 반으로 나눴습니다"
+    }
+  ]
+}

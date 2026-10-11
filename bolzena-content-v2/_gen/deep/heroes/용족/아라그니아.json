@@ -1,0 +1,732 @@
+{
+  "heroes": [
+    {
+      "id": "아라그니아",
+      "name": "아라그니아",
+      "nature": "냉정",
+      "race": "용족",
+      "role": "서포터",
+      "style": "아껴 두기형",
+      "star": 3,
+      "hp": 680,
+      "atk": 75,
+      "def": 60,
+      "crit": 5,
+      "blurb": "진주에서 태어난 해룡 여왕. 산호를 씹어 진주를 빚고 다친 백성에게 하나씩 날려 보냅니다. 다 내주지 않고 쥐어 둔 진주는 턴을 마칠 때 삼켜 단단한 껍질이 됩니다.",
+      "keyword": {
+        "name": "진주 구슬",
+        "desc": "다친 백성에게 날아가는 구슬",
+        "carrier": "self",
+        "cap": 6,
+        "rules": [
+          {
+            "name": "백성을 향한 구슬",
+            "when": {
+              "on": "hurt"
+            },
+            "conds": [
+              {
+                "c": "stack",
+                "id": "진주 구슬",
+                "n": 1
+              }
+            ],
+            "fx": [
+              {
+                "k": "spend",
+                "id": "진주 구슬",
+                "v": 1
+              },
+              {
+                "k": "heal",
+                "ratio": 0.31
+              }
+            ]
+          },
+          {
+            "name": "여왕은 백성을 버리지 않느니라",
+            "when": {
+              "on": "lowHp",
+              "pct": 0.3
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "진주 구슬",
+                "v": 3
+              },
+              {
+                "k": "status",
+                "id": "불굴",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "산호 씹기",
+            "when": {
+              "on": "turnStart"
+            },
+            "fx": [
+              {
+                "k": "stack",
+                "id": "진주 구슬",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "짐이 지켜주겠느니라",
+            "when": {
+              "on": "spend",
+              "id": "진주 구슬"
+            },
+            "fx": [
+              {
+                "k": "shield",
+                "ratio": 0.1
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "파도 치는 피날레",
+        "cost": 200,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 0.31,
+            "target": "randomEnemy",
+            "hits": 3
+          },
+          {
+            "k": "status",
+            "id": "약화",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "stack",
+            "id": "진주 구슬",
+            "v": 3
+          }
+        ]
+      },
+      "starter": [
+        "아라그니아_s1",
+        "아라그니아_s2",
+        "아라그니아_s3",
+        "아라그니아_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "아라그니아_s1",
+      "name": "최강 꼬리치기",
+      "hero": "아라그니아",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "아라그니아_s2",
+      "name": "짐의 하사품",
+      "hero": "아라그니아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "아라그니아_u1",
+      "name": "마음속의 펄",
+      "hero": "아라그니아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "진주 구슬",
+          "v": 3
+        },
+        {
+          "k": "shield",
+          "ratio": 1.64
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 5
+            },
+            {
+              "k": "shield",
+              "ratio": 2.44
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 4
+            },
+            {
+              "k": "heal",
+              "ratio": 2.64
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 3
+            },
+            {
+              "k": "shield",
+              "ratio": 1.56
+            },
+            {
+              "k": "when",
+              "on": "handEnd"
+            },
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 4
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.98
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.98
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아라그니아_u2",
+      "name": "남은 구슬은 짐의 것",
+      "hero": "아라그니아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "later",
+          "n": 1,
+          "then": [
+            {
+              "k": "shield",
+              "ratio": 3.32
+            }
+          ]
+        },
+        {
+          "k": "draw",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "shield",
+                  "ratio": 4.96
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "heal",
+                  "ratio": 4.76
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "진주 구슬"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.76
+            },
+            {
+              "k": "ifStack",
+              "id": "진주 구슬",
+              "n": 4
+            },
+            {
+              "k": "ap",
+              "v": 1
+            },
+            {
+              "k": "spend",
+              "id": "진주 구슬",
+              "all": true
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "later",
+              "n": 1,
+              "then": [
+                {
+                  "k": "shield",
+                  "ratio": 4.52
+                }
+              ]
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "perStack",
+              "id": "진주 구슬"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.25,
+              "base": "def",
+              "target": "allEnemies"
+            },
+            {
+              "k": "spend",
+              "id": "진주 구슬",
+              "all": true
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아라그니아_u3",
+      "name": "파도 한 줄기",
+      "hero": "아라그니아",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 0.37,
+          "target": "allEnemies"
+        },
+        {
+          "k": "status",
+          "id": "약화",
+          "v": 1,
+          "target": "allEnemies"
+        },
+        {
+          "k": "stack",
+          "id": "진주 구슬",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.56,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "strip",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.61,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.54,
+              "target": "allEnemies"
+            },
+            {
+              "k": "heal",
+              "ratio": 2.16
+            },
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.59,
+              "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.2,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 2,
+              "target": "allEnemies"
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "weakSpot"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "아라그니아_u4",
+      "name": "진주 왕국의 보물고",
+      "hero": "아라그니아",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "tags": [
+        "보존"
+      ],
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.77
+        },
+        {
+          "k": "perStack",
+          "id": "진주 구슬",
+          "n": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 0.42
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "아라그니아_s3",
+      "name": "꼬리 후려치기",
+      "hero": "아라그니아",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "아라그니아_s4",
+      "name": "구슬 날리기",
+      "hero": "아라그니아",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "heal",
+          "ratio": 2.44
+        },
+        {
+          "k": "stack",
+          "id": "진주 구슬",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.68
+            },
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.44
+            },
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.44
+            },
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 2.44
+            },
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.2
+            },
+            {
+              "k": "stack",
+              "id": "진주 구슬",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

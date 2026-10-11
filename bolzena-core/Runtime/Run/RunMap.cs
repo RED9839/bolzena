@@ -5,20 +5,27 @@ using System.Linq;
 namespace Bolzena.Core
 {
     /// <summary>
-    /// 지도 — 층마다 열 칸 길(1-1 ~ 1-10), 줄마다 칸 2~4개. 1-1 은 일반 전투만, 1-2 ~ 1-8 은 일반 · 엘리트 · 휴식 · 휴식(상점) · 이벤트,
-    /// 1-9 는 휴식(상점) 하나, 1-10 은 보스. 선은 같은 자리 · 바로 옆 자리로만(엇갈리지 않는다). 씨앗 · 층 · 마을로 정해진다.
+    /// 지도 — 층마다 R.FLOOR_NODES 칸 길(17 이면 1-1 ~ 1-17), 줄마다 칸 2~4개. 1-1 은 일반 전투만, 그 뒤 길 칸은 일반 · 엘리트 · 휴식 · 휴식(상점) · 이벤트,
+    /// 끝에서 둘째 칸은 휴식(상점) 하나, 마지막 칸은 보스. 엘리트 · 휴식이 열리는 칸과 적 세기(0 · 1 · 2) 경계는 길 길이의 비율이라 칸 수가 바뀌어도 고르게 늘어난다
+    /// (10 칸: 엘리트 1-4~ · 세기 1-1/1-4/1-6 — 17 칸: 엘리트 1-6~ · 세기 1-1/1-6/1-10). 선은 같은 자리 · 바로 옆 자리로만(엇갈리지 않는다). 씨앗 · 층 · 마을로 정해진다.
     /// </summary>
     public sealed partial class Run
     {
-        public const int MAP_ROWS = 10;
+        public static int MAP_ROWS => R.FLOOR_NODES;
         public const int MAX_LANES = 4;
+        /// <summary>길 칸(보스 앞 · 보스를 뺀 줄) 수 중 앞쪽 이 비율까지는 엘리트 · 휴식이 없고 세기 0 — 그 뒤 TIER2_AT 까지 세기 1, 나머지 세기 2.
+        /// 10 칸이던 때의 경계(r 3 · r 5)를 그대로 내는 값.</summary>
+        const double OPEN_AT = 0.35, TIER2_AT = 0.6;
+        static int PathRows => MAP_ROWS - 2;
+        static int OpenRow => (int)Math.Round(PathRows * OPEN_AT, MidpointRounding.AwayFromZero);
+        static int Tier2Row => (int)Math.Round(PathRows * TIER2_AT, MidpointRounding.AwayFromZero);
         public static readonly Dictionary<string, string> KIND_KO = new() { ["start"] = "출발", ["fight"] = "일반", ["elite"] = "엘리트", ["camp"] = "휴식", ["campshop"] = "휴식+상점", ["event"] = "이벤트", ["boss"] = "보스" };
 
         static List<(string kind, int w)> KindWeights(int r) => new()
         {
-            ("fight", 46), ("event", 22), ("elite", r >= 3 ? 17 : 0), ("camp", r >= 3 ? 8 : 0), ("campshop", r >= 3 && r <= MAP_ROWS - 4 ? 20 : 0),
+            ("fight", 46), ("event", 22), ("elite", r >= OpenRow ? 17 : 0), ("camp", r >= OpenRow ? 8 : 0), ("campshop", r >= OpenRow && r <= MAP_ROWS - 4 ? 20 : 0),
         };
-        static int TierOf(int r) => r < 3 ? 0 : r < 5 ? 1 : 2;
+        static int TierOf(int r) => r < OpenRow ? 0 : r < Tier2Row ? 1 : 2;
 
         static List<string> PickFoes(GameData d, Rng rng, string village, int floor, MapNode node, List<List<string>> prev)
         {

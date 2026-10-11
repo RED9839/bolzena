@@ -50,7 +50,7 @@ namespace Bolzena.Battle
             string art = !string.IsNullOrEmpty(info?.art) ? info.art : id;
             // 같은 그림의 시범 표가 있으면 그 색 · 결 그대로(콘텐츠의 리코타 = 시범의 rico)
             foreach (var x in heroes.Values) if (x.Art == art) { made[id] = x; return x; }
-            var hd = Data?.Hero(id);
+            var hd = Data?.CloneHero(id);   // 플레이어 사도 · 클론 전용 사도(보스 클론의 겉모습)
             string nature = hd?.Nature ?? info?.nature;
             string row = info?.row;   // 원작 표의 서는 자리 — 규칙이 아니라 공격 모습(근접 돌진 · 타격 결)만 고른다(사도 열은 코어에 없다)
             h = new HeroLook

@@ -15,7 +15,7 @@ namespace Bolzena.RunUI
         {
             var want = (Arg("-arca-party") ?? "").Split(',').Select(k => Roster.ByKey(k.Trim())?.key).Where(k => k != null).Distinct().ToList();
             foreach (var k in Roster.All.Where(h => h.Playable).Select(h => h.key)) { if (want.Count >= 3) break; if (!want.Contains(k)) want.Add(k); }
-            Flow.DemoLobbyHero = Arg("-arca-lobby") ?? "에르핀";
+            Flow.DemoLobbyHero = Arg("-arca-lobby") ?? "에르핀_왕도";
             yield return Wait(0.5f);
             f.Lobby();
             yield return Screen_("lobby", 2.4f);

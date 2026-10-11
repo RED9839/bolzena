@@ -11,6 +11,20 @@ using Bolzena.Core;
 static class Program
 {
     static List<string> rest;
+    /// <summary>
+    /// --out 을 안 줬을 때의 결과 파일 — 지금 폴더에 그 이름으로 쓰되, 이미 있으면 덮어쓰지 않고 새 이름(「solo_20261011_1654.md」)으로(2026-10-11 — 사용자 폴더의 solo.md 를 덮어쓴 사고).
+    /// 덮어쓰려면 --out 으로 경로를 준다.
+    /// </summary>
+    static string NewOut(string name)
+    {
+        if (!File.Exists(name)) return name;
+        string stem = Path.GetFileNameWithoutExtension(name), ext = Path.GetExtension(name), t = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        string o = $"{stem}_{t}{ext}";
+        for (int i = 2; File.Exists(o); i++) o = $"{stem}_{t}_{i}{ext}";
+        Console.WriteLine($"({name} 이 이미 있어 덮어쓰지 않고 {o} 로 쓴다 — 덮어쓰려면 --out)");
+        return o;
+    }
+
     static string Opt(string name, string d = null)
     {
         int i = rest.IndexOf("--" + name);
@@ -103,6 +117,44 @@ static class Program
             sb.AppendLine($"| {h.Name} | {h.Role} | " + string.Join(" | ", rs.Select(r => { var x = r.Heroes.FirstOrDefault(y => y.Key == h.Id); return x != null ? $"{x.Win:0.0}% ({x.N})" : "-"; })) + " |");
         return sb.ToString();
     }
+    /// <summary>결정 지점 측정 표(▶E30, 00_원칙 §10 — 쓰기 · 미루기가 갈리는 턴 ≥ 30%).</summary>
+    static string TraceReport(GameData data, string hero)
+    {
+        long G(string k) => Battle.Trace.TryGetValue(k, out var v) ? v : 0;
+        string P(long a, long b) => b <= 0 ? "-" : $"{100.0 * a / b:0.0}%";
+        long turns = G("turns");
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"결정 지점 — {data.Hero(hero)?.Name ?? hero} · 그 사도가 있는 턴 {turns}");
+        sb.AppendLine($"  그 사도 카드를 낸 턴 {P(G("played"), turns)} · 쥐고 넘긴 턴 {P(G("held"), turns)} · 낼 AP 가 있는데 쥔 턴 {P(G("heldPlayable"), turns)}");
+        if (G("tokenHeld") > 0) sb.AppendLine($"  생성 카드를 쥐고 넘긴 턴 {P(G("tokenHeld"), turns)}");
+        if (G("shieldSpend") + G("shieldKept") > 0) sb.AppendLine($"  실드 헐기 {G("shieldSpend")}번(일부만 {G("shieldPartial")}) · 실드 소모 카드를 쥐고 넘긴 턴 {P(G("shieldKept"), turns)}");
+        if (G("keepHeld") > 0)
+        {   // (엘다인 4차 ▶E87) 때 보고 쥐기 — 낼 수 있는 보존 카드를 쥔 턴 · 까닭 · 다음에 낼 때 때가 맞았나
+            var why = Battle.Trace.Where(kv => kv.Key.StartsWith("keepWhy:")).OrderByDescending(kv => kv.Value).Select(kv => $"{kv.Key.Substring(8)} {kv.Value}");
+            sb.AppendLine($"  보존 카드를 낼 수 있는데 쥔 턴 {P(G("keepHeld"), turns)} — 까닭 {string.Join(" · ", why)}");
+            long later = G("keepPaid") + G("keepUnpaid");
+            if (later > 0) sb.AppendLine($"  쥐었다 낸 {later}번 가운데 때가 맞음 {P(G("keepPaid"), later)}");
+        }
+        // 싸움 종류별(엘다인 4차 — 결정 지점 목표는 보스 · 엘리트전 기준, 사용자 2026-10-11)
+        foreach (var (k, ko) in new[] { ("boss", "보스"), ("elite", "엘리트"), ("normal", "일반") })
+        {
+            long t = G(k + "|turns");
+            if (t <= 0) continue;
+            var why = Battle.Trace.Where(kv => kv.Key.StartsWith(k + "|keepWhy:")).OrderByDescending(kv => kv.Value).Select(kv => $"{kv.Key.Substring(k.Length + 9)} {kv.Value}");
+            long later = G(k + "|keepPaid") + G(k + "|keepUnpaid");
+            sb.AppendLine($"  [{ko}] 턴 {t} · 낸 턴 {P(G(k + "|played"), t)} · 쥐고 넘긴 턴 {P(G(k + "|held"), t)} · 낼 AP 가 있는데 쥔 턴 {P(G(k + "|heldPlayable"), t)} · 보존 카드 쥔 턴 {P(G(k + "|keepHeld"), t)}{(G(k + "|keepHeld") > 0 ? $" — 까닭 {string.Join(" · ", why)}" : "")}{(later > 0 ? $" · 때 맞음 {P(G(k + "|keepPaid"), later)}" : "")}");
+        }
+        if (G("pick") > 0) sb.AppendLine($"  고른 만큼 쓰기 {G("pick")}번 — 전부가 아닌 고름 {P(G("pickPartial"), G("pick"))}");
+        if (G("formIn") > 0)
+        {
+            var at = Battle.Trace.Where(kv => kv.Key.StartsWith("formInTurn:")).Select(kv => (t: int.Parse(kv.Key.Substring(11)), n: kv.Value)).OrderBy(x => x.t).ToList();
+            long offs = Battle.Trace.Where(kv => kv.Key.StartsWith("formOff:")).Sum(kv => kv.Value);
+            sb.AppendLine($"  변신 {G("formIn")}번 · 든 턴 {string.Join(" · ", at.Take(8).Select(x => $"{x.t}턴 {x.n}"))} · 평균 지속 {(offs > 0 ? (double)G("formTurns") / offs : 0):0.0}턴");
+            sb.AppendLine($"  끝 — 시간 만료 {G("formOff:time")} · 카드로 끝냄 {G("formOff:card")} · 계기 {G("formOff:until")} · 다른 변신 {G("formOff:switch")}");
+        }
+        return sb.ToString().TrimEnd();
+    }
+
     static List<string> Many(string name) { var o = new List<string>(); string v; while ((v = Opt(name)) != null) o.AddRange(v.Split(';', StringSplitOptions.RemoveEmptyEntries)); return o; }
     static double D(string s) => double.Parse(s, CultureInfo.InvariantCulture);
 
@@ -112,7 +164,15 @@ static class Program
         rest = args.ToList();
         if (Opt("bossult") == "0") BossUlt.On = false;   // 보스 클론 고학년 끄기(전후 비교)
         string bux = Opt("bossultx"); if (bux != null) BossUlt.Scale = D(bux);   // 보스 고학년 피해 배율(계수 찾기)
+        string rgd = Opt("roleguard"); if (rgd != null) { var rv = rgd.Split(',').Select(D).ToArray(); R.ROLE_GUARD["탱커"] = rv[0]; R.ROLE_GUARD["서포터"] = rv.Length > 1 ? rv[1] : rv[0]; }   // 역할별 실드 · 회복 배율 시험(탱커,서포터)
+        string rdu = Opt("roledup"); if (rdu != null) R.ROLE_DUP = D(rdu);   // 같은 역할 겹침 시험
+        string gek = Opt("guardk"); if (gek != null) R.GUARD_EXTRA_K = D(gek);   // 실드 · 회복의 추가 방어력 몫 시험
+        string fhp = Opt("floorhp"); if (fhp != null) { var hv = fhp.Split(',').Select(D).ToArray(); for (int i = 0; i < hv.Length; i++) R.FLOOR_HP[i + 1] = hv[i]; }   // 층별 적 체력 배율 시험(1층,2층)
+        string ghp = Opt("fighthp"); if (ghp != null) { var gv = ghp.Split(',').Select(D).ToArray(); for (int i = 0; i < gv.Length; i++) R.FIGHT_HP[i + 1] = gv[i]; }   // 층별 일반 싸움 적 체력 배율 시험(1층,2층)
+        string bhp = Opt("bosshp"); if (bhp != null) { var bv = bhp.Split(',').Select(D).ToArray(); for (int i = 0; i < bv.Length; i++) R.BOSS_HP[i + 1] = bv[i]; }   // 층별 보스 체력 배율 시험(1층,2층)
+        string bdm = Opt("bossdmg"); if (bdm != null) { var bv = bdm.Split(',').Select(D).ToArray(); for (int i = 0; i < bv.Length; i++) R.BOSS_DMG[i + 1] = bv[i]; }   // 층별 보스 피해 배율 시험(1층,2층)
         string fdm = Opt("floordmg"); if (fdm != null) { var fv = fdm.Split(',').Select(D).ToArray(); for (int i = 0; i < fv.Length; i++) R.FLOOR_DMG[i + 1] = fv[i]; }   // 층별 적 피해 배율 시험(1층,2층 — Rules.cs 를 고치기 전 후보 재기)
+        string nodes = Opt("nodes"); if (nodes != null) R.FLOOR_NODES = int.Parse(nodes);   // 층 길이 시험(옛 10 칸과 견주기 — Rules.cs FLOOR_NODES)
         var paths = Many("data");
         if (paths.Count == 0) paths.Add(rest.FirstOrDefault() == "records" && Directory.Exists(@"C:\projects\bolzena-content-v2") ? @"C:\projects\bolzena-content-v2"   // 플레이 기록은 실제 콘텐츠로 읽는다
             : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../Data/Sample")));
@@ -128,7 +188,8 @@ static class Program
                 {
                     string hero = Opt("hero"); bool quiet = Flag("quiet");
                     var v = Validator.Check(data);
-                    bool Mine(string e) => hero == null || e.Contains(hero);
+                    var heroes = hero?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);   // 여럿은 쉼표로(엘다인 시범 — 「시온더다크불릿,이드」)
+                    bool Mine(string e) => hero == null || heroes.Any(e.Contains);
                     var errs = v.Errors.Where(Mine).ToList();
                     var warns = v.Warnings.Where(Mine).ToList();
                     Console.WriteLine($"{(errs.Count == 0 ? "검사 통과" : "검사 실패")} — 오류 {errs.Count} · 주의 {warns.Count} · 사도 {data.Heroes.Count} · 카드 {data.Cards.Count} · 적 {data.Enemies.Count} · 마을 {data.Villages.Count} · 이벤트 {data.Events.Count} · 장비 {data.Equips.Count}");
@@ -183,7 +244,7 @@ static class Program
                 }
             case "sim":
                 {
-                    // sim [판(바퀴)] [--with 사도] [--hp 1] [--dmg 1] [--seed 0] [--bot basic|skilled] [--party random|role|synergy] [--uniqueonly] [--relations 관계.json] [--out 파일.md]
+                    // sim [판(바퀴)] [--trace 사도 — 결정 지점(그 사도를 넣어 잰다)] [--with 사도] [--hp 1] [--dmg 1] [--seed 0] [--threads 0] [--bot basic|skilled] [--party random|role|synergy] [--uniqueonly] [--relations 관계.json] [--out 파일.md]
                     string with = Opt("with");
                     int seed = int.Parse(Opt("seed", "0")); double hp = D(Opt("hp", "1")), dmg = D(Opt("dmg", "1"));
                     var (bot, party, err) = BotOpts(); if (err != null) { Console.WriteLine(err); return 1; }
@@ -191,14 +252,20 @@ static class Program
                     string outMd = Opt("out");
                     int n = rest.Count > 0 && int.TryParse(rest[0], out var x) ? x : 30;
                     string kwOut = Opt("kw"); if (kwOut != null) { KwMeter.Reset(); KwMeter.On = true; }
-                    var res = MetaSim.Run(data, n, seed, hp, dmg, with: with, bot: bot, party: party, syn: syn);
+                    int threads = int.Parse(Opt("threads", "0"));   // 0 = 코어 수 - 1
+                    string trace = Opt("trace");   // (엘다인 ▶E30) 결정 지점 — 그 사도 카드를 쥐고 넘긴 턴 · 고른 만큼 · 실드 헐기 · 변신 진입
+                    if (trace != null) { if (data.Hero(trace) == null) { Console.WriteLine($"없는 사도: {trace}"); return 1; } Battle.TraceHero = trace; Battle.Trace.Clear(); with ??= trace; }
+                    var res = MetaSim.Run(data, n, seed, hp, dmg, threads: threads, with: with, bot: bot, party: party, syn: syn);
                     if (outMd != null) { File.WriteAllText(outMd, MetaSim.MarkdownV2(data, res, null, null, res.Label)); Console.WriteLine($"→ {Path.GetFullPath(outMd)}"); }
                     if (kwOut != null) { KwMeter.On = false; File.WriteAllText(kwOut, KwTable(data)); }
                     Console.WriteLine(MetaSim.Report(data, res));
+                    Console.WriteLine($"자원 — {res.Sec:0.0}초 · {res.Runs / Math.Max(0.001, res.Sec):0.0}판/초 · 할당 {GC.GetTotalAllocatedBytes() / 1e9:0.0}GB · GC {GC.CollectionCount(0)}/{GC.CollectionCount(1)}/{GC.CollectionCount(2)} · GC 멈춤 {GC.GetTotalPauseDuration().TotalSeconds:0.0}초 · 최대 메모리 {System.Diagnostics.Process.GetCurrentProcess().PeakWorkingSet64 / 1e9:0.0}GB");
                     // 멈춤 방지 상한(규칙 하나 한 턴 Battle.SAFETY_CAP 번)에 걸린 턴 수 — 사도 · 규칙별
                     var caps = Battle.CapHits.OrderByDescending(kv => kv.Value).ToList();
                     Console.WriteLine($"멈춤 방지 상한({Battle.SAFETY_CAP}회/턴) 걸림 — {caps.Sum(kv => kv.Value)}턴 · 규칙 {caps.Count}개");
                     foreach (var kv in caps.Take(30)) { var k = kv.Key.Split('|'); Console.WriteLine($"  {data.Hero(k[0])?.Name ?? k[0]} · {string.Join("|", k.Skip(1))} — {kv.Value}턴"); }
+                    Console.WriteLine($"AP 얻기 한 턴 상한({Battle.AP_GAIN_CAP}) 걸림 — {Battle.ApCapHits}번");   // 엘다인 3차 ▶E46
+                    if (trace != null) Console.WriteLine(TraceReport(data, trace));
                     return 0;
                 }
             case "botcmp":
@@ -208,7 +275,7 @@ static class Program
                     int seed = int.Parse(Opt("seed", "0")); double hp = D(Opt("hp", "1")), dmg = D(Opt("dmg", "1"));
                     var modes = (Opt("modes") ?? "basic:random;skilled:role;skilled:synergy;skilled:role:unique").Split(';', StringSplitOptions.RemoveEmptyEntries).ToList();
                     var vs = (Opt("vs") ?? "0,1").Split(',').Select(int.Parse).ToArray(); int top = int.Parse(Opt("top", "12"));
-                    string outp = Opt("out", "botcmp.md"), title = Opt("title", "봇 · 편성 모드별 완주율");
+                    string outp = Opt("out") ?? NewOut("botcmp.md"), title = Opt("title", "봇 · 편성 모드별 완주율");
                     int n = rest.Count > 0 && int.TryParse(rest[0], out var x3) ? x3 : 100;
                     PartyPick.SynScore syn = null;
                     var rs = new List<MetaSim.Result>();
@@ -228,7 +295,7 @@ static class Program
             case "report":
                 {
                     // report [바퀴] [--pairs 판] [--comps 판] [--top 쌍] [--old] [--out 파일.md] — 메타 + 역할 조합 + 짝(같은 종족 · 키워드 맞물림)
-                    string outp = Opt("out", "meta.md"); int pairs = int.Parse(Opt("pairs", "0")); int seed = int.Parse(Opt("seed", "0"));
+                    string outp = Opt("out") ?? NewOut("meta.md"); int pairs = int.Parse(Opt("pairs", "0")); int seed = int.Parse(Opt("seed", "0"));
                     int comps = int.Parse(Opt("comps", "0")); int top = int.Parse(Opt("top", "30")); bool old = Flag("old"); string title = Opt("title", "사도 완주율");
                     int n = rest.Count > 0 && int.TryParse(rest[0], out var x2) ? x2 : 100;
                     var res = MetaSim.Run(data, n, seed);
@@ -246,7 +313,7 @@ static class Program
                 {
                     // solo [--err 2] [--min 300] [--max 3000] [--hero 키;키] [--out 파일.md] [--seed 0] — 사도마다 「혼자」 완주율(그 사도 + 무작위 둘), 병렬
                     double err = D(Opt("err", "2")); int min = int.Parse(Opt("min", "300")), max = int.Parse(Opt("max", "3000")), seed = int.Parse(Opt("seed", "0"));
-                    var only = Many("hero"); string outp = Opt("out", "solo.md"); string kwOut = Opt("kw");
+                    var only = Many("hero"); string outp = Opt("out") ?? NewOut("solo.md"); string kwOut = Opt("kw");
                     if (kwOut != null) { KwMeter.Reset(); KwMeter.On = true; }
                     var t0 = DateTime.Now;
                     var rows = MetaSim.Solo(data, err, min, max, seed, heroes: only.Count > 0 ? only : null, log: Console.WriteLine);
@@ -278,6 +345,29 @@ static class Program
                     if (outDir != null) { File.WriteAllText(outDir, md); Console.WriteLine($"→ {Path.GetFullPath(outDir)}"); } else Console.WriteLine(md);
                     return 0;
                 }
+            case "build":
+                {
+                    // build --spec 빌드.json [--n 200] [--seed 0] [--full] [--threads 0] [--out 파일.md] [--tsv 파일] — 사도 빌드(핵심 카드 · 신탁 고정)별 완주율(BuildSim.cs)
+                    string spec = Opt("spec"); if (spec == null) { Console.WriteLine("build --spec 빌드.json [--n 200] [--full]"); return 1; }
+                    int bn = int.Parse(Opt("n", "200")), bseed = int.Parse(Opt("seed", "0")), bth = int.Parse(Opt("threads", "0")); bool full = Flag("full");
+                    return BuildSim.Run(paths, spec, bn, bseed, full, Opt("out"), Opt("tsv"), bth);
+                }
+            case "foestat":
+                {
+                    // foestat [바퀴] [--seed 0] [--bot skilled] [--top 25] — 층 · 종류 · 적별 턴 · HP 손실 · 쓰러짐(FoeStat.cs)
+                    int seed = int.Parse(Opt("seed", "0")); int top = int.Parse(Opt("top", "25"));
+                    var (bot, _, err) = BotOpts(); if (err != null) { Console.WriteLine(err); return 1; }
+                    int n = rest.Count > 0 && int.TryParse(rest[0], out var x5) ? x5 : 200;
+                    return FoeStat.Run(data, n, seed, bot.Skilled, top);
+                }
+            case "weaksim":
+                {
+                    // weaksim [바퀴] [--seed 0] [--bot skilled] [--weak role|0|1|2|3] [--crayon all|표] — 약점 사도 수별 완주율(WeakSim.cs)
+                    int seed = int.Parse(Opt("seed", "0")); string weak = Opt("weak", "role");
+                    var (bot, _, err) = BotOpts(); if (err != null) { Console.WriteLine(err); return 1; }
+                    int n = rest.Count > 0 && int.TryParse(rest[0], out var x4) ? x4 : 400;
+                    return WeakSim.Run(data, n, seed, bot.Skilled, weak, bot.Perks);
+                }
             case "bench":
                 // bench [판 20] [--seed 0] [--rep 3] [--records 파일] · bench --sim 바퀴 [--threads 8] · bench --textdump 파일 — 엔진 성능(Bench.cs)
                 return Bench.Run(data, rest);
@@ -287,6 +377,24 @@ static class Program
                     string outp = Opt("out");
                     string md = BossUlt.Table(data);
                     if (outp != null) { File.WriteAllText(outp, md); Console.WriteLine($"→ {Path.GetFullPath(outp)}"); } else Console.WriteLine(md);
+                    return 0;
+                }
+            case "intents":
+                {   // 적의 수 종류 분포(엘다인 4차 — 아야 만년설의 앎): 공격 · 방어 · 강화 · 방해, 공격만 하는 적 비율
+                    bool each = Flag("each"); int total = 0, onlyAtk = 0; var cnt = new Dictionary<string, int>();
+                    var per = new List<string>();
+                    foreach (var e in data.Enemies.Values.OrderBy(x => x.Id, StringComparer.Ordinal))
+                    {
+                        var its = e.Intents.Concat(e.Phase?.Intents ?? new List<Intent>()).Concat(e.Phase2?.Intents ?? new List<Intent>()).Concat(e.Open != null ? new[] { e.Open } : new Intent[0]).ToList();
+                        if (its.Count == 0) continue;
+                        var kinds = its.Select(Battle.IntentKind).Where(k => k != null).Distinct().ToList();
+                        total++; if (kinds.Count == 1 && kinds[0] == "attack") onlyAtk++;
+                        foreach (var k in kinds) cnt[k] = (cnt.TryGetValue(k, out var v) ? v : 0) + 1;
+                        if (each) per.Add($"{e.Id}\t{e.Name}\t{string.Join(",", kinds.Select(k => Battle.INTENT_KIND_KO[k]))}");
+                    }
+                    Console.WriteLine($"적 {total} · 공격만 하는 적 {onlyAtk}({(total > 0 ? 100.0 * onlyAtk / total : 0):0.0}%)");
+                    foreach (var k in Battle.INTENT_KINDS) Console.WriteLine($"  {Battle.INTENT_KIND_KO[k]} 수가 있는 적 {(cnt.TryGetValue(k, out var v) ? v : 0)}");
+                    foreach (var l in per) Console.WriteLine(l);
                     return 0;
                 }
             case "natures":

@@ -1,0 +1,791 @@
+{
+  "heroes": [
+    {
+      "id": "스노키",
+      "name": "스노키",
+      "nature": "우울",
+      "race": "마녀",
+      "role": "탱커",
+      "style": "버티형",
+      "star": 3,
+      "hp": 920,
+      "atk": 101,
+      "def": 67,
+      "crit": 5,
+      "blurb": "두유 유통 조직의 전 두목, 지금은 경호원 겸 오른팔. 동료가 주먹을 내밀 때마다 두유 한 병씩 건넵니다.",
+      "keyword": {
+        "name": "밀두유",
+        "desc": "조직에서 빼돌린 두유",
+        "carrier": "self",
+        "cap": 3,
+        "onMax": {
+          "empower": "any",
+          "ratio": 0.5,
+          "consume": true
+        },
+        "rules": [
+          {
+            "name": "두유 배달",
+            "when": {
+              "on": "play",
+              "type": "공격",
+              "who": "other"
+            },
+            "fx": [
+              {
+                "k": "shield",
+                "ratio": 0.22
+              },
+              {
+                "k": "stack",
+                "id": "밀두유",
+                "v": 1
+              }
+            ]
+          },
+          {
+            "name": "불법 유통망",
+            "when": {
+              "on": "shieldBreak"
+            },
+            "fx": [
+              {
+                "k": "status",
+                "id": "취약",
+                "v": 1,
+                "target": "oneEnemy"
+              }
+            ]
+          }
+        ]
+      },
+      "passives": [],
+      "ult": {
+        "name": "구역 점거",
+        "cost": 300,
+        "fx": [
+          {
+            "k": "dmg",
+            "ratio": 1.76,
+            "target": "allEnemies",
+            "base": "def"
+          },
+          {
+            "k": "status",
+            "id": "둔화",
+            "v": 2,
+            "target": "allEnemies"
+          },
+          {
+            "k": "status",
+            "id": "반격",
+            "v": 2
+          }
+        ]
+      },
+      "starter": [
+        "스노키_s1",
+        "스노키_s2",
+        "스노키_s3",
+        "스노키_u1"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "스노키_s1",
+      "name": "절도 있는 발차기",
+      "hero": "스노키",
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 1,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "스노키_s2",
+      "name": "경호 자세",
+      "hero": "스노키",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 1.4
+        }
+      ]
+    },
+    {
+      "id": "스노키_u1",
+      "name": "경호원 출동",
+      "hero": "스노키",
+      "unique": true,
+      "cost": 1,
+      "type": "강화",
+      "tags": [
+        "개전"
+      ],
+      "fx": [
+        {
+          "k": "stack",
+          "id": "밀두유",
+          "v": 1
+        },
+        {
+          "k": "shield",
+          "ratio": 0.5
+        },
+        {
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "shield",
+                  "ratio": 0.35
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 0.75
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.51
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀두유",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.65
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "shieldBreak"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "취약",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    },
+                    {
+                      "k": "stack",
+                      "id": "밀두유",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "tags": [
+            "개전"
+          ],
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 3
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "play",
+                    "type": "공격",
+                    "who": "other"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.28
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "개전"
+          ],
+          "cost": 0,
+          "fx": [
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 1
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.3
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스노키_u2",
+      "name": "불법 두유",
+      "hero": "스노키",
+      "unique": true,
+      "cost": 2,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 2
+        },
+        {
+          "k": "stack",
+          "id": "밀두유",
+          "v": 1
+        },
+        {
+          "k": "status",
+          "id": "실드 유지",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.01
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 2
+            },
+            {
+              "k": "status",
+              "id": "실드 유지",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.23
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 3
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.79
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.79
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.15
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "blocked"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "밀두유",
+                      "v": 3
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "draw"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스노키_u3",
+      "name": "두유 상자 던지기",
+      "hero": "스노키",
+      "unique": true,
+      "cost": 1,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "ifStack",
+          "id": "밀두유",
+          "n": 3
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.98,
+          "base": "def",
+          "target": "allEnemies"
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "power"
+        },
+        {
+          "name": "축복 2",
+          "kind": "cost"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            }
+          ]
+        }
+      ],
+      "complete": true
+    },
+    {
+      "id": "스노키_u4",
+      "name": "의리의 대명사",
+      "hero": "스노키",
+      "unique": true,
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.89
+        },
+        {
+          "k": "dealtMod",
+          "v": 0.25,
+          "target": "strongestAlly",
+          "turns": 2
+        },
+        {
+          "k": "stack",
+          "id": "밀두유",
+          "v": 1
+        }
+      ],
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.34
+            },
+            {
+              "k": "dealtMod",
+              "v": 0.38,
+              "target": "strongestAlly",
+              "turns": 2
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.34
+            },
+            {
+              "k": "status",
+              "id": "피해 감소",
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "heal",
+              "ratio": 3.24
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "cost": 0,
+          "power": true,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.5
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "dealtMod",
+                      "v": 0.15,
+                      "target": "strongestAlly"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.37
+            },
+            {
+              "k": "empower",
+              "ratio": 0.79,
+              "who": "any"
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 3
+            }
+          ]
+        }
+      ],
+      "blesses": [
+        {
+          "name": "축복 1",
+          "kind": "guard"
+        },
+        {
+          "name": "축복 2",
+          "kind": "heal"
+        },
+        {
+          "name": "축복 3",
+          "fx": [
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "스노키_s3",
+      "name": "돌려차기",
+      "hero": "스노키",
+      "cost": 2,
+      "type": "공격",
+      "fx": [
+        {
+          "k": "dmg",
+          "ratio": 2.2,
+          "base": "def",
+          "target": "oneEnemy"
+        }
+      ]
+    },
+    {
+      "id": "스노키_s4",
+      "name": "밀두유 한 모금",
+      "hero": "스노키",
+      "cost": 1,
+      "type": "스킬",
+      "fx": [
+        {
+          "k": "shield",
+          "ratio": 0.99
+        },
+        {
+          "k": "stack",
+          "id": "밀두유",
+          "v": 1
+        }
+      ],
+      "unique": true,
+      "oracles": [
+        {
+          "name": "신탁 1",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.49
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 2
+            }
+          ]
+        },
+        {
+          "name": "신탁 2",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.99
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.99
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 0.99
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 3
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1.29
+            },
+            {
+              "k": "stack",
+              "id": "밀두유",
+              "v": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
