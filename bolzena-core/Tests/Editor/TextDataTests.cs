@@ -164,6 +164,15 @@ namespace Bolzena.Core.Tests
             StringAssert.Contains("냉정 사도의 카드", CardText.Tip("냉정 약점"));
         }
 
+        /// <summary>(2026-10-12 사용자 「천상은 카드 효과 — 무기에 있으면 안 된다」) 비용 2 이상 계기는 「천상」 이름 대신 문장으로.</summary>
+        [Test] public void 장비의_비용_2_이상_계기는_천상이라고_안_쓴다()
+        {
+            var d = K.Data(equips: "[{id:'sw', name:'대검', grade:'고급', slot:'무기', effect:[{name:'무게 싣기', when:{on:'play', type:'공격', minCost:2}, fx:[{k:'tough', v:1}]}]}]");
+            var s = new CardText(d).Equip(d.Equips["sw"]);
+            StringAssert.DoesNotContain("천상", s);
+            StringAssert.Contains("2", s);
+        }
+
         [Test] public void 적의_수와_이벤트_결과()
         {
             Assert.AreEqual("공격 110", T.Intent(new Intent { T = "attack", V = 110 }));

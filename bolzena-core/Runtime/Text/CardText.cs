@@ -828,7 +828,7 @@ namespace Bolzena.Core
                 case "play":
                     if ((w.Seq != null && w.Seq.Count > 0) || w.Nth > 0 || w.Sig || w.Repeat || w.Marked != null || w.Every > 0 || w.Tag != null || w.MaxCost != null || w.PaidMax != null || w.Basic || w.Token != null || w.CardSt != null || w.SameHero) return null;
                     if (w.Chain) return (w.MinCost ?? 0) > 0 ? null : N("연속", who, w.Type);
-                    if (w.MinCost == 2) return N("천상", who, w.Type);
+                    // 「천상」 은 카드 태그(이드)로만 — 장비 · 패시브의 「비용 2 이상 카드를 내면」 은 문장 그대로(2026-10-12 사용자 「천상은 무기에 있으면 안 된다」)
                     if (w.Who == "other" && (w.MinCost ?? 0) <= 0) return N("연계", w.Type);
                     return null;
             }
