@@ -83,12 +83,12 @@ namespace Bolzena.Core.Tests
             finally { R.OPEN_EXPOSE = was; }
         }
 
-        [Test] public void 협공_추가_공격도_강인도를_깎는다()
+        [Test] public void 협공_추가_공격은_강인도를_안_깎는다()
         {
             var d = D();
             var b = K.Fight(d, new[] { "mad", "live" }, new[] { "pure" }); b.Pool.Status["협공"] = 1; K.Hand(b, "l_hit");
             double t0 = K.E(b).Tough; K.Play(b, "l_hit");
-            Assert.Greater(t0 - K.E(b).Tough, R.ToughDmg(1, false, false) + 1e-9, "카드 1/3칸 + 협공 몫");
+            Assert.AreEqual(R.ToughDmg(1, false, false), t0 - K.E(b).Tough, 1e-9, "카드 몫만 — 협공은 강인도 0(2026-10-12 사용자)");
         }
     }
 }

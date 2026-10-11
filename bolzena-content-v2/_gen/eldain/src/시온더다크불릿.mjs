@@ -71,7 +71,7 @@ export default hero({
         { power: true, fx: [M(2), power([rule({ on: 'discard', tag: B }, [stack(K, 1)])])] },
         { tags: ['보존'], fx: [{ k: 'perTag', id: B, n: 1 }, dmg(0.8, 'oneEnemy'), { k: 'burn', all: true, tag: B }] },   // 버리지 않고 태움(마탄 소각 마디로 장전)
         { tags: ['보존'], fx: [{ k: 'discard', v: 2, tag: B }, per, dmg(1.7, 'oneEnemy')] },
-        { cost: 0, tags: ['소멸'], fx: [allB, { k: 'perDiscarded' }, dmg(0.8, 'oneEnemy'), { k: 'nextAp', v: 1 }] },
+        { cost: 1, fx: [allB, { k: 'perDiscarded' }, dmg(0.8, 'oneEnemy')] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
         // 원작 보강(10-11 검토): 마탄 5발을 다 채워 쏘면 더 세다
         { fx: [allB, per, dmg(1.2, 'oneEnemy'), { k: 'ifEvent', n: 5 }, status('사기', 1)] },
       ],

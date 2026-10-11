@@ -75,7 +75,7 @@ export default hero({
         { fx: [ctr(2), shield(0.8), ...brk(2), ctr(3)] },
         { type: '공격', fx: [ctr(1), shield(0.8), ...brk(2), ddmg(0.8, 'allEnemies')] },
         { fx: [ctr(1), shield(0.8), ...brk(2), { k: 'counterMod', v: 1, turns: 1 }] },
-        { tags: ['소멸'], fx: [ctr(1), { k: 'nextAp', v: 1 }] },
+        { fx: [ctr(1), draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
         { fx: [ctr(1), shield(0.8), ...brk(2), shield(2)] },
       ],
       blesses: ['guard', 'draw', [S(1)]],

@@ -73,7 +73,7 @@ export default hero({
         { power: true, fx: [suit(1), power([rule({ on: 'turnStart' }, [suit(1)])])] },
         { fx: [spend(K, 'pick'), pickDress(), draw(1)] },   // 옛 「맞춤 의상」(동료 카드에 탐구심 · 보존)은 이 갈래로
         { fx: [spend(K, 'pick'), { k: 'perEvent', n: 1 }, suit(1, 'self'), draw(1)] },
-        { cost: 0, tags: ['소멸'], fx: [spend(K, 'pick'), pickDress()] },
+        { cost: 1, fx: [spend(K, 'pick'), pickDress()] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
         { fx: [spend(K, 'pick'), { k: 'cardStatus', id: '비용', v: -1, to: 'hand', who: 'other', pick: true }] },
       ],
       blesses: ['cost', 'draw', [S(1)]],

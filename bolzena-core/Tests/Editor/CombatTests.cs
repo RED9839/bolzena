@@ -291,11 +291,26 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(1, b.St(b.Enemies[1], "사기"));
         }
 
+        /// <summary>(2026-10-12 사용자) 강인도 고정 — 일반 적 3(데이터가 높아도) · 엘리트 · 보스 · 클론 5.</summary>
+        [Test] public void 강인도는_일반_3_엘리트_5_보스_7_고정()
+        {
+            R.TOUGH_FIXED = true;
+            try
+            {
+                Assert.AreEqual(3, Battle.ToughOf(new EnemyDef { Id = "big_mob", Tough = 6 }, false), "일반 — 데이터 6 이어도 3");
+                Assert.AreEqual(5, Battle.ToughOf(new EnemyDef { Id = "x_elite", Tough = 8 }, true), "엘리트 5");
+                Assert.AreEqual(7, Battle.ToughOf(new EnemyDef { Id = "boss", Boss = true, Tough = 10 }, false), "보스 7");
+                Assert.AreEqual(7, Battle.ToughOf(new EnemyDef { Id = "clone_x", Clone = "x", Tough = 13 }, false), "클론(층 보스) 7");
+                Assert.AreEqual(3, Battle.ToughOf(new EnemyDef { Id = "minion", Tough = 2 }, true), "엘리트 싸움의 여린 적도 3");
+            }
+            finally { R.TOUGH_FIXED = false; }
+        }
+
         [Test] public void 판이_바뀌면_수가_바뀌지만_강인도는_차지_않는다()
         {
             var d = K.Data(enemies: "[{id:'boss', name:'보스', hp:1000, boss:true, intents:[{t:'jam', v:0, rush:0}], phase:{at:0.5, say:'성났다', intents:[{t:'attack', v:50, rush:0}]}}]");
             var b = K.Fight(d, new[] { "a" }, new[] { "boss" });
-            Assert.AreEqual(7, K.E(b).ToughMax, "보스 강인도(데이터에 없으면 7)");
+            Assert.AreEqual(7, K.E(b).ToughMax, "보스 강인도(데이터에 없으면 7 — TOUGH_FIXED 끈 계산 테스트)");
             K.E(b).Hp = 400; K.E(b).Tough = 1;
             b.EndTurn();
             Assert.IsTrue(K.E(b).Phased);

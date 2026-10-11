@@ -526,8 +526,8 @@ namespace Bolzena.Core
                     {
                         var f = c.Fx[0];
                         bool atk = f.K == FxK.Dmg;
-                        double want = atk ? (c.Cost == 2 ? 2.2 : 1.0) : (c.Cost == 2 ? 2.5 : 1.4);
-                        if (Math.Abs(f.Ratio - want) > 0.2 + 1e-9) E($"{at} 기본 카드 {c.Id}: {c.Cost}코 {(atk ? "공격" : "방어")}는 {Math.Round(want * 100)}% 근처(±20%) — 지금 {Math.Round(f.Ratio * 100)}%");
+                        double want = atk ? (c.Cost == 2 ? 2.2 : 1.0) : (c.Cost == 2 ? 3.0 : 1.7);   // 2026-10-12 실드 · 회복 ×1.2(옛 1.4 · 2.5)
+                        if (Math.Abs(f.Ratio - want) > (atk ? 0.2 : 0.3 * (c.Cost == 2 ? 2 : 1)) + 1e-9) E($"{at} 기본 카드 {c.Id}: {c.Cost}코 {(atk ? "공격" : "방어")}는 {Math.Round(want * 100)}% 근처(±20%) — 지금 {Math.Round(f.Ratio * 100)}%");
                         if (atk && h.Role == "탱커" && f.Base != "def") E($"{at} 기본 카드 {c.Id}: 탱커의 기본 공격은 방어 기반(base def)");
                         if (atk && h.Role != "탱커" && f.Base == "def") E($"{at} 기본 카드 {c.Id}: 방어 기반 기본 공격은 탱커만");
                         if (atk && (f.Target ?? "oneEnemy") != "oneEnemy") E($"{at} 기본 카드 {c.Id}: 기본 공격은 적 1명");

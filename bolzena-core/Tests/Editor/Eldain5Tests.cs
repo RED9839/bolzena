@@ -512,6 +512,21 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(1, b.CostOf("clockbig2"), "다른 카드는 그대로 1");
         }
 
+        /// <summary>(2026-10-12 사용자 「강인도는 카드를 낼 때의 비용으로 — 아니면 리뉴아 카드는 무조건 격파」) 4코를 0코로 내면 강인도도 0코 몫.</summary>
+        [Test] public void 강인도는_낼_때의_비용으로_리뉴아_0코는_0코_몫()
+        {
+            var d = K.Data(heroes: TIME_H.Replace("max:6}", "max:6, who:'other'}"), cards: TIME_C);
+            var b = K.Fight(d, new[] { "tm", "c" }, new[] { "dummy" });
+            b.Ap = 9;
+            K.Hand(b, "clockbig", "zc", "zc", "zc", "zc");
+            for (int i = 0; i < 4; i++) K.Play(b, "zc");
+            Assert.AreEqual(0, b.CostOf("clockbig"));
+            double t0 = K.E(b).Tough; K.Play(b, "clockbig");
+            double lost = t0 - K.E(b).Tough;
+            Assert.LessOrEqual(lost, R.ToughDmg(0, true, false) + 1e-9, "0코로 냈으니 0코 몫(적힌 4코 몫이 아니다)");
+            Assert.Greater(lost, 0);
+        }
+
         [Test] public void 시간_낼_때의_비용으로_계기_paidMax()
         {
             var d = K.Data(heroes: TIME_H.Replace("cardValue:{grow:'allyPlay', reset:'play', cost:-1, max:6}}", "cardValue:{grow:'allyPlay', reset:'play', cost:-1, max:6}}, passives:[{name:'평화', when:{on:'play', paidMax:0}, fx:[{k:'gauge', v:7}]}]"), cards: TIME_C);

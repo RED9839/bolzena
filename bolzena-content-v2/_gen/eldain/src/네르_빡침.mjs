@@ -69,7 +69,7 @@ export default hero({
         { fx: [dmg(0.7), tough(2)] },
         { fx: [dmg(0.7), tough(1), { k: 'ifBreak' }, stack(Q, 2)] },
         { fx: [dmg(0.5, 'allEnemies'), tough(1)] },
-        { tags: ['소멸'], fx: [dmg(0.7), tough(1), inF, { k: 'ap', v: 1 }] },
+        { fx: [dmg(0.7), tough(1), inF, draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
         { fx: [dmg(0.7), tough(1), { k: 'ifFoe', id: 'broken' }, dmg(2.8)] },
       ],
       blesses: ['power', 'draw', [stack(Q, 1)]],

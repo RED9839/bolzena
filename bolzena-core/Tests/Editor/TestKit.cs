@@ -15,7 +15,8 @@ namespace Bolzena.Core.Tests
     {
         // 첫 수 약점 노출(R.OPEN_EXPOSE, 2026-10-10)은 시험에서 끈다 — 시험은 성격 · 약점을 하나씩 따로 본다(켜는 시험은 KarzenaRuleTests)
         // 역할별 실드 · 회복 배율(R.ROLE_GUARD, 2026-10-10)도 시험에서는 1 — 시험 사도 'a' 가 탱커라 실드 수치 시험이 배율과 섞이지 않게(켜는 시험은 KarzenaRuleTests)
-        static K() { R.OPEN_EXPOSE = 0; foreach (var k in R.ROLE_GUARD.Keys.ToList()) R.ROLE_GUARD[k] = 1; R.ROLE_DUP = 0; }
+        static K() { R.TOUGH_FIXED = false;   // 강인도 계산 테스트는 데이터 칸으로(고정 규칙은 강인도는_일반_3_엘리트_보스_5_고정 에서)
+            R.OPEN_EXPOSE = 0; foreach (var k in R.ROLE_GUARD.Keys.ToList()) R.ROLE_GUARD[k] = 1; R.ROLE_DUP = 0; }
         public const string HEROES = @"[
  {id:'a', name:'가', role:'탱커', row:'front', hp:1000, atk:100, def:50, crit:0},
  {id:'b', name:'나', role:'서포터', row:'mid', hp:800, atk:80, def:40, crit:0},

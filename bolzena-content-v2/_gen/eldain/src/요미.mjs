@@ -56,7 +56,7 @@ export default hero({
       oracles: [
         { fx: [pick, draw(2)] },
         { fx: [pick, lock] },
-        { tags: ['보존', '소멸'], fx: [pick, { k: 'nextAp', v: 1 }] },
+        { tags: ['보존'], fx: [pick, draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
         { fx: [pick, empower(0.3, { who: 'other' })] },                  // 서포터
         { fx: [pick, draw(1, { who: 'other' })] },                        // 서포터
       ],

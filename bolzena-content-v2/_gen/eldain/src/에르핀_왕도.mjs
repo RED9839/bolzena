@@ -44,7 +44,7 @@ export default hero({
         { tags: WK, fx: [dmg(3.6)] },
         { tags: [...WK, '회수 3'], fx: [dmg(3.2)] },
         { tags: WK, fx: [dmg(1.1, 'allEnemies')] },
-        { cost: 0, tags: [...WK, '소멸'], fx: [dmg(1.4)] },
+        { cost: 1, tags: WK, fx: [dmg(1.4)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
         { tags: WK, fx: [dmg(3.2), { k: 'ifKill' }, dil(1)] },
       ],
       blesses: ['power', 'cost', [dil(1)]],
@@ -57,7 +57,7 @@ export default hero({
         { fx: [{ k: 'gauge', v: 20, target: 'oneAlly' }, draw(1)] },
         { fx: [make(BR, 1, { owner: 'other' }), draw(1)] },
         { fx: [draw(2)] },
-        { tags: ['소멸'], fx: [OT(0.3), { k: 'nextAp', v: 1 }] },
+        { fx: [OT(0.3), draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
       ],
       blesses: ['draw', 'ap', [dil(1)]],
     },
@@ -69,7 +69,7 @@ export default hero({
         { fx: [dmg(1.1), barrage(1.1, 'oneEnemy')] },
         { fx: [dmg(1, 'randomEnemy', { hits: 2 }), barrage(1)] },
         { tags: ['보존'], fx: [dmg(1, 'randomEnemy'), barrage(1)] },   // 10-11 사용자: X 코스트에 회수는 돌아와도 AP 0 이라 무의미 — 보존(AP 많은 턴까지 쥐기)
-        { tags: ['소멸'], fx: [status('면역', 1), barrage(1.2), { k: 'nextAp', v: 1 }] },   // 원작 여왕의 의지
+        { fx: [status('면역', 1), barrage(1.2)] },   // 원작 여왕의 의지
       ],
       blesses: ['power', 'draw', [dil(1)]],
     },

@@ -347,7 +347,7 @@ namespace Bolzena.Core
                 HitTags = CardHitTags(cardId, c), Card = true, Type = c.Type, Chain = ChainNat(PrevNat, nat), Tune = tune,
                 Link = c.Hero != null && last != null && last.Value.Item1 == c.Hero, Prev = last?.Item2,
                 Repeat = repeat, Held = held, PlayedBefore = playedBefore,
-                CardId = cardId, Made = GameData.IsPlain(cardId), Cost = c.X ? paid : c.Cost, Choice = opts.Choice ?? 0, Scale = opts.Scale ?? 1, SpendPick = opts.Spend, Pricier = pricier,
+                CardId = cardId, Made = GameData.IsPlain(cardId), Cost = c.X ? paid : cost0 /* 강인도 — 낼 때의 비용(2026-10-12 사용자 「카드를 낼 때의 비용으로」 · 옛: 적힌 비용) */, Choice = opts.Choice ?? 0, Scale = opts.Scale ?? 1, SpendPick = opts.Spend, Pricier = pricier,
                 ForceCrit = !c.IsStatus && !c.IsCurse && UseCritNext(c.Hero), StagePick = opts.Stage,
                 NthForce = !c.IsStatus && !c.IsCurse && UseNthNext(c.Hero), CostNow = cost0,
                 CritFoe = c.Fx.FirstOrDefault(x => x.K == FxK.CritNext && x.Now && x.FoeStack != null)?.FoeStack,   // 그 표식 적이면 치명(카드 어디에 둬도 처음부터 — 엘다인 4차 요청)

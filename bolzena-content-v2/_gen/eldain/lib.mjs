@@ -12,8 +12,11 @@ export const STATS = {
 const T = (o, x) => Object.assign(o, x || {});
 export const dmg = (ratio, target = 'oneEnemy', x) => T({ k: 'dmg', ratio, target }, x);
 export const ddmg = (ratio, target = 'oneEnemy', x) => T({ k: 'dmg', ratio, base: 'def', target }, x); // 방어 기반
-export const shield = (ratio, x) => T({ k: 'shield', ratio }, x);
-export const heal = (ratio, x) => T({ k: 'heal', ratio }, x);
+// 2026-10-12 사용자 「플레이해 보니 쉴드량 · 힐량이 낮다」 — 실드 · 회복 계수 ×1.2(카드 글 숫자도 같이 오르게 데이터에서 · 10% 단위, 20% 아래는 5% 단위)
+export const GUARD_UP = 1.2;
+const up = (r) => { const v = r * GUARD_UP; return v >= 0.2 ? Math.round(v * 10) / 10 : Math.round(v * 20) / 20; };
+export const shield = (ratio, x) => T({ k: 'shield', ratio: up(ratio) }, x);
+export const heal = (ratio, x) => T({ k: 'heal', ratio: up(ratio) }, x);
 export const stack = (id, v = 1, x) => T({ k: 'stack', id, v }, x);
 export const spend = (id, v, x) => T(v === 'all' ? { k: 'spend', id, all: true } : v === 'pick' ? { k: 'spend', id, pick: true } : { k: 'spend', id, v }, x);
 export const make = (id, v = 1, x) => T({ k: 'make', id, v }, x);

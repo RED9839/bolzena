@@ -60,7 +60,7 @@ export default hero({
         { fx: [crit, dmg(2.4)] },
         { fx: [crit, dmg(1.8), { k: 'perStack', id: W }, dmg(0.3)] },
         { fx: [{ k: 'perStack', id: W, each: true, max: 1 }, dmg(1.1, 'allEnemies')] },
-        { cost: 0, tags: ['소멸'], fx: [{ k: 'ifStack', id: P, n: 1 }, dmg(1.7), { k: 'ifKill' }, { k: 'ap', v: 1 }] },
+        { cost: 1, fx: [{ k: 'ifStack', id: P, n: 1 }, dmg(1.7), { k: 'ifKill' }, { k: 'ap', v: 1 }] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
         { fx: [crit, dmg(1.8), wolf(1)] },
       ],
       blesses: ['power', 'cost', [wolf(1)]],
@@ -73,7 +73,7 @@ export default hero({
         { fx: [{ k: 'spend', id: W, v: 3 }, dmg(2.1, 'oneEnemy', { hits: 3 })] },
         { fx: [{ k: 'perStack', id: W, n: 1 }, dmg(1.8), { k: 'ifKill' }, status('약점 노출', 1, { target: 'lowEnemy' })] },   // 「란과 벗님들」
         { fx: [{ k: 'perStack', id: W, n: 1 }, dmg(1.8), status('약점 노출', 1, { target: 'oneEnemy' })] },
-        { cost: 0, tags: ['소멸'], fx: [{ k: 'perStack', id: W, n: 1 }, dmg(1.1)] },
+        { cost: 1, fx: [{ k: 'perStack', id: W, n: 1 }, dmg(1.1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
       ],
       blesses: ['power', 'cost', [wolf(1)]],
     },

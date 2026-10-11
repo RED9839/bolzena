@@ -52,7 +52,7 @@ export default hero({
         { fx: [chill(1, 'allEnemies'), frost(1, 'allEnemies')] },
         { fx: [chill(1), frost(1), draw(1)] },
         { fx: [{ k: 'rushDown', v: 1, target: 'allEnemies' }, frost(1)] },
-        { tags: ['소멸'], fx: [chill(1), frost(1), { k: 'ap', v: 1 }] },
+        { fx: [chill(1), frost(1), draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
       ],
       blesses: ['draw', 'cost', [frost(1)]],
     },
@@ -76,7 +76,7 @@ export default hero({
         { tags: ['약점 공격'], fx: [dmg(0.6, 'allEnemies'), tough(1, 'allEnemies')] },
         { tags: ['약점 공격'], fx: [dmg(1), tough(2)] },
         { tags: ['약점 공격'], fx: [dmg(1), tough(1), frost(2)] },
-        { cost: 0, tags: ['약점 공격', '소멸'], fx: [dmg(0.8), tough(1)] },
+        { cost: 1, tags: ['약점 공격'], fx: [dmg(0.8), tough(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
       ],
       blesses: ['power', 'cost', [frost(1)]],
     },

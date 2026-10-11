@@ -664,8 +664,9 @@ namespace Bolzena.RunUI
                 {
                     int jj = j;
                     var pb = Btn.Make(pills, kd.Vars[j].Grade, BtnStyle.Ghost, () => { ls.Pick[kd.Key + "|" + n] = jj; Draw(jj); }, Theme.FsCap, "var " + kd.Vars[j].Grade);
-                    pb.Bg.sprite = Theme.Pill; pb.Label.rectTransform.Fill(6, 0, 6, 0);
-                    pb.Pref(kd.Vars[j].Grade.Length > 2 ? 58 : 48, 22);
+                    pb.Bg.sprite = Theme.Pill; pb.Label.rectTransform.Fill(2, 0, 2, 0);
+                    pb.Label.enableAutoSizing = true; pb.Label.fontSizeMin = 9; pb.Label.fontSizeMax = Theme.FsCap; pb.Label.overflowMode = TMPro.TextOverflowModes.Overflow;   // 2026-10-12 「일반」 이 「···」 로 잘렸다
+                    pb.Pref(kd.Vars[j].Grade.Length > 2 ? 66 : 56, 22);
                     pillBtns.Add(pb);
                     Stage.Hot[$"dexvar:{kd.Key}|{n}:{kd.Vars[j].Grade}"] = pb;
                 }

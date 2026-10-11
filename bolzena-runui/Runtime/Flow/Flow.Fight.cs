@@ -396,29 +396,26 @@ namespace Bolzena.RunUI
             }
         }
 
-        // ── 보스 보상 — 가진 고유 카드 셋 가운데 하나를 복제 ──
+        // ── 보스 보상 — 가진 고유 카드 가운데 원하는 하나를 복제 ──
         void BossCopyPick(List<string> ids, Action<string> pick)
         {
             ids = CardOrder.Sort(ids, P.Data, P.S.Party);
             Stage.Show("bosscopy", root =>
             {
                 W.StatusBar(root, this, true, true, false, "층 보스의 몫", "고유 카드 하나를 복제합니다 — 지금 신탁 · 축복 그대로, 그 뒤로는 받을 수 없습니다");
-                float cw = Theme.C(280, 236);
-                var row = Ui.Rect("cards", root).At(0.5f, 0.5f, 0, Theme.C(-10, -6), 1000, cw * 1.4f + 30);
-                Ui.Row(row, 30, TextAnchor.MiddleCenter, null, false, false);
-                int i = 0;
+                // 2026-10-12 사용자 「원하는 사도 카드 복제로」 — 무작위 셋 대신 덱의 파티 사도 고유 카드 전부를 사도별로(수련 화면과 같은 꼴 · 스크롤)
+                float mw = Mathf.Min(1240, Stage.Size.x - 40);
+                var area = Ui.Rect("cards", root).At(0.5f, 0.5f, 0, Theme.C(4, 2), mw, Stage.Size.y - Theme.C(250, 190));
+                var content = Ui.Scroll(area, out _);
                 string chosen = null;
                 Btn go = null;
                 var frames = new List<Image>();
-                foreach (var id in ids)
+                CardGroups(content, ids, 170, GridCols(mw - 80, 170, 12, Theme.Compact ? 3 : 6, 8), (c, id, i) =>
                 {
-                    var holder = Ui.Rect("c" + i, row); holder.Pref(cw, cw * 1.4f + 20);
-                    var card = W.Card(holder, this, id, cw);
-                    card.At(0.5f, 0.5f, 0, 0, cw, cw * 1.4f);
-                    var frame = Ui.Img(holder, Theme.S("frame_thick", 24), Theme.Gold.A(0), "pick");   // 속이 빈 금 테 — 고른 카드를 가리지 않는다
-                    frame.rectTransform.Fill(-8, -8, -8, -8);
+                    var frame = Ui.Img(c, Theme.S("frame_thick", 24), Theme.Gold.A(0), "pick");   // 속이 빈 금 테 — 고른 카드를 가리지 않는다
+                    frame.rectTransform.Fill(-6, -6, -6, -6); frame.raycastTarget = false;
                     frames.Add(frame);
-                    var b = card.gameObject.AddComponent<Btn>();
+                    var b = c.gameObject.AddComponent<Btn>();
                     var me = frame;
                     b.OnClick = () =>
                     {
@@ -429,10 +426,8 @@ namespace Bolzena.RunUI
                     };
                     b.OnHold = () => CardZoom(id, ids);   // 꾹 누르면 카드 상세(고르기는 그냥 누름)
                     Stage.Hot["copy" + i] = b;
-                    Tw.Pop(holder, 0.2f + i * 0.12f, 0.6f, 0.5f);
-                    i++;
-                }
-                var hint = Ui.Text(root, "하나를 고르세요", Theme.FsMd, Theme.Sub, TextAlignmentOptions.Center);
+                });
+                var hint = Ui.Text(root, "복제할 카드를 하나 고르세요", Theme.FsMd, Theme.Sub, TextAlignmentOptions.Center);
                 hint.rectTransform.At(0.5f, 0, 0, Theme.Gutter + 18, 600, 30); hint.Outline(0.2f);
                 go = Btn.Make(root, "카드를 고르세요", BtnStyle.PillGold, () => pick(chosen), Theme.FsLg);
                 go.GetComponent<RectTransform>().At(1, 0, -Theme.Gutter, Theme.Gutter, 320, 66);

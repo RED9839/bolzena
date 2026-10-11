@@ -543,8 +543,12 @@ namespace Bolzena.Core
             return c != null && !GameData.IsCopy(id) && (c.Unique || c.Neutral) && c.Oracles.Count == 5 && !S.Flash.ContainsKey(id) && !Data.View(id).IsTaboo;
         }).ToList();
 
-        /// <summary>휴식 수련(강화) 후보 — 신탁 후보에서 축복만 받은 카드도 뺀다(2026-10-09 사용자). 지금은 축복이 늘 신탁과 함께 붙어 FlashTargets 와 같지만, 옛 저장(축복만 있는 카드)용 안전장치.</summary>
-        public List<string> CampTargets() => FlashTargets().Where(id => !S.Shin.ContainsKey(id)).ToList();
+        /// <summary>휴식 수련(강화) 후보 — 신탁 다섯이 있는 고유 · 교주 카드 전부(복제본 · 금기 빼고). 이미 신탁 · 축복이 붙은 카드도 골라 신탁을 다시 뽑는다(2026-10-12 사용자 「휴식에서는 기존 신탁 · 축복 카드도 리롤」).</summary>
+        public List<string> CampTargets() => S.Deck.Distinct().Where(id =>
+        {
+            var c = Data.Card(id);
+            return c != null && !GameData.IsCopy(id) && (c.Unique || c.Neutral) && c.Oracles.Count == 5 && !Data.View(id).IsTaboo;
+        }).ToList();
 
         /// <summary>이 카드에 쓸모 있는 축복 — 그 카드만의 축복이 있으면 그것들, 없으면 공용 풀에서 쓸모 있는 것.</summary>
         public static List<string> DivineKindsFor(CardView c)
@@ -649,7 +653,7 @@ namespace Bolzena.Core
             if (S.Camp == null || cardId == null || !CampTargets().Contains(cardId)) return null;
             S.Camp.Offers ??= new();
             var o = S.Camp.Offers.Find(x => x.CardId == cardId);
-            if (o == null) { o = OfferOf(cardId); S.Camp.Offers.Add(o); }
+            if (o == null) { o = OfferOf(cardId, S.Flash.TryGetValue(cardId, out var cur) ? cur : 0, S.Flash.ContainsKey(cardId)); S.Camp.Offers.Add(o); }   // 이미 붙은 신탁은 후보에서 뺀다(리롤)
             S.Camp.Train = o;
             return o;
         }
@@ -842,10 +846,14 @@ namespace Bolzena.Core
             var outs = new List<string>();
             while (outs.Count < n && pool.Count > 0)
             {
-                var w = pool.Select(id => weights[Data.Equip(id).Grade]).ToList();
+                // 부위를 먼저 고르게(2026-10-12 사용자 「무기가 많이 뜬다」 — 고급 19개 가운데 무기가 10개라 등급만 굴리면 무기가 몰렸다), 그 부위 안에서 등급 무게대로
+                var slots = pool.Select(id => Data.Equip(id).Slot ?? "").Distinct().OrderBy(x => x, StringComparer.Ordinal).ToList();
+                var slot = slots[RndInt(slots.Count)];
+                var cand = pool.Where(id => (Data.Equip(id).Slot ?? "") == slot).ToList();
+                var w = cand.Select(id => weights[Data.Equip(id).Grade]).ToList();
                 double r = Rnd() * w.Sum(); int i = 0;
                 while (r >= w[i]) r -= w[i++];
-                outs.Add(pool[i]); pool.RemoveAt(i);
+                outs.Add(cand[i]); pool.Remove(cand[i]);
             }
             return outs;
         }
@@ -888,15 +896,14 @@ namespace Bolzena.Core
         }).ToList();
 
         /// <summary>
-        /// 층 보스 보상(1층 보스 뒤 「복제」 단계 — 이벤트의 복제 Pending「dupe」 와 따로) — 덱에 든 파티 사도 고유 카드 가운데 무작위 셋(같은 카드는 한 번, 기본 · 교주 · 상태 · 저주 · 복제본 · 유일 · 금기 빼고).
+        /// 층 보스 보상(1층 보스 뒤 「복제」 단계 — 이벤트의 복제 Pending「dupe」 와 따로) — 덱에 든 파티 사도 고유 카드 전부에서 하나(2026-10-12, 옛: 무작위 셋)(같은 카드는 한 번, 기본 · 교주 · 상태 · 저주 · 복제본 · 유일 · 금기 빼고).
         /// 셋보다 적으면 있는 만큼, 없으면 빈 목록(화면은 이 단계를 건너뛴다). 하나를 고르면 복제본이 한 장 더(BossCopy) — 그때 모습 그대로.
         /// </summary>
         public List<string> BossCopyOffer()
         {
             string at = S.Floor.ToString();
             if (S.CopyOffer != null && S.CopyOffer.At == at) return S.CopyOffer.Ids.ToList();
-            var pool = Copyable(); var ids = new List<string>();
-            while (ids.Count < 3 && pool.Count > 0) { int i = RndInt(pool.Count); ids.Add(pool[i]); pool.RemoveAt(i); }
+            var ids = Copyable();   // 2026-10-12 사용자 「원하는 사도 카드 복제로」 — 무작위 셋 대신 복제할 수 있는 카드 전부에서 고른다
             S.CopyOffer = new CopyOffer { At = at, Ids = ids };
             return ids.ToList();
         }

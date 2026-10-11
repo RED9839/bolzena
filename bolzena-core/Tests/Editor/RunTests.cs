@@ -23,7 +23,7 @@ namespace Bolzena.Core.Tests
         {
             var d = K.Sample();
             int N = Run.MAP_ROWS;
-            Assert.AreEqual(17, N);
+            Assert.AreEqual(R.FLOOR_NODES, N);   // 2026-10-12 한 층 15줄(옛 17)
             for (long seed = 1; seed <= 20; seed++)
                 for (int floor = 0; floor < 2; floor++)
                 {
@@ -210,32 +210,20 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(c.Train.Picks[0], run.S.Flash["sion_u2"]);
         }
 
-        [Test] public void 수련_후보에서_신탁_받은_카드와_축복만_받은_카드는_빠진다()
+        /// <summary>(2026-10-12 사용자 「휴식에서는 기존 신탁 · 축복 카드도 리롤」) 수련 후보에 신탁 · 축복 받은 카드도 들고, 다시 뽑으면 지금 신탁은 후보에서 빠진다.</summary>
+        [Test] public void 수련은_신탁_축복_받은_카드도_골라_다시_뽑는다()
         {
             var run = New();
             run.S.Deck.AddRange(new[] { "sion_u2", "rico_u1", "carrot_u1" });
-            var all = run.CampTargets();
-            CollectionAssert.IsSubsetOf(new[] { "sion_u2", "rico_u1", "carrot_u1" }, all);
             run.S.Flash["sion_u2"] = 1;     // 신탁 받음
-            run.S.Shin["rico_u1"] = "draw"; // 축복만 받음
+            run.S.Shin["rico_u1"] = "draw"; // 축복 받음
             var t = run.CampTargets();
-            CollectionAssert.DoesNotContain(t, "sion_u2");
-            CollectionAssert.DoesNotContain(t, "rico_u1");
-            CollectionAssert.Contains(t, "carrot_u1");
-            CollectionAssert.Contains(run.FlashTargets(), "rico_u1", "전투 · 이벤트 신탁 후보는 축복만 받은 카드를 그대로 둔다");
-            // 같은 카드 두 장 가운데 한 장(id#n)만 신탁 · 축복
-            run.S.Deck.AddRange(new[] { "carrot_u1", "carrot_u1#2" });
-            run.S.Flash["carrot_u1#2"] = 1;
-            CollectionAssert.DoesNotContain(run.CampTargets(), "carrot_u1#2");
-            CollectionAssert.Contains(run.CampTargets(), "carrot_u1");
-            run.S.Shin["carrot_u1"] = "draw";
-            CollectionAssert.DoesNotContain(run.CampTargets(), "carrot_u1");
-            // 캠프 — 후보가 아니면 못 연다 · 처음 제시도 후보 안에서
-            run.S.Map = null; run.S.Floor = 1;
-            var c = run.EnterCamp("camp");
-            Assert.IsTrue(c.Train == null || run.CampTargets().Contains(c.Train.CardId));
-            Assert.IsNull(run.CampOffer("rico_u1"));
-            Assert.IsNull(run.CampOffer("sion_u2"));
+            CollectionAssert.IsSubsetOf(new[] { "sion_u2", "rico_u1", "carrot_u1" }, t);
+            CollectionAssert.DoesNotContain(run.FlashTargets(), "sion_u2", "전투 · 이벤트 신탁 후보는 그대로 — 신탁 받은 카드는 빠진다");
+            run.S.Node = 0; run.EnterCamp("camp");
+            var o = run.CampOffer("sion_u2");
+            Assert.IsNotNull(o);
+            CollectionAssert.DoesNotContain(o.Picks, 1, "지금 붙은 신탁 1 은 다시 뽑기 후보에서 빠진다");
         }
 
         [Test] public void 이벤트_축복을_받으면_신탁도_함께_붙는다()
@@ -250,7 +238,7 @@ namespace Bolzena.Core.Tests
             Assert.IsTrue(run.S.Shin.ContainsKey(target), "축복");
             Assert.IsTrue(run.S.Flash.TryGetValue(target, out var n) && n >= 1 && n <= 5, "신탁도 함께");
             CollectionAssert.DoesNotContain(run.FlashTargets(), target);
-            CollectionAssert.DoesNotContain(run.CampTargets(), target);
+            CollectionAssert.Contains(run.CampTargets(), target, "휴식 수련은 신탁 · 축복 받은 카드도 다시 뽑을 수 있다(2026-10-12)");
             CollectionAssert.DoesNotContain(run.ShinAble(null), target);
             Assert.IsTrue(run.S.Event.Log.Any(x => x.Contains("신탁") && x.Contains("함께")));
         }
@@ -326,7 +314,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(3, run.ViewOf(cid).Cost, "신탁 ②(코스트 3)");
         }
 
-        [Test] public void 보스_복제_후보는_덱의_파티_고유_카드_무작위_셋_같은_카드는_한_번()
+        [Test] public void 보스_복제_후보는_덱의_파티_고유_카드_전부_같은_카드는_한_번()
         {
             var seen = new HashSet<string>();
             for (long seed = 1; seed <= 60; seed++)
@@ -335,8 +323,8 @@ namespace Bolzena.Core.Tests
                 run.S.Deck.AddRange(new[] { "rico_u1", "rico_u1", "rico_u2", "sion_u2", "carrot_u2", "rico_u3", "n_bond@rico" });
                 run.AddCopy("rico_u2");
                 var off = run.BossCopyOffer();
-                Assert.AreEqual(3, off.Count, $"씨앗 {seed}");
-                Assert.AreEqual(3, off.Distinct().Count(), "같은 카드는 한 번");
+                Assert.AreEqual(4, off.Count, $"씨앗 {seed} — 무작위 셋이 아니라 전부(2026-10-12 사용자 「원하는 사도 카드 복제」)");
+                Assert.AreEqual(4, off.Distinct().Count(), "같은 카드는 한 번");
                 foreach (var id in off)
                 {
                     var c = run.Data.Card(id);
@@ -347,11 +335,11 @@ namespace Bolzena.Core.Tests
                     seen.Add(id);
                 }
             }
-            CollectionAssert.AreEquivalent(new[] { "rico_u1", "rico_u2", "sion_u2", "carrot_u2" }, seen, "넷 가운데 무작위 셋");
+            CollectionAssert.AreEquivalent(new[] { "rico_u1", "rico_u2", "sion_u2", "carrot_u2" }, seen, "넷 전부");
 
             var one = New();
             one.S.Deck.Add("sion_u2");
-            CollectionAssert.AreEqual(new[] { "sion_u2" }, one.BossCopyOffer(), "셋보다 적으면 있는 만큼");
+            CollectionAssert.AreEqual(new[] { "sion_u2" }, one.BossCopyOffer(), "하나뿐이면 하나");
             var none = New();
             none.AddCopy("rico_u1");
             Assert.AreEqual(0, none.BossCopyOffer().Count, "고유 카드가 없으면(복제본뿐) 빈 목록 — 화면이 건너뛴다");

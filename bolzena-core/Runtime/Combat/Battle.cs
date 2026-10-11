@@ -315,7 +315,9 @@ namespace Bolzena.Core
             if (elite && !e.Boss && t < R.TOUGH.Elite) t += R.TOUGH.EliteMinion;
             bool big = !summon && (e.Boss || e.Clone != null || e.Id != null && e.Id.EndsWith("_elite", StringComparison.Ordinal));
             double min = big ? R.MIN_TOUGH_BIG : R.MIN_TOUGH_FIGHT;   // 2026-10-10 사용자 — 보스도 5(옛 TOUGH.MinBoss 7 은 쓰지 않는다)
-            return Math.Max(min, t);
+            // 2026-10-12 사용자 「일반이면 3 고정(탱커 컨셉이라고 5 주지 말고) · 엘리트 · 보스만 5」 — 데이터 tough 는 더 쓰지 않는다
+            if (summon || !R.TOUGH_FIXED) return Math.Max(min, t);
+            return e.Boss || e.Clone != null ? R.BOSS_TOUGH : big ? R.ELITE_TOUGH : R.MIN_TOUGH_FIGHT;
         }
 
         /// <summary>

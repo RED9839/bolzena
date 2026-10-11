@@ -122,7 +122,7 @@ namespace Bolzena.RunUI
             var ids = P.Run.CampTargets();
             if (ids.Count == 0) return;
             float mw = Mathf.Min(Theme.Compact ? 1240 : Mathf.Max(1240, 8 * (170 + 12) + 80), Stage.Size.x - 40);
-            var (right, closeM, _) = Stage.ModalBox("trainpick", mw, Mathf.Min(680, Stage.Size.y - 24), "강화할 카드를 고릅니다", "신탁을 붙일 수 있는 카드 — 고르면 신탁 셋이 나옵니다", true, null, 0, false);
+            var (right, closeM, _) = Stage.ModalBox("trainpick", mw, Mathf.Min(680, Stage.Size.y - 24), "강화할 카드를 고릅니다", "신탁을 붙이거나 다시 뽑을 카드 — 고르면 신탁 셋이 나옵니다(이미 붙은 신탁은 빠짐)", true, null, 0, false);
             Ui.Col(right, Theme.Gap, TextAnchor.UpperLeft, new RectOffset(4, 4, 0, 4));
             var area = Ui.Rect("pick", right); area.Pref(-1, 200, -1, 1);
             var content = Ui.Scroll(area, out _);

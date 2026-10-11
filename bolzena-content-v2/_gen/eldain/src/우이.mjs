@@ -17,7 +17,7 @@ export default hero({
   blurb: '행복을 지키려는 영원살이 막내. 넘치게 고친 웃음은 저금통에 모아 두었다가, 깨서 동료가 큰 카드를 낼 수 있게 숨을 돌려 줍니다.',
   keyword: {
     name: K, desc: '넘치는 웃음을 모아 두는 저금통', carrier: 'self', cap: 3,
-    rules: [{ name: '넘치는 웃음', when: { on: 'overheal', who: 'any', once: true }, fx: [S(1)] }],   // 넘치면 저금 +1(AP 쪽은 부탁해 · 장화로)
+    rules: [{ name: '넘치는 웃음', when: { on: 'overheal', who: 'any', once: true, pct: 0.7 }, fx: [S(1)] }],   // 10-12 사용자 「초과 힐이 너무 힘들다」 — 최대 HP 를 넘길 때 → 회복이 HP 70% 를 넘길 때   // 넘치면 저금 +1(AP 쪽은 부탁해 · 장화로)
   },
   // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
   keywords: [{ name: '에루의 우비', desc: '에루가 접어 준 우비 — 턴이 끝날 때마다 파티를 덮어 준다', carrier: 'self', cap: 3, per: [{ stat: 'hot', ratio: 0.15 }] }],   // 10-11 밸런스(서포터 하향 뒤 48.8%) 10→15%
@@ -46,9 +46,9 @@ export default hero({
       name: '우비 접어 주기', cost: 0, type: '스킬',
       fx: [draw(1), stack('에루의 우비', 1), ...brk(1), { k: 'ap', v: 1 }],
       oracles: [
-        { tags: ['소멸'], fx: [draw(2), ...brk(1), { k: 'ap', v: 1 }] },
-        { tags: ['소멸'], fx: [draw(1), ...brk(1), { k: 'nextAp', v: 2 }] },
-        { tags: ['소멸'], fx: [{ k: 'payHpPct', v: 0.05 }, { k: 'ap', v: 1 }] },
+        { cost: 1, fx: [draw(2), ...brk(1), { k: 'ap', v: 1 }] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 — 0코 + AP 는 소멸이어야 해(검사기) 1코로
+        { cost: 1, fx: [draw(1), ...brk(1), { k: 'nextAp', v: 2 }] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 — 1코로
+        { fx: [{ k: 'payHpPct', v: 0.05 }, draw(2)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 — AP 대신 드로우 2
         { tags: ['소멸'], fx: [...brk(2), { k: 'ap', v: 2 }] },
         { fx: [draw(1), ...brk(1), { k: 'gauge', v: 20, target: 'otherAllies' }] },
       ],

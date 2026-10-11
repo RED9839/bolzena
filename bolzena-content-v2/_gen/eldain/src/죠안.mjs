@@ -42,7 +42,7 @@ export default hero({
         { fx: [bread(1, 'strongestAlly'), page(1)] },
         { power: true, fx: [bread(1), power([rule({ on: 'turnStart' }, [bread(1)])])] },
         { fx: [make(CR, 1, { owner: 'other' }), page(1)] },
-        { tags: ['소멸'], fx: [bread(1), { k: 'nextAp', v: 1 }] },
+        { fx: [bread(1), draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
       ],
       blesses: ['draw', 'heal', [page(1)]],
     },
@@ -63,7 +63,7 @@ export default hero({
       fx: [read(1), page(1), { k: 'ifPile', from: 'record', n: 1, not: true }, draw(1)],
       oracles: [
         { fx: [read(1.2), page(1)] },
-        { cost: 0, tags: ['소멸'], fx: [read(0.5), page(1)] },
+        { cost: 1, fx: [read(0.5), page(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
         { fx: [read(0.6), draw(1)] },
         { fx: [read(0.6), page(1), draw(1, { who: 'other' })] },
         { fx: [read(0.6), page(1), inF, draw(2)] },

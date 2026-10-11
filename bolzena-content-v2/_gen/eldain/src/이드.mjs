@@ -74,7 +74,7 @@ export default hero({
         { tags: ['보존'], fx: [{ k: 'spendShield', all: true }, dmg(1, 'allEnemies', { ofEvent: 2 }), ...hold] },
         { tags: ['보존'], fx: [{ k: 'spendShield', half: true }, dmg(1, 'oneEnemy', { ofEvent: 1.5 }), S(1)] },
         { cost: 2, tags: ['천상'], fx: [{ k: 'spendShield', half: true }, dmg(1, 'oneEnemy', { ofEvent: 2 })] },
-        { tags: ['소멸'], fx: [dmg(1, 'oneEnemy', { ofEvent: 1, ofShield: true }), { k: 'nextAp', v: 1 }] },
+        { fx: [dmg(1, 'oneEnemy', { ofEvent: 1, ofShield: true }), draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
       ],
       blesses: ['cost', 'draw', [S(1)]],
     },
