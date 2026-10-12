@@ -23,7 +23,7 @@ namespace Bolzena.Core.Tests
         {
             var d = K.Sample();
             int N = Run.MAP_ROWS;
-            Assert.AreEqual(R.FLOOR_NODES, N);   // 2026-10-12 한 층 15줄(옛 17)
+            Assert.AreEqual(R.FLOOR_NODES, N);   // 한 층 R.FLOOR_NODES 줄(2026-10-12 12줄 — 옛 17 · 15)
             for (long seed = 1; seed <= 20; seed++)
                 for (int floor = 0; floor < 2; floor++)
                 {
@@ -35,8 +35,9 @@ namespace Bolzena.Core.Tests
                     Assert.IsTrue(m.Rows[1].All(n => n.Type == "fight"));
                     Assert.That(m.Rows[1].Count, Is.InRange(2, 4));
                     for (int r = 2; r <= N - 2; r++) Assert.IsTrue(m.Rows[r].Any(n => n.Type == "fight" || n.Type == "elite"));
-                    Assert.IsFalse(m.Rows.Skip(2).Take(4).SelectMany(x => x).Any(n => n.Type == "elite" || n.Type == "camp"), "엘리트 · 휴식은 1-6 부터");
-                    Assert.IsTrue(m.Rows.Skip(1).Take(5).SelectMany(x => x).Where(n => n.Type == "fight").All(n => n.Fight == 0), "1-1 ~ 1-5 는 약한 싸움");
+                    int weak = (int)System.Math.Round((R.FLOOR_NODES - 2) * 0.35, System.MidpointRounding.AwayFromZero);   // 길 칸의 앞 35%(15 칸이면 5 · 12 칸이면 4 — RunMap.OPEN_AT)
+                    Assert.IsFalse(m.Rows.Skip(2).Take(weak - 1).SelectMany(x => x).Any(n => n.Type == "elite" || n.Type == "camp"), $"엘리트 · 휴식은 1-{weak + 1} 부터");
+                    Assert.IsTrue(m.Rows.Skip(1).Take(weak).SelectMany(x => x).Where(n => n.Type == "fight").All(n => n.Fight == 0), $"1-1 ~ 1-{weak} 는 약한 싸움");
                     Assert.IsTrue(m.Rows.Skip(10).Take(N - 11).SelectMany(x => x).Where(n => n.Type == "fight").All(n => n.Fight == 2), "1-10 부터 센 싸움");
                     // 모든 칸이 보스에 닿는다
                     var reach = new HashSet<string> { $"r{N}c0" };
