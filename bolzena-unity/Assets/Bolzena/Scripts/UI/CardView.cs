@@ -341,7 +341,7 @@ namespace Bolzena.UI
             finRim.enabled = finBg.enabled = finIc.enabled = finTx.enabled = on;
             if (!on) return;
             finTx.ForceMeshUpdate();
-            float bw = finTx.preferredWidth + 0.46f, cy = -H / 2 + 0.62f;   // 손패에서 이웃 카드에 덜 가리는 그림 아래쪽
+            float bw = finTx.preferredWidth + 0.46f, cy = -H / 2 - 0.02f;   // 카드 아랫변에 걸친 띠(그림 · 글을 가리지 않게)
             finBg.size = new Vector2(bw, 0.32f);
             finBg.transform.localPosition = new Vector3(0, cy, 0);
             finIc.transform.localPosition = new Vector3(-bw / 2 + 0.19f, cy, 0);
@@ -721,7 +721,9 @@ namespace Bolzena.UI
             {   // 붉은 테는 천천히 숨쉰다(움직임 줄이기 · 저사양이면 멈춤)
                 bool calmF = Bolzena.RunUI.Settings.ReduceMotion || LowSpecFx.On;
                 float fk = calmF ? 0.85f : 0.7f + 0.3f * Mathf.Sin(Time.unscaledTime * 3f);
-                Make.Alpha(finRim, 0.95f * fk * a); Make.Alpha(finBg, 0.97f * a); Make.Alpha(finIc, a); finTx.alpha = a;
+                // 효과 글이 보이면(올림 · 상세) 띠는 걷는다 — 글의 「종극」 낱말이 같은 말을 한다(2026-10-12 사용자)
+                float fb = a * (1 - descA);
+                Make.Alpha(finRim, 0.95f * fk * fb); Make.Alpha(finBg, 0.97f * fb); Make.Alpha(finIc, fb); finTx.alpha = fb;
             }
             if (empRim.enabled)
             {

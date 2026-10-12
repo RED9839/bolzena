@@ -186,6 +186,21 @@ namespace Bolzena.UI
                 float push = 0;
                 if (up >= 0 && i != up) push = (i < up ? -1 : 1) * upPush;
                 float x = off * spacing + push;
+                // 밀린 카드가 손 폭(HalfSpan) 밖 — 고학년 · 턴 종료 단추 뒤 — 로 나가지 않게, 바깥 카드들을 남은 자리에 고르게 좁혀 앉힌다(2026-10-12 사용자: 10장이면 넘어갔다)
+                if (up >= 0 && i != up && upPush > 0)
+                {
+                    float bound = HalfSpan - cw / 2, upX = (up - (m - 1) / 2f) * spacing;
+                    int k = i < up ? up : (m - 1 - up);                  // 그쪽 카드 수
+                    float sign = i < up ? -1 : 1;
+                    float outer = sign * (m - 1) / 2f * spacing;         // 그쪽 맨 끝 자리(밀기 전)
+                    float near = upX + sign * (spacing + upPush);        // 올린 카드 바로 옆이 앉을 자리
+                    if (sign * (outer + sign * upPush) > bound)
+                    {
+                        int j = i < up ? up - 1 - i : i - up - 1;           // 올린 카드에서 몇 번째(0 = 바로 옆)
+                        float edge = sign * bound;
+                        x = k <= 1 || sign * near >= bound ? (sign * near >= bound ? edge : near) : Mathf.Lerp(near, edge, j / (float)(k - 1));
+                    }
+                }
                 float sc = s;
                 float y = Bottom + CardView.H * sc / 2 - off * off * 0.018f;
                 float rot = -off * 1.1f;

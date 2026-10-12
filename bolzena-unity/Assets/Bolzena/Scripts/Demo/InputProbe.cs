@@ -453,7 +453,7 @@ namespace Bolzena.Demo
                         if (byKey) yield return Press(Key.Digit1);
                         else
                         {
-                            var o = opts[0].transform.position;
+                            var o = EpiphanyWindow.PickAt != null ? EpiphanyWindow.PickAt[0] : opts[0].transform.position;   // 고르기는 카드 아래 단추(카드를 누르면 상세)
                             Set(Scr(o), false); yield return Frames(20);
                             yield return Click(o);
                         }

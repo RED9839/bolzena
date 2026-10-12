@@ -220,16 +220,18 @@ namespace Bolzena.RunUI
                     var at = Ui.Text(h, Core.OracleOption.ATTACK_LINE, compact ? 12 : 14, new Color(0.88f, 0.8f, 1f), TextAlignmentOptions.Top);
                     at.rectTransform.At(0.5f, 0, 0, -16, cw * 1.3f, 22); at.enableAutoSizing = true; at.fontSizeMin = 9; at.fontSizeMax = compact ? 12 : 14;
                 }
+                // 카드를 누르면 상세(신탁을 얹은 모습), 고르기는 아래 「고르기」 단추로(2026-10-12 사용자 — 눌러서 상세를 보게)
                 var b = face.gameObject.AddComponent<Btn>();
-                b.OnHold = () => { if (Phase == "choose" && chosen < 0) f.CardZoom(p.CardId); };   // 길게 누르면 카드 상세
-                b.OnClick = () =>
+                b.OnClick = () => { if (Phase == "choose" && chosen < 0) f.CardZoomView(p.CardId, p.View); };
+                var pick = Btn.Make(h, "고르기", BtnStyle.PillGold, () =>
                 {
                     if (Phase != "choose" || chosen >= 0) return;
                     var why = o.Try?.Invoke(idx);
                     if (why != null) { Toast.Show(why); return; }
                     chosen = idx;
-                };
-                st.Hot[o.Hot + i] = b;
+                }, compact ? 16 : 20, "pick");
+                pick.GetComponent<RectTransform>().At(0.5f, 0, 0, p.ToAttack ? (compact ? -64 : -76) : (compact ? -44 : -52), Mathf.Min(cw * 0.78f, compact ? 130 : 170), compact ? 36 : 44);
+                st.Hot[o.Hot + i] = pick;
                 holders.Add(h);
                 homes.Add(new Vector2((i - (n - 1) / 2f) * gap, cy));
                 h.localScale = Vector3.one * 1.1f;

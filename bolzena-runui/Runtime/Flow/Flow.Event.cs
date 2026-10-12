@@ -486,6 +486,15 @@ namespace Bolzena.RunUI
             var t = Ui.Text(bg.transform, text, Theme.FsSm - 1, bad ? Theme.Bad : Theme.Ink, TextAlignmentOptions.MidlineLeft, false, "t");
             t.textWrappingMode = TextWrappingModes.NoWrap; t.overflowMode = TextOverflowModes.Overflow; t.rectTransform.Fill(30, 0, 10, 0);
             float w = t.GetPreferredValues(text).x + 42;
+            // 카드 칩(골칫거리 · 받는 카드) — 누르면 그 카드 상세(2026-10-12 사용자 「이벤트로 얻는 디버프 카드를 미리 보게」). 끝에 작은 ⓘ
+            if (x.Id != null && P.Data.Card(x.Id) != null && (x.K == "curse" || x.K == "gift" || x.K == "unique" || x.K == "neutral"))
+            {
+                var info = Ui.Img(bg.transform, Theme.S("ic_info"), (bad ? Theme.Bad : Theme.Gold).A(0.9f), "info"); info.preserveAspect = true;
+                info.rectTransform.At(1, 0.5f, -10, 0, 15, 15);
+                w += 16;
+                bg.raycastTarget = true;
+                var cb = bg.gameObject.AddComponent<Btn>(); cb.Bg = null; var id = x.Id; cb.OnClick = () => CardZoomPlain(id);
+            }
             bg.Pref(w, 28);
             return (bg.rectTransform, w);
         }

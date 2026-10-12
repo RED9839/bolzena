@@ -276,10 +276,22 @@ namespace Bolzena.Demo
                 Shot("epiphany_after_longpress", 0);
                 yield return Wait(0.3f);
             }
+            // 카드를 누르면 상세 → 아무 데나 눌러 닫고 → 아래 「고르기」(2026-10-12)
+            yield return Tap();
+            yield return Wait(0.5f);
+            Shot("epiphany_zoom", 0);
+            yield return Tap();
+            yield return Wait(0.3f);
+            var pa = EpiphanyWindow.PickAt;
+            if (pa != null && pa.Count > 0) { yield return MoveTo(pa[0], 0.3f); yield return Tap(); }
+        }
+        IEnumerator Tap()
+        {
             PointerInput.SimHeld = true;
             yield return null;
             yield return null;
             PointerInput.SimHeld = false;
+            yield return null;
         }
 
         // 남은 카드 — 낼 수 있는 공격 카드를 첫 적에게, 없으면 스킬, 그것도 없으면 끝

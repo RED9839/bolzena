@@ -21,11 +21,15 @@ namespace Bolzena.RunUI
         bool detailPlain;   // 판 밖(도감 · 사도 상세 · 시작 덱)에서 연 상세는 언제나 기본형 — 판에 남은 신탁이 새지 않게
         public void CardZoom(string id, IList<string> list = null, int index = -1) { detailPlain = false; CardDetail(id, list, index, true); }
         public void CardZoomPlain(string id, IList<string> list = null, int index = -1) { detailPlain = true; CardDetail(id, list, index, true); }
+        /// <summary>정해진 모습(신탁 후보 — 신탁을 얹은 카드)으로 상세를 연다.</summary>
+        public void CardZoomView(string id, Core.CardView view) { detailPlain = false; detailView = view; CardDetail(id, null, -1, true); }
+        Core.CardView detailView;
 
         void CardDetail(string id, IList<string> list, int index, bool fadeIn)
         {
             var size = Stage.Size;
-            var v = detailPlain ? P.Data.View(id) : P.View(id);
+            var given = detailView; detailView = null;   // 한 번만(다음 상세는 늘 지금 덱의 모습)
+            var v = given ?? (detailPlain ? P.Data.View(id) : P.View(id));
             var def = P.Data.Card(id);
             if (list != null && list.Count < 2) list = null;
             if (list != null && (index < 0 || index >= list.Count || list[index] != id)) index = list.IndexOf(id);
@@ -81,7 +85,7 @@ namespace Bolzena.RunUI
             var rule = Ui.Img(ui, Theme.White, Theme.Line, "rule"); rule.rectTransform.Band(1, 1, Theme.Gutter, Theme.Gutter, -topH);
 
             // ── 가운데 큰 카드 ──
-            var card = W.Card(ui, this, id, cw, "zoom", detailPlain ? v : null); card.At(0.5f, 0.5f, 0, midY, cw, ch);
+            var card = W.Card(ui, this, id, cw, "zoom", detailPlain || given != null ? v : null); card.At(0.5f, 0.5f, 0, midY, cw, ch);
             if (fadeIn) Tw.Pop(card, 0.02f, 0.9f, 0.3f);
             float side = (size.x - cw) / 2 - arrowW - 26;   // 카드 한쪽 옆에 남는 폭
             float sideTop = size.y / 2 - topH - 12, sideBot = -size.y / 2 + botH + 8;   // 가운데 칸 위 · 아래(화면 가운데 기준)

@@ -540,6 +540,14 @@ namespace Bolzena
             yield return Present(evs);
             while (!Over)
             {
+                // 종극 — 그 카드로 턴이 끝난다. 코어는 잠그기만 하니 여기서 바로 턴을 넘긴다(손패를 버리고 적 차례).
+                //   전에는 화면이 넘기지 않아 손패가 남은 채 아무것도 못 내고 턴 종료를 눌러야 했다(2026-10-12 사용자)
+                if (Battle is CoreBattle fin && fin.Fight != null && fin.Fight.FinaleLock)
+                {
+                    yield return Clock.WaitU(0.25f);
+                    EnemyTurn = true; yield return EndTurnFlow(); EnemyTurn = false;
+                    continue;
+                }
                 request = null;
                 Hand.Request = null;
                 Hand.Interactive = true;
