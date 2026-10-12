@@ -21,11 +21,10 @@ namespace Bolzena.UI
         public static System.Action<string> OnStage;
         /// <summary>지금 열린 창의 고를 카드들(닫혀 있으면 null) — 입력 재현(InputProbe)이 짚는다.</summary>
         public static List<CardView> Options { get; private set; }
-        /// <summary>후보마다 아래 「고르기」 단추 자리(월드 — 데모 · 입력 재현이 누른다).</summary>
+        /// <summary>후보 카드 자리(월드 — 데모 · 입력 재현이 두 번 누른다).</summary>
         public static List<Vector3> PickAt { get; private set; }
 
         // card — 손에서 뽑아 낸 그 카드(이 창이 끝나면 바뀐 모습으로 돌려준다). demoPick 이 0 이상이면 그것을 고른다(자동 데모)
-        const float PickW = 1.9f, PickH = 0.56f;
         public static IEnumerator Run(Transform parent, CardView card, IReadOnlyList<CardInfo> options, System.Action<int> picked, int demoPick = -1, System.Action openDeck = null)
         {
             var root = Make.Node("Epiphany", parent);
@@ -48,7 +47,7 @@ namespace Bolzena.UI
             var title = Make.Text("title", root, "<color=#ffd76a>신탁 효과</color>를 결정하세요.", new Vector3(0, 3.45f, 0), 0.5f, O + 40, Color.white);
             Make.Outline(title, 0.22f, Color.black);
             // 아래 안내(회색 작은 글) — 길게 누르면 카드 상세. 폰엔 오른쪽 단추가 없어 「(우클릭)」을 뺀다
-            var sub = Make.Text("sub", root, "카드를 누르면 자세히 볼 수 있습니다. 아래 「고르기」로 결정하세요.", new Vector3(0, -4.05f, 0), 0.2f, O + 40, new Color(0.82f, 0.84f, 0.9f));
+            var sub = Make.Text("sub", root, "카드를 누르면 자세히 보고, 한 번 더 누르면 결정합니다.", new Vector3(0, -4.05f, 0), 0.2f, O + 40, new Color(0.82f, 0.84f, 0.9f));
             Make.Outline(sub, 0.3f, Color.black);
             // 제목 아래 가는 금빛 줄 + 가운데 별 하나
             var subBg = Make.Box("titleline", root, Res.UI("band_line"), new Vector3(0, 3.0f, 0), new Vector2(5.2f, 0.03f), O + 40, new Color(1f, 0.84f, 0.45f, 0));
@@ -138,19 +137,9 @@ namespace Bolzena.UI
             var origLb = Make.Text("origlb", root, "지금 카드", new Vector3(origX, -0.15f + CardView.H * origS / 2 + 0.25f, 0), 0.24f, O + 41, new Color(0.82f, 0.84f, 0.9f));
             Make.Outline(origLb, 0.3f, Color.black); origLb.alpha = 0;
             Clock.Run(Clock.Tween(0.25f, t => { if (orig) orig.SetAlpha(0.92f * t); if (origLb) origLb.alpha = t; }, true));
-            // 「고르기」 단추 — 카드 아래(카드를 누르면 상세가 뜨고, 고르기는 이 단추로. 2026-10-12 사용자)
+            // 고르기 — 카드를 한 번 누르면 상세 + 골라짐, 같은 카드를 한 번 더 누르면 결정(2026-10-12 사용자 — 「고르기」 단추는 뺐다)
             var pickAt = new List<Vector3>();
-            var pickBg = new List<SpriteRenderer>(); var pickTx = new List<TextMeshPro>();
-            for (int i = 0; i < options.Count; i++)
-            {
-                var at = new Vector3((i - (options.Count - 1) / 2f) * 3.7f, -CardView.H / 2 * 1.55f - 0.52f, 0);
-                pickAt.Add(at);
-                var bg = Make.Sliced("pick" + i, root, Res.UI("bar_fill_9s"), at, new Vector2(PickW, PickH), O + 40, new Color(0.949f, 0.812f, 0.478f, 0));
-                var tx = Make.Text("picktx" + i, root, "고르기", at + new Vector3(0, -0.01f, 0), 0.26f, O + 41, new Color(0.165f, 0.102f, 0.02f));
-                tx.alpha = 0;
-                pickBg.Add(bg); pickTx.Add(tx);
-            }
-            Clock.Run(Clock.Tween(0.25f, t => { for (int i = 0; i < pickBg.Count; i++) { if (pickBg[i]) Make.Alpha(pickBg[i], t); if (pickTx[i]) pickTx[i].alpha = t; } }, true));
+            for (int i = 0; i < options.Count; i++) pickAt.Add(new Vector3((i - (options.Count - 1) / 2f) * 3.7f, 0f, 0));
             PickAt = pickAt;
             yield return Clock.WaitU(0.3f);
             OnStage?.Invoke("epiphany_window");
@@ -159,7 +148,7 @@ namespace Bolzena.UI
             // 고르기 — 손가락(진짜 · 데모)으로 올려 누른다
             int choice = -1;
             int hover = -1, keyHover = -1, press = -1;
-            bool zoomed = false;
+            bool zoomed = false; int sel = -1;
             float waited = 0;
             while (choice < 0)
             {
@@ -187,30 +176,33 @@ namespace Bolzena.UI
                 if (h != hover)
                 {
                     hover = h;
-                    for (int i = 0; i < opts.Count; i++)
-                    {
-                        opts[i].Hovered = i == h;
-                        opts[i].TargetScale = i == h ? 1.65f : 1.55f;
-                        opts[i].TargetPos = new Vector3((i - (opts.Count - 1) / 2f) * 3.7f, i == h ? 0.1f : 0f, 0);
-                    }
                     if (h >= 0) Sfx.Play("card_hover", 0.4f);
                 }
+                for (int i = 0; i < opts.Count; i++)
+                {   // 올린 카드 · 골라 둔 카드는 조금 크고 높게
+                    bool up = i == hover || i == sel;
+                    opts[i].TargetScale = up ? 1.65f : 1.55f;
+                    opts[i].TargetPos = new Vector3((i - (opts.Count - 1) / 2f) * 3.7f, up ? 0.1f : 0f, 0);
+                }
                 // 카드를 누르면(떼면) 상세(CardZoom) — 다시 아무 데나 누르면 닫힌다. 고르기는 아래 「고르기」 단추 · 숫자 · 엔터. PC 는 우클릭으로도 상세
-                int onPick = -1;
-                for (int i = 0; i < pickAt.Count; i++) if (Mathf.Abs(p.x - pickAt[i].x) < PickW / 2 && Mathf.Abs(p.y - pickAt[i].y) < PickH / 2) onPick = i;
-                for (int i = 0; i < pickBg.Count; i++) if (pickBg[i]) pickBg[i].transform.localScale = Vector3.one * (i == onPick && !zoomed ? 1.06f : 1f);
                 if (PointerInput.Down)
                 {
-                    if (zoomed) { zoomed = false; press = -1; }
-                    else if (onPick >= 0) { choice = onPick; press = -1; }
+                    // 상세가 떠 있으면 닫는다 — 고른 카드를 다시 누른 것이면 결정
+                    if (zoomed) { zoomed = false; if (sel >= 0 && hover == sel) choice = sel; press = -1; }
                     else press = onOrig ? -2 : hover;
                 }
                 if (PointerInput.RightDown && hover >= 0) { press = hover; zoomed = !zoomed; }
                 if (PointerInput.Up)
                 {
-                    if (!zoomed && ((press >= 0 && press == hover) || (press == -2 && onOrig)) && !PointerInput.Moved) { zoomed = true; Sfx.Play("card_hover", 0.5f); }
-                    else press = zoomed ? press : -1;
+                    if (!zoomed && press >= 0 && press == hover && !PointerInput.Moved)
+                    {
+                        if (sel == press) choice = sel;                                   // 고른 카드를 한 번 더 — 결정
+                        else { sel = press; zoomed = true; Sfx.Play("card_hover", 0.5f); }   // 처음 — 상세 + 골라 둠
+                    }
+                    else if (!zoomed && press == -2 && onOrig && !PointerInput.Moved) { zoomed = true; Sfx.Play("card_hover", 0.5f); }
+                    else if (!zoomed) press = -1;
                 }
+                for (int i = 0; i < opts.Count; i++) opts[i].Hovered = i == hover || i == sel;   // 골라 둔 카드는 올린 모습 그대로
                 if (zoomed && press == -2) CardZoom.Show(root, baseInfo, new Vector3(0, 0.25f, 0), 1.7f);
                 else if (zoomed && press >= 0 && press < opts.Count) CardZoom.Show(root, options[press], new Vector3(0, 0.25f, 0), 1.7f);
                 else CardZoom.Hide();
@@ -221,7 +213,6 @@ namespace Bolzena.UI
             }
             Options = null; PickAt = null; live[0] = false;
             if (orig) Object.Destroy(orig.gameObject); if (origLb) Object.Destroy(origLb.gameObject);
-            for (int i = 0; i < pickBg.Count; i++) { if (pickBg[i]) pickBg[i].enabled = false; if (pickTx[i]) pickTx[i].alpha = 0; }
             CardZoom.Hide();
             if (deckBg != null) { deckBg.enabled = false; deckTx.alpha = 0; }
             picked?.Invoke(choice);

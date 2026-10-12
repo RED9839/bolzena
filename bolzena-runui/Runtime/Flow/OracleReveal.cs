@@ -198,7 +198,7 @@ namespace Bolzena.RunUI
             var holders = new List<RectTransform>();
             var homes = new List<Vector2>();
             var labels = new List<CanvasGroup>();
-            int chosen = -1;
+            int chosen = -1, marked = -1;   // marked — 한 번 눌러 골라 둔 후보
             for (int i = 0; i < n; i++)
             {
                 int idx = i;
@@ -231,18 +231,18 @@ namespace Bolzena.RunUI
                     var at = Ui.Text(h, Core.OracleOption.ATTACK_LINE, compact ? 12 : 14, new Color(0.88f, 0.8f, 1f), TextAlignmentOptions.Top);
                     at.rectTransform.At(0.5f, 0, 0, -16, cw * 1.3f, 22); at.enableAutoSizing = true; at.fontSizeMin = 9; at.fontSizeMax = compact ? 12 : 14;
                 }
-                // 카드를 누르면 상세(신탁을 얹은 모습), 고르기는 아래 「고르기」 단추로(2026-10-12 사용자 — 눌러서 상세를 보게)
+                // 한 번 누르면 상세(신탁을 얹은 모습) + 골라 둠, 같은 카드를 한 번 더 누르면 결정(2026-10-12 사용자 — 「고르기」 단추는 뺐다)
                 var b = face.gameObject.AddComponent<Btn>();
-                b.OnClick = () => { if (Phase == "choose" && chosen < 0) f.CardZoomView(p.CardId, p.View); };
-                var pick = Btn.Make(h, "고르기", BtnStyle.PillGold, () =>
+                b.OnClick = () =>
                 {
                     if (Phase != "choose" || chosen >= 0) return;
+                    if (marked != idx && !Demo.Active) { marked = idx; f.CardZoomView(p.CardId, p.View); return; }   // 자동 데모는 한 번에 고른다
                     var why = o.Try?.Invoke(idx);
                     if (why != null) { Toast.Show(why); return; }
                     chosen = idx;
-                }, compact ? 16 : 20, "pick");
-                pick.GetComponent<RectTransform>().At(0.5f, 0, 0, p.ToAttack ? (compact ? -64 : -76) : (compact ? -44 : -52), Mathf.Min(cw * 0.78f, compact ? 130 : 170), compact ? 36 : 44);
-                st.Hot[o.Hot + i] = pick;
+                };
+                b.OnHold = () => { if (Phase == "choose" && chosen < 0) f.CardZoomView(p.CardId, p.View); };
+                st.Hot[o.Hot + i] = b;
                 holders.Add(h);
                 homes.Add(new Vector2((i - (n - 1) / 2f) * gap, cy));
                 h.localScale = Vector3.one * 1.1f;
@@ -278,9 +278,10 @@ namespace Bolzena.RunUI
                 for (int i = 0; i < holders.Count; i++)
                 {
                     if (!holders[i]) continue;
-                    var want = homes[i] + new Vector2(0, i == hover ? 16 : 0);
+                    bool up = i == hover || i == marked;
+                    var want = homes[i] + new Vector2(0, up ? 16 : 0);
                     holders[i].anchoredPosition = Vector2.Lerp(holders[i].anchoredPosition, want, 1 - Mathf.Exp(-14 * Time.unscaledDeltaTime));
-                    float sc = Mathf.Lerp(holders[i].localScale.x, i == hover ? 1.08f : 1f, 1 - Mathf.Exp(-14 * Time.unscaledDeltaTime));
+                    float sc = Mathf.Lerp(holders[i].localScale.x, up ? 1.08f : 1f, 1 - Mathf.Exp(-14 * Time.unscaledDeltaTime));
                     holders[i].localScale = Vector3.one * sc;
                 }
                 yield return null;

@@ -697,7 +697,7 @@ namespace Bolzena.RunUI
                 var fo = P.Run.FlashOptions(p.Offer);
                 OracleReveal.Show(this, new RevealOpts
                 {
-                    Title = "신탁!", Sub = "정보를 확인하려면 카드를 길게 누르세요.", Picks = RevealPick.Of(P.Data, p.Offer.CardId, fo), Cancel = false, Hot = "pending",
+                    Title = "신탁!", Sub = "카드를 누르면 자세히 보고, 한 번 더 누르면 결정합니다.", Picks = RevealPick.Of(P.Data, p.Offer.CardId, fo), Cancel = false, Hot = "pending",
                     Try = i => null,
                     Done = i =>
                     {

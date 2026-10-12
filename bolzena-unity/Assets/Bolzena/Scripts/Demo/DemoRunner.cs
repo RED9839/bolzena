@@ -276,14 +276,11 @@ namespace Bolzena.Demo
                 Shot("epiphany_after_longpress", 0);
                 yield return Wait(0.3f);
             }
-            // 카드를 누르면 상세 → 아무 데나 눌러 닫고 → 아래 「고르기」(2026-10-12)
+            // 카드를 누르면 상세 + 골라 둠 → 같은 카드를 한 번 더 누르면 결정(2026-10-12)
             yield return Tap();
             yield return Wait(0.5f);
             Shot("epiphany_zoom", 0);
             yield return Tap();
-            yield return Wait(0.3f);
-            var pa = EpiphanyWindow.PickAt;
-            if (pa != null && pa.Count > 0) { yield return MoveTo(pa[0], 0.3f); yield return Tap(); }
         }
         IEnumerator Tap()
         {

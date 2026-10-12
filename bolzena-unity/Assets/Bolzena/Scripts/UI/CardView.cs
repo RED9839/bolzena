@@ -56,6 +56,7 @@ namespace Bolzena.UI
         float dim = 1f, descA = 1f;
         float alphaMul = 1f;
         public const float W = 1.9f, H = 2.7f;
+        const float BgFloor = 0.075f;   // 효과 글 판의 아래 끝 — 카드 테 줄(아랫변) 안쪽
         // 그림 창 — 카드 전체(테 안쪽)
         public const float Bd = 0.03f;   // 테두리 두께(양쪽 합) — 2026-10-08 사용자 「너무 두껍다」 0.07 → 0.04
         const float ArtW = W - Bd, ArtH = H - Bd;
@@ -275,7 +276,8 @@ namespace Bolzena.UI
             descText.ForceMeshUpdate();
             float th = string.IsNullOrEmpty(descText.text) ? 0 : Mathf.Min(descText.rectTransform.sizeDelta.y, descText.GetRenderedValues(true).y);
             float bgTop = tags.Length > 0 ? -H / 2 + 0.98f + extra + blessH : descText.transform.localPosition.y + th / 2 + 0.06f;
-            float bgBot = descText.transform.localPosition.y - th / 2 - 0.08f - blessH;
+            // 아래 끝은 카드 테 줄 안쪽까지만(2026-10-12 사용자 — 글이 많은 카드에서 판이 테 줄을 넘어 내려왔다)
+            float bgBot = Mathf.Max(descText.transform.localPosition.y - th / 2 - 0.08f - blessH, -H / 2 + BgFloor);
             descBg.enabled = th > 0 || hasBL;
             blessLineTx.enabled = blessLineIc.enabled = hasBL;
             if (hasBL)

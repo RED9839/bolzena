@@ -505,7 +505,7 @@ namespace Bolzena.RunUI
                         var fo = P.Run.FlashOptions(t.Flash);
                         OracleReveal.Show(this, new RevealOpts
                         {
-                            Title = "특별 수업!", Sub = "신탁 하나를 고릅니다 · 카드를 길게 누르면 자세히", Picks = RevealPick.Of(P.Data, t.Flash.CardId, fo), Cancel = false, Hot = "grade.flash",
+                            Title = "특별 수업!", Sub = "신탁 하나를 고릅니다 · 누르면 자세히, 한 번 더 누르면 결정", Picks = RevealPick.Of(P.Data, t.Flash.CardId, fo), Cancel = false, Hot = "grade.flash",
                             Done = i => { P.Run.TakeFlash(t.Flash.CardId, fo[i].N); P.Save("map"); then?.Invoke(); },
                         });
                     }

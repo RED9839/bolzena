@@ -360,7 +360,7 @@ namespace Bolzena.RunUI
             OracleReveal.Show(this, new RevealOpts
             {
                 Title = card ? "신탁!" : "은총!", Awake = card ? "신탁" : "은총",
-                Sub = $"{who} — 빛났지만 내지 않은 카드 · 하나를 고르세요(닫고 떠나면 사라집니다)",
+                Sub = $"{who} — 빛났지만 내지 않은 카드 · 누르면 자세히, 한 번 더 누르면 결정(닫고 떠나면 사라집니다)",
                 BaseCardId = cardId, Picks = picks, Cancel = true, Hot = "glow.opt",
                 Try = k => { gcs = CardSnap(); return P.ClaimGlow(cardId, g, order[k]); },
                 Done = k =>
