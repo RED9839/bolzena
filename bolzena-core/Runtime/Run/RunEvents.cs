@@ -136,7 +136,6 @@ namespace Bolzena.Core
             if (rm != null && rm.Basic && !S.Deck.Any(IsBasic)) return "뺄 시작 카드가 없습니다";
             if (ops.Any(x => x.K == "dupe") && !S.Deck.Any(DupeOk)) return "복제할 고유 카드가 없습니다";
             if (ops.Any(x => x.K == "gift" && OnlyCard(x.Id) && HasCard(x.Id))) return "유일 — 이미 덱에 있는 카드입니다";
-            if (MindBroken && ops.Any(x => x.K == "remove" || x.K == "dupe" || x.K == "unique" || x.K == "neutral" || x.K == "flash" || x.K == "gift")) return MIND;
             return null;
         }
 
@@ -277,7 +276,7 @@ namespace Bolzena.Core
                     case "gift":
                         if (OnlyCard(o.Id) && HasCard(o.Id)) { E.Log.Add($"「{Data.Card(o.Id).Name}」 — 유일, 이미 덱에 있습니다"); break; }
                         GainCard(o.Id); E.Log.Add($"「{Data.Card(o.Id).Name}」 — 덱에"); break;
-                    case "mindBreak": S.MindBreak = Math.Max(S.MindBreak, Math.Max(1, o.N)); E.Log.Add($"정신 붕괴 — 다음 전투 {Math.Max(1, o.N)}번이 끝날 때까지 카드 얻기 · 신탁 · 제거를 할 수 없습니다"); break;
+                    case "mindBreak": S.MindBreak = Math.Max(S.MindBreak, Math.Max(1, o.N)); E.Log.Add($"유령의 장난 — 다음 전투 {Math.Max(1, o.N)}번 동안 매 턴 손에 「{Data.Card(R.MIND_CARD)?.Name ?? "망령의 속삭임"}」 이 듭니다"); break;
                     case "flag": if (!string.IsNullOrEmpty(o.Id)) S.Flags.Add(o.Id); break;
                     case "scout": S.Scout = true; E.Log.Add("지도 공개 — 다음 이벤트 칸에서 둘 중 하나를 고릅니다"); break;
                     case "shopGift": S.ShopGift = o.Grade; E.Log.Add($"다음 상점에서 {o.Grade} 아티팩트 하나를 공짜로 받습니다"); break;

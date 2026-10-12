@@ -78,21 +78,14 @@ namespace Bolzena.Core.Tests
             m0 = Mag(b);
             b.EndTurn();
             notes.Add($"원플원 ③ 강화 다음 턴: +{Mag(b) - m0} (알바 1 + 강화 1 = 2)");
-            // 대물 저격총 신탁 ③(보존 · 턴 끝에 손에 있으면 마탄 1)
-            b = Start(d, H + "_u3", 3);
-            m0 = Mag(b);
-            b.EndTurn();
-            notes.Add($"대물 ③ 손에 쥐고 턴 끝: +{Mag(b) - m0} (알바 1 + 보존 1 = 2)");
-            // 같은 것 — AP 를 다 쓰고(알바 없음) 턴 끝
-            b = Start(d, H + "_u3", 3);
-            for (int k = 0; k < 6 && b.Ap > 0; k++) { int j = b.Hand.FindIndex(x => GameData.BaseId(x) != H + "_u3" && b.CanPlay(x) == null); if (j < 0) break; b.PlayCard(j, 0); }
-            m0 = Mag(b);
-            bool held = b.Hand.Any(x => GameData.BaseId(x) == H + "_u3");
-            b.EndTurn();
-            notes.Add($"대물 ③ AP 0 · 손에 {(held ? "있음" : "없음")} 턴 끝: +{Mag(b) - m0} (보존 1)");
             // 턴 끝에 만든 마탄은 버려지지 않고 다음 턴 손에 남는다(2026-10-12 — 전에는 손패와 함께 버려졌다)
+            // 2026-10-13 리뉴얼: 대물 ③(턴 끝 마탄)은 무덤 정리 신탁으로 바뀌어 — 알바(AP 를 남기고 턴 끝 마탄 1)로 잰다 · 보존은 사수
+            b = Start(d, H + "_u4", 0);
+            m0 = Mag(b);
+            b.EndTurn();
+            notes.Add($"사수 쥐고 AP 남기고 턴 끝: +{Mag(b) - m0} (알바 1)");
             Assert.GreaterOrEqual(b.Hand.Count(x => GameData.BaseId(x) == B), 1, "턴 끝에 만든 마탄이 다음 턴 손에");
-            Assert.IsTrue(b.Hand.Any(x => GameData.BaseId(x) == H + "_u3"), "보존 카드도 손에");
+            Assert.IsTrue(b.Hand.Any(x => GameData.BaseId(x) == H + "_u4"), "보존 카드(마.탄.의.사.수)도 손에");
             // 패시브 「어.둠.의.구.원.자★」 — 다른 아군이 버리게 하면 1(한 턴 한 번)
             b = Start(d, "클로에_u2", 0, new List<string> { H + "_s3" });
             hi = b.Hand.FindIndex(x => GameData.BaseId(x) == "클로에_u2");
@@ -101,6 +94,36 @@ namespace Bolzena.Core.Tests
             notes.Add($"클로에가 버리게 함: {(r.Ok ? "ok" : r.Why)} +{Mag(b) - m0} (1)");
             UnityEngine.Debug.Log("[SION] " + string.Join(" · ", notes));
             Assert.Pass(string.Join(" · ", notes));
+        }
+
+        /// <summary>(2026-10-13 사용자) 마탄은 손에 9장까지 — 넘게 만들면 손에 들지 않고 그 자리에서 탄환으로 쏜다.</summary>
+        [Test] public void 시온_마탄_손에_9장까지()
+        {
+            var d = Data();
+            Assert.AreEqual(9, d.Card(B).HandMax, "마탄 handMax 9");
+            var b = Battle.Start(d, new BattleSetup { Party = new List<string> { H, "클로에" }, Enemies = new List<string> { d.Enemies.Keys.First() }, Deck = d.Hero(H).Starter.ToList(), Gauge = 300, Seed = 7, EnemyHp = 50 });
+            b.Hand.Clear();
+            for (int k = 0; k < 9; k++) b.Hand.Add(B + GameData.PLAIN);
+            Assert.IsTrue(b.UseUlt(H).Ok);   // 고학년 — 마탄 2장
+            Assert.AreEqual(9, b.Hand.Count(x => GameData.BaseId(x) == B), "손의 마탄은 9장 그대로");
+            Assert.IsTrue(b.Log.Any(l => l.Contains("바로 쏜다")), "넘친 마탄은 바로 쏜다");
+        }
+
+        /// <summary>(2026-10-13 사용자 — 카제나식 탄환) 손에 남은 탄환은 턴 끝에 버려지며 쏘고, 내면(사용) 소멸한다(「소멸」 태그 없이).</summary>
+        [Test] public void 탄환_턴끝_발사_사용하면_소멸()
+        {
+            var d = Data();
+            Assert.IsFalse(d.Card(B).Tags.Contains("소멸"), "마탄 태그는 탄환만");
+            var b = Battle.Start(d, new BattleSetup { Party = new List<string> { H, "클로에" }, Enemies = new List<string> { d.Enemies.Keys.First() }, Deck = d.Hero(H).Starter.ToList(), Seed = 7, EnemyHp = 50 });
+            b.Hand.Clear();
+            b.Hand.Add(B + GameData.PLAIN); b.Hand.Add(B + GameData.PLAIN);
+            int n0 = b.Log.Count(l => l.Contains("탄환!"));
+            var r = b.PlayCard(0, 0);
+            Assert.IsTrue(r.Ok, r.Why);
+            Assert.IsTrue(b.Gone.Any(x => GameData.BaseId(x) == B) || b.Log.Any(l => l.Contains("마탄") && l.Contains("소멸")), "낸 마탄은 소멸");
+            Assert.IsFalse(b.Discard.Any(x => GameData.BaseId(x) == B), "낸 마탄은 버린 더미로 가지 않는다");
+            b.EndTurn();
+            Assert.Greater(b.Log.Count(l => l.Contains("탄환!")), n0, "턴 끝에 손에 남은 마탄이 버려지며 쏜다");
         }
     }
 }

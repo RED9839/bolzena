@@ -137,6 +137,7 @@ namespace Bolzena.RunUI
                 var legal = Ui.Text(legalBox, $"<color={Theme.GoldTag}>비공식 팬 게임 · 비영리</color> — 트릭컬 리바이브의 그림 · 음성 · 설정의 저작권은 EPID Games 에 있습니다. 공식과 무관하며, 권리자의 요청이 있으면 즉시 내립니다.", Theme.FsCap - 1, Theme.Sub, TextAlignmentOptions.MidlineLeft);
                 legal.rectTransform.Fill(16, 6, 14, 6); legal.textWrappingMode = TextWrappingModes.Normal;
                 legal.enableAutoSizing = true; legal.fontSizeMin = 10; legal.fontSizeMax = Theme.FsCap - 1;
+                LobbyVersion(root);   // 오른쪽 위 — 버전 · 업데이트 내용(Flow.PatchNotes.cs)
             });
         }
 

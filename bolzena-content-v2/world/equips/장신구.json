@@ -180,17 +180,20 @@
         {
           "name": "과즙 코팅",
           "when": {
-            "on": "turnStart"
+            "on": "overheal",
+            "who": "any"
           },
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.2
+              "ratio": 1,
+              "ofEvent": 0.6,
+              "fixed": true
             }
           ]
         }
       ],
-      "blurb": "화산섬 과일을 짠 주스. 몸을 감싼 막이 날마다 새로 돋습니다."
+      "blurb": "넘치게 마셔도 버릴 게 없는 주스. 차고 넘친 기운이 끈적한 막으로 남습니다."
     },
     {
       "id": "eq_battery",
@@ -258,18 +261,19 @@
         {
           "name": "펼쳐 둔 장",
           "when": {
-            "on": "fightStart"
+            "on": "make",
+            "who": "any"
           },
           "fx": [
             {
-              "k": "status",
-              "id": "다음 턴 드로우",
-              "v": 1
+              "k": "empower",
+              "ratio": 0.2,
+              "who": "any"
             }
           ]
         }
       ],
-      "blurb": "전투 전에 다음 주문이 적힌 장을 펼쳐 둡니다."
+      "blurb": "펼쳐 두면 새 장이 저절로 채워지는 마법서. 새로 생긴 카드에 힘을 실어 줍니다."
     },
     {
       "id": "eq_goldcrown",
@@ -308,19 +312,19 @@
         {
           "name": "급소 복습",
           "when": {
-            "on": "fightStart"
+            "on": "break"
           },
           "fx": [
             {
               "k": "status",
               "id": "약점 노출",
-              "v": 1,
-              "target": "randomEnemy"
+              "v": 2,
+              "target": "oneEnemy"
             }
           ]
         }
       ],
-      "blurb": "급소 그림이 가득한 지침서. 첫 차례에는 어디를 쳐야 할지 다 압니다."
+      "blurb": "급소 그림이 가득한 지침서. 한 번 무너뜨린 적은 어디를 쳐야 할지 다 압니다."
     },
     {
       "id": "eq_healpendant",
@@ -340,7 +344,7 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.4
+              "ratio": 0.2
             }
           ]
         }
@@ -463,23 +467,18 @@
         {
           "name": "겹쳐 박은 다이아",
           "when": {
-            "on": "play",
-            "tag": "결속",
-            "who": "any"
+            "on": "keepAp",
+            "kind": "keep"
           },
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.8
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "ratio": 0.6
             }
           ]
         }
       ],
-      "blurb": "다이아 조각을 겹겹이 박은 팔찌. 조각이 겹친 카드를 낼 때마다 반짝 막이 섭니다."
+      "blurb": "단단히 쥐고 있을수록 빛나는 팔찌. 손에 남겨 둔 카드만큼 막이 됩니다."
     },
     {
       "id": "eq_greedring",
@@ -519,24 +518,17 @@
         {
           "name": "마지막 장면",
           "when": {
-            "on": "play",
-            "tag": "종극",
-            "who": "any"
+            "on": "kill"
           },
           "fx": [
             {
               "k": "heal",
-              "ratio": 0.6
-            },
-            {
-              "k": "status",
-              "id": "다음 턴 드로우",
-              "v": 1
+              "ratio": 0.3
             }
           ]
         }
       ],
-      "blurb": "멋진 장면을 넣어 둘 액자. 하루를 마치는 장면에서 모두 기운을 차립니다."
+      "blurb": "적이 쓰러지는 장면을 담는 액자. 한 장 걸릴 때마다 모두 숨을 돌립니다."
     },
     {
       "id": "eq_cutletpin",
@@ -551,23 +543,19 @@
         {
           "name": "배꼽시계",
           "when": {
-            "on": "play",
-            "tag": "주도",
-            "who": "any"
+            "on": "keepAp",
+            "kind": "ap"
           },
           "fx": [
             {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "nextCheaper",
+              "k": "status",
+              "id": "다음 턴 드로우",
               "v": 1
             }
           ]
         }
       ],
-      "blurb": "보기만 해도 배고파지는 머리핀. 먼저 달려드는 손에 한 장이 더 붙고, 다음 손이 가벼워집니다."
+      "blurb": "배꼽시계가 울리면 손을 멈추고 쉽니다. 아껴 둔 만큼 다음 손이 넉넉합니다."
     },
     {
       "id": "eq_thimble",

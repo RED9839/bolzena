@@ -445,6 +445,14 @@ namespace Bolzena.Core
             double q = x / unit;
             return Math.Abs(q - Math.Round(q)) > 1e-6 ? $"{Math.Round(x, 2)}%" : null;
         }
+        /// <summary>(2026-10-12 밤 비비 「수은 중독」 1겹당 +8% · 5겹 +40%) 1개당 10% 미만 값은 1% 단위도 된다 — 최대 겹을 다 채운 값이 10% 단위면.</summary>
+        static bool CapGrid(double v, int? cap)
+        {
+            double x = Math.Abs(v) * 100;
+            if (x < 1e-9 || x >= 10 - 1e-9 || cap == null || cap < 2 || Math.Abs(x - Math.Round(x)) > 1e-6) return false;
+            double t = x * cap.Value / 10;
+            return Math.Abs(t - Math.Round(t)) < 1e-6;
+        }
 
         void PctCheck(string at, IEnumerable<Fx> fx)
         {
@@ -556,7 +564,7 @@ namespace Bolzena.Core
                 var rules = h.Passives.Select(r => ("패시브", r)).Concat(h.AllKeywords.SelectMany(k => k.Rules.Select(r => ("고유 능력", r))))
                     .Concat((h.Forms ?? new List<FormDef>()).SelectMany(fm => (fm.Passives ?? new List<PassiveRule>()).Select(r => ("변신 " + fm.Id, r)))).ToList();
                 foreach (var (w, r) in rules) PctCheck($"{at} {w} {r.Name}", r.Fx);
-                foreach (var k in h.AllKeywords) foreach (var pp in k.Per.Where(x => x.Stat != "ultCost")) { var b = PctOff(pp.V) ?? PctOff(pp.Ratio); if (b != null) E($"{at} 「{k.Name}」 1개당: % 는 10% 단위(20% 미만은 5%) — {b}"); }
+                foreach (var k in h.AllKeywords) foreach (var pp in k.Per.Where(x => x.Stat != "ultCost")) { var b = (CapGrid(pp.V, k.Cap) ? null : PctOff(pp.V)) ?? PctOff(pp.Ratio); if (b != null) E($"{at} 「{k.Name}」 1개당: % 는 10% 단위(20% 미만은 5%) — {b}"); }
                 foreach (var fm in h.Forms ?? new List<FormDef>())
                 {
                     foreach (var kv in fm.Mods ?? new Dictionary<string, double>()) { var b = PctOff(kv.Value); if (b != null) E($"{at} 변신 {fm.Id} mods {kv.Key}: % 는 10% 단위 — {b}"); }
@@ -732,7 +740,7 @@ namespace Bolzena.Core
                     if (p.Stat == "ultCost" && p.V >= 0) W($"{at}: per stat ultCost 는 보통 음수(1개당 고학년 요구 게이지 -비율)");
                 }
                 if (k.Reserve && !k.Decays) W($"{at}: 예약 키워드는 「적의 차례가 끝나면 N 감소」 와 같이 쓴다");
-                if (k.Burn != null && (k.Carrier != "hero" || k.Burn.On != "play" || k.Burn.Shield < 0 || k.Burn.Heal < 0)) E($"{at}: 「{k.Name}」 burn 은 아군 표시(carrier hero)에 on play · shield · heal 0 이상");
+                if (k.Burn != null && ((k.Carrier != "hero" && k.Carrier != "self") || k.Burn.On != "play" || k.Burn.Shield < 0 || k.Burn.Heal < 0)) E($"{at}: 「{k.Name}」 burn 은 아군 표시(carrier hero) · 주인이 쥔 파티 촛불(carrier self)에 on play · shield · heal 0 이상");
                 if (k.HuntCarry != null && (k.HuntCarry != "lowEnemy" || !k.Hunt || k.Carrier != "enemy")) E($"{at}: 「{k.Name}」 huntCarry 는 적 사냥감(hunt · carrier enemy)에 lowEnemy");
                 if (k.Hunt && k.Carrier != "enemy" && k.Carrier != "hero") E($"{at}: 찍기(hunt)는 적에게 거는 표식(carrier enemy) · 아군 표시(carrier hero)에만");
                 if (k.Per.Where(p => p.Stat != "dot" && p.Stat != "hot" && p.Stat != "ultCost").Any(p => Math.Abs(p.V) * (k.Cap ?? 1) > (k.Consumes ? 1.0 : 0.6) + 1e-9))
@@ -920,6 +928,7 @@ namespace Bolzena.Core
             if (c.Becomes != null && d.Card(c.Becomes) == null) E($"{at}: becomes(금기 카드)가 없다 — {c.Becomes}");
             if (c.Tags.Contains(Tag.SealedTaboo) && c.Becomes == null) E($"{at}: 봉인된 금기는 becomes(보스를 처치하면 바뀔 금기 카드)가 있어야 한다");
             if (c.PayRate < 0) E($"{at}: payRate 는 1 이상");
+            if (c.HandMax < 0) E($"{at}: handMax(손 최대 장수)는 0 이상");
             if (c.PayWith != null && (c.Hero == null || !d.Hero(c.Hero)?.AllKeywords.Any(k => k.Name == c.PayWith && (k.Carrier ?? "self") == "self") == true)) E($"{at}: payWith 는 그 사도의 고유 효과(carrier self) 이름 — 「{c.PayWith}」");
             if (c.Choices != null && c.Choices.Count != 2) E($"{at}: choices 는 갈래 이름 둘");
             if (c.Choices != null && !c.Fx.Any(f => f.K == FxK.IfChoice)) W($"{at}: choices 가 있는데 효과에 ifChoice 가 없다");

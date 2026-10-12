@@ -523,8 +523,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(0, b.CostOf("clockbig"));
             double t0 = K.E(b).Tough; K.Play(b, "clockbig");
             double lost = t0 - K.E(b).Tough;
-            Assert.LessOrEqual(lost, R.ToughDmg(0, true, false) + 1e-9, "0코로 냈으니 0코 몫(적힌 4코 몫이 아니다)");
-            Assert.Greater(lost, 0);
+            Assert.LessOrEqual(lost, R.ToughDmg(0, true, false) + 1e-9, "0코로 냈으니 0코 몫(적힌 4코 몫이 아니다)");   // 2026-10-12 밤 — 비약점 0코는 0 이라 0 도 맞다
         }
 
         [Test] public void 시간_낼_때의_비용으로_계기_paidMax()
@@ -582,7 +581,7 @@ namespace Bolzena.Core.Tests
             double t0 = K.E(b).Tough; K.Hand(b, "snowT"); K.Play(b, "snowT");
             double lost = t0 - K.E(b).Tough;
             Assert.GreaterOrEqual(lost, 2.0, "만년설 4 × 0.5"); Assert.LessOrEqual(lost, 2.0 + R.TOUGH.Zero + 1e-9, "그 위는 카드 자체의 강인도 몫뿐");
-            StringAssert.Contains("「만년설」 1개당 강인도 피해 0.5", new CardText(d).Card(d.View("snowT")));
+            StringAssert.Contains("「만년설」 1당 강인도 피해 0.5", new CardText(d).Card(d.View("snowT")));
             Assert.IsFalse(Validator.Check(d).Errors.Any(e => e.Contains("1개당")), string.Join(" | ", Validator.Check(d).Errors));
         }
 

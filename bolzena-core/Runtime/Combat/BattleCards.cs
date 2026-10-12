@@ -412,8 +412,9 @@ namespace Bolzena.Core
             // 강화 카드 · 소멸 · 소멸 N · 회수
             bool exhausted = false;
             int useN = c.TagN(Tag.Exhaust);   // 「소멸 2」 → 2 · 「소멸」 → 0 · 없음 → -1
+            if (useN < 0 && c.HasTag(Tag.Bullet)) useN = 0;   // 탄환 — 사용하면 소멸(키워드 규칙, 2026-10-13 사용자)
             bool exhaustN = useN > 0;
-            bool spent = (c.IsPower || (c.Type == "강화" && Data.Card(cardId).Tags.Contains(Tag.Exhaust))) && !exhaustN;
+            bool spent = c.Type == "강화" && !exhaustN;   // 강화는 주인 없는 교주 카드 · 신탁으로 강화가 된 카드도 — 다시 손에 오면 겹이 끝없이 쌓였다(자기 계발 0코 신탁, 2026-10-12)
             if (spent) Say($"강화 카드 「{c.Name}」 — 이 전투에서 사라진다");
             if (!mute) KwConsume(owner, c);
             if (exhaustN) UseCount[cardId] = (UseCount.TryGetValue(cardId, out var uc) ? uc : 0) + 1;

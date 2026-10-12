@@ -21,47 +21,47 @@ export default hero({
     rules: [{ name: '맞춤 가봉', when: { on: 'play', who: 'any', tag: T }, fx: [S(1)] }],
   },
   // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
-  keywords: [{ name: '바느질', desc: '꿰맬수록 단단해지는 재단사의 솜씨 — 받는 피해가 줄어든다', carrier: 'self', cap: 4, per: [{ stat: 'taken', v: -0.05 }] }],
+  keywords: [{ name: '바느질', desc: '꿰맬수록 단단해지는 재단사의 솜씨', carrier: 'self', cap: 3, per: [{ stat: 'taken', v: -0.1, who: 'allies' }] }],   // 10-13 사용자 「어차피 체력 공유잖아」 — 파티가 받는 피해(다른 사도의 피해 감소와 더해짐) · 10-12 탱커 손질(뎀감 정체성) 1개당 5→10% · 최대 4→3(-20% → -30%)
   // 사용자 10-11: 20명 모두 고유 능력 2개
   passives: [
-    { name: '인형의 의지', when: { on: 'turnStart' }, conds: [{ c: 'stack', id: K, n: 2 }], fx: [status('피해 감소', 1)] },   // 세바스티안이 2 이상이면 매 턴 피해 감소 1(뎀감 정체성)
+    { name: '인형의 의지', when: { on: 'turnStart' }, conds: [{ c: 'stack', id: K, n: 1 }], fx: [status('피해 감소', 1)] },   // 10-12 밤 실드 덧붙임은 봇 측정에서 너무 세 뺐다 · 세바스티안이 있으면 매 턴 피해 감소 1(뎀감 정체성) — // 10-12 탱커 손질 2 이상 → 1 이상
   ],
-  ult: { name: 'F/W 클로에록', cost: 300, fx: [ddmg(1.2, 'allEnemies'), S(3), status('피해 감소', 2)] },
+  ult: { name: 'F/W 클로에록', cost: 250, fx: [ddmg(1.2, 'allEnemies'), S(5), status('피해 감소', 4), status('약화', 1, { target: 'allEnemies' })] },   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 세바스티안 3→5 · 피해 감소 2→4 · 적 전체 약화 1   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로
 }, {
   basicNames: ['곰 인형 휘두르기', '곰 인형 찌르기', '재단사의 자세'], deck: 'light',
   uniques: [
     { // 시동
       name: '메리 고 라운드', cost: 1, type: '스킬',
-      fx: [status('피해 감소', 1), S(2)],   // 클로에 = 피해 감소(사용자 10-11 — 실드 정체성은 이드)
+      fx: [status('피해 감소', 2), S(2)],   // 10-12 탱커 손질 피해 감소 1→2 · 클로에 = 피해 감소(사용자 10-11 — 실드 정체성은 이드)
       oracles: [
-        { fx: [status('피해 감소', 1), S(3)] },
-        { fx: [S(2), empower(0.5)] },
-        { power: true, fx: [S(1), power([rule({ on: 'turnStart' }, [S(1)])])] },
-        { fx: [S(1), suit(1)] },
-        { cost: 2, fx: [status('피해 감소', 2), S(3)] },
+        { fx: [status('피해 감소', 2), S(3)] },
+        { fx: [status('피해 감소', 1), S(2), empower(0.5)] },   // 10-12 본판 피해 감소 2 에 맞춰 신탁에도
+        { power: true, fx: [status('피해 감소', 1), S(1), power([rule({ on: 'turnStart' }, [S(1)])])] },
+        { fx: [status('피해 감소', 2), S(1), suit(1)] },   // 10-13 신탁 점검: 피해 감소 1→2
+        { cost: 2, fx: [status('피해 감소', 4), S(4), draw(1)] },   // 10-13 신탁 점검: 세바스티안 4 · 드로우 1
       ],
       blesses: ['guard', 'draw', [S(1)]],
     },
     {
       name: '찢긴 곳 꿰매기', cost: 0, type: '스킬',
-      fx: [discard(1), S(1), stack('바느질', 1)],
+      fx: [discard(1), stack('바느질', 1), suit(1, 'self')],   // 10-12 밤: 「맞춤옷」 이 더 자주(꿰맬 때마다 한 벌) — 옛 세바스티안 +1 은 입으면(맞춤 가봉) 들어온다
       oracles: [
-        { fx: [discard(1), S(2)] },
-        { fx: [discard(1, { who: 'other' }), S(2)] },
-        { fx: [empower(0.5), S(1)] },
-        { cost: 1, fx: [discard(2), S(2), draw(1)] },
-        { fx: [{ k: 'pull', from: 'draw', n: 1, who: 'other' }, S(1)] },
+        { fx: [discard(1), S(2), suit(1, 'self')] },   // 10-13 신탁 점검: 10-12 밤 본판의 맞춤옷(자신)을 신탁에도
+        { fx: [discard(1, { who: 'other' }), S(2), suit(1, 'self')] },
+        { fx: [shield(1), S(1), suit(1, 'self')] },   // 10-12 밤: 다음 카드 +50% → 실드
+        { cost: 0, fx: [discard(2), S(2), draw(1)] },   // 10-13 신탁 점검: 비용 1 → 0
+        { fx: [{ k: 'pull', from: 'draw', n: 1, who: 'other' }, S(2)] },   // 10-13 신탁 점검 3차: 세바스티안 2
       ],
       blesses: ['draw', 'ap', [S(1)]],
     },
     {
       name: '세바스티안, 공격!', cost: 1, type: '공격',
-      fx: [ddmg(1.2), order(0.7)],
+      fx: [ddmg(1.2), order(0.7), shield(0.3)],   // 10-12 밤 사용자 「클로에 쉴드 생성할 수 있는 거 더」 — 명령하며 실드(규칙 2개 한도라 카드에)
       oracles: [
-        { fx: [ddmg(0.8), order(0.6)] },
-        { fx: [ddmg(0.8), order(0.2, 'allEnemies')] },
+        { fx: [ddmg(1.2), order(0.7), shield(0.3)] },   // 10-13 신탁 점검: 실드를 잃고 약하던 신탁 — 본판 꼴로(같은 꼴이라 피해 ×1.3)
+        { fx: [ddmg(0.8), order(0.3, 'allEnemies'), shield(0.3)] },   // 10-13 신탁 점검
         { fx: [order(0.4), suit(1)] },
-        { cost: 0, fx: [{ k: 'ifStack', id: K, n: 3 }, order(0.4)] },
+        { cost: 0, fx: [{ k: 'ifStack', id: K, n: 3 }, order(0.6)] },   // 10-13 신탁 점검
         { fx: [order(0.4), S(1)] },
       ],
       blesses: ['power', 'cost', [S(1)]],
@@ -71,10 +71,10 @@ export default hero({
       fx: [spend(K, 'pick'), { k: 'perEvent', n: 1 }, suit(1), draw(1)],
       oracles: [
         { power: true, fx: [suit(1), power([rule({ on: 'turnStart' }, [suit(1)])])] },
-        { fx: [spend(K, 'pick'), pickDress(), draw(1)] },   // 옛 「맞춤 의상」(동료 카드에 탐구심 · 보존)은 이 갈래로
+        { fx: [spend(K, 'pick'), pickDress(), draw(2)] },   // 옛 「맞춤 의상」(동료 카드에 탐구심 · 보존)은 이 갈래로
         { fx: [spend(K, 'pick'), { k: 'perEvent', n: 1 }, suit(1, 'self'), draw(1)] },
-        { cost: 1, fx: [spend(K, 'pick'), pickDress()] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
-        { fx: [spend(K, 'pick'), { k: 'cardStatus', id: '비용', v: -1, to: 'hand', who: 'other', pick: true }] },
+        { cost: 0, fx: [spend(K, 'pick'), pickDress()] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 · 10-13 신탁 점검: 같은 비용에 약하기만 해 비용 0
+        { fx: [spend(K, 'pick'), { k: 'cardStatus', id: '비용', v: -1, to: 'hand', who: 'other', pick: true }, draw(1)] },   // 10-13 신탁 점검: 드로우 되살림
       ],
       blesses: ['cost', 'draw', [S(1)]],
     },
@@ -92,6 +92,6 @@ export default hero({
     },
   ],
   tokens: [
-    { id: T, name: '맞춤옷', cost: 0, type: '스킬', tags: ['소멸'], fx: [shield(0.6)], blurb: '클로에가 치수를 재어 지어 준 옷' },
+    { id: T, name: '맞춤옷', cost: 0, type: '스킬', tags: ['소멸'], fx: [shield(0.8)], blurb: '클로에가 치수를 재어 지어 준 옷' },   // 10-12 탱커 손질 실드 60→80%
   ],
 });

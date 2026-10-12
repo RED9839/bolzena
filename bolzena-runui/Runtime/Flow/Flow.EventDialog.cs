@@ -64,6 +64,22 @@ namespace Bolzena.RunUI
                 cur.Append(ch);
             }
             Narr(cur.ToString());
+            return Merge(outs);
+        }
+
+        /// <summary>한 장에 묶는 글자 수 상한 — 서술 · 같은 사람 대사가 잇달면 이만큼까지 한 장에(2026-10-13 사용자 「이벤트 글이 많아 여러 번 눌러야 한다」).</summary>
+        public const int EV_LINE_MAX = 120;
+
+        /// <summary>잇단 서술끼리 · 같은 사람 대사끼리 한 장으로 묶는다(상한 EV_LINE_MAX 자). 말하는 이가 바뀌면 새 장.</summary>
+        static List<EvLine> Merge(List<EvLine> src)
+        {
+            var outs = new List<EvLine>();
+            foreach (var l in src)
+            {
+                var prev = outs.Count > 0 ? outs[outs.Count - 1] : null;
+                if (prev != null && prev.Who == l.Who && prev.Text.Length + 1 + l.Text.Length <= EV_LINE_MAX) prev.Text += " " + l.Text;
+                else outs.Add(new EvLine { Who = l.Who, Text = l.Text });
+            }
             return outs;
         }
 
@@ -92,6 +108,8 @@ namespace Bolzena.RunUI
                 // 맥락 — scene 의 마지막 서술 한 줄을 선택지 위에 작게(선택지 왼쪽 시작선)
                 var sceneLines = EventLines(evd.Scene, speaker, party);
                 var last = sceneLines.LastOrDefault(l => l.Who == null) ?? sceneLines.LastOrDefault();
+                if (last != null && last.Who == null)   // 장으로 묶인 서술이면 맨 끝 문장만(선택지 위 맥락 한 줄)
+                    last = new EvLine { Text = Regex.Split(last.Text, @"(?<=[.!?…。])\s+").Last(s => !string.IsNullOrWhiteSpace(s)).Trim() };
                 if (last != null)
                 {
                     var size = Stage.Size;

@@ -14,22 +14,20 @@
       "blurb": "요정 왕국의 여왕이 된 에르핀. 남은 왕마력을 마력 난타로 모두 쏟아붓고, 적이 쓰러질 때마다 한 발 더 — 부지런한 여왕은 쓰러뜨린 만큼 숨을 돌립니다.",
       "keyword": {
         "name": "축복의 왕관",
-        "desc": "여왕이 씌워 준 왕관 — 쓴 동료의 공격력이 오른다",
-        "carrier": "hero",
-        "cap": 1,
-        "hunt": true,
+        "desc": "여왕이 쓴 축복의 왕관",
+        "carrier": "self",
+        "cap": 3,
         "per": [
           {
             "stat": "atk",
-            "v": 0.1,
-            "who": "holder"
+            "v": 0.1
           }
         ]
       },
       "keywords": [
         {
           "name": "왕마력",
-          "desc": "여왕의 왕마력 — 왕마력탄에 마력탄이 줄줄이 따라붙는다",
+          "desc": "마력탄을 줄줄이 부르는 왕마력",
           "carrier": "self",
           "cap": 5
         }
@@ -64,13 +62,18 @@
       ],
       "ult": {
         "name": "에르피엔 펀치",
-        "cost": 300,
+        "cost": 250,
         "fx": [
           {
             "k": "dmg",
-            "ratio": 0.4,
-            "target": "oneEnemy",
+            "ratio": 0.2,
+            "target": "allEnemies",
             "hits": 8
+          },
+          {
+            "k": "dmg",
+            "ratio": 0.6,
+            "target": "allEnemies"
           },
           {
             "k": "status",
@@ -78,9 +81,9 @@
             "v": 1
           },
           {
-            "k": "dealtMod",
-            "v": 0.2,
-            "target": "allAllies"
+            "k": "stack",
+            "id": "축복의 왕관",
+            "v": 1
           }
         ]
       },
@@ -163,6 +166,10 @@
               "v": 1
             },
             {
+              "k": "draw",
+              "v": 2
+            },
+            {
               "k": "power",
               "rules": [
                 {
@@ -190,9 +197,13 @@
               "v": 1
             },
             {
-              "k": "empower",
-              "ratio": 0.3,
-              "who": "other"
+              "k": "stack",
+              "id": "축복의 왕관",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
             }
           ]
         },
@@ -206,7 +217,7 @@
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 2
             }
           ]
         },
@@ -220,6 +231,10 @@
               "k": "status",
               "id": "근면",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 2
             }
           ]
         }
@@ -282,8 +297,19 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.6,
+              "ratio": 4,
               "target": "oneEnemy"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.3,
+              "target": "randomEnemy",
+              "hitsPer": "왕마력"
+            },
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 2
             }
           ]
         },
@@ -309,21 +335,26 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.8,
+              "ratio": 2.1,
               "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
             }
           ]
         },
         {
           "name": "신탁 4",
-          "cost": 1,
+          "cost": 0,
           "tags": [
             "약점 공격"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
+              "ratio": 2.9,
               "target": "oneEnemy"
             }
           ]
@@ -381,8 +412,7 @@
       "fx": [
         {
           "k": "empower",
-          "ratio": 1,
-          "who": "other"
+          "ratio": 0.6
         },
         {
           "k": "draw",
@@ -395,8 +425,7 @@
           "fx": [
             {
               "k": "empower",
-              "ratio": 1.2,
-              "who": "other"
+              "ratio": 0.8
             },
             {
               "k": "draw",
@@ -409,8 +438,12 @@
           "fx": [
             {
               "k": "gauge",
-              "v": 20,
-              "target": "oneAlly"
+              "v": 30,
+              "target": "self"
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3
             },
             {
               "k": "draw",
@@ -424,18 +457,21 @@
             {
               "k": "make",
               "id": "에르핀_왕도_t1",
-              "v": 1,
-              "owner": "other"
+              "v": 2
             },
             {
               "k": "draw",
-              "v": 1
+              "v": 2
             }
           ]
         },
         {
           "name": "신탁 4",
           "fx": [
+            {
+              "k": "empower",
+              "ratio": 0.3
+            },
             {
               "k": "draw",
               "v": 2
@@ -446,9 +482,13 @@
           "name": "신탁 5",
           "fx": [
             {
+              "k": "stack",
+              "id": "축복의 왕관",
+              "v": 1
+            },
+            {
               "k": "empower",
-              "ratio": 0.3,
-              "who": "other"
+              "ratio": 0.4
             },
             {
               "k": "draw",
@@ -516,7 +556,7 @@
                   "fx": [
                     {
                       "k": "dmg",
-                      "ratio": 0.5,
+                      "ratio": 1.2,
                       "target": "randomEnemy"
                     }
                   ]
@@ -630,18 +670,15 @@
         {
           "k": "stack",
           "id": "축복의 왕관",
-          "v": 1,
-          "target": "oneAlly"
+          "v": 1
         },
         {
           "k": "draw",
-          "v": 1,
-          "who": "other"
+          "v": 1
         },
         {
           "k": "empower",
-          "ratio": 0.5,
-          "who": "other"
+          "ratio": 0.3
         }
       ],
       "oracles": [
@@ -655,13 +692,11 @@
             },
             {
               "k": "draw",
-              "v": 1,
-              "who": "other"
+              "v": 1
             },
             {
               "k": "empower",
-              "ratio": 0.5,
-              "who": "other"
+              "ratio": 0.4
             }
           ]
         },
@@ -675,8 +710,11 @@
             },
             {
               "k": "draw",
-              "v": 1,
-              "who": "other"
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3
             }
           ]
         },
@@ -686,13 +724,11 @@
           "fx": [
             {
               "k": "draw",
-              "v": 1,
-              "who": "other"
+              "v": 1
             },
             {
               "k": "empower",
-              "ratio": 0.2,
-              "who": "other"
+              "ratio": 0.2
             }
           ]
         },
@@ -705,9 +741,17 @@
               "v": 1
             },
             {
-              "k": "status",
-              "id": "사기",
+              "k": "stack",
+              "id": "축복의 왕관",
               "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
+            },
+            {
+              "k": "empower",
+              "ratio": 0.3
             }
           ]
         },
@@ -717,12 +761,16 @@
             {
               "k": "gauge",
               "v": 20,
-              "target": "otherAllies"
+              "target": "self"
             },
             {
-              "k": "empower",
-              "ratio": 0.3,
-              "who": "other"
+              "k": "stack",
+              "id": "축복의 왕관",
+              "v": 1
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         }

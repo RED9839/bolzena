@@ -283,7 +283,8 @@ namespace Bolzena.RunUI
             return ("ic_question", gray, null);   // 모르는 수 — 작은 「i」 는 「!」 로 읽혔다
         }
 
-        public static RectTransform IntentRow(Transform parent, Flow f, Intent it, string head = null)
+        /// <param name="byScale">(도감) 층 · 싸움 배율마다 낸 글 — 하나면 그 글, 여럿이면 줄마다 「1층」 머리표(2026-10-13 실제 전투 값). 없으면 데이터 값 글.</param>
+        public static RectTransform IntentRow(Transform parent, Flow f, Intent it, string head = null, List<(string label, string text)> byScale = null)
         {
             var (icon, col, gloss) = IntentLook(it);
             var row = Ui.Img(parent, Theme.Round, Theme.NavyWell.A(0.55f), "intent " + it?.T);
@@ -293,7 +294,10 @@ namespace Bolzena.RunUI
             disc.rectTransform.At(0, 0.5f, 10, 0, 40, 40);
             var ring = Ui.Img(disc.transform, Theme.S("frame_pill"), col.A(0.85f), "ring"); ring.rectTransform.Fill();
             var g = Ui.Img(disc.transform, Theme.S(icon), col, "glyph"); g.preserveAspect = true; g.rectTransform.Fill(9, 9, 9, 9);
-            string main = IntentNum.Replace(f.P.Text.Intent(it), m => $"<color={Theme.GoldTag}>{m.Value}</color>");
+            string Gold(string x) => IntentNum.Replace(x, m => $"<color={Theme.GoldTag}>{m.Value}</color>");
+            string main = byScale == null || byScale.Count == 0 ? Gold(f.P.Text.Intent(it))
+                : byScale.Count == 1 ? Gold(byScale[0].text)
+                : string.Join("\n", byScale.Select(x => $"<size=80%><color={Theme.SubTag}>{x.label}</color></size>  {Gold(x.text)}"));
             if (head != null) main = $"<color={Theme.GoldTag}><size=86%>{head}</size></color>  " + main;
             // 글 높이만큼 줄이 자란다(바깥 Col 이 이 줄의 선호 높이를 쓴다) — 동그라미는 배치 밖
             disc.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
@@ -348,7 +352,7 @@ namespace Bolzena.RunUI
         {
             if (v == null) return Theme.LeaderCard;
             if (v.IsStatus || v.IsCurse) return Theme.StatusCard;
-            if (v.Hero == null && !string.IsNullOrEmpty(v.Def?.Grade)) return Theme.GradeOf(v.Def.Grade);   // 교주 카드 = 등급 색(2026-10-06 사용자)
+            if (v.Hero == null && owner == null && !string.IsNullOrEmpty(v.Def?.Grade)) return Theme.GradeOf(v.Def.Grade);   // 주인 없는 교주 카드(상점 · 보상 진열) = 등급 색(2026-10-06). 넣은 사도가 있으면 그 사도의 성격(2026-10-12 밤 사용자 「교주 카드는 얻으면 그 사도의 속성을 따른다」 — 전투와 같게)
             var key = v.Hero ?? owner;
             if (key == null) return Theme.LeaderCard;
             var hd = f.P.Data.Hero(key);

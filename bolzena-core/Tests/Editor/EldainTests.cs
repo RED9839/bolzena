@@ -503,7 +503,7 @@ namespace Bolzena.Core.Tests
  {id:'t3', name:'t3', hero:'a', cost:1, type:'스킬', fx:[{k:'perShield', per:100}, {k:'shield', ratio:0.5}]}]",
                 heroes: "[{id:'q', name:'큐', role:'딜러', hp:600, atk:100, def:20, keyword:{name:'분', cap:9}}]");
             var t = new CardText(d);
-            Assert.AreEqual("파티 실드 절반을 씀, 적 1명에게 쓴 양의 200% 고정 피해", t.Card(d.Card("t1")));
+            Assert.AreEqual("파티 실드 절반을 씀, 쓴 양의 200% 고정 피해", t.Card(d.Card("t1")));
             Assert.AreEqual("「분」을 고른 만큼 써서 1개당 적 전체에 피해 30%", t.Card(d.Card("t2")));
             StringAssert.Contains("파티 실드 100당", t.Card(d.Card("t3")));
         }

@@ -237,7 +237,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("회복 뒤 HP가 80% 이상이면", t.WhenText(new When { On = "overheal", Pct = 0.8 }));
             StringAssert.Contains("고른 만큼 소모", t.Fx(new List<Fx> { new Fx { K = FxK.Spend, Id = "주머니", Pick = true } }));
             StringAssert.Contains("다음 카드", t.Fx(new List<Fx> { new Fx { K = FxK.Empower, Ratio = 0.5 } }));
-            StringAssert.Contains("주인: 다음 아군", t.Fx(new List<Fx> { new Fx { K = FxK.Make, Id = "tok", V = 1, Owner = "other" } }));
+            StringAssert.DoesNotContain("주인", t.Fx(new List<Fx> { new Fx { K = FxK.Make, Id = "tok", V = 1, Owner = "other" } }));   // 2026-10-13 사용자 — 「(주인: …)」 괄호를 카드 글에서 뺐다
         }
 
         // ── 봇 ───────────────────────────────────────────────────────

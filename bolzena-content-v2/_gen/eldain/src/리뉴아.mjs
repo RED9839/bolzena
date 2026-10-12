@@ -17,17 +17,17 @@ export default hero({
   id: H, name: '리뉴아', nature: '광기', race: '엘프', role: '딜러', star: 3,
   blurb: '오천 년을 건너온 인조 엘다인. 손에 쥔 시공 포격은 동료가 움직일 때마다 시간이 흘러 싸지고, 비용이 0 이 되는 정각에 가장 셉니다.',
   keyword: {
-    name: K, desc: '손에 쥔 리뉴아 카드마다 따로 흐르는 시간 — 쌓일수록 그 카드가 싸진다', carrier: 'self', cap: 6,
+    name: K, desc: '리뉴아 카드마다 따로 흐르는 시간', carrier: 'self', cap: 6,
     cardValue: { grow: 'allyPlay', reset: 'play', cost: -1, max: 6, who: 'other' },
   },
   // 자동 규칙 하나(사용자 10-11 — 원작 어사이드 「우리들의 평화로운 시간」): 리뉴아 카드를 비용 0(정각)으로 내면 이번 턴 아군 주는 피해 +10%
   // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
-  keywords: [{ name: '메아리', desc: '정각에 울린 포격의 메아리 — 이번 턴 정지된 6초가 더 여러 번 몰아친다', carrier: 'self', cap: 3, endClear: true }],
+  keywords: [{ name: '메아리', desc: '정각에 울린 포격의 메아리', carrier: 'self', cap: 3, endClear: true }],
   passives: [
     { name: '우리들의 평화로운 시간', when: { on: 'play', paidMax: 0 }, fx: [{ k: 'dealtMod', v: 0.1, target: 'allAllies' }] },
     { name: '시공간, 저 너머로!', when: { on: 'ult', who: 'any' }, fx: [tick(1)] },   // 원작 2성 — 아군이 고학년을 쓰면 손의 리뉴아 카드 시간 +1
   ],
-  ult: { name: '타임 브레이크', cost: 250, fx: [dmg(0.3, 'allEnemies', { hits: 4 }), tick(4), swift] },   // 사용자 10-11: 손의 리뉴아 카드 시간 +4(정각 근처로) · 이번 턴 남은 카드 신속 — 그 턴에 4~6코를 몰아 냄
+  ult: { name: '타임 브레이크', cost: 250, fx: [dmg(0.5, 'allEnemies', { hits: 4 }),   /* 10-13 사용자: 고학년 비교에서 가장 약함(1.14) — 4회 × 30% → 50% */ tick(4), swift] },   // 사용자 10-11: 손의 리뉴아 카드 시간 +4(정각 근처로) · 이번 턴 남은 카드 신속 — 그 턴에 4~6코를 몰아 냄
 }, {
   basicNames: ['시공 사격', '호버보드 돌진', '호버보드 회피'], deck: 'light',
   uniques: [
@@ -48,10 +48,10 @@ export default hero({
       fx: [dmg(0.5, 'randomEnemy', { hits: 3 }), JK, draw(2)],
       oracles: [
         { tags: KEEP, fx: [dmg(0.8, 'randomEnemy', { hits: 3 }), JK, draw(2)] },
-        { tags: KEEP, fx: [dmg(0.6, 'randomEnemy', { hits: 3 }), tick(1)] },
-        { tags: KEEP, fx: [dmg(0.6, 'randomEnemy', { hits: 3 }), JK, ally] },
-        { type: '스킬', tags: KEEP, fx: [draw(2), JK, { k: 'gauge', v: 20 }] },               // 원작 쿨 감소
-        { tags: KEEP, fx: [dmg(0.6, 'randomEnemy', { hits: 3 }), JK, { k: 'recast', ratio: 1 }] },
+        { tags: KEEP, fx: [dmg(0.8, 'randomEnemy', { hits: 3 }), tick(1)] },   // 10-13 신탁 점검
+        { tags: KEEP, fx: [dmg(0.7, 'randomEnemy', { hits: 3 }), JK, ally] },   // 10-13 신탁 점검
+        { tags: KEEP, fx: [dmg(0.4, 'randomEnemy', { hits: 3 }), draw(2), JK, { k: 'gauge', v: 30 }] },   // 원작 쿨 감소 · 10-13 신탁 점검: 피해 되살림 · 드로우는 늘 · 게이지 20→30
+        { tags: KEEP, fx: [dmg(0.7, 'randomEnemy', { hits: 3 }), JK, { k: 'recast', ratio: 1 }] },   // 10-13 신탁 점검
       ],
       blesses: ['cost', 'draw', [tick(1)]],
     },
@@ -62,7 +62,7 @@ export default hero({
         { tags: KEEP, fx: [dmg(0.5, 'oneEnemy', { hits: 5 }), { k: 'dispel', n: 1 }, JK, { k: 'strip', target: 'oneEnemy' }] },
         { tags: KEEP, fx: [dmg(0.4, 'oneEnemy', { hits: 5 }), tick(1)] },
         { tags: KEEP, fx: [dmg(0.2, 'allEnemies', { hits: 5 }), JK, { k: 'dispel', n: 1, target: 'allEnemies' }] },
-        { tags: KEEP, fx: [dmg(0.4, 'oneEnemy', { hits: 5 }), JK, slow('oneEnemy')] },
+        { tags: KEEP, fx: [dmg(0.5, 'oneEnemy', { hits: 5 }), JK, slow('oneEnemy')] },   // 10-13 신탁 점검
         { tags: KEEP, fx: [dmg(0.4, 'oneEnemy', { hits: 5 }), JK, { k: 'recast', ratio: 1 }] },
       ],
       blesses: ['power', 'cost', [tick(1)]],
@@ -71,8 +71,8 @@ export default hero({
       name: '정지된 6초', cost: 6, type: '공격', tags: KEEP,
       fx: [dmg(0.3, 'allEnemies', { hitsPer: '메아리', hitsAdd: 6 }), JK, swift, slow()],
       oracles: [
-        { power: true, fx: [slow('oneEnemy'), power([rule({ on: 'play', who: 'any', nth: 4 }, [tick(1)])])] },
-        { tags: KEEP, fx: [dmg(0.6, 'oneEnemy', { hits: 6 }), JK, swift] },
+        { power: true, fx: [slow(), power([rule({ on: 'play', who: 'any', nth: 4 }, [tick(2)])])] },   // 10-13 신탁 점검: 적 전체 둔화 · 시간 2
+        { tags: KEEP, fx: [dmg(0.7, 'oneEnemy', { hits: 6 }), JK, swift] },   // 10-13 신탁 점검
         { tags: KEEP, fx: [dmg(0.4, 'allEnemies', { hits: 6 }), tick(2)] },
         { tags: KEEP, fx: [dmg(0.4, 'allEnemies', { hits: 6 }), JK, { k: 'nextAp', v: 1 }] },
         { tags: KEEP, fx: [dmg(0.4, 'allEnemies', { hits: 6 }), JK, ally] },
@@ -84,10 +84,10 @@ export default hero({
       fx: [dmg(0.6), JK, draw(2), stack('메아리', 1)],
       oracles: [
         { tags: SW, fx: [dmg(1.1), JK, draw(2)] },
-        { tags: SW, fx: [dmg(0.8), tick(1)] },
-        { tags: SW, fx: [dmg(0.8), JK, ally] },
-        { tags: SW, fx: [dmg(0.8), JK, slow('oneEnemy')] },
-        { cost: 3, tags: SW, fx: [dmg(0.6), JK, { k: 'recast', ratio: 1 }] },
+        { tags: SW, fx: [dmg(1), tick(1), stack('메아리', 1)] },   // 10-13 신탁 점검: 메아리 되살림(아래 넷도)
+        { tags: SW, fx: [dmg(1), stack('메아리', 1), JK, ally] },
+        { tags: SW, fx: [dmg(1), stack('메아리', 1), JK, slow('oneEnemy')] },
+        { cost: 3, tags: SW, fx: [dmg(0.7), stack('메아리', 1), JK, { k: 'recast', ratio: 1 }] },   // 10-13 신탁 점검 3차
       ],
       blesses: ['draw', 'power', [tick(1)]],
     },

@@ -15,6 +15,7 @@ namespace Bolzena.Core
         public Unit Pool;
         public List<Unit> Enemies = new();
         public int Turn, Ap, ApJam, ApCarry, ApLeft, StartAp, Opening, Gauge, NextCheaper, SeqN, KillSeq, CritSeq, GlowSeq, ShockSeq, FirstRushDown, FoeQuiet, Drawn, PlayedThisTurn;
+        public bool MindWhisper;
         public int? SwitchTurn, PreviewPick;
         public string LastUlt, Over, PrevNat;
         public bool NoNature, RushedThisTurn, FinaleLock;
@@ -85,7 +86,7 @@ namespace Bolzena.Core
         {
             Rng = Rng.State, Party = Party, Pool = Pool, Enemies = Enemies,
             Turn = Turn, Ap = Ap, ApJam = ApJam, ApCarry = ApCarry, ApLeft = ApLeft, StartAp = StartAp, Opening = Opening, Gauge = Gauge, NextCheaper = NextCheaper,
-            SeqN = SeqN, KillSeq = KillSeq, CritSeq = CritSeq, GlowSeq = GlowSeq, ShockSeq = ShockSeq, FirstRushDown = FirstRushDown, FoeQuiet = FoeQuiet, Drawn = Drawn,
+            SeqN = SeqN, KillSeq = KillSeq, CritSeq = CritSeq, GlowSeq = GlowSeq, ShockSeq = ShockSeq, FirstRushDown = FirstRushDown, FoeQuiet = FoeQuiet, Drawn = Drawn, MindWhisper = MindWhisper,
             PlayedThisTurn = PlayedThisTurn, SwitchTurn = SwitchTurn, PreviewPick = PreviewPick, LastUlt = LastUlt, Over = Over, PrevNat = PrevNat,
             NoNature = NoNature, RushedThisTurn = RushedThisTurn, FinaleLock = FinaleLock,
             Draw = Draw, Hand = Hand, Discard = Discard, Gone = Gone, GainedCards = GainedCards,
@@ -113,7 +114,7 @@ namespace Bolzena.Core
             foreach (var u in s.Party) u.BodyRef = s.Pool;
             s.Turn = x.Turn; s.Ap = x.Ap; s.ApJam = x.ApJam; s.ApCarry = x.ApCarry; s.ApLeft = x.ApLeft; s.StartAp = x.StartAp; s.Opening = x.Opening; s.Gauge = x.Gauge;
             s.NextCheaper = x.NextCheaper; s.SeqN = x.SeqN; s.KillSeq = x.KillSeq; s.CritSeq = x.CritSeq; s.GlowSeq = x.GlowSeq; s.ShockSeq = x.ShockSeq;
-            s.FirstRushDown = x.FirstRushDown; s.FoeQuiet = x.FoeQuiet; s.Drawn = x.Drawn; s.PlayedThisTurn = x.PlayedThisTurn; s.SwitchTurn = x.SwitchTurn; s.PreviewPick = x.PreviewPick;
+            s.FirstRushDown = x.FirstRushDown; s.FoeQuiet = x.FoeQuiet; s.MindWhisper = x.MindWhisper; s.Drawn = x.Drawn; s.PlayedThisTurn = x.PlayedThisTurn; s.SwitchTurn = x.SwitchTurn; s.PreviewPick = x.PreviewPick;
             s.LastUlt = x.LastUlt; s.Over = x.Over; s.PrevNat = x.PrevNat; s.NoNature = x.NoNature; s.RushedThisTurn = x.RushedThisTurn; s.FinaleLock = x.FinaleLock;
             s.Draw = x.Draw ?? new(); s.Hand = x.Hand ?? new(); s.Discard = x.Discard ?? new(); s.Gone = x.Gone ?? new(); s.GainedCards = x.GainedCards ?? new();
             s.GainedFlash = x.GainedFlash.Select(g => (g.CardId, g.N, g.Shin)).ToList();

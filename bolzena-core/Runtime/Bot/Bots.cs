@@ -472,12 +472,14 @@ namespace Bolzena.Core
         public double StackWorth(Battle s, string id, int n, string holder = null)
         {
             if (!s.Kw.TryGetValue(id, out var kw)) return 1.5 * K * n;
-            if (kw.Def.Burn != null && holder != null)
+            bool partyBurn = kw.Def.Burn != null && kw.Carrier == "self";   // (2026-10-12 벨라 파티 촛불) 주인 말고 누가 내든 탐
+            if (kw.Def.Burn != null && (holder != null || partyBurn))
             {   // (엘다인 4차 벨라 촛불) 붙은 동료가 낼 카드 수만큼 탈 실드 — 손의 그 동료 카드 + 다음 턴 몫(카드를 많이 내는 동료에게 켤수록 값)
                 var giver = s.HeroUnit(kw.Owner); if (giver == null || giver.Dead) return 0;
                 int mine = 0, deck = 0, all = 0;
-                foreach (var h in s.Hand) if (s.CardOf(h)?.Hero == holder) mine++;
-                foreach (var h in s.Draw.Concat(s.Discard)) { all++; if (s.CardOf(h)?.Hero == holder) deck++; }
+                bool Burns(string hid) => partyBurn ? hid != null && hid != kw.Owner : hid == holder;
+                foreach (var h in s.Hand) if (Burns(s.CardOf(h)?.Hero)) mine++;
+                foreach (var h in s.Draw.Concat(s.Discard)) { all++; if (Burns(s.CardOf(h)?.Hero)) deck++; }
                 double plays = mine + (all > 0 ? 5.0 * deck / all : 1.5);
                 return Math.Min(n, plays) * (s.GuardAmount(giver, kw.Def.Burn.Shield, null) + (kw.Def.Burn.Heal > 0 ? s.HealAmount(giver, kw.Def.Burn.Heal, null) : 0)) * 0.5;
             }
@@ -812,7 +814,8 @@ namespace Bolzena.Core
             var c = s.CardOf(id);
             if (c == null) return 0;
             if (c.IsStatus || c.IsCurse) return -10;
-            return CardVal(s, id) - (burning ? 0 : 2 * CardValue.PartValue(c.Fx, "discard") + (c.Tags.Any(t => Tag.Parse(t).id == Tag.Bullet) ? 3 : 0));   // 탄환 — 버리면 쏜다
+            bool bullet = c.Tags.Any(t => Tag.Parse(t).id == Tag.Bullet);
+            return CardVal(s, id) - (burning ? (bullet ? -2 : 0) : 2 * CardValue.PartValue(c.Fx, "discard") + (bullet ? 1 : 0));   // 탄환 — 버리면 쏘지만 턴 끝에도 쏜다(2026-10-13) · 태우면 그 한 발을 잃는다
         }
 
         public bool Apply(Battle s, Move m)

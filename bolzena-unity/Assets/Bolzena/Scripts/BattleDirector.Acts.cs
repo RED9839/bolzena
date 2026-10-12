@@ -459,10 +459,7 @@ namespace Bolzena
                     break;
                 case "start":
                 {
-                    FoeFrame(true);
-                    var look = e.Anim != null ? Look.Hero(e.Anim) : null;
-                    if (look != null && !Bolzena.RunUI.Settings.SkipCutin)
-                        yield return UltCutin.Play(ScreenRoot, look.Art, es != null ? es.Name : "", e.Say ?? "", new Color(0.85f, 0.12f, 0.12f), true);
+                    FoeFrame(true);   // 적 클론 고학년은 컷인 화면 없이 바로 몸짓으로(2026-10-12 사용자)
                     break;
                 }
                 case "hit":

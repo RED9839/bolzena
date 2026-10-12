@@ -474,7 +474,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(4 - R.TOUGH.Area, K.E(b, 0).Tough, 1e-9, "광역 1코 약점 = 적마다 1/2(2026-10-10 카제나식 — 2026-10-08 의 1 에서 되돌림)");
             Assert.AreEqual(6 - R.TOUGH.Area, K.E(b, 1).Tough, 1e-9);
             K.Play(b, "h_pure0", 1);
-            Assert.AreEqual(6 - R.TOUGH.Area - R.TOUGH.Zero / 3, K.E(b, 1).Tough, 1e-9, "0코 비약점 = 0.5 의 1/3(2026-10-10 카제나 표 — 옛 1코처럼)");
+            Assert.AreEqual(6 - R.TOUGH.Area, K.E(b, 1).Tough, 1e-9, "0코 비약점 = 0(2026-10-12 밤 사용자)");
         }
 
         // 2026-10-08 사용자 — 「1코 광역이 강인도 1칸을 못 깎는다」 · 0코도 1코처럼 → 2026-10-10 카제나식으로 광역은 적마다 1/2(R.TOUGH.Area)
@@ -498,9 +498,9 @@ namespace Bolzena.Core.Tests
         {
             var b = F("mad"); K.Hand(b, "h_cool0", "h_pure0");
             K.Play(b, "h_cool0");
-            Assert.AreEqual(6 - R.TOUGH.Zero, K.E(b).Tough, 1e-9, "0코 약점 = 0.5(2026-10-10 카제나 표)");
+            Assert.AreEqual(5.5, K.E(b).Tough, 1e-9, "0코 약점 = 0.5(2026-10-12 밤 사용자)");
             K.Play(b, "h_pure0");
-            Assert.AreEqual(6 - R.TOUGH.Zero - R.TOUGH.Zero / 3, K.E(b).Tough, 1e-9, "0코 비약점 = 0.5 의 1/3");
+            Assert.AreEqual(6 - R.TOUGH.Zero, K.E(b).Tough, 1e-9, "0코 비약점 = 0(2026-10-12 밤 사용자)");
             Assert.AreEqual(3, b.Ap, "0코 둘 — AP 그대로");
         }
 
@@ -529,11 +529,11 @@ namespace Bolzena.Core.Tests
         [Test] public void 비용_0_을_여러_번_빼도_찌꺼기가_남지_않고_격파된다()
         {
             var b = F("small");
-            int ap = b.Ap;
-            for (int i = 0; i < 18; i++) { K.Hand(b, "h_pure0"); K.Play(b, "h_pure0"); }   // 1/6 × 18 = 3
-            Assert.IsTrue(K.E(b).Broken, "3 - 18 × 1/6 은 0 — 1e-15 가 남아 격파가 안 나던 것");
+            b.Ap = 20;
+            for (int i = 0; i < 9; i++) { K.Hand(b, "h_pure"); K.Play(b, "h_pure"); }   // 1코 비약점 1/3 × 9 = 3(2026-10-12 밤 — 비약점 0코는 이제 0 이라 1코로)
+            Assert.IsTrue(K.E(b).Broken, "3 - 9 × 1/3 은 0 — 찌꺼기가 남아 격파가 안 나던 것");
             Assert.AreEqual(0, K.E(b).Tough);
-            Assert.AreEqual(ap + R.TOUGH.Ap, b.Ap);
+            Assert.AreEqual(20 - 9 + R.TOUGH.Ap, b.Ap);
             Assert.AreEqual(1, b.Breaks);
         }
 

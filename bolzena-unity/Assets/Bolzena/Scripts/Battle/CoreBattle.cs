@@ -1287,7 +1287,7 @@ namespace Bolzena.Battle
                         Key = spine, Skin = skin, Id = e.Key, Name = e.Name, Boss = e.Boss, Hp = Math.Max(0, e.Hp), MaxHp = e.MaxHp, Block = e.Block + e.Shield,
                         ToughV = (float)tv.Left, ToughMaxV = (float)tv.Max, Broken = tv.Broken, Resting = tv.Resting, Sealed = e.Sealed, Dead = e.Dead,
                         Intent = e.Broken || e.Dead ? IntentKind.None : ckind, IntentValue = charging ? chargeHit ?? it.Next?.V ?? 0 : shown ?? it?.V ?? 0, IntentHits = it != null && it.T == "multi" ? Math.Max(1, it.N) : 1,
-                        IntentText = it != null ? text.Intent(it, shown) : "", IntentSay = it?.Say,
+                        IntentText = it != null ? text.Intent(it, shown, e.Dmgx) : "", IntentSay = it?.Say,   // IntentText — 힘 모으기 · 고학년 예고의 다음 수도 층 배율(2026-10-13 도감과 같은 값)
                         UltName = BossUlt.IsUlt(it) && !e.Broken ? (it.T == "ult" ? it.Say : it.Next?.Say ?? it.Say) : null,
                         UltHero = BossUlt.IsUlt(it) ? (it.T == "ult" ? it.Id : it.Next?.Id ?? it.Id) : null, UltNow = it != null && it.T == "ult", RushNeed = b.RushOf(e), RushCnt = e.RushCnt, RushedTurn = e.RushedTurn,
                         Nature = tv.Nature, Blurb = def?.Blurb, Weak = tv.Weak ?? new List<string>(),

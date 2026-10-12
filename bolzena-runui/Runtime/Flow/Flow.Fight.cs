@@ -173,9 +173,9 @@ namespace Bolzena.RunUI
                 }
             }
 
-            // 왼쪽 가운데 「전투 끝」 칩
+            // 왼쪽 위(머리 띠 아래) 「전투 끝」 칩 — 왼쪽 가운데였을 때는 16:9 · 16:10 · 4:3 에서 전투 장면 맨 뒤 사도의 몸을 덮었다(2026-10-12 화면비 점검)
             var chip = Ui.Img(root, Theme.S("pill_dark", 46), new Color(1, 1, 1, 0.9f), "battleEnd").rectTransform;
-            chip.At(0, 0.5f, Theme.Gutter + 8, 20, 150, 64);
+            chip.At(0, 1, Theme.Gutter + 8, -Theme.HudBottom, 150, 64);
             var ring = Ui.Img(chip, Theme.FramePill, Theme.Gold.A(0.8f), "ring"); ring.rectTransform.Fill();
             var ct = Ui.Title(chip, $"<size=62%><color={Theme.SubTag}>{o.Turns}턴 · 승리</color></size>\n전투 끝", Theme.FsLg, Theme.Gold, TextAlignmentOptions.Center);
             ct.rectTransform.Fill(8, 4, 8, 4); ct.lineSpacing = -18;

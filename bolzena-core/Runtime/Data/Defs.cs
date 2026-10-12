@@ -319,6 +319,8 @@ namespace Bolzena.Core
         /// <summary>payWith — AP 1 을 고유 효과 몇 개로(기본 1) · 모자라면 AP 로 섞어 치른다.</summary>
         public int PayRate;
         public bool PayMix;
+        /// <summary>(2026-10-13 시온 마탄) 손에 쥘 수 있는 이 카드의 최대 장수 — 0 이면 제한 없음. 넘게 만들면 손에 안 들고 탄환이면 바로 쏜다(Battle.Make).</summary>
+        public int HandMax;
         /// <summary>두 갈래로 내기 — 갈래 이름(둘). 낼 때 PlayOpts.Choice(1 · 2)로 고르고 효과는 ifChoice n 으로 가른다.</summary>
         public List<string> Choices;
         /// <summary>(엘다인 ▶E2) 천상 계기에서만 이 카드를 비용 N 으로 센다(직접 낼 때). 0 이면 적힌 비용.</summary>

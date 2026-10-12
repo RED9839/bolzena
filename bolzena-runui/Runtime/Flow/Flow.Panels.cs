@@ -49,7 +49,7 @@ namespace Bolzena.RunUI
 
             // 아래 띠 — 왼쪽 안내 · 오른쪽 단추(로비로 · 닫기)
             Ui.Row(bar, Theme.Gap, TextAnchor.MiddleRight, new RectOffset(10, 10, 14, 14), false, true);
-            var hint = Ui.Text(bar, Theme.Compact ? "바깥을 누르면 닫힙니다" : "Esc 키나 바깥을 누르면 닫힙니다", Theme.FsSm, Theme.Dim, TextAlignmentOptions.MidlineLeft);
+            var hint = Ui.Text(bar, (Theme.Compact ? "바깥을 누르면 닫힙니다" : "Esc 키나 바깥을 누르면 닫힙니다") + " · 버전 " + PatchNotes.Version, Theme.FsSm, Theme.Dim, TextAlignmentOptions.MidlineLeft);
             hint.textWrappingMode = TextWrappingModes.NoWrap; hint.overflowMode = TextOverflowModes.Ellipsis;
             hint.Pref(0, -1, 1);
             if (inRun)

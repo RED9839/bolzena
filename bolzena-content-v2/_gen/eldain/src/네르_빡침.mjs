@@ -27,13 +27,13 @@ export default hero({
   ],
   forms: [{
     // 4차 태세(사용자 10-11): 신앙 5로 들고 · 격파마다 +1턴(최대 5)으로 지키고 · 시간이 다 되면 허기
-    id: F, name: '성전', desc: '본인은 성전, 다들 빡침이라 부르는 폭주 — 네르의 공격이 거세진다', stance: true, anim: 'Idle_Change',   // 원작 변신 쉬는 동작(태세로 바꾸며 빠졌던 것 — 10-11 되살림)
+    id: F, name: '성전', desc: '본인은 성전, 남들은 빡침이라 부르는 폭주', stance: true, anim: 'Idle_Change',   // 원작 변신 쉬는 동작(태세로 바꾸며 빠졌던 것 — 10-11 되살림)
     turns: 3,
     bonus: [{ type: '공격', ratio: 2, fx: [{ k: 'tough', v: 1 }] }],   // 성전 중 네르 공격 카드 피해 ×2 · 강인도 1(10-11 사용자 0.5→1)
     passives: [{ name: '새로이 쌓아갈 추억', when: { on: 'break', who: 'any' }, fx: [{ k: 'formExtend', id: F, v: 1, max: 5 }] }, { name: '심판의 벼락', when: { on: 'turnStart' }, fx: [dmg(0.8, 'allEnemies'), draw(1)] }],
     offExpire: [{ k: 'nextAp', v: -1 }, { k: 'spend', id: Q, all: true }],
   }],
-  ult: { name: '교단의 심판', cost: 300, fx: [dmg(2.1, 'allEnemies'), { k: 'form', id: F }] },
+  ult: { name: '교단의 심판', cost: 250, fx: [dmg(2.1, 'allEnemies'), { k: 'form', id: F }] },   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로
 }, {
   basicNames: ['도끼창 휘두르기', '적벽돌 던지기', '사제장의 망토'], deck: 'light', starter: true,
   uniques: [
@@ -43,9 +43,9 @@ export default hero({
       oracles: [
         { fx: [dmg(2.7), stack(Q, 2)] },
         { fx: [dmg(1.1), stack(Q, 3)] },
-        { needForm: F, fx: [dmg(1.5, 'allEnemies'), dmg(1, 'allEnemies', { ofForm: 0.1 })] },   // 거대 도끼창 — 성전 중에만 · 이번 성전 준 피해 10%(▶E76)
+        { needForm: F, fx: [dmg(1.9, 'allEnemies'), dmg(1, 'allEnemies', { ofForm: 0.1 })] },   // 10-13 신탁 점검: 성전 중에만이라 150→190%   // 거대 도끼창 — 성전 중에만 · 이번 성전 준 피해 10%(▶E76)
         { fx: [dmg(1.4), status('약화', 1), stack(Q, 2)] },
-        { fx: [dmg(1.6), stack(Q, 2), { k: 'ifBreak' }, { k: 'ap', v: 1 }] },
+        { fx: [dmg(1.6), stack(Q, 3), { k: 'ifBreak' }, { k: 'ap', v: 1 }] },   // 10-13 신탁 점검: 신앙 2→3
       ],
       blesses: ['power', 'cost', [stack(Q, 1)]],
     },
@@ -56,9 +56,9 @@ export default hero({
         { tags: ['보존'], fx: [stack(Q, 2), ban(1)] },
         { tags: ['보존'], fx: [stack(Q, 1), ban(1), inF, { k: 'formExtend', id: F, v: 1, max: 5 }] },
         { power: true, fx: [ban(1), power([rule({ on: 'turnStart' }, [stack(Q, 1)])])] },
-        { tags: ['보존'], fx: [stack(Q, 1), ban(2)] },
+        { tags: ['보존'], fx: [stack(Q, 2), ban(2)] },   // 10-13 신탁 점검
         // 08 — 기본 카드를 남길 이유
-        { power: true, fx: [ban(1), power([rule({ on: 'play', basic: true }, [stack(Q, 1)])])] },
+        { power: true, fx: [stack(Q, 1), ban(1), power([rule({ on: 'play', basic: true }, [stack(Q, 1)])])] },   // 10-13 신탁 점검
       ],
       blesses: ['draw', 'ap', [stack(Q, 1)]],
     },
@@ -67,8 +67,8 @@ export default hero({
       fx: [dmg(1.3), tough(1)],
       oracles: [
         { fx: [dmg(0.7), tough(2)] },
-        { fx: [dmg(0.7), tough(1), { k: 'ifBreak' }, stack(Q, 2)] },
-        { fx: [dmg(0.5, 'allEnemies'), tough(1)] },
+        { fx: [dmg(0.7), tough(1), { k: 'ifBreak' }, stack(Q, 3)] },   // 10-13 신탁 점검: 붕괴 신앙 2→3
+        { fx: [dmg(0.6, 'allEnemies'), tough(1)] },   // 10-13 신탁 점검
         { fx: [dmg(0.7), tough(1), inF, draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
         { fx: [dmg(0.7), tough(1), { k: 'ifFoe', id: 'broken' }, dmg(2.8)] },
       ],
@@ -78,10 +78,10 @@ export default hero({
       name: '성전 선포', cost: 1, type: '공격',
       fx: [dmg(1.9, 'allEnemies'), stack(Q, 2), ...declare(4)],
       oracles: [
-        { type: '스킬', fx: [stack(Q, 2), { k: 'ifStack', id: Q, n: 5 }, { k: 'spend', id: Q, v: 5 }, empower(0.6, { who: 'any' })] },
+        { type: '스킬', fx: [stack(Q, 3), ...declare(4), empower(0.6, { who: 'any' })] },   // 10-13 신탁 점검: 성전을 버리던 신탁 — 신앙 3 · 4로 성전 + 파티 다음 카드 +60%
         { fx: [dmg(1.4, 'allEnemies'), stack(Q, 2), ...declare(4)] },
-        { fx: [dmg(1.4, 'allEnemies'), status('취약', 2, { target: 'allEnemies' }), stack(Q, 1)] },
-        { fx: [dmg(1.4, 'allEnemies'), stack(Q, 2), inF, { k: 'formExtend', id: F, v: 2, max: 5 }] },
+        { fx: [dmg(1.4, 'allEnemies'), status('취약', 2, { target: 'allEnemies' }), ...declare(4)] },   // 10-13 신탁 점검: 성전 선포를 되살림(신앙 +1 대신)
+        { fx: [dmg(1.6, 'allEnemies'), stack(Q, 2), ...declare(3)] },   // 10-13 신탁 점검 3차: 성전 +2턴(봇 측정 크게 나쁨) → 신앙 3으로 성전(낮은 문턱)
         { fx: [dmg(2.8), stack(Q, 2), ...declare(4)] },
       ],
       blesses: ['power', 'draw', [stack(Q, 1)]],
@@ -92,8 +92,8 @@ export default hero({
       oracles: [
         { fx: [dmg(1.1), tough(1), inF, status('취약', 1, { target: 'allEnemies' })] },
         { fx: [dmg(0.8), tough(1), stack(Q, 1)] },
-        { fx: [dmg(0.5, 'allEnemies'), tough(1)] },
-        { fx: [dmg(0.8), status('취약', 1, { target: 'oneEnemy' })] },
+        { fx: [dmg(0.6, 'allEnemies'), tough(1)] },   // 10-13 신탁 점검: 80→100%
+        { fx: [dmg(0.8), tough(1), status('취약', 1, { target: 'oneEnemy' })] },   // 10-13 신탁 점검: 강인도 피해 되살림
         { fx: [dmg(0.8), tough(1), ban(1)] },
       ],
       blesses: ['power', 'cost', [stack(Q, 1)]],

@@ -35,6 +35,8 @@ namespace Bolzena.RunUI
         {
             public EnemyDef Def; public string Grade = "일반"; public string Summoner; public bool NoTough;
             public readonly List<(int vi, int floor)> Where = new List<(int, int)>();
+            /// <summary>나오는 싸움 — (층, 싸움 종류 fight · elite · boss). 실제 전투 수치(R.FoeScale)를 셈한다(2026-10-13).</summary>
+            public readonly List<(int floor, string kind)> Fights = new List<(int, string)>();
             public int VillageIdx => Where.Count > 0 ? Where.Min(w => w.vi) : 99;
         }
         List<FoeSpot> foeIndex;
@@ -108,10 +110,15 @@ namespace Bolzena.RunUI
                 for (int f = 0; f < v.Floors.Count; f++)
                 {
                     var fl = v.Floors[f];
-                    foreach (var id in fl.Boss.Concat(fl.Elites.SelectMany(x => x)).Concat(fl.Pools.SelectMany(p => p).SelectMany(x => x)))
+                    // 싸움 종류 — 보스 칸(BossElite 면 엘리트 배율) · 엘리트 칸 · 일반 칸. Run.FoeScaleOf 와 같은 고르기
+                    var ids = fl.Boss.Select(id => (id, kind: fl.BossElite ? "elite" : "boss"))
+                        .Concat(fl.Elites.SelectMany(x => x).Select(id => (id, kind: "elite")))
+                        .Concat(fl.Pools.SelectMany(p => p).SelectMany(x => x).Select(id => (id, kind: "fight")));
+                    foreach (var (id, kind) in ids)
                     {
                         var s = Spot(id);
                         if (s != null && !s.Where.Contains((vi, f))) s.Where.Add((vi, f));
+                        if (s != null && !s.Fights.Contains((f, kind))) s.Fights.Add((f, kind));
                     }
                 }
             }
@@ -125,7 +132,7 @@ namespace Bolzena.RunUI
                         if (it.T == "summon" && it.Id != null && !spots.ContainsKey(it.Id) && d.Enemy(it.Id) != null)
                         {
                             var n = Spot(it.Id); n.Grade = "소환물"; n.Summoner = s.Def.Name; n.NoTough = it.NoTough;
-                            n.Where.AddRange(s.Where);
+                            n.Where.AddRange(s.Where); n.Fights.AddRange(s.Fights);   // 소환물은 세운 적의 싸움 배율 그대로(Battle.Summon)
                             grew = true;
                         }
             }
@@ -208,6 +215,40 @@ namespace Bolzena.RunUI
         /// <summary>강인도 칸 수 — 적 데이터(tough), 없으면 등급 기본(R.TOUGH). 강인도 없는 소환물은 0.</summary>
         static double FoeTough(FoeSpot s) => s.NoTough ? 0 : FoeTough(s.Def, s.Grade);
         static double FoeTough(EnemyDef e, string grade) => Battle.ToughOf(e, grade == "엘리트", summon: grade == "소환물");   // 엔진과 같은 값(최소 강인도 포함, 2026-10-10)
+
+        // ── 실제 전투 수치(2026-10-13) — 데이터 HP · 수에 층 · 싸움 배율(R.FoeScale)을 곱한 값. 2층 적이 도감에서 약해 보이던 착각을 막는다 ──
+        /// <summary>층 · 싸움 종류마다 (머리표, 체력 배율, 피해 배율). 층 차례 → 일반 · 엘리트 · 보스. 종류가 여럿이면 머리표에 종류도. 나오는 곳이 없으면 빈 목록.</summary>
+        static List<(string label, double hp, double dmg)> FoeScales(IEnumerable<(int floor, string kind)> fights)
+        {
+            var fs = fights.Distinct().OrderBy(x => x.floor).ThenBy(x => x.kind == "fight" ? 0 : x.kind == "elite" ? 1 : 2).ToList();
+            bool kinds = fs.Select(x => x.kind).Distinct().Count() > 1;
+            return fs.Select(x =>
+            {
+                var sc = R.FoeScale(x.floor, boss: x.kind == "boss", elite: x.kind == "elite");
+                return ($"{x.floor + 1}층" + (kinds ? " " + (x.kind == "boss" ? "보스전" : x.kind == "elite" ? "엘리트전" : "일반전") : ""), sc.hp, sc.dmg);
+            }).ToList();
+        }
+
+        /// <summary>배율마다 낸 글을 같은 글끼리 묶는다 — (머리표 「1층 · 2층」, 글). 하나로 묶이면 부르는 쪽이 머리표를 쓰지 않는다.</summary>
+        static List<(string label, string text)> ByScale(List<(string label, double hp, double dmg)> scs, Func<(string label, double hp, double dmg), string> f)
+        {
+            var o = new List<(string label, string text)>();
+            foreach (var sc in scs)
+            {
+                string t = f(sc); int i = o.FindIndex(x => x.text == t);
+                if (i < 0) o.Add((sc.label, t)); else o[i] = (o[i].label + " · " + sc.label, t);
+            }
+            return o;
+        }
+
+        /// <summary>실제 전투 HP — Battle 처럼 Num.Round(데이터 HP × 체력 배율). 층마다 다르면 「1층 X · 2층 Y」. 나오는 곳이 없으면 데이터 값.</summary>
+        static string FoeHpKo(EnemyDef e, List<(string label, double hp, double dmg)> scs)
+        {
+            if (e == null) return $"<color={Theme.GoldTag}>0</color>";
+            if (scs.Count == 0) return $"<color={Theme.GoldTag}>{e.Hp:N0}</color>";
+            var g = ByScale(scs, sc => Num.Round(e.Hp * sc.hp).ToString("N0"));
+            return g.Count == 1 ? $"<color={Theme.GoldTag}>{g[0].text}</color>" : string.Join(" · ", g.Select(x => $"<size=80%><color={Theme.SubTag}>{x.label}</color></size> <color={Theme.GoldTag}>{x.text}</color>"));
+        }
 
         static string FoeNum(double v)
         {
@@ -653,7 +694,8 @@ namespace Bolzena.RunUI
                 var nm = Ui.Title(stats, s.Def.Name, Theme.FsSm, Theme.Ink, TextAlignmentOptions.Center); nm.rectTransform.Band(1, 24, 0, 0, 0);
                 nm.enableAutoSizing = true; nm.fontSizeMin = 9; nm.fontSizeMax = Theme.FsSm; nm.textWrappingMode = TextWrappingModes.NoWrap; nm.Outline(0.2f);
                 double tough = FoeTough(s);
-                var st = Ui.Text(stats, $"HP <color={Theme.GoldTag}>{s.Def.Hp:N0}</color>  강인도 " + (tough > 0 ? $"<color=#D6C2FF>{FoeNum(tough)}</color>" : "없음"), Theme.FsCap, Theme.Ink, TextAlignmentOptions.Center);
+                var hps = FoeScales(s.Fights).Select(sc => Num.Round(s.Def.Hp * sc.hp)).DefaultIfEmpty(s.Def.Hp).ToList();   // 실제 전투 HP — 층마다 다르면 범위
+                var st = Ui.Text(stats, $"HP <color={Theme.GoldTag}>{(hps.Min() == hps.Max() ? hps.Min().ToString("N0") : $"{hps.Min():N0}~{hps.Max():N0}")}</color>  강인도 " + (tough > 0 ? $"<color=#D6C2FF>{FoeNum(tough)}</color>" : "없음"), Theme.FsCap, Theme.Ink, TextAlignmentOptions.Center);
                 st.rectTransform.Band(1, 20, 0, 0, -26); st.textWrappingMode = TextWrappingModes.NoWrap; st.enableAutoSizing = true; st.fontSizeMin = 9; st.fontSizeMax = Theme.FsCap;
                 ToughPips(stats, tough, w * 0.72f, Theme.C(7, 6), 28);
                 var ed = Ui.Text(stats, EdgeKo(n, true), Theme.FsCap - 1, Theme.Ink, TextAlignmentOptions.Center); ed.rectTransform.Band(0, 20, 0, 0, 2);
@@ -808,7 +850,7 @@ namespace Bolzena.RunUI
             }
         }
 
-        void ActsSection(RectTransform content, EnemyDef e)
+        void ActsSection(RectTransform content, EnemyDef e, List<(string label, double hp, double dmg)> scs)
         {
             var acts = new List<(Intent it, string head)>();
             if (e.Open != null) acts.Add((e.Open, "첫 턴"));
@@ -817,7 +859,7 @@ namespace Bolzena.RunUI
             if (e.Phase2 != null) foreach (var it in e.Phase2.Intents) acts.Add((it, $"HP {e.Phase2.At * 100:0}% 아래"));
             if (acts.Count == 0) return;
             W.Section(content, "행동 패턴", e.Pick == "shuffle" ? "무작위(같은 수 세 번 연속 없음)" : "차례대로", 36);
-            foreach (var (it, head) in acts) W.IntentRow(content, this, it, head);
+            foreach (var (it, head) in acts) W.IntentRow(content, this, it, head, ByScale(scs, sc => P.Text.Intent(it, null, sc.dmg)));   // 실제 전투 값(층 · 보스 피해 배율)
         }
 
         void BraceSection(RectTransform content, EnemyDef e, bool noTough)
@@ -830,7 +872,7 @@ namespace Bolzena.RunUI
         }
 
         /// <summary>보스 · 엘리트가 세우는 적 — 이름 · HP · 강인도 · 몇씩 · 최대. 보스 소환물은 강인도 없음 · 보스와 함께 쓰러짐.</summary>
-        void SummonSection(RectTransform content, EnemyDef e, bool boss)
+        void SummonSection(RectTransform content, EnemyDef e, bool boss, List<(string label, double hp, double dmg)> scs)
         {
             var sums = AllIntents(e).SelectMany(Chain).Where(x => x.T == "summon" && x.Id != null).GroupBy(x => x.Id).Select(g => g.First()).ToList();
             if (sums.Count == 0) return;
@@ -844,7 +886,7 @@ namespace Bolzena.RunUI
                 if (pic != null) { var im = Ui.Img(row.transform, pic, Color.white, "art"); im.preserveAspect = true; im.rectTransform.At(0, 0.5f, 8, 0, 64, 64); }
                 double t = x.NoTough || se == null ? 0 : FoeTough(se, "일반");
                 string head = $"<b>{se?.Name ?? x.Id}</b>  <color={Theme.SubTag}>{Math.Max(1, x.N)}마리씩{(x.Max > 0 ? $" · 최대 {x.Max}" : "")}</color>";
-                string body = $"HP <color={Theme.GoldTag}>{se?.Hp ?? 0:N0}</color>  강인도 " + (t > 0 ? $"<color=#D6C2FF>{FoeNum(t)}</color>" : "없음 — 격파되지 않음") + (x.NoTough || se?.Tied == true || boss ? $"  <color={Theme.SubTag}>· 소환한 적이 쓰러지면 함께 쓰러짐</color>" : "");
+                string body = $"HP {FoeHpKo(se, scs)}  강인도 " + (t > 0 ? $"<color=#D6C2FF>{FoeNum(t)}</color>" : "없음 — 격파되지 않음") + (x.NoTough || se?.Tied == true || boss ? $"  <color={Theme.SubTag}>· 소환한 적이 쓰러지면 함께 쓰러짐</color>" : "");
                 var tx = Ui.Text(row.transform, head + "\n" + body, Theme.FsBody, Theme.Ink, TextAlignmentOptions.MidlineLeft); tx.rectTransform.Fill(84, 4, 12, 4);
                 tx.textWrappingMode = TextWrappingModes.Normal; tx.enableAutoSizing = true; tx.fontSizeMin = 11; tx.fontSizeMax = Theme.FsBody;
             }
@@ -882,9 +924,12 @@ namespace Bolzena.RunUI
             Ui.Col(content, 8, TextAnchor.UpperLeft, new RectOffset(4, 10, 4, 10), true, false);
             if (kd.Vars.Count > 1) PillRow(content, kd.Vars.Select(v => v.Grade).ToList(), vi, i => Reopen(n, i), "zoom.var");
             double tough = FoeTough(s);
-            W.Section(content, "수치", "성격과 상관없이 같음", 36);
-            DexLine(content, $"HP <color={Theme.GoldTag}>{e.Hp:N0}</color>    강인도 " + (tough > 0 ? $"<color=#D6C2FF>{FoeNum(tough)}</color> <size=80%><color={Theme.SubTag}>칸{(e.ToughTaken > 0 && e.ToughTaken != 1 ? $" · 받는 강인도 피해 ×{e.ToughTaken:0.##}" : "")}</color></size>" : $"<color={Theme.SubTag}>없음 — 격파되지 않음</color>"), Theme.FsLg, Theme.Ink);
+            var scs = FoeScales(s.Fights);
+            W.Section(content, "수치", "실제 전투 값 · 성격과 상관없이 같음", 36);
+            string hpKo = FoeHpKo(e, scs);
+            DexLine(content, $"HP {hpKo}" + (hpKo.Contains("층") ? "\n" : "    ") + "강인도 " + (tough > 0 ? $"<color=#D6C2FF>{FoeNum(tough)}</color> <size=80%><color={Theme.SubTag}>칸{(e.ToughTaken > 0 && e.ToughTaken != 1 ? $" · 받는 강인도 피해 ×{e.ToughTaken:0.##}" : "")}</color></size>" : $"<color={Theme.SubTag}>없음 — 격파되지 않음</color>"), Theme.FsLg, Theme.Ink);
             if (tough > 0) { var pr = Ui.Rect("pips", content); pr.Pref(-1, 16); ToughPips(pr, tough, Mathf.Min(420, 34 * (float)Math.Ceiling(tough)), 12, 2, true); }
+            DexLine(content, $"<color={Theme.SubTag}>" + (scs.Count > 0 ? "HP · 행동의 피해는 나오는 층 · 싸움(일반 · 엘리트 · 보스) 배율이 들어간 실제 전투 값입니다." : "나오는 곳이 없어 데이터 값 그대로입니다.") + "</color>", Theme.FsSm, Theme.Sub);
             W.Section(content, "상성", n != null ? $"{n} 모습" : null, 36);
             DexLine(content, EdgeKo(n), Theme.FsLg, Theme.Ink);
             DexLine(content, $"<color={Theme.SubTag}>" + (n != null ? $"모험의 적 속성이 {n}이면 이 모습 · 이 상성으로 나옵니다. 약점 성격으로 치면 피해와 강인도 피해가 커집니다." : "누루링 수액은 종족 스킨이 그대로이고, 성격은 모험의 적 속성을 따릅니다.") + "</color>", Theme.FsSm, Theme.Sub);
@@ -915,10 +960,10 @@ namespace Bolzena.RunUI
             W.Section(content, "나오는 곳", null, 36);
             DexLine(content, string.Join("\n", kd.Vars.Select(v => $"<color={Hx(FoeGradeColor(v.Grade))}>{v.Grade}</color>  " + (v.Where.Count > 0 ? WhereKo(v.Where) : "데이터에만 있음") + (v.Summoner != null ? $"  <color={Theme.SubTag}>· {v.Summoner} 이(가) 불러냄</color>" : ""))), Theme.FsBody, Theme.Ink);
             BraceSection(content, e, s.NoTough);
-            ActsSection(content, e);
+            ActsSection(content, e, scs);
             var more = P.Text.Enemy(e);
             if (!string.IsNullOrEmpty(more)) { W.Section(content, "특성", "패시브 · 쌓이는 수치 · 희귀종", 36); DexLine(content, more, Theme.FsBody, Theme.Ink); }
-            SummonSection(content, e, false);
+            SummonSection(content, e, false, scs);
             if (!string.IsNullOrEmpty(e.Blurb)) { W.Section(content, "이야기", null, 36); DexLine(content, $"<color={Theme.SubTag}>{e.Blurb}</color>", Theme.FsSm, Theme.Sub); }
             Stage.Hot["zoom.close"] = Stage.Hot["modal.x"];
         }
@@ -963,8 +1008,9 @@ namespace Bolzena.RunUI
             string bodyKey = e.Id.StartsWith(GameData.CLONE_MARK, StringComparison.Ordinal) ? e.Id.Split('~')[2] : e.Id;
             var bodyDef = d.Enemy(bodyKey);
             double tough = FoeTough(e, "보스");
-            W.Section(content, "보스 몸 수치", $"{r.V.Name} {floor + 1}층 보스 칸", 36);
-            DexLine(content, $"HP <color={Theme.GoldTag}>{e.Hp:N0}</color>    강인도 <color=#D6C2FF>{FoeNum(tough)}</color> <size=80%><color={Theme.SubTag}>칸</color></size>", Theme.FsLg, Theme.Ink);
+            var scs = FoeScales(new[] { (floor, r.V.Floors[floor].BossElite ? "elite" : "boss") });   // 그 층 보스 칸의 실제 전투 배율
+            W.Section(content, "보스 몸 수치", $"{r.V.Name} {floor + 1}층 보스 칸 · 실제 전투 값", 36);
+            DexLine(content, $"HP {FoeHpKo(e, scs)}    강인도 <color=#D6C2FF>{FoeNum(tough)}</color> <size=80%><color={Theme.SubTag}>칸</color></size>", Theme.FsLg, Theme.Ink);
             { var pr = Ui.Rect("pips", content); pr.Pref(-1, 16); ToughPips(pr, tough, Mathf.Min(420, 34 * (float)Math.Ceiling(tough)), 12, 2, true); }
             if (bodyDef != null && bodyDef.Clone != h.Id)
                 DexLine(content, $"<color={Theme.SubTag}>몸 — {bodyDef.Clone ?? bodyDef.Name} 몸(HP · 강인도 · 행동 · 패시브)을 빌려 씀</color>", Theme.FsSm, Theme.Sub);
@@ -975,12 +1021,12 @@ namespace Bolzena.RunUI
             else
             {
                 DexLine(content, $"<color={Theme.GoldTag}>{BossUlt.FIRST}턴째</color> 에 바로 사용 · 그 뒤 <color={Theme.GoldTag}>{BossUlt.EVERY}턴</color>마다 · 예고 · 끊기 없음", Theme.FsBody, Theme.Ink);
-                W.IntentRow(content, this, plan.Use, $"{floor + 1}층 값");
+                W.IntentRow(content, this, plan.Use, $"{floor + 1}층 값", ByScale(scs, sc => P.Text.Intent(plan.Use, null, sc.dmg)));
                 DexLine(content, $"<color={Theme.SubTag}>원래 고학년 — {plan.Orig}</color>" + (plan.Dropped.Count > 0 ? $"\n<color={Theme.SubTag}>보스판에서 빠진 것 — {string.Join(", ", plan.Dropped)}</color>" : ""), Theme.FsSm, Theme.Sub);
             }
-            SummonSection(content, e, true);
+            SummonSection(content, e, true, scs);
             BraceSection(content, e, false);
-            ActsSection(content, e);
+            ActsSection(content, e, scs);
             var more = P.Text.Enemy(e);
             if (!string.IsNullOrEmpty(more)) { W.Section(content, "특성", "패시브 · 쌓이는 수치", 36); DexLine(content, more, Theme.FsBody, Theme.Ink); }
             Stage.Hot["zoom.close"] = Stage.Hot["modal.x"];

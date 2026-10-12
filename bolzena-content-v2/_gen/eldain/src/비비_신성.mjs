@@ -17,12 +17,12 @@ export default hero({
   keyword: { name: K, desc: '손에 쥔 카드마다 자라는 새싹(카드 값)', carrier: 'self', cap: 4, cardValue: { grow: 'handEnd', reset: 'play' } },
   // 치명 정산(비비(신성) 소유 — 07 §3): 다른 아군이 치명을 내면 손의 카드 새싹 +1(P2 신성한 사냥 — 란 사냥감 치명이 새싹을 키움)
   // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
-  keywords: [{ name: '은총', desc: '다 자란 새싹이 내린 세계수의 은총 — 아군 모두의 치명이 잦아지고, 치명이 터질 때마다 하나씩 흩어진다', carrier: 'self', cap: 10, per: [{ stat: 'crit', v: 0.05, who: 'allies' }] }],   // 2026-10-11 사용자: 자신만 → 아군 전체 · 최대 3 → 10 · 치명마다 −1
+  keywords: [{ name: '은총', desc: '세계수의 은총 — 아군 치명이 잦아짐', carrier: 'self', cap: 10, per: [{ stat: 'crit', v: 0.05, who: 'allies' }] }],   // 2026-10-11 사용자: 자신만 → 아군 전체 · 최대 3 → 10 · 치명마다 −1
   // 사용자 10-11: 20명 모두 고유 능력 2개
   passives: [{ name: '신성한 품 속', when: { on: 'crit', who: 'any' }, fx: [{ k: 'spend', id: '은총', v: 1 }, grow(1)] },   // 10-11: 아군 · 자신의 치명마다 은총 −1(사용자) · 새싹 +1 — 자동 규칙 2개 한도라 한 규칙에 합침
     { name: '이른 봄의 기운', when: { on: 'lowHp', pct: 0.3 }, fx: [status('끈기', 1)] },   // 원작 3성 하위 — 파티 HP 30% 이하가 되면 끈기 1(전투당 한 번)
   ],
-  ult: { name: '모든 이를 굽어살피리', cost: 300, fx: [dmg(2.8, 'allEnemies'), { k: 'critDmg', v: 0.4, turns: 3, id: '신성', off: [status('취약', 1, { target: 'allEnemies' })] }, grow(1, { n: 0 })] },
+  ult: { name: '모든 이를 굽어살피리', cost: 250, fx: [dmg(2.8, 'allEnemies'), { k: 'critDmg', v: 0.4, turns: 3, id: '신성', off: [status('취약', 1, { target: 'allEnemies' })] }, grow(1, { n: 0 })] },   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로
 }, {
   basicNames: ['빛구슬', '영롱한 빛구슬', '녹발의 베일'], deck: 'heavy',
   uniques: [
@@ -30,10 +30,10 @@ export default hero({
       name: '손잡기', cost: 0, type: '스킬', tags: KEEP,
       fx: [grow(2), draw(1)],
       oracles: [
-        { tags: KEEP, fx: [grow(3), draw(1)] },
-        { tags: KEEP, fx: [grow(1, { n: 0 }), draw(1)] },
-        { power: true, fx: [power([rule({ on: 'make', who: 'other' }, [grow(1)])])] },
-        { tags: KEEP, fx: [draw(1, { who: 'other' }), grow(1)] },
+        { tags: KEEP, fx: [grow(3), draw(2)] },   // 10-13 신탁 점검
+        { tags: KEEP, fx: [grow(1, { n: 0 }), draw(2)] },   // 10-13 신탁 점검
+        { power: true, fx: [power([rule({ on: 'make', who: 'other' }, [grow(2)])])] },   // 10-13 신탁 점검: 새싹 1→2
+        { tags: KEEP, fx: [draw(1, { who: 'other' }), grow(2)] },   // 10-13 신탁 점검: 새싹 1→2
         { tags: KEEP, fx: [{ k: 'costMod', v: -1, n: 1, who: 'self', unique: true, turns: 1 }, draw(1)] },
       ],
       blesses: ['draw', 'ap', [grow(1)]],
@@ -43,10 +43,10 @@ export default hero({
       fx: [dmg(2.4), ifSt(3), team(0.2), stack('은총', 2)],
       oracles: [
         { tags: KEEP, fx: [dmg(2.4), ifSt(3), team(0.3)] },
-        { tags: KEEP, fx: [dmg(2.4), { k: 'perCardSt', id: K }, dmg(0.5)] },
+        { tags: KEEP, fx: [stack('은총', 2), dmg(2.4), { k: 'perCardSt', id: K }, dmg(0.5)] },   // 10-13 신탁 점검: 은총 되살림
         { tags: KEEP, fx: [dmg(1.2, 'allEnemies'), ifSt(3), team(0.2)] },
-        { tags: KEEP, fx: [dmg(2.4), ifSt(4), dmg(2.4)] },
-        { tags: KEEP, fx: [dmg(2.8), { k: 'cardStatus', id: K, to: 'this', half: true }] },
+        { tags: KEEP, fx: [stack('은총', 2), dmg(2.4), ifSt(4), dmg(2.4)] },   // 10-13 신탁 점검: 은총 되살림
+        { tags: KEEP, fx: [dmg(3.2), { k: 'cardStatus', id: K, to: 'this', half: true }] },   // 10-13 신탁 점검
       ],
       blesses: ['power', 'cost', [grow(1)]],
     },
@@ -58,7 +58,7 @@ export default hero({
         { tags: KEEP, fx: [status('사기', 1), ifSt(3), crit(2)] },
         { tags: KEEP, cost: 0, fx: [status('사기', 1), grow(2)] },
         { tags: KEEP, type: '공격', fx: [dmg(1), { k: 'perCardSt', id: K }, dmg(0.4)] },
-        { tags: KEEP, fx: [status('사기', 1), ifSt(3), { k: 'gauge', v: 30, target: 'oneAlly' }] },
+        { tags: KEEP, fx: [status('사기', 1), ifSt(3), { k: 'gauge', v: 40, target: 'oneAlly' }] },   // 10-13 신탁 점검
       ],
       blesses: ['cost', 'draw', [grow(1)]],
     },
@@ -66,10 +66,10 @@ export default hero({
       name: '영원한 포옹', cost: 2, type: '공격', tags: KEEP,
       fx: [dmg(1.3, 'allEnemies'), ifSt(3), status('끈기', 1), stack('은총', 2)],
       oracles: [
-        { power: true, fx: [team(0.2), power([rule({ on: 'play', cardSt: K }, [status('끈기', 1)])])] },
+        { power: true, fx: [stack('은총', 2), team(0.3), power([rule({ on: 'play', cardSt: K }, [status('끈기', 1)])])] },   // 10-13 신탁 점검: 은총 2 · 30%
         { tags: KEEP, fx: [dmg(1.3, 'allEnemies'), ifSt(3), team(0.3)] },
-        { type: '스킬', tags: KEEP, fx: [team(0.3), ifSt(3), status('끈기', 1)] },
-        { tags: KEEP, cost: 1, fx: [dmg(0.8, 'allEnemies'), ifSt(3), status('끈기', 1)] },
+        { type: '스킬', tags: KEEP, fx: [team(0.3), stack('은총', 2), ifSt(3), status('끈기', 1)] },   // 10-13 신탁 점검: 은총 되살림
+        { tags: KEEP, cost: 1, fx: [dmg(1.2, 'allEnemies'), stack('은총', 2), ifSt(3), status('끈기', 1)] },   // 10-13 신탁 점검: 은총 되살림
         { tags: KEEP, fx: [dmg(1.3, 'allEnemies'), ifSt(3), { k: 'nextAp', v: 1 }] },
       ],
       blesses: ['power', 'cost', [grow(1)]],
@@ -81,8 +81,8 @@ export default hero({
         { tags: KEEP, fx: [dmg(0.6, 'randomEnemy', { hits: 3 }), ifSt(3), crit()] },
         { tags: KEEP, fx: [dmg(0.5, 'randomEnemy', { hits: 3 }), ifSt(3), team(0.2)] },
         { tags: KEEP, fx: [dmg(0.5, 'randomEnemy', { hits: 3 }), grow(1)] },
-        { tags: KEEP, fx: [{ k: 'perCardSt', id: K, n: 1 }, dmg(0.4, 'randomEnemy')] },
-        { cost: 0, tags: KEEP, fx: [dmg(0.3, 'randomEnemy', { hits: 3 }), ifSt(3), crit()] },
+        { tags: KEEP, fx: [{ k: 'perCardSt', id: K, n: 1 }, dmg(0.7, 'randomEnemy')] },   // 10-13 신탁 점검
+        { cost: 0, tags: KEEP, fx: [dmg(0.4, 'randomEnemy', { hits: 3 }), ifSt(3), crit()] },   // 10-13 신탁 점검
       ],
       blesses: ['power', 'cost', [grow(1)]],
     },

@@ -17,7 +17,7 @@ export default hero({
   id: H, name: '죠안', nature: '우울', race: '요정', role: '서포터', star: 3,
   blurb: '말 한마디로 빵을 짓는 교단 주교. 동료에게 빵을 쥐여 주고 힘을 나눠 지키며 경전을 채우고, 경전으로 꿈결에 들면 사슬로 적을 치며 그 힘으로 파티를 고칩니다.',
   keyword: { name: Q, desc: '교주님 말씀을 받아 적은 책의 쪽수', carrier: 'self', cap: 4 },
-  keywords: [{ name: SH, desc: '죠안이 나눠 지키는 아군 — 노려진 피해를 덜고 그만큼 파티 실드로', carrier: 'hero', cap: 1, endDecay: 1, share: 0.3 }],
+  keywords: [{ name: SH, desc: '죠안이 힘을 나눠 지키는 아군', carrier: 'hero', cap: 1, endDecay: 1, share: 0.3 }],
   // 사용자 10-11: 20명 모두 고유 능력 2개
   passives: [
     { name: '은혜 갚은 죠안', when: { on: 'fightStart' }, fx: [bread(1)] },   // 원작 3성 — 전투 시작 빵 1장
@@ -25,23 +25,23 @@ export default hero({
   ],
   forms: [{
     // 4차 태세(사용자 10-11): 경전 4로 들고 · 교리 ③ 으로 지키고 · 3턴 뒤 풀림(반동 없음). 태세 중 죠안 카드가 적을 치면 파티 회복(꿈결의 사슬 — 피해 기반 회복 소유)
-    id: F, name: '꿈결 형상', desc: '꿈결에 든 주교 — 죠안이 적을 칠 때마다 파티를 고친다', stance: true, anim: 'Idle_DreamForm',   // 원작 꿈결 형상 쉬는 동작(10-11 붙임)
+    id: F, name: '꿈결 형상', desc: '꿈결에 든 주교', stance: true, anim: 'Idle_DreamForm',   // 원작 꿈결 형상 쉬는 동작(10-11 붙임)
     turns: 3,
     bonus: [{ type: '공격', ratio: 1.6 }],
     passives: [{ name: '꿈결의 사슬', when: { on: 'hit' }, fx: [heal(0.6)] }, { name: '은혜 갚은 죠안', when: { on: 'turnStart' }, fx: [draw(1), bread(1)] }],
   }],
-  ult: { name: '제가 목도한 것을', cost: 250, fx: [dmg(0.8, 'allEnemies'), shield(2), { k: 'form', id: F }] },
+  ult: { name: '제가 목도한 것을', cost: 250, fx: [dmg(0.8, 'allEnemies'), shield(2.5), heal(1.5), { k: 'form', id: F }] },   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 실드 200→250% · 회복 150% 더함
 }, {
   basicNames: ['경건한 일격', '사슬 휘두르기', '갓 구운 빵'], heal: true, deck: 'light',
   uniques: [
     { // 시동
-      name: '빵이 있으라', cost: 0, type: '스킬',
+      name: '빵이 있으라', cost: 1, type: '스킬',   // 2026-10-12 사용자 「0코로 빵을 두 번 — 탱커 없이 죠안 하나로 파티를 돌본다」 0 → 1코(신탁도 따라감)
       fx: [bread(1), page(2)],
       oracles: [
         { fx: [bread(2), page(1)] },
-        { fx: [bread(1, 'strongestAlly'), page(1)] },
+        { fx: [bread(1, 'strongestAlly'), page(2)] },   // 10-13 신탁 점검: 경전 1→2
         { power: true, fx: [bread(1), power([rule({ on: 'turnStart' }, [bread(1)])])] },
-        { fx: [make(CR, 1, { owner: 'other' }), page(1)] },
+        { fx: [make(CR, 1, { owner: 'other' }), page(2)] },   // 10-13 신탁 점검: 경전 1→2
         { fx: [bread(1), draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
       ],
       blesses: ['draw', 'heal', [page(1)]],
@@ -51,8 +51,8 @@ export default hero({
       fx: [share(), page(1)],
       oracles: [
         { fx: [share(), { k: 'cutHit', v: 0.2 }, page(1)] },
-        { fx: [share('otherAllies'), page(1)] },
-        { fx: [shield(1.6), page(1), inF, { k: 'formKeep', turns: 1 }] },   // 태세 지키기
+        { fx: [share('otherAllies'), page(2)] },   // 10-13 신탁 점검: 경전 1→2
+        { fx: [shield(2), page(1), inF, { k: 'formKeep', turns: 1 }] },   // 10-13 신탁 점검   // 태세 지키기
         { cost: 0, fx: [share()] },
         { fx: [share(), bread(1)] },
       ],
@@ -62,11 +62,11 @@ export default hero({
       name: '경전 낭독', cost: 1, type: '스킬',
       fx: [read(1), page(1), { k: 'ifPile', from: 'record', n: 1, not: true }, draw(1)],
       oracles: [
-        { fx: [read(1.2), page(1)] },
-        { cost: 1, fx: [read(0.5), page(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
-        { fx: [read(0.6), draw(1)] },
-        { fx: [read(0.6), page(1), draw(1, { who: 'other' })] },
-        { fx: [read(0.6), page(1), inF, draw(2)] },
+        { fx: [read(1.2), page(1), { k: 'ifPile', from: 'record', n: 1, not: true }, draw(1)] },   // 10-13 신탁 점검: 드로우 되살림
+        { cost: 0, fx: [read(0.5), page(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 · 10-13 신탁 점검: 같은 비용에 약하기만 해 비용 0
+        { fx: [read(0.8), draw(1)] },   // 10-13 신탁 점검: 다시 60→80%(아래 둘도)
+        { fx: [read(0.8), page(1), draw(1, { who: 'other' })] },
+        { fx: [read(0.8), page(1), inF, draw(2)] },
       ],
       blesses: ['cost', 'draw', [page(1)]],
     },
@@ -74,12 +74,12 @@ export default hero({
       name: '제가 목도한 것을', cost: 1, type: '스킬',
       fx: [bread(1), ...dream(3)],
       oracles: [
-        { power: true, fx: [page(1), power([rule({ on: 'turnStart' }, [page(1)])])] },
+        { power: true, fx: [bread(1), page(1), power([rule({ on: 'turnStart' }, [page(1)])])] },   // 10-13 신탁 점검: 빵 되살림
         // 원작 배치 열 강화 공격 → 고르는 태세(D1): 공세(전열) · 보급(중열) · 축성(후열) — 들 때 덤
-        { type: '공격', fx: [page(1), ...dream(4), dmg(0.6, 'allEnemies')] },   // 공세(전열 범위)
-        { fx: [page(1), ...dream(4), draw(2)] },   // 보급(중열)
-        { fx: [page(1), ...dream(4), status('사기', 1)] },   // 축성(후열)
-        { fx: [bread(1), inF, { k: 'formExtend', id: F, v: 1, max: 4 }] },
+        { type: '공격', fx: [page(1), ...dream(3), dmg(0.6, 'allEnemies')] },   // 공세(전열 범위) · 10-13 신탁 점검: 셋 다 경전 4→3(기본과 같게)
+        { fx: [page(1), ...dream(3), draw(2)] },   // 보급(중열)
+        { fx: [page(1), ...dream(3), status('사기', 1)] },   // 축성(후열)
+        { fx: [bread(1), inF, { k: 'formExtend', id: F, v: 2, max: 4 }] },   // 10-13 신탁 점검: +1턴 → +2턴
       ],
       blesses: ['guard', 'draw', [heal(0.5)]],
     },
@@ -88,10 +88,10 @@ export default hero({
       fx: [dmg(1.1, 'allEnemies'), bread(1)],
       oracles: [
         { fx: [dmg(1.4, 'allEnemies'), bread(1)] },
-        { fx: [dmg(0.6, 'allEnemies'), page(1)] },
-        { fx: [dmg(0.6, 'allEnemies'), inF, dmg(0.6, 'allEnemies')] },
-        { fx: [dmg(1.2), bread(1, 'strongestAlly')] },
-        { cost: 0, fx: [dmg(0.4, 'allEnemies'), page(1)] },
+        { fx: [dmg(0.7, 'allEnemies'), bread(1), page(1)] },   // 10-13 신탁 점검: 빵 되살림
+        { fx: [dmg(0.6, 'allEnemies'), bread(1), inF, dmg(0.6, 'allEnemies')] },   // 10-13 신탁 점검: 빵 되살림
+        { fx: [dmg(1.5), bread(1, 'strongestAlly')] },   // 10-13 신탁 점검
+        { cost: 0, fx: [dmg(0.6, 'allEnemies'), bread(1)] },   // 10-13 신탁 점검 3차: 경전 대신 빵   // 10-13 신탁 점검
       ],
       blesses: ['power', 'draw', [page(1)]],
     },

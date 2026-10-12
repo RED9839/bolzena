@@ -20,10 +20,10 @@ export default hero({
   id: H, name: '티그(영웅)', nature: '광기', race: '수인', role: '딜러', star: 3,
   blurb: '영웅이 된 티그. 영웅의 검을 휘두를수록 검이 자라고, 다른 카드로 검을 다시 쥐고 · 싸게 하고 · 더 키워 같은 검을 몇 번이고 내리칩니다.',
   keyword: {
-    name: G, desc: '영웅의 검을 낼수록 자라는 성장 — 1당 그 검의 피해 덤(이번 전투)', carrier: 'self', cap: 10, cardValue: { max: 10 },
+    name: G, desc: '영웅의 검을 낼수록 자라는 힘', carrier: 'self', cap: 10, cardValue: { max: 10 },
   },
   // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
-  keywords: [{ name: '용기', desc: '공격을 거듭하며 붙은 영웅의 용기 — 티그의 피해가 커지고 사슴류 베기가 더 여러 번 몰아친다', carrier: 'self', cap: 3, per: [{ stat: 'dealt', v: 0.1 }],   // 1당 주는 피해 +10%(10-11 순환을 빼며 덧붙임)
+  keywords: [{ name: '용기', desc: '공격을 거듭하며 붙은 영웅의 용기', carrier: 'self', cap: 3, per: [{ stat: 'dealt', v: 0.1 }],   // 1당 주는 피해 +10%(10-11 순환을 빼며 덧붙임)
     rules: [{ name: '영웅심', when: { on: 'play', type: '공격', token: false, every: 2 }, fx: [stack('용기', 1)] }] }],   // 공격 2장마다 용기 +1
   // 사용자 10-11: 20명 모두 고유 능력 2개
   passives: [
@@ -40,8 +40,8 @@ export default hero({
         { tags: KEEP, fx: [dmg(1.2), { k: 'perCardSt', id: G }, dmg(0.8), grow(1)] },
         { tags: KEEP, fx: [dmg(1.2), { k: 'perCardSt', id: G }, dmg(0.6), grow(2)] },
         { tags: [...KEEP, '회수 3'], fx: [dmg(1), { k: 'perCardSt', id: G }, dmg(0.6), grow(1)] },
-        { tags: KEEP, fx: [dmg(1.6), low(0.4), dmg(1.6), grow(1)] },   // 낮은 체력 추가 피해(처형 대신)
-        { cost: 1, tags: KEEP, fx: [dmg(1.8), { k: 'perCardSt', id: G }, dmg(0.6), grow(1)] },
+        { tags: KEEP, fx: [dmg(1.8), low(0.4), dmg(1.8), grow(1)] },   // 낮은 체력 추가 피해(처형 대신)
+        { cost: 1, tags: KEEP, fx: [dmg(2), { k: 'perCardSt', id: G }, dmg(0.7), grow(1)] },   // 10-13 신탁 점검
       ],
       blesses: ['power', 'cost', [grow(1)]],
     },
@@ -49,10 +49,10 @@ export default hero({
       name: '사슴류 베기', cost: 1, type: '공격',
       fx: [dmg(0.5, 'allEnemies', { hitsPer: '용기', hitsAdd: 2 }), stack('용기', 1)],
       oracles: [
-        { fx: [dmg(0.6, 'allEnemies', { hits: 2 })] },
-        { fx: [dmg(0.8, 'oneEnemy', { hits: 3 })] },
-        { fx: [dmg(0.4, 'allEnemies', { hits: 2 }), feed(1)] },
-        { cost: 0, fx: [dmg(0.7, 'allEnemies')] },
+        { fx: [dmg(0.6, 'allEnemies', { hits: 2 }), stack('용기', 1)] },   // 10-13 신탁 점검: 용기 되살림
+        { fx: [dmg(0.8, 'oneEnemy', { hits: 3 }), stack('용기', 1)] },   // 10-13 신탁 점검: 용기 되살림
+        { fx: [dmg(0.5, 'allEnemies', { hits: 2 }), feed(1)] },   // 10-13 신탁 점검
+        { cost: 0, fx: [dmg(0.7, 'allEnemies'), stack('용기', 1)] },   // 10-13 신탁 점검: 용기 되살림
         // 원작 배치 열 덤 → 무작위 덤(D1 기본안)
         { fx: [dmg(0.6, 'allEnemies', { hits: 2 }), { k: 'roll', n: 2 }, { k: 'ifRoll', n: 1 }, status('사기', 1), { k: 'ifRoll', n: 2 }, draw(1)] },
       ],
@@ -63,9 +63,9 @@ export default hero({
       fx: [dmg(1.5), back],   // 10-11 밸런스(사용자 「다 해 줘」)
       oracles: [
         { fx: [dmg(0.9), back] },
-        { type: '스킬', fx: [back, feed(1)] },
+        { type: '스킬', fx: [back, feed(2)] },   // 10-13 신탁 점검: 성장 1→2
         { fx: [dmg(0.6), back, tough(1)] },
-        { type: '스킬', fx: [{ k: 'pull', from: 'draw', n: 1, tag: SWD }, draw(1)] },
+        { type: '스킬', fx: [{ k: 'pull', from: 'draw', n: 1, tag: SWD }, draw(2)] },   // 10-13 신탁 점검: 드로우 1→2
         { tags: ['회수 3'], fx: [dmg(0.6), back] },
       ],
       blesses: ['power', 'draw', [feed(1)]],
@@ -74,11 +74,11 @@ export default hero({
       name: '영웅의 길', cost: 1, type: '공격',
       fx: [dmg(2.1), { k: 'costMod', v: -1, n: 1, turns: 1, tag: SWD }, stack('용기', 1)],   // 10-11 밸런스(사용자 「다 해 줘」)
       oracles: [
-        { fx: [dmg(1.6), { k: 'costMod', v: -1, n: 1, turns: 1, tag: SWD }] },
-        { fx: [dmg(1.2), twice, dmg(1.2)] },
-        { fx: [dmg(1.2), { k: 'costMod', v: -2, n: 1, turns: 1, tag: SWD }] },
-        { fx: [dmg(1.2), { k: 'ifFoe', id: 'hp', pct: 0.3 }, dmg(1.2)] },
-        { fx: [dmg(1), back] },
+        { fx: [dmg(1.6), { k: 'costMod', v: -1, n: 1, turns: 1, tag: SWD }, stack('용기', 2)] },   // 10-13 신탁 점검: 용기 2(같은 꼴이라 피해는 본판 210%)
+        { fx: [dmg(1.4), twice, dmg(1.4)] },   // 10-13 신탁 점검
+        { fx: [dmg(1.2), { k: 'costMod', v: -2, n: 1, turns: 1, tag: SWD }, stack('용기', 1)] },   // 10-13 신탁 점검: 용기 되살림(아래 둘도)
+        { fx: [dmg(1.2), stack('용기', 1), { k: 'ifFoe', id: 'hp', pct: 0.3 }, dmg(1.2)] },
+        { fx: [dmg(1), back, stack('용기', 1)] },
       ],
       blesses: ['power', 'cost', [feed(1)]],
     },
@@ -87,10 +87,10 @@ export default hero({
       fx: [dmg(1.3), feed(1)],   // 10-11 밸런스(사용자 「다 해 줘」)
       oracles: [
         { fx: [dmg(0.8), feed(1)] },
-        { type: '스킬', fx: [feed(2)] },
+        { fx: [dmg(0.5), feed(2)] },   // 10-13 신탁 점검: 성장 2 에 피해 80%
         { fx: [dmg(0.6), stack('용기', 1), feed(1)] },
         { fx: [dmg(0.6), tough(1), feed(1)] },
-        { fx: [dmg(0.6), low(0.4), dmg(0.8)] },
+        { fx: [dmg(0.6), feed(1), low(0.4), dmg(0.8)] },   // 10-13 신탁 점검: 성장 되살림
       ],
       blesses: ['power', 'draw', [feed(1)]],
     },

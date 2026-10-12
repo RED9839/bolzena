@@ -28,13 +28,13 @@ export default hero({
       { unique: true, fx: [status('둔화', 1, { target: 'oneEnemy' }), status('피해 감소', 1)] },
     ],
   },
-  keywords: [{ name: F, desc: '달빛 아래 피어난 꽃밭 — 턴이 끝날 때마다 꽃잎이 적을 찌른다', carrier: 'self', cap: 3, per: [{ stat: 'dot', ratio: 0.3 }] }],
+  keywords: [{ name: F, desc: '달빛 아래 피어난 꽃밭', carrier: 'self', cap: 3, per: [{ stat: 'dot', ratio: 0.3 }] }],
   // 사용자 10-11: 20명 모두 고유 능력 2개
   passives: [
     { name: '소망을 머금은 꽃', when: { on: 'fightStart' }, fx: [fl(2)] },   // 원작 2성 — 전투 시작 꽃밭 2
     { name: '지극정성', when: { on: 'turnStart' }, conds: [{ c: 'stack', id: M, n: 2 }], fx: [heal(0.3)] },   // 반달 · 보름 · 그믐이면 매 턴 회복(초승 빼고)
   ],
-  ult: { name: '지극정성의 마중', cost: 250, fx: [dmg(0.5, 'allEnemies', { hits: 4 }), pick, status('둔화', 1, { target: 'allEnemies' }), { k: 'nextAp', v: 1 }] },
+  ult: { name: '지극정성의 마중', cost: 250, fx: [dmg(0.5, 'allEnemies', { hits: 4 }), pick, status('둔화', 1, { target: 'allEnemies' }), { k: 'ap', v: 2 }] },   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 다음 턴 AP 1 → 지금 AP 2
 }, {
   basicNames: ['달빛 탄', '석장 휘두르기', '사제의 베일'], deck: 'heavy',
   uniques: [
@@ -44,7 +44,7 @@ export default hero({
       oracles: [
         { fx: [dmg(1.5, 'allEnemies'), step(1)] },                       // 메인딜
         { type: '스킬', cost: 0, fx: [fl(1), step(1)] },                                // 메인딜(꽃밭)
-        { fx: [dmg(0.9, 'allEnemies'), step(2)] },                        // 순환
+        { fx: [dmg(1.1, 'allEnemies'), step(2)] },                        // 순환
         { type: '스킬', fx: [stack(M, 1, { set: 2 }), shield(0.9)] },     // 서포터(반달로)
         { type: '스킬', fx: [stack(M, 1, { set: 4 }), heal(1.2)] },       // 서포터(그믐으로)
       ],
@@ -55,9 +55,9 @@ export default hero({
       fx: [pick, draw(1)],
       oracles: [
         { fx: [pick, draw(2)] },
-        { fx: [pick, lock] },
+        { fx: [pick, lock, draw(1)] },   // 10-13 신탁 점검: 드로우 되살림
         { tags: ['보존'], fx: [pick, draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
-        { fx: [pick, empower(0.3, { who: 'other' })] },                  // 서포터
+        { fx: [pick, empower(0.3, { who: 'other' }), draw(1)] },                  // 서포터 · 10-13 신탁 점검: 드로우 되살림
         { fx: [pick, draw(1, { who: 'other' })] },                        // 서포터
       ],
       blesses: ['draw', 'ap', [fl(1)]],
@@ -69,20 +69,20 @@ export default hero({
         { tags: KEEP, fx: [dmg(1.4, 'randomEnemy', { hits: 2 }), slowed, dmg(1.4)] },   // 메인딜
         { tags: KEEP, fx: [dmg(1, 'randomEnemy', { hits: 2, hitFx: [status('약화', 1)] })] },   // 서포터
         { tags: KEEP, cost: 0, fx: [dmg(0.6, 'randomEnemy', { hits: 2 }), slowed, dmg(0.6)] },
-        { tags: KEEP, fx: [dmg(1, 'randomEnemy', { hits: 2 }), step(1)] },
+        { tags: KEEP, fx: [dmg(1.2, 'randomEnemy', { hits: 2 }), step(1)] },   // 10-13 신탁 점검
         { tags: KEEP, fx: [dmg(1, 'randomEnemy', { hits: 2 }), dark, status('둔화', 1, { target: 'allEnemies' })] },   // 서포터
       ],
       blesses: ['power', 'cost', [fl(1)]],
     },
     { // 마무리 — 보름 메인딜 / 반달 · 그믐 서포터 갈래
-      name: '달님께 비는 운석', cost: 2, type: '공격', tags: KEEP,
+      name: '달님께 비는 운석', cost: 2, type: '공격', tags: KEEP,   // 10-13 신탁 점검: 신탁 1 · 2 · 3 · 5 올림(운석은 다음 턴 · 보름 고정 340%)
       fx: [dmg(2.2, 'allEnemies')],
       oracles: [
-        { power: true, fx: [fl(1), power([rule({ on: 'play' }, [moon(3), dmg(0.8, 'randomEnemy')])])] },   // 메인딜
-        { tags: KEEP, fx: [{ k: 'later', n: 2, then: [dmg(4.2, 'allEnemies')] }] },                         // 메인딜
-        { tags: KEEP, fx: [dmg(3, 'allEnemies'), stack(M, 1, { set: 3 }), lock] },                       // 메인딜(보름 고정)
+        { power: true, fx: [fl(2), power([rule({ on: 'play' }, [moon(3), dmg(1.2, 'randomEnemy')])])] },   // 메인딜
+        { tags: KEEP, fx: [{ k: 'later', n: 1, then: [dmg(5, 'allEnemies')] }] },                         // 메인딜
+        { tags: KEEP, fx: [dmg(3.4, 'allEnemies'), stack(M, 1, { set: 3 }), lock] },                       // 메인딜(보름 고정)
         { type: '스킬', tags: KEEP, fx: [heal(2), dark, { k: 'nextAp', v: 1 }] },                         // 서포터(그믐)
-        { type: '스킬', tags: KEEP, fx: [shield(1.5), half, status('약화', 1, { target: 'allEnemies' })] },   // 서포터(반달)
+        { type: '스킬', tags: KEEP, fx: [shield(1.8), half, status('약화', 1, { target: 'allEnemies' })] },   // 서포터(반달)
       ],
       blesses: ['power', 'cost', [fl(1)]],
     },
@@ -94,7 +94,7 @@ export default hero({
         { fx: [shield(1.2), half, status('약화', 1, { target: 'allEnemies' })] },
         { fx: [heal(1), draw(1, { who: 'other' })] },
         { fx: [heal(1), pick] },
-        { fx: [heal(0.6), fl(1)] },
+        { fx: [heal(0.8), fl(1)] },   // 10-13 신탁 점검
       ],
       blesses: ['heal', 'cost', [fl(1)]],
     },

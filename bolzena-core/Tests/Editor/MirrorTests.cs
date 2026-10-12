@@ -61,7 +61,7 @@ namespace Bolzena.Core.Tests
             var tx = new CardText(d);
             string t = tx.Fx(d.Card("hide").Fx);
             Assert.IsFalse(t.Contains("hide"));
-            StringAssert.Contains("1개당(최소 5 · 최대 10)", tx.Fx(d.Hero("m").AllKeywords.First(k => k.Name == "숨음").Rules[0].Fx));
+            StringAssert.Contains("1당(최소 5 · 최대 10)", tx.Fx(d.Hero("m").AllKeywords.First(k => k.Name == "숨음").Rules[0].Fx));
         }
     }
 }

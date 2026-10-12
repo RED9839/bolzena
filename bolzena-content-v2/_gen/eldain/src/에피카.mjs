@@ -12,7 +12,7 @@ export default hero({
   id: H, name: '에피카', nature: '활발', race: '수인', role: '딜러', star: 3,
   blurb: '하프를 켜는 유니콘 음유시인. 손을 빠르게 갈며 무대를 달구고, 똑같은 차림의 에피콘 제자들은 동료가 카드를 낼 때마다 따라 칩니다.',
   keyword: {
-    name: HEAT, desc: '이번 턴 에피카가 낸 · 버린 카드만큼 달아오른 무대', carrier: 'self', cap: 10, endClear: true,
+    name: HEAT, desc: '카드를 낼수록 달아오르는 무대', carrier: 'self', cap: 10, endClear: true,
     tally: ['play', 'discardBy'],
   },
   keywords: [{
@@ -34,7 +34,7 @@ export default hero({
         { fx: [draw(3), discard(1)] },
         { fx: [draw(2), stack(HEAT, 2)] },
         { fx: [discard(1, { all: true }), draw(5)] },
-        { power: true, fx: [draw(1), power([rule({ on: 'play', every: 3 }, [draw(1)])])] },
+        { power: true, fx: [draw(2), power([rule({ on: 'play', every: 3 }, [draw(1)])])] },   // 10-13 신탁 점검
         { fx: [{ k: 'costMod', v: -1, n: 1, who: 'other', turns: 1 }, draw(1)] },
       ],
       blesses: ['draw', 'ap', [stack(HEAT, 1)]],
@@ -47,7 +47,7 @@ export default hero({
         { fx: [discard(2), draw(2), S(1)] },
         { type: '공격', cost: 1, fx: [discard(2), { k: 'perDiscarded' }, dmg(0.7, 'randomEnemy'), draw(2)] },
         { fx: [discard(1), draw(3)] },
-        { fx: [discard(2), { k: 'pull', from: 'discarded', n: 1 }] },
+        { fx: [discard(2), draw(1), { k: 'pull', from: 'discarded', n: 1 }] },   // 10-13 신탁 점검: 드로우 1 되살림
       ],
       blesses: ['draw', 'ap', [stack(HEAT, 1)]],
     },
@@ -56,9 +56,9 @@ export default hero({
       fx: [S(1), draw(1), ifStack(HEAT, 3), S(1)],
       oracles: [
         { fx: [S(1), draw(1), ifStack(HEAT, 3), S(2)] },
-        { cost: 0, fx: [ifStack(HEAT, 3), spend(HEAT, 3), S(1)] },
-        { fx: [ifStack(HEAT, 2), spend(HEAT, 2), S(1), status('사기', 1)] },
-        { fx: [discard(1), S(1)] },
+        { cost: 0, fx: [S(1), ifStack(HEAT, 3), spend(HEAT, 3), S(1)] },   // 10-13 신탁 점검: 에피칸 1 은 늘
+        { fx: [draw(1), ifStack(HEAT, 2), spend(HEAT, 2), S(1), status('사기', 1)] },   // 10-13 신탁 점검: 드로우 되살림
+        { fx: [discard(1), draw(2), S(1)] },   // 10-13 신탁 점검: 드로우 2
         { fx: [draw(1), ifStack(HEAT, 3), S(1), { k: 'when', on: 'draw' }, S(1)] },
       ],
       blesses: ['cost', 'draw', [S(1)]],
@@ -67,9 +67,9 @@ export default hero({
       name: '교주에게 바칩니다', cost: 1, type: '공격',
       fx: [heat, dmg(0.4, 'randomEnemy'), status('사기', 1)],
       oracles: [
-        { power: true, fx: [S(1), power([rule({ on: 'play', nth: 4 }, [S(1)])])] },
+        { power: true, fx: [S(1), status('사기', 1), power([rule({ on: 'play', nth: 4 }, [S(1)])])] },   // 10-13 신탁 점검: 사기 되살림
         { fx: [heat, dmg(0.4), status('사기', 1)] },
-        { fx: [{ k: 'perStack', id: K, n: 1 }, dmg(0.4, 'randomEnemy', { hits: 2 })] },
+        { fx: [{ k: 'perStack', id: K, n: 1 }, dmg(0.8, 'randomEnemy', { hits: 2 })] },   // 10-13 신탁 점검
         { cost: 0, fx: [heat, dmg(0.3, 'randomEnemy'), draw(1)] },
         { fx: [heat, dmg(0.4, 'randomEnemy'), { k: 'nextAp', v: 1 }] },
       ],
@@ -81,7 +81,7 @@ export default hero({
       oracles: [
         { fx: [dmg(0.4, 'randomEnemy', { hits: 2 }), { k: 'perStack', id: K }, dmg(0.4, 'randomEnemy')] },
         { fx: [dmg(0.4, 'randomEnemy', { hits: 2 }), S(1)] },
-        { fx: [{ k: 'perStack', id: K, n: 1 }, dmg(0.6)] },
+        { fx: [{ k: 'perStack', id: K, n: 1 }, dmg(0.8)] },   // 10-13 신탁 점검
         { cost: 0, fx: [{ k: 'perStack', id: K }, dmg(0.3, 'randomEnemy'), draw(1)] },
         { fx: [dmg(0.4, 'randomEnemy', { hits: 2 }), status('사기', 1)] },
       ],

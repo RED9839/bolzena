@@ -42,17 +42,19 @@ for (const id of ids) {
   if (!file) { console.log(`없음 ${id}`); bad++; continue; }
   const j = JSON.parse(fs.readFileSync(file, 'utf8'));
   // % 단위
-  const walk = (o, at) => {
-    if (Array.isArray(o)) return o.forEach((x, i) => walk(x, `${at}[${i}]`));
+  const walk = (o, at, cap) => {
+    if (Array.isArray(o)) return o.forEach((x, i) => walk(x, `${at}[${i}]`, cap));
     if (!o || typeof o !== 'object') return;
     for (const [k, v] of Object.entries(o)) {
       if (o.stat === 'ultCost' || o.k === 'ultCostMod') continue;   // 고학년 게이지 증감 25% 칸(▶E78 — 엔진 검사기도 뺌)
       if (typeof v === 'number' && ['ratio', 'ofEvent'].includes(k) || (typeof v === 'number' && k === 'v' && Math.abs(v) < 1 && v !== 0)) {
         const p = Math.round(Math.abs(v) * 1000) / 10; // %
         const ok = p >= 20 ? Math.abs(p / 10 - Math.round(p / 10)) < 1e-6 : Math.abs(p / 5 - Math.round(p / 5)) < 1e-6;
-        if (!ok) pct.push(`${id} ${at}.${k}=${v}`);
+        // 고유 효과 1개당 10% 미만은 1% 단위도 — 최대 겹을 채운 값이 10% 단위면(엔진 검사기 CapGrid · 10-12 밤 비비 수은 중독 8% × 5)
+        const capOk = k === 'v' && at.includes('.per[') && cap >= 2 && p < 10 && Number.isInteger(p) && Number.isInteger(p * cap / 10);
+        if (!ok && !capOk) pct.push(`${id} ${at}.${k}=${v}`);
       }
-      walk(v, `${at}.${k}`);
+      walk(v, `${at}.${k}`, o.cap ?? cap);
     }
   };
   walk(j, id);

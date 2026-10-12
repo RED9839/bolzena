@@ -302,7 +302,7 @@ namespace Bolzena.Core
             {
                 Party = S.Party.ToList(), Deck = S.Deck.ToList(), Enemies = CurrentEnemies().ToList(),
                 PartyHp = S.PartyHp, PartyMaxHp = S.PartyMaxHp, Gear = GearStats(), GearRules = GearRules(), Flash = S.Flash,
-                EnemyHp = sc.hp * hpx, EnemyDmg = sc.dmg * dmgx, Next = next, Shin = S.Shin, Gauge = GradeGauge(),
+                EnemyHp = sc.hp * hpx, EnemyDmg = sc.dmg * dmgx, Next = next, Mind = S.MindBreak > 0, Shin = S.Shin, Gauge = GradeGauge(),
                 Elite = S.EventFight != null ? S.EventFight.Elite : S.Elite || BossAsElite, EnemyNature = S.EnemyNature, Floor = S.Floor + 1,
                 Glow = glow, Growth = GradeGrowth(), CardVals = S.CardVals, CritDmg = Perk("critDmg"),
                 Seed = (uint)(S.Seed + S.Floor * 101 + S.Node * 7 + S.Step * 13 + (S.EventFight != null ? 555 : 0)),
@@ -316,12 +316,8 @@ namespace Bolzena.Core
         /// <summary>전투가 끝난 뒤 — 얻은 카드 · 신탁, 파티 HP, 남은 게이지, 싸움 기록.</summary>
         public void AfterFight(Battle b)
         {
-            bool mind = MindBroken;
-            if (!mind)
-            {
-                foreach (var id in b.GainedCards) if (!S.Deck.Contains(id) && PowerWhy(id) == null) GainCard(id);
-                foreach (var (cid, n, shin) in b.GainedFlash) { if (GameData.IsCopy(cid)) continue; var cardId = OwnInst(cid); S.Flash[cardId] = n; if (shin != null) S.Shin[cardId] = shin; }
-            }
+            foreach (var id in b.GainedCards) if (!S.Deck.Contains(id) && PowerWhy(id) == null) GainCard(id);
+            foreach (var (cid, n, shin) in b.GainedFlash) { if (GameData.IsCopy(cid)) continue; var cardId = OwnInst(cid); S.Flash[cardId] = n; if (shin != null) S.Shin[cardId] = shin; }
             // 제거 태그 — 덱에서 완전히 뺀다(전투가 갈라 낸 한 장 「#n」이면 덱의 맨 id 한 장)
             foreach (var id0 in b.Removed)
             {
@@ -353,7 +349,7 @@ namespace Bolzena.Core
                     var d = Data.Card(S.Deck[i]);
                     if (d != null && d.Becomes != null && Data.Card(d.Becomes) != null && Data.View(S.Deck[i]).HasTag(Tag.SealedTaboo)) { S.Flash.Remove(S.Deck[i]); S.Deck[i] = d.Becomes; }
                 }
-            // 정신 붕괴 — 이 싸움이 끝나면 하나 줄고, 파티에 정신 붕괴가 남은 채 끝났으면 다음 싸움까지
+            // 정신 붕괴(판) — 이 싸움이 끝나면 하나 줄고, 파티에 정신 붕괴(전투 상태)가 남은 채 끝났으면 다음 싸움 하나에 「망령의 속삭임」
             if (S.MindBreak > 0) S.MindBreak--;
             if (b.St(b.Pool, "정신 붕괴") > 0) S.MindBreak = Math.Max(S.MindBreak, 1);
             S.Hist.Add(new FightRecord
@@ -363,7 +359,7 @@ namespace Bolzena.Core
                 Plays = b.PlaysTotal, Ults = b.UltsUsed, Log = TapeOf(b),
                 Deck = b.Tape?.Deck.Select(GameData.BaseId).Distinct().OrderBy(x => x, StringComparer.Ordinal).ToList(),
             });
-            RecordFightPicks(b, mind);   // 플레이 기록 — 전투 중 고른 빛 · 끝난 뒤 제시된 빛 · 전리품(RunRecord.cs)
+            RecordFightPicks(b, false);   // 플레이 기록 — 전투 중 고른 빛 · 끝난 뒤 제시된 빛 · 전리품(RunRecord.cs)
             S.PartyHp = Math.Max(0, b.Pool.Hp); S.PartyMaxHp = b.Pool.MaxHp;
             S.Gauge = Num.Clamp(b.Gauge, 0, R.GAUGE_MAX);
             GainCredits(b);   // 학점 · 진급(RunGrade.cs)
@@ -458,13 +454,11 @@ namespace Bolzena.Core
             OracleOption.Of(Data, offer.CardId, offer.Picks.Select((n, i) => new GlowPick { N = n, Shin = offer.Shins != null && i < offer.Shins.Count ? offer.Shins[i] : null }));
 
         /// <summary>쓰지 못한 신탁 — 빛났지만 그 카드를 안 내고 끝났다. 끝난 뒤 하나를 골라 받는다. 못 받으면 까닭.</summary>
-        /// <summary>정신 붕괴 — 카드 얻기 · 신탁 · 제거가 막혔다.</summary>
+        /// <summary>정신 붕괴(2026-10-12 다시 만듦) — 남은 전투 수만큼, 그 전투의 매 턴 시작에 손패로 「망령의 속삭임」(R.MIND_CARD). 카드 얻기 · 신탁 · 제거는 막지 않는다.</summary>
         public bool MindBroken => S.MindBreak > 0;
-        const string MIND = "정신 붕괴 — 카드를 얻거나 신탁 · 제거를 할 수 없습니다";
 
         public string ClaimGlow(string cardId, Glow g, int choice)
         {
-            if (MindBroken) return MIND;
             if (g == null || choice < 0 || choice >= g.Count) return "고를 수 없습니다";
             if (g.Kind == "hero")
             {
@@ -660,7 +654,6 @@ namespace Bolzena.Core
         public string CampTrain(int n)
         {
             if (CampUsed) return "이번 캠프에서는 이미 골랐습니다";
-            if (MindBroken) return MIND;
             var t = S.Camp.Train;
             if (t == null || !TakeOffer(t, n)) return "수련할 카드가 없습니다";
             S.Stops[S.Camp.Key] = "train";
@@ -728,7 +721,6 @@ namespace Bolzena.Core
             if (it == null || it.Sold) return "이미 팔린 물건입니다";
             if (S.Gold < it.Price) return "골드가 모자랍니다";
             if (it.Kind == "neutral" && PowerWhy(it.Id) != null) return PowerWhy(it.Id);
-            if (it.Kind == "neutral" && MindBroken) return MIND;
             S.Gold -= it.Price;
             it.Sold = true;
             if (it.Kind == "equip") GainEquip(it.Id, bought: true); else GainCard(it.Id, heroKey);
@@ -742,7 +734,6 @@ namespace Bolzena.Core
         public string RemoveCard(string cardId)
         {
             if (S.Shop == null || S.Shop.RemoveUsed) return "이번에는 더 뺄 수 없습니다";
-            if (MindBroken) return MIND;
             int price = RemovePrice;
             if (S.Gold < price) return "골드가 모자랍니다";
             int i = S.Deck.IndexOf(cardId);
@@ -913,7 +904,6 @@ namespace Bolzena.Core
             var pool = Copyable();
             Pick("copy", null, S.CopyOffer?.Ids, id);
             S.CopyOffer = null;
-            if (MindBroken) return null;
             if (id == null || !pool.Contains(id)) return null;
             return AddCopy(id);
         }

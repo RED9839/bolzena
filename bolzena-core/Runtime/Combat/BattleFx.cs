@@ -737,6 +737,11 @@ namespace Bolzena.Core
             {
                 if (to == "draw") { Draw.Insert(Rng.Int(Draw.Count + 1), made); CardCue(made, "new", "draw", "make"); }
                 else if (to == "top") { Draw.Add(made); CardCue(made, "new", "draw", "make"); }
+                else if (c.HandMax > 0 && Hand.Count(h => Data.Card(h)?.Id == c.Id) >= c.HandMax)
+                {   // (2026-10-13 시온 마탄) 손 최대 장수 — 넘친 장은 손에 들지 않고 사라진다 · 탄환이면 그 자리에서 쏜다
+                    Gone.Add(made); CardCue(made, "new", "gone", "handMax"); Say($"「{c.Name}」 손에 {c.HandMax}장까지 — 넘친 한 장{(HasTagB(made, Tag.Bullet) ? "은 바로 쏜다" : "은 사라진다")}");
+                    BulletDrop(made); if (Over != null) return;
+                }
                 else if (to == "discard" || Hand.Count >= R.HAND_MAX) { Discard.Add(made); CardCue(made, "new", "discard", "make"); }
                 else { Hand.Add(made); CardCue(made, "new", "hand", "make"); }
             }

@@ -255,7 +255,7 @@ string run.Save();   Run Run.Load(GameData d, string json)
 RunState run.S       // 판의 모든 것(읽기 · 저장): Village · Party · PartyHp · PartyMaxHp · Deck · Flash · Shin · Gold · Gauge
                      //   Gear[사도][칸] · Bag(정할 장비) · Floor(0·1) · Node · Done("clear") · Map · Reward · Shop · Camp · Event · NextFight …
 VillageDef run.VillageDef;  FloorDef run.CurrentFloor;  bool run.IsBoss;  bool run.IsLastFloor;  bool run.PartyWiped
-bool run.MindBroken    // 정신 붕괴 — 카드 얻기 · 신탁 · 제거가 막혔다(그 함수들이 까닭 글을 준다). RunState.MindBreak · Growth · CardVals
+bool run.MindBroken    // 정신 붕괴 — 다음 싸움(들)의 매 턴 손에 「망령의 속삭임」(R.MIND_CARD). 2026-10-12 부터 카드 얻기 · 신탁 · 제거는 막지 않는다. RunState.MindBreak · Growth · CardVals
 CardView run.ViewOf(cardId)    // 덱 카드의 지금 모습(신탁 반영)
 ```
 

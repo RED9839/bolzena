@@ -18,7 +18,7 @@ export default hero({
   },
   keywords: [{
     // 4차 덧붙임(사용자 10-11): 3겹까지 쌓이는 사냥감 — 1겹당 란에게 받는 피해 +15% · 쓰러지면 가장 약한 적에게 겹째로(늑대 표식은 파티가 거는 지속 피해, 발톱은 란만의 사냥감 강화)
-    name: P, desc: '란이 노리는 사냥감 — 쓰러지면 가장 약한 적에게 겹째로', carrier: 'enemy', cap: 3, hunt: true, huntCarry: 'lowEnemy',
+    name: P, desc: '란이 노리는 사냥감', carrier: 'enemy', cap: 3, hunt: true, huntCarry: 'lowEnemy',
     per: [{ stat: 'taken', v: 0.2, from: 'owner' }],   // 10-11 밸런스 15→20%
   }],
   // 사용자 10-11: 20명 모두 고유 능력 2개
@@ -34,10 +34,10 @@ export default hero({
       fx: [dmg(1.2, 'allEnemies'), wolf(1, 'allEnemies'), prey()],   // 10-11 밸런스(사용자 「다 해 줘」)
       oracles: [
         { fx: [dmg(1, 'allEnemies'), wolf(2, 'allEnemies'), prey()] },
-        { type: '스킬', cost: 0, fx: [wolf(1, 'allEnemies')] },
+        { type: '스킬', cost: 0, fx: [wolf(2, 'allEnemies'), prey()] },   // 10-13 신탁 점검 3차: 늑대 2   // 10-13 신탁 점검: 발톱 되살림
         { fx: [dmg(1, 'allEnemies'), wolf(1, 'allEnemies'), status('약화', 1, { target: 'allEnemies' })] },
-        { fx: [dmg(2.2), wolf(2)] },
-        { fx: [dmg(1, 'allEnemies'), wolf(1, 'allEnemies'), wolf(2)] },
+        { fx: [dmg(2.6), wolf(2), prey()] },   // 10-13 신탁 점검: 260% · 발톱 되살림
+        { fx: [dmg(1.2, 'allEnemies'), wolf(1, 'allEnemies'), wolf(2)] },   // 10-13 신탁 점검: 100→120%
       ],
       blesses: ['power', 'draw', [wolf(1)]],
     },
@@ -46,10 +46,10 @@ export default hero({
       fx: [wolf(2), status('고통', 2, { target: 'oneEnemy' })],
       oracles: [
         { fx: [wolf(3), status('고통', 2, { target: 'oneEnemy' })] },
-        { fx: [wolf(1, 'allEnemies'), status('고통', 1, { target: 'allEnemies' })] },
+        { fx: [wolf(1, 'allEnemies'), status('고통', 2, { target: 'allEnemies' })] },   // 10-13 신탁 점검: 고통 1→2
         { fx: [wolf(2), status('약화', 2, { target: 'oneEnemy' })] },
-        { cost: 1, fx: [wolf(2), draw(2)] },
-        { fx: [status('고통', 2, { target: 'oneEnemy' }), draw(1, { who: 'other' })] },
+        { cost: 1, fx: [wolf(2), status('고통', 2, { target: 'oneEnemy' }), draw(2)] },   // 10-13 신탁 점검: 고통 되살림
+        { fx: [wolf(1), status('고통', 2, { target: 'oneEnemy' }), draw(1, { who: 'other' })] },   // 10-13 신탁 점검: 늑대 1
       ],
       blesses: ['draw', 'ap', [wolf(1)]],
     },
@@ -58,9 +58,9 @@ export default hero({
       fx: [crit, dmg(2.5)],   // 10-11 밸런스(사용자 「다 해 줘」)
       oracles: [
         { fx: [crit, dmg(2.4)] },
-        { fx: [crit, dmg(1.8), { k: 'perStack', id: W }, dmg(0.3)] },
-        { fx: [{ k: 'perStack', id: W, each: true, max: 1 }, dmg(1.1, 'allEnemies')] },
-        { cost: 1, fx: [{ k: 'ifStack', id: P, n: 1 }, dmg(1.7), { k: 'ifKill' }, { k: 'ap', v: 1 }] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
+        { fx: [crit, dmg(2.1), { k: 'perStack', id: W }, dmg(0.4)] },   // 10-13 신탁 점검
+        { fx: [{ k: 'perStack', id: W, each: true, max: 1 }, dmg(1.8, 'allEnemies')] },   // 10-13 신탁 점검 3차   // 10-13 신탁 점검: 110→150%
+        { cost: 1, fx: [{ k: 'ifStack', id: P, n: 1 }, dmg(2.8), { k: 'ifKill' }, { k: 'ap', v: 1 }] },   // 10-13 신탁 점검 3차   // 10-13 신탁 점검: 170→240%   // 10-12 사용자 「신탁 소멸 줄여 줘」
         { fx: [crit, dmg(1.8), wolf(1)] },
       ],
       blesses: ['power', 'cost', [wolf(1)]],
@@ -69,11 +69,11 @@ export default hero({
       name: '사랑니 발도술', cost: 1, type: '공격',
       fx: [{ k: 'perStack', id: W, n: 1 }, dmg(2.1), wolf(1)],   // 10-11 밸런스(사용자 「다 해 줘」)
       oracles: [
-        { power: true, fx: [wolf(1), power([rule({ on: 'stackReach', id: W, n: 4 }, [status('약점 노출', 1, { target: 'oneEnemy' })])])] },
+        { power: true, fx: [wolf(1, 'allEnemies'), power([rule({ on: 'stackReach', id: W, n: 4 }, [status('약점 노출', 2, { target: 'oneEnemy' })])])] },   // 10-13 신탁 점검: 적 전체 늑대 · 약점 노출 2
         { fx: [{ k: 'spend', id: W, v: 3 }, dmg(2.1, 'oneEnemy', { hits: 3 })] },
-        { fx: [{ k: 'perStack', id: W, n: 1 }, dmg(1.8), { k: 'ifKill' }, status('약점 노출', 1, { target: 'lowEnemy' })] },   // 「란과 벗님들」
+        { fx: [{ k: 'perStack', id: W, n: 1 }, dmg(2), { k: 'ifKill' }, status('약점 노출', 1, { target: 'lowEnemy' })] },   // 10-13 신탁 점검   // 「란과 벗님들」
         { fx: [{ k: 'perStack', id: W, n: 1 }, dmg(1.8), status('약점 노출', 1, { target: 'oneEnemy' })] },
-        { cost: 1, fx: [{ k: 'perStack', id: W, n: 1 }, dmg(1.1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
+        { fx: [{ k: 'perStack', id: W, n: 1 }, dmg(2.1), wolf(2)] },   // 10-13 신탁 점검: 기본보다 약하기만 하던 신탁 — 늑대 2   // 10-12 사용자 「신탁 소멸 줄여 줘」
       ],
       blesses: ['power', 'cost', [wolf(1)]],
     },
@@ -81,11 +81,11 @@ export default hero({
       name: '란과 벗님들', cost: 0, type: '스킬',
       fx: [wolf(1), prey(), empower(0.3, { who: 'other' })],
       oracles: [
-        { fx: [wolf(1), empower(0.5, { who: 'other' })] },
-        { fx: [wolf(1, 'allEnemies')] },
-        { fx: [prey(), prey()] },
-        { fx: [wolf(1), draw(1, { who: 'other' })] },
-        { fx: [status('약화', 1, { target: 'oneEnemy' }), wolf(1)] },
+        { fx: [wolf(1), prey(), empower(0.5, { who: 'other' })] },   // 10-13 신탁 점검: 발톱 되살림(아래 넷도)
+        { fx: [wolf(1, 'allEnemies'), prey()] },
+        { fx: [wolf(1), stack(P, 2, { target: 'oneEnemy' })] },   // 10-12 카드 글: 같은 조각 두 번 → 2 하나로
+        { fx: [wolf(1), prey(), draw(1, { who: 'other' })] },
+        { fx: [status('약화', 1, { target: 'oneEnemy' }), wolf(1), prey()] },
       ],
       blesses: ['draw', 'cost', [wolf(1)]],
     },

@@ -187,7 +187,6 @@ namespace Bolzena.Core
         /// <summary>파티 사도 하나의 아직 없는 고유 카드 1장을 덱에(은총). 못 하면 null.</summary>
         string GraceOne()
         {
-            if (MindBroken) return null;
             var hs = S.Party.Where(k => UniquesLeft(k).Count > 0).ToList();
             if (hs.Count == 0) return null;
             var k = hs[RndInt(hs.Count)];
@@ -234,7 +233,7 @@ namespace Bolzena.Core
                 case "heal": S.PartyHp = Math.Min(S.PartyMaxHp, S.PartyHp + Num.Round(S.PartyMaxHp * c.V)); break;
                 case "gauge": S.Gauge = Math.Min(R.GAUGE_MAX, S.Gauge + (int)c.V); break;
                 case "flash":
-                    t.Flash = MindBroken ? null : OfferFlash();
+                    t.Flash = OfferFlash();
                     if (t.Flash == null) { S.Gold += GRACE_GOLD; t.Note = $"신탁을 붙일 카드가 없습니다 — 대신 골드 +{GRACE_GOLD}"; }
                     break;
                 case "grace":
@@ -242,7 +241,7 @@ namespace Bolzena.Core
                     if (t.Card == null) { S.Gold += GRACE_GOLD; t.Note = $"받을 고유 카드가 없습니다 — 대신 골드 +{GRACE_GOLD}"; }
                     break;
                 case "remove":
-                    t.Remove = !MindBroken && S.Deck.Count > 1;
+                    t.Remove = S.Deck.Count > 1;
                     if (!t.Remove) { S.Gold += GRACE_GOLD; t.Note = $"뺄 수 없습니다 — 대신 골드 +{GRACE_GOLD}"; }
                     break;
                 case "equip":
@@ -254,7 +253,7 @@ namespace Bolzena.Core
                     }
                 case "neutral":
                     {
-                        var pool = MindBroken ? new List<string>() : NeutralOffer(c.Grade, 1);
+                        var pool = NeutralOffer(c.Grade, 1);
                         if (pool.Count > 0) { GainCard(pool[0]); t.Card = pool[0]; }
                         else { S.Gold += GRACE_GOLD; t.Note = $"받을 교주 카드가 없습니다 — 대신 골드 +{GRACE_GOLD}"; }
                         break;
@@ -290,7 +289,6 @@ namespace Bolzena.Core
         /// <summary>진급 보상 「카드 1장 빼기」 — 상점 값 없이 덱에서 뺀다. 못 빼면 까닭.</summary>
         public string GradeRemove(string cardId)
         {
-            if (MindBroken) return MIND;
             int i = cardId != null ? S.Deck.IndexOf(cardId) : -1;
             if (i < 0) return "덱에 없는 카드입니다";
             S.Deck.RemoveAt(i);

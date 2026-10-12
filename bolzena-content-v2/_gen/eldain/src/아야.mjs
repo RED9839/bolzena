@@ -18,11 +18,11 @@ export default hero({
   id: H, name: '아야', nature: '냉정', race: '마녀', role: '딜러', star: 3,
   blurb: '만년설의 현자, 영원살이 맏이. 서리와 동상으로 적을 얼려 약점을 드러내고, 금이 간 자리를 빙설화도로 깨뜨립니다.',
   keyword: {
-    name: K, desc: '아야가 새긴 서리 — 금이 가 강인도가 잘 깎인다', carrier: 'enemy', cap: 5,
+    name: K, desc: '아야가 새긴 서리 — 강인도가 잘 깎임', carrier: 'enemy', cap: 5,
     per: [{ stat: 'tough', v: 0.05 }],
   },
   // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
-  keywords: [{ name: '만년설', desc: '현자가 쌓아 온 만년설 — 얼음 결정 깨기가 강인도를 더 깊이 깬다', carrier: 'self', cap: 3 }],
+  keywords: [{ name: '만년설', desc: '현자가 쌓아 온 만년설', carrier: 'self', cap: 3 }],
   // 사용자 10-11: 20명 모두 고유 능력 2개
   passives: [
     { name: '만년설의 현자님!', when: { on: 'fightStart' }, fx: [draw(1)] },   // 현자 — 전투 시작 드로우 1
@@ -37,9 +37,9 @@ export default hero({
       fx: [dmg(0.4, 'oneEnemy', { hits: 2 }), weak(1), frost(1)],   // 10-11 사용자 「아야 너무 약함」 30→50%
       oracles: [
         { fx: [dmg(0.7, 'oneEnemy', { hits: 2 }), weak(1), frost(1)] },
-        { fx: [dmg(0.4, 'randomEnemy', { hits: 3, hitFx: [frost(1)] })] },
+        { fx: [dmg(0.5, 'randomEnemy', { hits: 3, hitFx: [frost(1)] }), weak(1)] },   // 10-13 신탁 점검: 50% · 약화 되살림
         { fx: [dmg(0.5, 'oneEnemy', { hits: 2 }), weak(1, 'allEnemies')] },
-        { fx: [dmg(0.5, 'oneEnemy', { hits: 2 }), frost(2)] },
+        { fx: [dmg(0.5, 'oneEnemy', { hits: 2 }), weak(1), frost(2)] },   // 10-13 신탁 점검: 약화 되살림
         { fx: [dmg(0.5, 'oneEnemy', { hits: 2 }), chill(1), tough(1)] },
       ],
       blesses: ['power', 'draw', [frost(1)]],
@@ -49,10 +49,10 @@ export default hero({
       fx: [chill(1), { k: 'rushDown', v: 1, target: 'oneEnemy' }, stack('만년설', 1)],
       oracles: [
         { fx: [chill(2), { k: 'rushDown', v: 1, target: 'oneEnemy' }, frost(1)] },
-        { fx: [chill(1, 'allEnemies'), frost(1, 'allEnemies')] },
+        { fx: [chill(1, 'allEnemies'), frost(1, 'allEnemies'), stack('만년설', 1)] },   // 10-13 신탁 점검: 만년설 되살림
         { fx: [chill(1), frost(1), draw(1)] },
-        { fx: [{ k: 'rushDown', v: 1, target: 'allEnemies' }, frost(1)] },
-        { fx: [chill(1), frost(1), draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
+        { fx: [{ k: 'rushDown', v: 1, target: 'allEnemies' }, frost(1), stack('만년설', 1)] },   // 10-13 신탁 점검: 만년설 되살림
+        { fx: [chill(1), { k: 'rushDown', v: 1, target: 'oneEnemy' }, draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 · 10-13 신탁 점검: 신탁 3 과 같은 글이라 늦춤 · 드로우로
       ],
       blesses: ['draw', 'cost', [frost(1)]],
     },
@@ -62,7 +62,7 @@ export default hero({
       oracles: [
         { fx: [dmg(1), expose(1), debuffed, tough(1)] },
         { fx: [dmg(0.8), expose(2)] },
-        { fx: [dmg(0.5, 'allEnemies'), expose(1, 'allEnemies')] },
+        { fx: [dmg(0.7, 'allEnemies'), expose(1, 'allEnemies'), tough(1, 'allEnemies')] },   // 10-13 신탁 점검: 70% · 강인도 되살림
         { fx: [dmg(0.8), expose(1), debuffed, tough(2)] },
         { fx: [dmg(0.8), expose(1), draw(1)] },
       ],
@@ -85,7 +85,7 @@ export default hero({
       fx: [dmg(1.5), tough(1), lowT(0.5), dmg(1.1)],   // 10-11 80+60 → 180+140%
       oracles: [
         { tags: ['보존'], fx: [dmg(2.8), tough(1), lowT(0.5), dmg(2.4)] },
-        { tags: ['보존'], fx: [dmg(2.4), { k: 'ifFoe', id: '약점 노출' }, dmg(2.4)] },
+        { tags: ['보존'], fx: [dmg(2.4), tough(1), { k: 'ifFoe', id: '약점 노출' }, dmg(2.4)] },   // 10-13 신탁 점검: 강인도 되살림
         { tags: ['보존'], fx: [dmg(1.4, 'allEnemies'), tough(1, 'allEnemies')] },
         { tags: ['보존'], fx: [dmg(2.4), tough(1), { k: 'ifFoe', id: 'alone' }, dmg(2.4)] },
         { tags: ['보존'], fx: [dmg(2.4), tough(2), lowT(0.3), dmg(1.6)] },

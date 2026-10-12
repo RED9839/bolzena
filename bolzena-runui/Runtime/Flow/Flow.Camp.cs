@@ -15,7 +15,12 @@ namespace Bolzena.RunUI
             bool withShop = kind == "campshop";
             var f = P.Floor;
             Stage.SetBg(f.Bg != null && f.Bg.TryGetValue("fight", out var bg) ? bg : "stage3_2", 0.85f);
-            Stage.Show("camp", root => BuildCamp(root, kind, withShop), 1.2f);
+            Stage.Show("camp", root =>
+            {
+                BuildCamp(root, kind, withShop);
+                // 창 크기가 바뀌면(화면비 · 전체 화면) 모닥불 · 파티를 지금 캔버스 높이로 다시 세운다(2026-10-12 화면비 점검 — 전에는 처음 크기 그대로 작게 · 낮게 남았다)
+                Stage.WhenResized(root, () => { if (Stage.Current != "camp") return true; if (Stage.ModalLayer.childCount > 0 || CardGain.IsOpen || OracleReveal.IsOpen) return false; BuildCamp(root, kind, withShop); return true; });
+            }, 1.2f);
         }
 
         void BuildCamp(RectTransform root, string kind, bool withShop)
@@ -28,18 +33,21 @@ namespace Bolzena.RunUI
             float optH = Theme.C(150, 132);
 
             // 가운데 — 모닥불과 파티
+            // 자리는 캔버스 높이 900 기준 — 높이가 다른 캔버스(폰 · 1280×720 의 720, 4:3 의 1200)에서는 몸 키(Stage.Size.y × 0.24)와 같이 늘고 준다.
+            //   (2026-10-12 화면비 점검: 폰에서 고정 자리 390 이 화면 위쪽에 가까워 떠 있는 벨라의 왕관이 머리 띠 설명 글을 덮었다)
+            float ck = Stage.Size.y / 900f;
             var scene = Ui.Rect("fire", root).Fill();
             scene.SetSiblingIndex(1);   // 머리 띠(HUD) 밑에
             var warm = Ui.Img(scene, Theme.S("soft"), new Color(1f, 0.55f, 0.2f, 0.55f), "warm");
-            warm.rectTransform.At(0.5f, 0, 0, 40, 1300, 760);
+            warm.rectTransform.At(0.5f, 0, 0, 40 * ck, 1300 * ck, 760 * ck);
             Tw.Pulse(warm, 0.38f, 0.6f, 0.35f);
             var fire = Ui.Img(scene, Theme.S("ic_fire"), new Color(1f, 0.75f, 0.35f), "flame");
-            fire.rectTransform.At(0.5f, 0, 0, 300, 110, 110);
+            fire.rectTransform.At(0.5f, 0, 0, 300 * ck, 110 * ck, 110 * ck);
             Tw.Breathe(fire.transform, 0.08f, 0.45f);
             var core = Ui.Img(scene, Theme.S("soft"), new Color(1f, 0.9f, 0.5f, 0.8f), "core");
-            core.rectTransform.At(0.5f, 0, 0, 300, 200, 160);
+            core.rectTransform.At(0.5f, 0, 0, 300 * ck, 200 * ck, 160 * ck);
             Tw.Pulse(core, 0.5f, 0.9f, 0.27f);
-            StartCoroutine(Embers(scene, 320));
+            StartCoroutine(Embers(scene, 320 * ck));
             // 파티 — 전투 화면과 같은 SD 전투 스파인(SceneHero: 같은 배율 · 쉬는 동작 · 이벤트 장면과 같은 몸 키) · 모닥불 둘레 구도는 그대로(2026-10-06 사용자: 미니미 → SD)
             //   불 왼쪽 둘은 오른쪽(불)을, 오른쪽 하나는 왼쪽을 본다(좌우 뒤집기). 뒤에 선 사도(가운데 위)를 먼저 그려 앞 사도에 가려지게.
             float body = Stage.Size.y * 0.24f;
@@ -48,7 +56,7 @@ namespace Bolzena.RunUI
             foreach (int i in Enumerable.Range(0, party.Count).OrderByDescending(x => spots[x].y))
             {
                 var h = Roster.OfCore(party[i]);
-                var spot = Ui.Rect("hero" + i, scene).At(0.5f, 0, spots[i].x, spots[i].y, 10, 10);
+                var spot = Ui.Rect("hero" + i, scene).At(0.5f, 0, spots[i].x * ck, spots[i].y * ck, 10, 10);
                 SceneHero.Make(spot, h, body, spots[i].x < 0, i * 0.4f);
                 Tw.Pop(spot, 0.2f + i * 0.1f, 0.5f, 0.4f);
             }
@@ -81,11 +89,10 @@ namespace Bolzena.RunUI
 
             var targets = P.Run.CampTargets();
             bool anyT = targets.Count > 0;
-            bool mind = P.Run.MindBroken;
-            string noTrain = mind ? "정신 붕괴 — 수련할 수 없습니다 · 쉬기만 고를 수 있습니다" : "신탁을 붙일 고유 카드가 없습니다 — 쉬기만 고를 수 있습니다";
-            var tr = W.Option(bottom, "수련", used == "train" ? "<color=#6EE0A0>손을 익혔습니다</color>" : anyT && !mind ? "강화할 카드를 고르면 신탁 셋이 나옵니다 — 하나를 붙입니다" : noTrain, () => TrainPick(root, kind, withShop), optH, Theme.S("ic_spark"), "train");
+            string noTrain = "신탁을 붙일 고유 카드가 없습니다 — 쉬기만 고를 수 있습니다";   // 정신 붕괴는 수련을 막지 않는다(2026-10-12 — 다음 전투의 「망령의 속삭임」 으로 바뀜)
+            var tr = W.Option(bottom, "수련", used == "train" ? "<color=#6EE0A0>손을 익혔습니다</color>" : anyT ? "강화할 카드를 고르면 신탁 셋이 나옵니다 — 하나를 붙입니다" : noTrain, () => TrainPick(root, kind, withShop), optH, Theme.S("ic_spark"), "train");
             tr.Pref(300, -1, 1);
-            tr.Interactable = used == "" && anyT && !mind;
+            tr.Interactable = used == "" && anyT;
             tr.Why = used != "" ? "이번 휴식에서는 이미 골랐습니다" : noTrain;
             if (used == "train") W.Select(tr, true);
             Stage.Hot["camp.trainopen"] = tr;

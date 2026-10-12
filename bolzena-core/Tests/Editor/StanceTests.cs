@@ -152,7 +152,27 @@ namespace Bolzena.Core.Tests
             K.Play(b, "hit_c");
             Assert.AreEqual(2, b.StackOf("c", "촛불"));
             Assert.Greater(b.Pool.Hp, hp0, "촛불이 타며 파티 HP 회복");
-            StringAssert.Contains("파티 HP 회복 40%", new CardText(d).Keyword(d.Hero("be2").Keyword));
+            StringAssert.Contains("회복 40%(벨의 방어력)", new CardText(d).Keyword(d.Hero("be2").Keyword));
+        }
+
+        /// <summary>(2026-10-12 밤 벨라 파티 촛불) carrier self + burn — 주인이 쥔 촛불이 주인 말고 누가 카드를 내든 1 탄다. 고를 동료 없음.</summary>
+        [Test] public void 파티_촛불은_주인_말고_누가_내든_탐()
+        {
+            var d = K.Data(heroes: BE.Replace("carrier:'hero', cap:5, hunt:true, burn:{on:'play', shield:0.3}", "carrier:'self', cap:5, burn:{on:'play', shield:0.3, heal:0.2}"),
+                cards: BE_C.Replace("{k:'stack', id:'촛불', v:3, target:'oneAlly'}", "{k:'stack', id:'촛불', v:3}"));
+            Assert.IsFalse(Validator.Check(d).Errors.Any(e => e.Contains("burn")), "carrier self 에도 burn");
+            var b = K.Fight(d, new[] { "be2", "c", "ur3" }, new[] { "dummy" });
+            var c = b.HeroUnit("c"); b.Ap = 9;
+            K.Hand(b, "light", "light", "hit_c", "area2");
+            K.Play(b, "light", c.Idx);
+            Assert.AreEqual(3, b.StackOf("be2", "촛불"), "주인에게 쌓임");
+            K.Play(b, "light", c.Idx);
+            Assert.AreEqual(5, b.StackOf("be2", "촛불"), "주인 카드로는 타지 않음(최대 5)");
+            int sh0 = b.Pool.Shield; K.Play(b, "hit_c");
+            Assert.AreEqual(4, b.StackOf("be2", "촛불")); Assert.AreEqual(sh0 + 15, b.Pool.Shield, "벨 방어력 50 × 30%");
+            K.Play(b, "area2", c.Idx, new PlayOpts { Ally = c.Idx });
+            Assert.AreEqual(3, b.StackOf("be2", "촛불"), "다른 동료 카드에도 탐");
+            StringAssert.Contains("벨 말고 동료가 카드를 낼 때마다 1 탐 · 실드 30% · 회복 20%(벨의 방어력)", new CardText(d).Keyword(d.Hero("be2").Keyword));
         }
 
         /// <summary>(2026-10-11 실비아) per from marked — 적 표식 「티파티」 는 「초대장」 이 붙은 아군이 칠 때만 받는 피해 증가.</summary>
@@ -223,7 +243,7 @@ namespace Bolzena.Core.Tests
             K.Play(b, "gift", 1);
             Assert.AreEqual(2, b.StackOf("ay2", "만년설의 앎"), "동료 카드가 아야의 앎에(방해)");
             var t = new CardText(d);
-            StringAssert.Contains("적 1명의 수를 「만년설의 앎」에 적음", t.Card(d.View("learn1")));
+            StringAssert.Contains("대상의 수를 「만년설의 앎」에 적음", t.Card(d.View("learn1")));
             StringAssert.Contains("아는 수면", t.Card(d.View("cut2")));
             StringAssert.Contains("아는 수를 하는 적은 2회", t.Card(d.View("storm")));
         }
@@ -245,7 +265,7 @@ namespace Bolzena.Core.Tests
             int h0 = K.Hp(b); K.Play(b, "blow");
             Assert.AreEqual(50, h0 - K.Hp(b), "모두 써서 1당 10% × 5"); Assert.AreEqual(0, b.StackOf("c", "촛불"));
             K.Play(b, "count"); Assert.AreEqual(10, b.Gauge, "없으면");
-            StringAssert.Contains("「촛불」 동료에게 +2", new CardText(d).Card(d.View("refill")));
+            StringAssert.Contains("「촛불」 +2", new CardText(d).Card(d.View("refill")));
         }
 
         [Test] public void 봇은_태세를_들고_덤을_쓴_뒤에_동료_공격()

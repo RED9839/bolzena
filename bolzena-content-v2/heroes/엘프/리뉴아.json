@@ -14,7 +14,7 @@
       "blurb": "오천 년을 건너온 인조 엘다인. 손에 쥔 시공 포격은 동료가 움직일 때마다 시간이 흘러 싸지고, 비용이 0 이 되는 정각에 가장 셉니다.",
       "keyword": {
         "name": "시간",
-        "desc": "손에 쥔 리뉴아 카드마다 따로 흐르는 시간 — 쌓일수록 그 카드가 싸진다",
+        "desc": "리뉴아 카드마다 따로 흐르는 시간",
         "carrier": "self",
         "cap": 6,
         "cardValue": {
@@ -28,7 +28,7 @@
       "keywords": [
         {
           "name": "메아리",
-          "desc": "정각에 울린 포격의 메아리 — 이번 턴 정지된 6초가 더 여러 번 몰아친다",
+          "desc": "정각에 울린 포격의 메아리",
           "carrier": "self",
           "cap": 3,
           "endClear": true
@@ -73,7 +73,7 @@
         "fx": [
           {
             "k": "dmg",
-            "ratio": 0.3,
+            "ratio": 0.5,
             "target": "allEnemies",
             "hits": 4
           },
@@ -364,7 +364,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.9,
               "target": "randomEnemy",
               "hits": 3
             },
@@ -386,7 +386,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.9,
               "target": "randomEnemy",
               "hits": 3
             },
@@ -406,11 +406,16 @@
         },
         {
           "name": "신탁 4",
-          "type": "스킬",
           "tags": [
             "보존"
           ],
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "randomEnemy",
+              "hits": 3
+            },
             {
               "k": "draw",
               "v": 2
@@ -422,7 +427,7 @@
             },
             {
               "k": "gauge",
-              "v": 20
+              "v": 30
             }
           ]
         },
@@ -434,7 +439,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.9,
               "target": "randomEnemy",
               "hits": 3
             },
@@ -587,7 +592,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.6,
               "target": "oneEnemy",
               "hits": 5
             },
@@ -694,7 +699,7 @@
               "k": "status",
               "id": "둔화",
               "v": 1,
-              "target": "oneEnemy"
+              "target": "allEnemies"
             },
             {
               "k": "power",
@@ -709,7 +714,7 @@
                     {
                       "k": "cardStatus",
                       "id": "시간",
-                      "v": 1,
+                      "v": 2,
                       "to": "hand",
                       "who": "self",
                       "unique": true
@@ -728,7 +733,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.7,
               "target": "oneEnemy",
               "hits": 6
             },
@@ -903,7 +908,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 1.1,
               "target": "oneEnemy"
             },
             {
@@ -913,6 +918,11 @@
               "to": "hand",
               "who": "self",
               "unique": true
+            },
+            {
+              "k": "stack",
+              "id": "메아리",
+              "v": 1
             }
           ]
         },
@@ -925,8 +935,13 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 1.4,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "메아리",
+              "v": 1
             },
             {
               "k": "ifCost",
@@ -951,8 +966,13 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 1.4,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "메아리",
+              "v": 1
             },
             {
               "k": "ifCost",
@@ -977,8 +997,13 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.7,
+              "ratio": 0.8,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "메아리",
+              "v": 1
             },
             {
               "k": "ifCost",

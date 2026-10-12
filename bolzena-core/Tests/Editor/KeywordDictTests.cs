@@ -626,8 +626,7 @@ namespace Bolzena.Core.Tests
             CollectionAssert.DoesNotContain(run.S.Deck, "rm1", "제거 — 덱에서 빠졌다");
             CollectionAssert.Contains(run.S.Deck, "st2", "봉인된 금기 — 보스를 처치하자 금기 카드로");
             Assert.AreEqual(5, run.S.Growth["rico"].Atk);
-            Assert.IsTrue(run.MindBroken);
-            StringAssert.Contains("정신 붕괴", run.ClaimGlow("st2", new Glow { Kind = "hero", Options = new List<string> { "st2" } }, 0));
+            Assert.IsTrue(run.MindBroken, "전투 정신 붕괴가 남은 채 끝나면 다음 싸움에 「망령의 속삭임」(2026-10-12 — 카드 얻기는 막지 않는다)");
             var (b2, _) = run.OpenFight();
             Assert.AreEqual(d.Hero("rico").Atk + 5 + Num.Round(d.Hero("rico").Atk * Grades.STAT_PCT * (run.Grade - 1)), b2.Party[0].Atk, "판 단위 성장은 다음 싸움에도(보스 학점으로 진급한 학년 몫과 함께)");
             run.AfterFight(b2);

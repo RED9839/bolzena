@@ -11,51 +11,51 @@ namespace Bolzena.Core.Tests
         static Fx F(string json) => GameData.FromJson<Fx>(json.Replace('\'', '"'));
         static List<Fx> L(params string[] js) => js.Select(F).ToList();
 
-        [TestCase("{'k':'dmg','ratio':1.2,'target':'oneEnemy'}", "적 1명에게 피해 120%")]
-        [TestCase("{'k':'dmg','ratio':0.45,'hits':3,'target':'oneEnemy'}", "적 1명에게 3회 × 피해 45%")]
+        [TestCase("{'k':'dmg','ratio':1.2,'target':'oneEnemy'}", "피해 120%")]
+        [TestCase("{'k':'dmg','ratio':0.45,'hits':3,'target':'oneEnemy'}", "3회 × 피해 45%")]
         [TestCase("{'k':'dmg','ratio':0.35,'hits':4,'target':'randomEnemy'}", "무작위 적 4회 × 피해 35%")]
         [TestCase("{'k':'dmg','ratio':0.7,'target':'allEnemies'}", "적 전체에 피해 70%")]
-        [TestCase("{'k':'dmg','ratio':0.8,'base':'def','target':'oneEnemy'}", "적 1명에게 방어 기반 피해 80%")]
-        [TestCase("{'k':'dmg','ratio':0.9,'fixed':true,'target':'oneEnemy'}", "적 1명에게 고정 피해 90%")]
+        [TestCase("{'k':'dmg','ratio':0.8,'base':'def','target':'oneEnemy'}", "방어 기반 피해 80%")]
+        [TestCase("{'k':'dmg','ratio':0.9,'fixed':true,'target':'oneEnemy'}", "고정 피해 90%")]
         [TestCase("{'k':'block','ratio':2.0}", "방어 200%")]
         [TestCase("{'k':'shield','ratio':1.5,'target':'party'}", "실드 150%")]
         [TestCase("{'k':'shield','ratio':1.3,'fixed':true,'target':'party'}", "고정 실드 130%")]
-        [TestCase("{'k':'heal','ratio':2.1}", "HP 회복(방어력 210%)")]
+        [TestCase("{'k':'heal','ratio':2.1}", "회복 210%")]
         [TestCase("{'k':'draw','v':2}", "드로우 2")]
         [TestCase("{'k':'ap','v':1}", "AP +1")]
         [TestCase("{'k':'gauge','v':30}", "고학년 게이지 +30%")]
         [TestCase("{'k':'nextCheaper','v':1}", "다음 카드 비용 -1")]
-        [TestCase("{'k':'status','id':'기절','v':1,'target':'oneEnemy'}", "적 1명 기절")]
+        [TestCase("{'k':'status','id':'기절','v':1,'target':'oneEnemy'}", "기절")]
         [TestCase("{'k':'rushDown','v':1,'target':'allEnemies'}", "적 전체 즉시 행동 1장 늦춤")]
         [TestCase("{'k':'cleanse','v':1}", "파티 디버프 1개 해제")]
         [TestCase("{'k':'payHp','v':90}", "파티 HP 90 소모")]
         [TestCase("{'k':'status','id':'사기','v':1}", "사기 1")]
         [TestCase("{'k':'status','id':'잔광','v':1}", "잔광 1")]
         [TestCase("{'k':'status','id':'리듬','v':2}", "리듬 2")]
-        [TestCase("{'k':'status','id':'취약','v':2,'target':'oneEnemy'}", "적 1명 취약 2")]
+        [TestCase("{'k':'status','id':'취약','v':2,'target':'oneEnemy'}", "취약 2")]
         [TestCase("{'k':'status','id':'잔불','v':1,'target':'allEnemies'}", "적 전체 잔불 1")]
         [TestCase("{'k':'atkMod','v':0.1,'run':true,'target':'self'}", "이 전투 동안 자신의 공격력 +10%")]
         [TestCase("{'k':'atkMod','v':0.3,'run':true,'target':'oneAlly'}", "이 전투 동안 아군 1명의 공격력 +30%")]
-        [TestCase("{'k':'takenMod','v':0.2,'target':'oneEnemy','turns':2}", "2턴간 적 1명의 받는 피해 +20%")]
+        [TestCase("{'k':'takenMod','v':0.2,'target':'oneEnemy','turns':2}", "2턴간 대상의 받는 피해 +20%")]
         [TestCase("{'k':'hasten','v':1}", "재촉 1")]
         [TestCase("{'k':'flip'}", "전환")]
         [TestCase("{'k':'spendRhythm','all':true}", "리듬 전부 소모")]
-        [TestCase("{'k':'stack','id':'시계','v':2}", "적 1명에게 「시계」 2")]
+        [TestCase("{'k':'stack','id':'시계','v':2}", "「시계」 2")]
         public void 효과_한_줄(string fx, string want) => Assert.AreEqual(want, T.Fx(L(fx)));
 
         [Test] public void 태그와_조건은_문장으로()
         {
-            Assert.AreEqual("연계. 적 1명에게 피해 80%", T.Compose(new[] { "연계" }, L("{'k':'dmg','ratio':0.8,'target':'oneEnemy'}")));
-            Assert.AreEqual("소멸 2. 적 1명에게 피해 160%", T.Compose(new[] { "소멸 2" }, L("{'k':'dmg','ratio':1.6,'target':'oneEnemy'}")));
-            Assert.AreEqual("적 1명에게 피해 120%. 파괴: AP +1", T.Fx(L("{'k':'dmg','ratio':1.2,'target':'oneEnemy'}", "{'k':'ifBroken'}", "{'k':'ap','v':1}")));
+            Assert.AreEqual("연계. 피해 80%", T.Compose(new[] { "연계" }, L("{'k':'dmg','ratio':0.8,'target':'oneEnemy'}")));
+            Assert.AreEqual("소멸 2. 피해 160%", T.Compose(new[] { "소멸 2" }, L("{'k':'dmg','ratio':1.6,'target':'oneEnemy'}")));
+            Assert.AreEqual("피해 120%. 파괴: AP +1", T.Fx(L("{'k':'dmg','ratio':1.2,'target':'oneEnemy'}", "{'k':'ifBroken'}", "{'k':'ap','v':1}")));
             Assert.AreEqual("드로우 1. 조율: AP +2", T.Fx(L("{'k':'draw','v':1}", "{'k':'ifTune'}", "{'k':'ap','v':2}")));
             Assert.AreEqual("방어 150%. 영감: 사기 1", T.Fx(L("{'k':'block','ratio':1.5}", "{'k':'when','on':'draw'}", "{'k':'status','id':'사기','v':1}")));
-            Assert.AreEqual("방어 150%. 앞이 공격: 적 1명에게 피해 60%", T.Fx(L("{'k':'block','ratio':1.5}", "{'k':'ifPrev','type':'공격'}", "{'k':'dmg','ratio':0.6,'target':'oneEnemy'}")));
-            Assert.AreEqual("리듬 1개당 적 1명에게 피해 30%, 리듬 전부 소모", T.Fx(L("{'k':'perRhythm'}", "{'k':'dmg','ratio':0.3,'target':'oneEnemy'}", "{'k':'spendRhythm','all':true}")));
+            Assert.AreEqual("방어 150%. 앞이 공격: 피해 60%", T.Fx(L("{'k':'block','ratio':1.5}", "{'k':'ifPrev','type':'공격'}", "{'k':'dmg','ratio':0.6,'target':'oneEnemy'}")));
+            Assert.AreEqual("리듬 1당 피해 30%, 리듬 전부 소모", T.Fx(L("{'k':'perRhythm'}", "{'k':'dmg','ratio':0.3,'target':'oneEnemy'}", "{'k':'spendRhythm','all':true}")));
             Assert.AreEqual("드로우 1. 리듬이 3 이상이면 AP +1", T.Fx(L("{'k':'draw','v':1}", "{'k':'ifRhythm','n':3}", "{'k':'ap','v':1}")));
             Assert.AreEqual("사용 불가. 증발.", T.Compose(new[] { "사용 불가", "증발" }, new List<Fx>()));
             Assert.AreEqual("소멸. 턴 끝에 손에 있으면 파티 HP 60 소모", T.Compose(new[] { "소멸" }, L("{'k':'when','on':'handEnd'}", "{'k':'payHp','v':60}")));
-            Assert.AreEqual("적 1명에게 피해 100%, 강인도 피해 2", T.Fx(L("{'k':'dmg','ratio':1.0,'target':'oneEnemy'}", "{'k':'tough','v':2,'target':'oneEnemy'}")));
+            Assert.AreEqual("피해 100% · 강인도 피해 2", T.Fx(L("{'k':'dmg','ratio':1.0,'target':'oneEnemy'}", "{'k':'tough','v':2,'target':'oneEnemy'}")));
         }
 
         /// <summary>
@@ -66,11 +66,11 @@ namespace Bolzena.Core.Tests
         {
             CardDef C(string json) => GameData.FromJson<CardDef>(json.Replace('\'', '"'));
             var rip = C("{'id':'rip','name':'찢기','cost':2,'type':'공격','fx':[{'k':'dmg','ratio':2.2,'target':'oneEnemy'},{'k':'ifHand','n':2},{'k':'dmg','ratio':0.9,'target':'oneEnemy'},{'k':'ifHand','n':0},{'k':'dmg','ratio':1.4,'target':'oneEnemy'}]}");
-            Assert.AreEqual("적 1명에게 피해 220%\n낸 뒤 손패가 2장 이하면 피해 90% 더\n낸 뒤 손패가 없으면 피해 140% 더", T.Card(rip));
+            Assert.AreEqual("피해 220%\n낸 뒤 손패가 2장 이하면 피해 90% 더\n낸 뒤 손패가 없으면 피해 140% 더", T.Card(rip));
             var nth = C("{'id':'n1','name':'첫','cost':0,'type':'스킬','tags':['소멸'],'fx':[{'k':'draw','v':1},{'k':'ifNth','n':1},{'k':'ap','v':1}]}");
             Assert.AreEqual("소멸.\n드로우 1\n이번 턴 첫 카드면 AP +1", T.Card(nth));
             var foe = C("{'id':'f1','name':'격파','cost':1,'type':'공격','fx':[{'k':'dmg','ratio':1.0,'target':'oneEnemy'},{'k':'ifFoe','id':'broken'},{'k':'status','id':'취약','v':1,'target':'oneEnemy'}]}");
-            Assert.AreEqual("적 1명에게 피해 100%\n격파 상태면 그 적 취약 1", T.Card(foe));
+            Assert.AreEqual("피해 100%\n격파 상태면 취약 1", T.Card(foe));
             // 카드 글이 아닌 곳(Fx 바로)은 한 줄 그대로 — 패시브 · 장비 · 로그
             Assert.AreEqual("드로우 1. 낸 뒤 손패가 없으면 AP +1", T.Fx(L("{'k':'draw','v':1}", "{'k':'ifHand','n':0}", "{'k':'ap','v':1}")));
         }
@@ -108,10 +108,15 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("버팀: 턴 시작 시 파티 불굴이 2 이상이면 방어 100%", T.Passives(new List<PassiveRule> { r3 }));
             Assert.AreEqual("박자: 리듬이 5가 되면 드로우 1", T.Passives(new List<PassiveRule> { new PassiveRule { Name = "박자", When = new When { On = "rhythm", N = 5 }, Fx = L("{'k':'draw','v':1}") } }));
             var kw = new KeywordDef { Name = "이온화", Desc = "적에게 쌓는 전하", Carrier = "enemy", Cap = 5, Decay = 1, Per = new List<PerStat> { new PerStat { Stat = "taken", V = 0.05 } } };
-            Assert.AreEqual("적에게 쌓는 전하\n· 적에게 거는 디버프 · 적마다 최대 5\n· 「이온화」 1당 그 적의 받는 피해 +5%\n· 적의 차례가 끝나면 −1", T.Keyword(kw));
+            Assert.AreEqual("적에게 쌓는 전하\n· 적에게 거는 디버프 · 적마다 최대 5\n· 「이온화」 1당 받는 피해 +5%\n· 적의 차례가 끝나면 −1", T.Keyword(kw));
             // 「자세히」 없앰(Docs/설명글.md) — Short 와 Detail 은 같은 글(수치 · 제한까지 다)
             Assert.AreEqual(T.Keyword(kw), T.Short(kw));
             Assert.AreEqual(T.Keyword(kw), T.Detail(kw));
+            // 파티는 한 몸 — 아군 모두(allies)의 받는 피해 · 소환물 깎기는 「파티가 받는 피해」(2026-10-13 클로에)
+            var sew = new KeywordDef { Name = "바느질", Carrier = "self", Cap = 3, Per = new List<PerStat> { new PerStat { Stat = "taken", V = -0.1, Who = "allies" } } };
+            StringAssert.Contains("「바느질」 1당 파티가 받는 피해 -10%", T.Keyword(sew));
+            var bear = new KeywordDef { Name = "곰", Carrier = "self", Cap = 5, Guard = true, Cut = 0.6 };
+            StringAssert.Contains("적의 공격 한 대마다 파티가 받는 피해 −60%", T.Keyword(bear));
             var r4 = new PassiveRule { Name = "덫", When = new When { On = "hurt" }, Limit = new Limit { Per = "turn", N = 2 }, Fx = L("{'k':'spend','id':'덫','v':1}", "{'k':'dmg','ratio':1.1,'target':'oneEnemy'}") };
             Assert.AreEqual("파티가 피해를 받으면 「덫」 1 소모, 때린 적에게 피해 110% (턴당 2회)", T.Detail(r4));
             Assert.AreEqual(T.Detail(r4), T.Short(r4));
@@ -132,7 +137,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("공격으로 꽂는 깃발", tr[1].Sub);
             Assert.AreEqual("· 적에게 거는 디버프(깃발이 전용) · 적마다 최대 3\n· 「깃발」이 있는 적은 아군 카드에 약점으로 맞음 — 카드 1장이 칠 때마다 −1", tr[1].Body);
             Assert.AreEqual("찜", tr[2].Name);
-            Assert.AreEqual("· 자신의 공격 카드를 낼 때마다 그 적에게 「깃발」 1 (턴당 1회)\n· 「깃발」이 있는 적이 쓰러지면 드로우 1, AP +1 (턴당 1회)", tr[2].Body);
+            Assert.AreEqual("· 자신의 공격 카드를 낼 때마다 「깃발」 1 (턴당 1회)\n· 「깃발」이 있는 적이 쓰러지면 드로우 1, AP +1 (턴당 1회)", tr[2].Body);
             Assert.AreEqual("따로", tr[3].Name);
             Assert.AreEqual("턴 시작 시 사기 1", tr[3].Body);
             // 패시브가 없는 사도 — 고유 능력(keyword)이 있으면 패시브 칸을 두지 않는다(2026-10-10 패시브를 고유 능력으로 합침), 둘 다 없을 때만 「없음」
@@ -157,7 +162,7 @@ namespace Bolzena.Core.Tests
             var body = new CardText(d).Trait(d.Hero("mq"), d.Hero("mq").Keyword);
             StringAssert.Contains("적에게 거는 디버프(수은이 전용) · 적마다 최대 5", body);
             StringAssert.DoesNotContain("표식", body);
-            StringAssert.Contains("저절로 줄지 않음 · 그 적이 쓰러지면 사라짐", body);
+            StringAssert.Contains("전투 끝까지 남음 · 그 적이 쓰러지면 사라짐", body);   // 2026-10-12 옛 「저절로 줄지 않음 · …」
             StringAssert.DoesNotContain("얻는 카드 —", body);   // 2026-10-11 사용자 「얻는 카드 · 신탁 이런 거 없애 줘」 — 카드 목록 줄은 안 씀
             StringAssert.DoesNotContain("쓰는 카드 —", body);
             StringAssert.Contains("내 턴이 시작될 때마다 −1", CardText.Tip("약점 노출"));
@@ -225,15 +230,15 @@ namespace Bolzena.Core.Tests
         [Test] public void 샘플_카드_글()
         {
             var d = K.Sample(); var t = new CardText(d);
-            Assert.AreEqual("「코스」 1개당 적 1명에게 방어 기반 피해 60%, 「코스」 전부 소모, 그 적 강인도 피해 1", t.Card(d.Cards["rico_u1"]));
-            Assert.AreEqual("연계.\n적 1명에게 방어 기반 피해 60%\n앞이 스킬: 「코스」 1", t.Card(d.Cards["rico_u4"]));
-            Assert.AreEqual("비용 1.\n「코스」 1개당 적 1명에게 방어 기반 피해 50%, 「코스」 전부 소모, 그 적 강인도 피해 1", t.Oracle(d.Cards["rico_u1"], d.Cards["rico_u1"].Oracles[0]));
-            Assert.AreEqual("피해 ×1.3.", t.Bless(d.Cards["rico_u1"].Blesses[0]));
+            Assert.AreEqual("「코스」 1당 방어 기반 피해 60%, 「코스」 전부 소모, 강인도 피해 1", t.Card(d.Cards["rico_u1"]));
+            Assert.AreEqual("연계.\n방어 기반 피해 60%\n앞이 스킬: 「코스」 1", t.Card(d.Cards["rico_u4"]));
+            Assert.AreEqual("비용 1.\n「코스」 1당 방어 기반 피해 50%, 「코스」 전부 소모, 강인도 피해 1", t.Oracle(d.Cards["rico_u1"], d.Cards["rico_u1"].Oracles[0]));
+            Assert.AreEqual("피해 ×1.3", t.Bless(d.Cards["rico_u1"].Blesses[0]));
             StringAssert.Contains("5개가 되면 모두 써서 「진혼의 탄환」 1장 생성", t.Keyword(d.Heroes["sion"].Keyword));
             Assert.AreEqual("적", d.View("sion_u4").Target);
             var sheet = t.Hero(d.Heroes["rico"]);
             StringAssert.StartsWith("리코타 — 탱커 · 냉정 · 박자형", sheet);
-            StringAssert.Contains("시작 「도마 찍기」 [1] 적 1명에게 방어 기반 피해 70%, 「코스」 1 ×2", sheet);
+            StringAssert.Contains("시작 「도마 찍기」 [1] 방어 기반 피해 70%, 「코스」 1 ×2", sheet);
             StringAssert.Contains("고유 「풀코스 서빙」 [2] 공격", sheet);
             Assert.AreEqual("없음", d.View("rico_s2").Target);
         }

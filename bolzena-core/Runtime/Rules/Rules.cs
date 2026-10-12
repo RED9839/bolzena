@@ -26,18 +26,20 @@ namespace Bolzena.Core
         public const int AP_PER_TURN = 3;
         public const int DRAW_PER_TURN = 5;
         public const int HAND_MAX = 10;
+        /// <summary>정신 붕괴(판)가 걸린 싸움의 매 턴 시작에 손으로 드는 상태 카드(world/neutral/상태카드.json).</summary>
+        public const string MIND_CARD = "st_mindwhisper";
 
         // ── 눈금 · 적 세기 ───────────────────────────────────────────
-        public const double ENEMY_HP = 0.72;   // 2026-10-12 사용자 「적 체력 15% 정도 감소」(0.85 × 0.85)
+        public const double ENEMY_HP = 0.85;   // 2026-10-13 사용자 「적 너프했던 것 다시 빼 봐」 — 10-12 의 −15%(0.72) 되돌림
         public const int SCALE = 10;
         /// <summary>층별 적 체력 배율. 2026-10-10 적 수치 재조정 — 2층 3.25 → 4.3(2층 일반 싸움 2.35턴 → 2.9턴, _measure/난이도_재조정_20261010.md §8)</summary>
         public static readonly Dictionary<int, double> FLOOR_HP = new() { [1] = 2.0, [2] = 4.3 };
         /// <summary>층별 보스 체력 배율. 2026-10-11 엘다인 4차 0.7 · 0.6 → 1.0 · 0.7 — 1층 보스 4.35턴 → 5.6턴, 보스 쓰러짐 1층 2.1 → 5.1% · 2층 3.3 → 3.9%(§12). 사도 8장 · 태세 뒤 2층 0.7 → 0.58 — 2층 보스 7.3턴 → 6.2턴(BOSS_DMG 2층 1.15 와 함께, §13). 고유 효과 2개 · 시작 덱 4장 뒤 2층 0.58 → 0.6 — 2층 보스 5.8 → 5.9턴(§14)</summary>
-        public static readonly Dictionary<int, double> BOSS_HP = new() { [1] = 0.9, [2] = 0.54 };   // 2026-10-12 사용자 「체력도 10% 낮추자」(1.0 · 0.6 × 0.9)
+        public static readonly Dictionary<int, double> BOSS_HP = new() { [1] = 1.0, [2] = 0.6 };   // 2026-10-13 사용자 — 10-12 의 보스 체력 −10%(0.9 · 0.54) 되돌림
         /// <summary>층별 일반 싸움(엘리트 · 보스가 아닌 싸움, 이벤트 일반 싸움 포함) 적 체력 배율 — FLOOR_HP 위에 곱한다. 일반 싸움 턴만 늘리는 손잡이(2026-10-11 엘다인 4차, _measure/난이도_재조정_20261010.md §12)</summary>
         public static readonly Dictionary<int, double> FIGHT_HP = new() { [1] = 1.5, [2] = 1.15 };
         /// <summary>층별 보스 피해 배율 — FLOOR_DMG 위에 곱한다. 보스 체력을 줄여 턴을 줄일 때 쓰러짐을 지키는 손잡이(2026-10-11 엘다인 4차 뒤, §13)</summary>
-        public static readonly Dictionary<int, double> BOSS_DMG = new() { [1] = 0.75, [2] = 0.92 };   // 2026-10-12 「데미지 20% 줄여」(1.05 · 1.15 × 0.8) 뒤 사용자 「1층 보스 딜도 좀 줄여야」 — 1층 0.84 → 0.75
+        public static readonly Dictionary<int, double> BOSS_DMG = new() { [1] = 1.05, [2] = 1.15 };   // 2026-10-13 사용자 — 10-12 의 보스 피해 −20%(0.84 · 0.92) 되돌림
         /// <summary>보스(층 보스 · 보스 클론) 강인도 — 데이터가 더 높아도 이 칸으로(2026-10-12 사용자 「보스 강인도 5로 너프」).</summary>
         public const double BOSS_TOUGH = 7;   // 2026-10-12 사용자 「보스들 강인도 다시 7로」(5 → 7)
         /// <summary>엘리트 강인도(2026-10-12 사용자 「엘리트 · 보스 5」 뒤 보스만 7).</summary>
@@ -54,7 +56,7 @@ namespace Bolzena.Core
         /// 2026-10-11 엘다인 4차 최종(일반 싸움 FIGHT_HP 1.5 · 1.15 · 보스 BOSS_HP 1.0 · 0.7 와 함께) — 2.0 · 1.9 → 1.85 · 2.0, 완주 38.1%(§12)
         /// 2026-10-11 사도 8장(고유 5) · 변신 → 태세 뒤 — 2층 2.0 → 1.95(보스 체력 · 피해 조정과 함께), 완주 38.3%(§13)
         /// 2026-10-11 고유 효과 2개씩 · 시작 덱 4장(시동 필수) 뒤 — 1.85 · 1.95 → 2.1 · 2.35(보스 피해 1층 1.05 와 함께), 완주 63.6 → 38.3%(§14)
-        public static readonly Dictionary<int, double> FLOOR_DMG = new() { [1] = 1.9, [2] = 2.35 };   // 2026-10-12 사람 기록 24판(완주 31.8% · 끝난 판의 41% 가 1층에서 쓰러짐) — 1층만 2.1 → 1.9
+        public static readonly Dictionary<int, double> FLOOR_DMG = new() { [1] = 2.1, [2] = 2.35 };   // 2026-10-13 사용자 — 10-12 의 1층 피해 1.9 되돌림(2.1)
         public const double ELITE_HP = 1.5;
 
         /// <summary>층(0부터) · 보스 · 엘리트 → 적 체력 배율 · 피해 배율.</summary>
@@ -102,9 +104,9 @@ namespace Bolzena.Core
         public static readonly Dictionary<string, string> DIVINE_KO = new()
         {
             ["power"] = "불타는 웅변 — 피해 ×1.3", ["cost"] = "가벼운 발걸음 — 비용 -1", ["weakSpot"] = "약점 공략 — 취약인 적에게 피해 ×1.3",
-            ["frost"] = "눈보라 예보 — 맞은 적 취약 1", ["ap"] = "발맞추기 — 내면 AP +1", ["draw"] = "끝없는 이야기 — 내면 드로우 1",
+            ["frost"] = "눈보라 예보 — 맞은 적 취약 1", ["ap"] = "발맞추기 — AP +1", ["draw"] = "끝없는 이야기 — 드로우 1",   // 「내면」 은 뺐다 — 카드에 붙은 덤이라 낼 때가 당연(2026-10-12 카드 글 간소화)
             ["heal"] = "괜찮아 — 회복 ×1.3", ["guard"] = "양보하는 마음 — 방어 · 실드 ×1.3",
-            ["atkUp"] = "한 땀 한 땀 — 내면 이번 전투 이 사도 공격력 +10%", ["defUp"] = "꺾이지 않는 실 — 내면 이번 전투 이 사도 방어력 +10%",
+            ["atkUp"] = "한 땀 한 땀 — 이 전투 동안 자신의 공격력 +10%", ["defUp"] = "꺾이지 않는 실 — 이 전투 동안 자신의 방어력 +10%",
         };
         public const string DIVINE_NAME = "겨우살이의 축복";
         public const double SHIN = 1.3;
@@ -271,7 +273,7 @@ namespace Bolzena.Core
             /// <summary>광역(allEnemies) · 논타겟(무작위 대상) 카드가 적 하나에 주는 강인도 피해 배율 — 2026-10-10 카제나 표 1/2(2026-10-08 의 1 을 되돌림).</summary>
             public const double Area = 1;   // 2026-10-11 사용자 「강인도 0.5 같은 것 깔끔하게 — 1로」: 광역 · 논타겟도 단일과 같게
             /// <summary>0코 카드의 강인도 단위(카제나 표 0.5칸).</summary>
-            public const double Zero = 1;   // 2026-10-11 사용자: 0코도 1칸
+            public const double Zero = 0.5;   // 2026-10-12 밤 사용자 「약점이면 0코도 0.5」 — 약점 0코 0.5칸 · 비약점 0코 0(ToughDmg). 옛 10-11: 0코도 1칸
             /// <summary>추가 공격류(협공 · 공명 · 추가 공격 · 표식 터짐 · 소환물 공격) 한 번의 약점 강인도(카제나 표 0.5칸).</summary>
             public const double Extra = 0;   // 2026-10-12 사용자 「강인도는 카드의 원래 AP 와 강인도 피해 +n 만」 — 추가 공격 · 협공 · 반격 · 소환물 · 표식은 강인도를 안 깎는다(옛 11: 1칸)
             /// <summary>고학년 → 카제나 에고 EP 환산 — 고학년 게이지 50% 가 EP 1, 약점 단일 EP 1 당 0.5칸 ⇒ 게이지 100% 당 1칸(250% 고학년 = 2.5칸).</summary>
@@ -283,7 +285,7 @@ namespace Bolzena.Core
         /// 광역 · 논타겟은 1/2, 약점이 아니면 1/3(곱해 겹친다 — 광역 비약점 1/6). X 는 낸 AP. 고학년은 ToughUnitUlt.
         /// (옛: 2026-10-08 「0코도 1칸 · 광역도 단일과 같음」 — 이 표로 대체)
         /// </summary>
-        public static double ToughDmg(int cost, bool weak, bool area) => ToughOf(cost <= 0 ? TOUGH.Zero : cost, weak, area);
+        public static double ToughDmg(int cost, bool weak, bool area) => cost <= 0 ? (weak ? ToughOf(TOUGH.Zero, true, area) : 0) : ToughOf(cost, weak, area);   // 0코: 약점이면 TOUGH.Zero, 아니면 0(2026-10-12 밤 사용자)
         /// <summary>강인도 단위(약점 단일 기준 칸) → 약점 · 광역을 친 강인도 피해.</summary>
         public static double ToughOf(double unit, bool weak, bool area)
         {

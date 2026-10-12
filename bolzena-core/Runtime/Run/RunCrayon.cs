@@ -314,7 +314,7 @@ namespace Bolzena.Core
             S.Perks = new Dictionary<string, double>(perks);
             S.Gold += (int)Perk("gold");
             // 예습 노트(2026-10-09 학년을 끈 뒤) — 모험 시작 때 무작위 카드 1장에 무작위 신탁(덜 칠했으면 그 확률로)
-            for (int n = (int)Math.Floor(Perk("startOracle") + 1e-9) + PerkChance("startOracle"); n > 0 && !MindBroken; n--)
+            for (int n = (int)Math.Floor(Perk("startOracle") + 1e-9) + PerkChance("startOracle"); n > 0; n--)
             {
                 var o = OfferFlash();
                 if (o == null || o.Picks.Count == 0) break;

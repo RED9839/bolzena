@@ -85,7 +85,12 @@ namespace Bolzena.RunUI
             if (hero == null && EventRaw(evd.Id) is Dictionary<string, object> raw && raw.TryGetValue("target", out var tg) && tg is string tk) hero = Roster.ByKey(tk);
             float sh = size.y - floorY - 110, sw = Mathf.Min(size.x * 0.34f, sh * 1.1f);
             var standArea = Ui.Rect("npc", scene); standArea.anchorMin = standArea.anchorMax = standArea.pivot = Vector2.zero;
-            standArea.sizeDelta = new Vector2(sw, sh); standArea.anchoredPosition = new Vector2(size.x * 0.66f - sw / 2, floorY);
+            // 대상 자리 — 화면 폭의 66%. 좁은 화면비(4:3 · 3:2)는 파티(몸 키가 화면 높이 비례)가 그만큼 오른쪽으로 와 대상과 겹쳤다(2026-10-12 화면비 점검)
+            //   → 맨 앞 사도 발에서 몸 키 1.4배는 띄우고, 칸이 화면 오른쪽 밖으로 나가지 않게
+            float pmh = size.y * 0.24f;
+            float tx = Mathf.Max(size.x * 0.66f, Theme.Gutter + pmh * 1.05f + Mathf.Max(0, pn - 1) * pmh * 0.9f + pmh * 1.4f);
+            tx = Mathf.Min(tx, size.x - Theme.Gutter - sw / 2);
+            standArea.sizeDelta = new Vector2(sw, sh); standArea.anchoredPosition = new Vector2(tx - sw / 2, floorY);
             Spine.Unity.SkeletonGraphic sg = null;
             Vector2? targetHead = null; bool targetFoe = false;
             // 오른쪽 대상 — 전투 스파인(왼쪽을 본다)이 있으면 그것, 없으면 스탠딩
@@ -94,7 +99,7 @@ namespace Bolzena.RunUI
                 var bspot = Ui.Rect("battle", standArea).At(0.5f, 0, 0, 0, 10, 10);
                 sg = SceneHero.Make(bspot, hero, size.y * 0.24f, false);   // 파티와 같은 크기 · 바닥선 · 파티 쪽(왼쪽)을 본다
                 if (sg == null) Destroy(bspot.gameObject);
-                else targetHead = new Vector2(size.x * 0.66f, floorY + size.y * 0.24f * 1.05f);   // SD 가 없으면 아래 스탠딩(움직이는) · NPC 스파인 차례 — 정지 대체는 버린다
+                else targetHead = new Vector2(tx, floorY + size.y * 0.24f * 1.05f);   // SD 가 없으면 아래 스탠딩(움직이는) · NPC 스파인 차례 — 정지 대체는 버린다
             }
             if (sg == null && hero?.art != null) sg = SpineUi.Standing(standArea, hero.art, sw, sh, StandMode.Full, 0, 0);
             if (sg == null && npc != null && NpcSpine.TryGetValue(npc, out var key))
@@ -124,8 +129,8 @@ namespace Bolzena.RunUI
             // SD · 스탠딩 · NPC 스파인 대상 — 메시 꼭대기(ClampInto 뒤). 메시가 없으면 SD 는 짐작 높이, 스탠딩은 칸 높이의 0.9
             if (sg != null && !targetFoe)
             {
-                if (MeshTopY(sg, root) is float top) targetHead = new Vector2(size.x * 0.66f, Mathf.Min(top, floorY + sh));
-                else if (targetHead == null) targetHead = new Vector2(size.x * 0.66f, floorY + sh * 0.9f);
+                if (MeshTopY(sg, root) is float top) targetHead = new Vector2(tx, Mathf.Min(top, floorY + sh));
+                else if (targetHead == null) targetHead = new Vector2(tx, floorY + sh * 0.9f);
             }
 
             // 그림 — 대상이 있어야 하는 이벤트(npc · 표의 target · foe)인데 움직이는 그림 없이 정지 그림 · 빈 자리로 떨어졌는지(데모 단언)

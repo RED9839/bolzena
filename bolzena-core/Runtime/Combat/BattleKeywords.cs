@@ -224,14 +224,17 @@ namespace Bolzena.Core
 
         /// <summary>
         /// 탄환(2026-10-10) — 탄환 카드가 효과 · 연결로 손에서 버려지면 그 카드의 주인 사도(교주 카드면 공격력이 가장 높은 사도)가
-        /// 가장 앞의 적에게 추가 공격(공격력 R.SV("탄환")). 턴 끝 버림은 아니다 — 「버려서 쏜다」 가 빌드의 몫.
+        /// 무작위 적에게 추가 공격(공격력 R.SV("탄환")). 2026-10-13 사용자 — 턴 끝 버림도 쏜다(손에서 버린 더미로 가면 모두 · 카제나 「진혼의 탄환」).
+        /// 탄환 카드를 내면(사용) 소멸한다 — 「소멸」 태그 없이 키워드 규칙(BattleCards.PlayCard).
+        /// 2026-10-13 사용자 — 가장 앞의 적 → 무작위 적(카제나 「진혼의 탄환」 · 소피아와 같게).
         /// </summary>
         void BulletDrop(string id)
         {
             if (Over != null || !HasTagB(id, Tag.Bullet)) return;
             var owner = CardOf(id)?.Hero;
             var hero = owner != null && HeroUnit(owner) is Unit h && !h.Dead ? h : AliveParty().OrderByDescending(AtkNow).FirstOrDefault();
-            ExtraHit(hero, AliveEnemies().FirstOrDefault(), R.SV("탄환"), null, "탄환!");
+            var foes = AliveEnemies().ToList();
+            ExtraHit(hero, foes.Count > 0 ? foes[Rng.Int(foes.Count)] : null, R.SV("탄환"), null, "탄환!");
         }
 
         /// <summary>공명 — 카드를 버리면 추가 공격 80%(버린 카드 한 장에 1). 치는 사도는 버린 사도, 없으면 공격력이 가장 높은 사도.</summary>

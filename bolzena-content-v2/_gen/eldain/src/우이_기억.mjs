@@ -21,12 +21,12 @@ export default hero({
     // 자동 규칙 하나 — 누구의 카드든 소멸하면 고학년 게이지 +5(지운 기억이 연못을 데움). 예열은 고학년이 직접 쌓는다
     rules: [{ name: '지운 기억', when: { on: 'exhaust', who: 'any' }, fx: [gauge(5)] }],
   },
-  keywords: [{ name: R, desc: '세잎클로버가 막아 낸 피해(20당 1)', carrier: 'self', cap: 30 }],
+  keywords: [{ name: R, desc: '세잎클로버가 큰 아픔을 막아 낸 횟수', carrier: 'self', cap: 10 }],   // 10-12 카드 글: 「막아 낸 피해 20당 1」 → 「막을 때마다 1」(카드 글의 「그 값 20당」 을 없앰) · 최대 30 → 10
   // 사용자 10-11: 20명 모두 고유 능력 2개
   passives: [
     { name: '행복 전파자', when: { on: 'fightStart' }, fx: [clover(1)] },   // 전투 시작 세잎클로버 1장
   ],
-  ult: { name: '이젠 피하지 않아', cost: 150, fx: [stack(K, 1), dmg(1.2, 'allEnemies'), vulnAll(1), clover(1), draw(1), { k: 'ifStack', id: K, n: 2 }, dmg(1.2, 'allEnemies')] },
+  ult: { name: '이젠 피하지 않아', cost: 200,   /* 10-13 사용자: 고학년 값어치 3.66 으로 높음 — 비용 150 → 200 */ fx: [stack(K, 1), dmg(1.2, 'allEnemies'), vulnAll(1), clover(1), draw(2), { k: 'ifStack', id: K, n: 2 }, dmg(1.2, 'allEnemies')] },   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 드로우 1→2
 }, {
   basicNames: ['물방울', '잔물결', '기억 떠올리기'], heal: true, deck: 'light',
   uniques: [
@@ -35,10 +35,10 @@ export default hero({
       fx: [heal(2.2), clover(1)],
       oracles: [
         { fx: [heal(3), clover(1)] },
-        { fx: [clover(2)] },
+        { fx: [heal(1.2), clover(2)] },   // 10-13 신탁 점검: 회복 되살림
         { fx: [heal(1.4), { k: 'healMod', v: 0.3, turns: 2 }, clover(1)] },
-        { fx: [heal(1.4), clover(1), draw(1)] },
-        { fx: [clover(1), gauge(20, { target: 'strongestAlly' })] },   // 원작 강화 공격(에루가 올라탐)
+        { fx: [heal(1.8), clover(1), draw(1)] },   // 10-13 신탁 점검
+        { fx: [heal(1.2), clover(1), gauge(20, { target: 'strongestAlly' })] },   // 원작 강화 공격(에루가 올라탐)
       ],
       blesses: ['heal', 'draw', [gauge(10)]],
     },
@@ -47,9 +47,9 @@ export default hero({
       fx: [{ k: 'burn', v: 1 }, draw(2)],
       oracles: [
         { tags: ['소멸'], fx: [{ k: 'burn', v: 1 }, draw(3)] },
-        { tags: ['소멸'], fx: [{ k: 'burn', v: 2 }, draw(2)] },
+        { tags: ['소멸'], fx: [{ k: 'burn', v: 2 }, draw(3)] },   // 10-13 신탁 점검
         { tags: ['소멸'], fx: [{ k: 'exileFrom', from: 'draw', n: 1, basic: true }, clover(1)] },
-        { tags: ['소멸'], fx: [status('계몽', 1), draw(1)] },
+        { tags: ['소멸'], fx: [status('계몽', 1), draw(2)] },   // 10-13 신탁 점검
         { tags: ['보존', '회수 3'], fx: [{ k: 'burn', v: 1 }, draw(2)] },
       ],
       blesses: ['draw', 'ap', [gauge(10)]],
@@ -59,10 +59,10 @@ export default hero({
       fx: [revive(), gauge(20)],
       oracles: [
         { fx: [revive(), gauge(30)] },
-        { fx: [revive({ who: 'other' }), draw(1)] },
+        { fx: [revive({ who: 'other' }), draw(1), gauge(20)] },   // 10-13 신탁 점검: 게이지 되살림
         { fx: [revive(), empower(0.5)] },
-        { fx: [vulnAll(1), gauge(20)] },   // 옛 「일렁이는 파동」
-        { fx: [revive({ to: 'top' }), draw(1)] },
+        { fx: [revive(), vulnAll(1)] },   // 옛 「일렁이는 파동」 · 10-13 신탁 점검: 되찾기 되살림(게이지 대신)
+        { fx: [revive({ to: 'top' }), draw(1), gauge(20)] },   // 10-13 신탁 점검: 게이지 되살림
       ],
       blesses: ['cost', 'draw', [gauge(10)]],
     },
@@ -74,18 +74,18 @@ export default hero({
         { fx: [dmg(0.8, 'allEnemies'), warm, dmg(0.3, 'allEnemies')] },
         { fx: [{ k: 'exileFrom', from: 'hand', n: 1, tag: C }, dmg(1.8), gauge(20)] },
         { fx: [dmg(0.8), warm, dmg(0.6), { k: 'nextAp', v: 1 }] },
-        { fx: [dmg(1.2), { k: 'perStack', id: R }, dmg(0.1)] },   // 3차 꼴 — 이번 전투 클로버가 막은 피해 20당
+        { fx: [dmg(1.2), { k: 'perStack', id: R }, dmg(0.5)] },   // 3차 꼴 — 이번 전투 클로버가 막은 횟수 1당(10-12 단위를 바꿔 10% → 50%)
       ],
       blesses: ['power', 'cost', [gauge(10)]],
     },
     { // 4차 8장 — 굴리기(고학년 「연못 단계」): 예열이 있으면 연못이 파티를 고친다
       name: '에루의 연못', cost: 1, type: '스킬',
-      fx: [gauge(20), { k: 'ifStack', id: K, n: 1 }, heal(1.2)],
+      fx: [gauge(20), heal(1.2)],   // 10-12 우이 손질: 옛 「예열이 있으면」 조건을 뺐다(고학년 전엔 못 고쳤다)
       oracles: [
-        { fx: [gauge(30), { k: 'ifStack', id: K, n: 1 }, heal(1.2)] },
+        { fx: [gauge(30), heal(1.2)] },
         { fx: [heal(1), clover(1)] },
-        { fx: [gauge(20, { target: 'strongestAlly' }), draw(1)] },
-        { fx: [gauge(20), { k: 'perStack', id: K }, heal(0.6)] },
+        { fx: [gauge(20, { target: 'strongestAlly' }), heal(0.8), draw(1)] },   // 10-13 신탁 점검: 회복 되살림
+        { fx: [gauge(20), heal(0.8), { k: 'perStack', id: K }, heal(0.6)] },   // 10-13 신탁 점검: 회복 되살림
         { cost: 0, tags: ['소멸'], fx: [gauge(30)] },
       ],
       blesses: ['heal', 'cost', [gauge(10)]],
@@ -94,7 +94,7 @@ export default hero({
   tokens: [
     {
       id: C, name: '세잎클로버', cost: 0, type: '스킬', tags: ['보존', '소멸'],
-      fx: [gauge(20), draw(1), { k: 'when', on: 'handHurtBig', pct: 0.15 }, gauge(30), stack(R, 1, { ofEvent: 0.05 })],
+      fx: [gauge(20), draw(1), { k: 'when', on: 'handHurtBig', pct: 0.15 }, gauge(30), stack(R, 1)],
       blurb: '큰 아픔을 조금만 남기는 행운',
     },
   ],

@@ -27,7 +27,7 @@ export default hero({
   ],
   // 4차 태세(사용자 10-11 — 카제나 린 흑운태세 꼴): 「도끼 부수기」 로 들고(기혈 → 연격) · 다른 아군의 공격 카드가 끼면 풀리고 · 「찢는다」 로 스스로 끝낸다(보상)
   forms: [{
-    id: F, name: '백수공권', desc: '도끼를 부수고 맨주먹으로 — 다른 아군의 공격 카드가 끼면 풀린다', stance: true, anim: 'Idle_Change',   // 원작 변신 쉬는 동작(10-11 되살림)
+    id: F, name: '백수공권', desc: '도끼를 부순 맨주먹 전성기', stance: true, anim: 'Idle_Change',   // 원작 변신 쉬는 동작(10-11 되살림)
    
     until: { on: 'play', who: 'other', type: '공격' },
     onEnter: [spend(Q, 'all'), stack(P, 1, { ofEvent: 1 })],
@@ -44,11 +44,11 @@ export default hero({
       name: '찢는다', cost: 1, type: '공격',
       fx: [vuln, inF, { k: 'perStack', id: P }, dmg(1.2, 'allEnemies'), { k: 'formEnd' }],   // 10-11 밸런스(사용자 「다 해 줘」)
       oracles: [
-        { fx: [dmg(0.8, 'allEnemies'), inF, { k: 'perStack', id: P }, dmg(0.6, 'allEnemies'), { k: 'formEnd' }] },
+        { fx: [dmg(0.8, 'allEnemies'), inF, { k: 'perStack', id: P }, dmg(0.9, 'allEnemies'), { k: 'formEnd' }] },   // 10-13 신탁 점검: 기혈당 60→90%
         { fx: [dmg(0.8, 'allEnemies'), stack(Q, 2), inF, { k: 'perStack', id: P }, dmg(0.5, 'allEnemies')] },
-        { fx: [dmg(1.4, 'allEnemies'), { k: 'takenMod', v: 0.1, turns: 2, target: 'allEnemies' }] },
-        { fx: [dmg(0.8, 'allEnemies'), inF, spend(P, 3), dmg(0.5, 'allEnemies', { hits: 3 })] },
-        { fx: [{ k: 'nextAp', v: 1 }, inF, { k: 'perStack', id: P }, dmg(0.5, 'allEnemies'), { k: 'formEnd' }] },
+        { fx: [dmg(1.6, 'allEnemies'), { k: 'takenMod', v: 0.2, turns: 2, target: 'allEnemies' }] },   // 10-13 신탁 점검: 140→160% · 받는 피해 10→20%
+        { fx: [dmg(0.8, 'allEnemies'), inF, spend(P, 3), dmg(0.8, 'allEnemies', { hits: 3 })] },   // 10-13 신탁 점검: 3회 60→90%
+        { fx: [{ k: 'nextAp', v: 1 }, inF, { k: 'perStack', id: P }, dmg(0.7, 'allEnemies'), { k: 'formEnd' }] },   // 10-13 신탁 점검: 기혈당 80→110%
       ],
       blesses: ['power', 'draw', [stack(Q, 1)]],
     },
@@ -59,7 +59,7 @@ export default hero({
         { fx: [discard(2), outF, stack(Q, 3), inF, stack(P, 2)] },
         { fx: [discard(1, { all: true }), outF, stack(Q, 3), inF, stack(P, 3)] },
         { fx: [outF, stack(Q, 2), inF, { k: 'formKeep', turns: 1 }] },   // 태세 지키기
-        { cost: 1, fx: [discard(1), draw(2), stack(Q, 1)] },
+        { cost: 1, fx: [discard(1), draw(2), stack(Q, 2)] },   // 10-13 신탁 점검: 나른한 삶 1→2
         { power: true, fx: [discard(2), stack(Q, 2), power([rule({ on: 'discard', who: 'other' }, [stack(Q, 1)])])] },
       ],
       blesses: ['draw', 'ap', [stack(Q, 1)]],
@@ -68,9 +68,9 @@ export default hero({
       name: '도끼 부수기', cost: 2, type: '공격',
       fx: [dmg(3.4), ...enter, { k: 'formKeep', turns: 1 }],   // 10-11 밸런스
       oracles: [
-        { fx: [dmg(3.3), ...enter] },
-        { cost: 1, fx: [dmg(2.2), ifStack(Q, 4), ...enter] },
-        { fx: [dmg(2), ...enter, { k: 'formExtend', id: F, v: 1, max: 4 }] },
+        { fx: [dmg(3.6), ...enter, draw(1)] },   // 10-13 신탁 점검: 보존을 잃던 신탁 — 400% · 드로우 1
+        { cost: 1, fx: [dmg(2.4), ...enter] },   // 10-13 신탁 점검 3차: 조건 없이 백수공권   // 10-13 신탁 점검: 조건 나른한 삶 4→2 · 240%
+        { fx: [dmg(2), ...enter, { k: 'formKeep', turns: 2 }] },   // 10-13 신탁 점검: +1턴 대신 2턴 보존(보존이 몸통)
         { fx: [dmg(1.6, 'allEnemies'), ...enter, stack(P, 2)] },
         { fx: [dmg(2.2), ...enter, { k: 'formKeep', turns: 1 }] },
       ],
@@ -80,11 +80,11 @@ export default hero({
       name: '하늘을 호령하는 포효', cost: 1, type: '공격',
       fx: [dmg(3.6), inF, { k: 'perStack', id: P }, dmg(0.5)],   // 10-11 밸런스(사용자 「다 해 줘」)
       oracles: [
-        { type: '스킬', fx: [stack(Q, 3)] },
-        { fx: [dmg(1.6), outF, { k: 'perStack', id: Q }, dmg(0.5)] },
-        { fx: [dmg(1.1, 'allEnemies'), inF, { k: 'perStack', id: P }, dmg(0.2, 'allEnemies')] },
-        { fx: [dmg(1.6), inF, spend(P, 3), dmg(0.8, 'oneEnemy', { hits: 3 })] },
-        { cost: 0, needForm: F, fx: [{ k: 'perStack', id: P, n: 1 }, dmg(0.4)] },   // 백수공권 중에만
+        { fx: [dmg(2), stack(Q, 3)] },   // 10-13 신탁 점검 3차   // 10-13 신탁 점검: 나른한 삶만 주던 스킬 → 피해 + 나른한 삶
+        { fx: [dmg(2), outF, { k: 'perStack', id: Q }, dmg(0.5)] },   // 10-13 신탁 점검
+        { fx: [dmg(1.4, 'allEnemies'), inF, { k: 'perStack', id: P }, dmg(0.3, 'allEnemies')] },   // 10-13 신탁 점검
+        { fx: [dmg(2), inF, spend(P, 3), dmg(0.8, 'oneEnemy', { hits: 3 })] },   // 10-13 신탁 점검
+        { cost: 0, needForm: F, fx: [{ k: 'perStack', id: P, n: 1 }, dmg(0.7)] },   // 10-13 신탁 점검: 50→80%   // 백수공권 중에만
       ],
       blesses: ['power', 'draw', [stack(Q, 1)]],
     },
@@ -93,10 +93,10 @@ export default hero({
       fx: [dmg(2.2), tough(1), stack(Q, 1)],   // 10-11 밸런스(사용자 「다 해 줘」)
       oracles: [
         { fx: [dmg(1.6), tough(1), stack(Q, 1)] },
-        { fx: [dmg(0.8, 'allEnemies'), outF, stack(Q, 1)] },
+        { fx: [dmg(1, 'allEnemies'), tough(1), outF, stack(Q, 1)] },   // 10-13 신탁 점검: 160% · 강인도 되살림
         { fx: [dmg(1.2), tough(2)] },
-        { cost: 0, fx: [dmg(0.8), outF, stack(Q, 1)] },
-        { fx: [dmg(1.2), { k: 'ifChain' }, dmg(0.8)] },
+        { cost: 0, fx: [dmg(1.2), tough(1), outF, stack(Q, 1)] },   // 10-13 신탁 점검 3차: 강인도 되살림   // 10-13 신탁 점검: 80→120%
+        { fx: [dmg(1.4), tough(1), { k: 'ifChain' }, dmg(0.8)] },   // 10-13 신탁 점검: 강인도 되살림
       ],
       blesses: ['power', 'draw', [stack(Q, 1)]],
     },

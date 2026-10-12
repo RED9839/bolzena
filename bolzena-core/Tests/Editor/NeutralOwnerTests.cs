@@ -30,6 +30,17 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(byA * 3 / 2, byC, 1);
         }
 
+        [Test] public void 교주_강화_카드도_내면_이_전투에서_사라진다()
+        {   // 2026-10-12 제보 — 자기 계발(0코 신탁)이 버린 더미로 돌아와 계속 써지고 강화 겹이 쌓였다
+            const string P = @"[{id:'np', name:'교주 계획표', cost:0, type:'강화', grade:'일반', price:50, tags:['유일'], fx:[{k:'power', id:'계획표', rules:[{when:{on:'turnStart'}, fx:[{k:'draw', v:1}]}]}]}]";
+            var b = K.Fight(K.Data(cards: P), new[] { "a", "c" }, new[] { "dummy" });
+            K.Hand(b, "np@a");
+            K.Play(b, "np@a");
+            Assert.IsTrue(b.Gone.Contains("np@a"), "강화 카드는 낸 뒤 이 전투에서 사라진다");
+            Assert.IsFalse(b.Discard.Contains("np@a"), "버린 더미로 돌아가지 않는다");
+            Assert.AreEqual(1, b.Powers.Single().N, "한 번만 켜진다");
+        }
+
         [Test] public void 실드는_주인_방어력()
         {
             int Shield(string id)

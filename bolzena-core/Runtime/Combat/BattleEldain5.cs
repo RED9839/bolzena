@@ -128,22 +128,25 @@ namespace Bolzena.Core
         void HitTakenReset() => Counts.Remove(HIT_TAKEN);
 
         // ── 벨라 「존속의 촛불」(엘다인 4차) ───────────────────────────────
-        /// <summary>그 동료가 자기 카드를 냈다 — 그 동료에게 붙은 burn 표시가 1 타며 키워드 주인 방어력 기준 실드.</summary>
+        /// <summary>그 동료가 자기 카드를 냈다 — burn 표시가 1 타며 키워드 주인 방어력 기준 실드 · 회복.
+        /// carrier hero = 그 동료에게 붙은 표시 · carrier self = 주인이 쥔 파티 촛불(2026-10-12 벨라 — 주인 말고 누가 내든 탐).</summary>
         void MarkBurn(string hero)
         {
             if (hero == null || Kw.Count == 0) return;
             foreach (var kw in Kw.Values)
             {
                 var bn = kw.Def.Burn;
-                if (bn == null || bn.On != "play" || kw.Carrier != "hero" || StackOf(hero, kw.Id) <= 0) continue;
+                if (bn == null || bn.On != "play") continue;
+                string at = kw.Carrier == "hero" ? hero : kw.Carrier == "self" && hero != kw.Owner ? kw.Owner : null;
+                if (at == null || StackOf(at, kw.Id) <= 0) continue;
                 var who = HeroUnit(hero); var giver = HeroUnit(kw.Owner);
                 if (who == null || giver == null || giver.Dead || Pool.Dead) continue;
-                int before = StackOf(hero, kw.Id);
-                AddStack(hero, kw.Id, -1);
-                StackChanged(kw.Owner, kw.Id, before, StackOf(hero, kw.Id), who);
+                int before = StackOf(at, kw.Id);
+                AddStack(at, kw.Id, -1);
+                StackChanged(kw.Owner, kw.Id, before, StackOf(at, kw.Id), at == hero ? who : giver);
                 int v = bn.Shield > 0 ? GuardAmount(giver, bn.Shield, null) : 0;
                 if (v > 0) { Pool.Shield += v; GainCue(PartyRep(who), "shield", v); TallyShield(giver, v); }
-                Say($"「{kw.Id}」 — {who.Name}의 카드에 1 탐{(v > 0 ? $"(실드 {v})" : "")} · 남은 {StackOf(hero, kw.Id)}");
+                Say($"「{kw.Id}」 — {who.Name}의 카드에 1 탐{(v > 0 ? $"(실드 {v})" : "")} · 남은 {StackOf(at, kw.Id)}");
                 if (bn.Heal > 0)   // (2026-10-11) 촛불이 타며 파티 회복 — 주인(벨라) 방어력 기준, 보통 회복과 같은 길(넘친 회복 · 부상 계기 포함)
                     RunFx(new List<Fx> { new Fx { K = FxK.Heal, Ratio = bn.Heal, Target = "party" } }, new FxCtx { Owner = giver, TargetIdx = AliveEnemies().FirstOrDefault()?.Idx ?? 0 });
                 if (Over != null) return;

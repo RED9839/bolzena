@@ -208,7 +208,7 @@ namespace Bolzena.View
         {
             float max = e.ToughMaxV;
             var s = Tip.Head("강인도") + (e.Broken ? "  <color=#ffd65a>격파</color>" : $"  {Thirds(v)} / {Thirds(max)}") + "\n" + Terms.WordText("강인도");
-            if (e.Weak != null && e.Weak.Count > 0) s += "\n" + Tip.Dim($"약점({string.Join(" · ", e.Weak)}) 사도의 카드는 비용만큼, 아니면 그 1/3만큼 깎습니다");
+            if (e.Weak != null && e.Weak.Count > 0) s += "\n" + Tip.Dim($"약점({string.Join(" · ", e.Weak)}) 사도의 카드는 비용만큼(0코는 1/2), 아니면 그 1/3만큼(0코는 0) 깎습니다");
             return s;
         }
 

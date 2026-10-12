@@ -360,6 +360,20 @@ static class Program
                     int n = rest.Count > 0 && int.TryParse(rest[0], out var x5) ? x5 : 200;
                     return FoeStat.Run(data, n, seed, bot.Skilled, top);
                 }
+            case "oracleab":
+                {
+                    // oracleab [바퀴 120] [--seed 0] [--per 1200] [--hero 키;키] [--hpx 1] [--dmgx 1] [--hard] [--reps 1] [--out 파일.tsv] — 고유 카드 신탁마다 같은 싸움을 없음 · 기본 · 신탁으로 다시 싸워 값어치 배율(OracleAB.cs, 2026-10-13)
+                    int seed = int.Parse(Opt("seed", "0")), per = int.Parse(Opt("per", "1200")); var only = Many("hero"); string outp = Opt("out") ?? NewOut("oracleab.tsv");
+                    int n = rest.Count > 0 && int.TryParse(rest[0], out var xo) ? xo : 120;
+                    return OracleAB.Run(data, n, seed, per, only.Count > 0 ? only : null, outp, D(Opt("hpx", "1")), D(Opt("dmgx", "1")), Flag("hard"), int.Parse(Opt("reps", "1")));
+                }
+            case "magstat":
+                {
+                    // magstat [판 600] --hero 사도 [--card 생성 카드 id] [--seed 0] — 싸움 끝 덱 속 생성 카드 장수 · 비율(MagStat.cs, 2026-10-13 시온 마탄)
+                    string h = Opt("hero", "시온더다크불릿"), cd = Opt("card") ?? h + "_t1"; int seed = int.Parse(Opt("seed", "0"));
+                    int n = rest.Count > 0 && int.TryParse(rest[0], out var xm) ? xm : 600;
+                    return MagStat.Run(data, n, seed, h, cd);
+                }
             case "weaksim":
                 {
                     // weaksim [바퀴] [--seed 0] [--bot skilled] [--weak role|0|1|2|3] [--crayon all|표] — 약점 사도 수별 완주율(WeakSim.cs)
@@ -371,6 +385,15 @@ static class Program
             case "bench":
                 // bench [판 20] [--seed 0] [--rep 3] [--records 파일] · bench --sim 바퀴 [--threads 8] · bench --textdump 파일 — 엔진 성능(Bench.cs)
                 return Bench.Run(data, rest);
+            case "ultstat":
+                {
+                    // ultstat [바퀴 400] [--seed 0] [--party role|random] [--gauge 0] [--out 파일.md] — 고학년 영향(UltStat.cs, 2026-10-12)
+                    int n = rest.Count > 0 && int.TryParse(rest[0], out var un) ? un : 400;
+                    string md = UltStat.Run(data, n, int.Parse(Opt("seed", "0")), Opt("party", "role"), int.Parse(Opt("gauge", "0")));
+                    string o = Opt("out"); if (o != null) File.WriteAllText(o, md);
+                    Console.WriteLine(md);
+                    return 0;
+                }
             case "bossult":
                 {
                     // bossult [--out 파일.md] — 보스 클론 고학년 변환표(사도마다 원래 효과 · 보스 효과 · 예고 피해)

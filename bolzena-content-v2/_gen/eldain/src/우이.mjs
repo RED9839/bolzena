@@ -17,40 +17,40 @@ export default hero({
   blurb: '행복을 지키려는 영원살이 막내. 넘치게 고친 웃음은 저금통에 모아 두었다가, 깨서 동료가 큰 카드를 낼 수 있게 숨을 돌려 줍니다.',
   keyword: {
     name: K, desc: '넘치는 웃음을 모아 두는 저금통', carrier: 'self', cap: 3,
-    rules: [{ name: '넘치는 웃음', when: { on: 'overheal', who: 'any', once: true, pct: 0.7 }, fx: [S(1)] }],   // 10-12 사용자 「초과 힐이 너무 힘들다」 — 최대 HP 를 넘길 때 → 회복이 HP 70% 를 넘길 때   // 넘치면 저금 +1(AP 쪽은 부탁해 · 장화로)
+    rules: [{ name: '넘치는 웃음', when: { on: 'overheal', who: 'any', once: true, pct: 0.5 }, fx: [S(1)] }],   // 10-12 우이 손질(사용자 「힐량이 낮고 조건이 빡세다」) 70% → 50% · 10-12 사용자 「초과 힐이 너무 힘들다」 — 최대 HP 를 넘길 때 → 회복이 HP 70% 를 넘길 때   // 넘치면 저금 +1(AP 쪽은 부탁해 · 장화로)
   },
   // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
-  keywords: [{ name: '에루의 우비', desc: '에루가 접어 준 우비 — 턴이 끝날 때마다 파티를 덮어 준다', carrier: 'self', cap: 3, per: [{ stat: 'hot', ratio: 0.15 }] }],   // 10-11 밸런스(서포터 하향 뒤 48.8%) 10→15%
+  keywords: [{ name: '에루의 우비', desc: '에루가 접어 준 파티의 우비', carrier: 'self', cap: 3, per: [{ stat: 'hot', ratio: 0.2 }] }],   // 10-12 우이 손질(사용자 「힐량이 낮고 조건이 빡세다」) 15→20%   // 10-11 밸런스(서포터 하향 뒤 48.8%) 10→15%
   // 사용자 10-11: 20명 모두 고유 능력 2개
   passives: [
-    { name: '긍정왕 우이', when: { on: 'turnStart' }, conds: [{ c: 'hp', pct: 0.5 }], fx: [heal(0.7)] },   // 파티 HP 50% 이하면 매 턴 회복
+    { name: '긍정왕 우이', when: { on: 'turnStart' }, conds: [{ c: 'hp', pct: 0.65 }], fx: [heal(0.7)] },   // 파티 HP 65% 이하면 매 턴 회복 — 10-12 우이 손질(사용자 「힐량이 낮고 조건이 빡세다」) 조건 50% → 65%(80% · 회복 100% 는 봇 측정에서 너무 셈)
   ],
   // 원작 보강(10-11 검토): 고학년이 무작위 적 행동을 늦춘다
-  ult: { name: '말하는대로!', cost: 200, fx: [heal(2), { k: 'cleanse', v: 3 }, { k: 'ap', v: 2 }, status('둔화', 1, { target: 'oneEnemy' }), S(1)] },
+  ult: { name: '말하는대로!', cost: 200, fx: [heal(3), { k: 'cleanse', v: 3 }, { k: 'ap', v: 2 }, draw(2)] },   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 회복 200→300% · 둔화 · 저금 1 → 드로우 2(효과 넷 한도)
 }, {
   basicNames: ['빗방울', '이슬 튕기기', '보슬보슬'], heal: true, deck: 'light', starter: true,
   uniques: [
     { // 시동(은총으로)
       name: '개굴비 내리기', cost: 1, type: '스킬',
-      fx: [heal(1), rain(1)],
+      fx: [heal(1.2), rain(1)],   // 10-12 우이 손질(사용자 「힐량이 낮고 조건이 빡세다」) 100→120%(글 140%)
       oracles: [
         { fx: [heal(2.4), rain(1)] },
-        { fx: [rain(2)] },
+        { fx: [heal(0.6), rain(2)] },   // 10-13 신탁 점검: 회복 되살림
         { fx: [heal(1.6), rain(1), S(1)] },
         { cost: 0, tags: ['증발'], fx: [heal(1)] },
-        { fx: [{ k: 'nextCheaper', v: 1 }, rain(1)] },
+        { fx: [heal(0.8), { k: 'nextCheaper', v: 1 }, rain(1)] },   // 10-13 신탁 점검: 회복 되살림
       ],
       blesses: ['heal', 'draw', [S(1)]],
     },
     {
-      name: '우비 접어 주기', cost: 0, type: '스킬',
+      name: '우비 접어 주기', cost: 0, type: '스킬',   // 10-13 신탁 점검: 신탁 다섯 모두 기본보다 약해(봇) — 우비 되살림 · 1코 둘은 드로우 2 · AP 2
       fx: [draw(1), stack('에루의 우비', 1), ...brk(1), { k: 'ap', v: 1 }],
       oracles: [
-        { cost: 1, fx: [draw(2), ...brk(1), { k: 'ap', v: 1 }] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 — 0코 + AP 는 소멸이어야 해(검사기) 1코로
-        { cost: 1, fx: [draw(1), ...brk(1), { k: 'nextAp', v: 2 }] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 — 1코로
-        { fx: [{ k: 'payHpPct', v: 0.05 }, draw(2)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 — AP 대신 드로우 2
-        { tags: ['소멸'], fx: [...brk(2), { k: 'ap', v: 2 }] },
-        { fx: [draw(1), ...brk(1), { k: 'gauge', v: 20, target: 'otherAllies' }] },
+        { cost: 1, fx: [draw(2), stack('에루의 우비', 1), ...brk(1), { k: 'ap', v: 2 }] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 — 0코 + AP 는 소멸이어야 해(검사기) 1코로
+        { cost: 1, fx: [draw(2), stack('에루의 우비', 1), ...brk(1), { k: 'nextAp', v: 2 }] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 — 1코로
+        { fx: [{ k: 'payHpPct', v: 0.05 }, draw(3), stack('에루의 우비', 2)] },   // 10-13 신탁 점검 3차   // 10-12 사용자 「신탁 소멸 줄여 줘」 — AP 대신 드로우 2
+        { tags: ['소멸'], fx: [draw(1), stack('에루의 우비', 1), ...brk(2), { k: 'ap', v: 2 }] },   // 10-13 신탁 점검: 드로우 · 우비 되살림
+        { fx: [draw(1), stack('에루의 우비', 1), ...brk(1), { k: 'gauge', v: 30, target: 'otherAllies' }] },   // 10-13 신탁 점검: 우비 되살림 · 게이지 20→30
       ],
       blesses: ['draw', 'heal', [S(1)]],
     },
@@ -62,7 +62,7 @@ export default hero({
         { cost: 0, fx: [...brk(2), cheap(-1, OT), draw(1)] },
         { fx: [...brk(1), cheap(-1, OT), empower(0.3, { who: 'any' })] },
         { fx: [empower(0.6, { who: 'any' }), draw(1)] },
-        { fx: [cheap(-1), S(1)] },
+        { fx: [cheap(-1), S(2)] },   // 10-13 신탁 점검
       ],
       blesses: ['cost', 'draw', [S(1)]],
     },
@@ -92,6 +92,6 @@ export default hero({
     },
   ],
   tokens: [
-    { id: R, name: '개굴비', cost: 0, type: '스킬', tags: ['연쇄', '소멸'], fx: [heal(0.6)], blurb: '에루가 부르는 개구리 비' },
+    { id: R, name: '개굴비', cost: 0, type: '스킬', tags: ['연쇄', '소멸'], fx: [heal(0.7)], blurb: '에루가 부르는 개구리 비' },   // 10-12 우이 손질(사용자 「힐량이 낮고 조건이 빡세다」) 60→70%(글 80%)
   ],
 });

@@ -60,7 +60,7 @@ namespace Bolzena.RunUI
             float cw = Mathf.Min(Theme.C(560, 400), (midH - 8) / 1.4f), ch = cw * 1.4f;   // 화면 높이의 약 65% (2026-10-08 사용자: 카드가 작다)
             float midY = (botH - topH) / 2;   // 가운데 칸의 가운데(화면 가운데에서)
             halo.rectTransform.At(0.5f, 0.5f, 0, midY, cw * 2.4f, cw * 2.4f);
-            halo.color = W.CardTint(this, v, null).A(0.22f);
+            halo.color = W.CardTint(this, v, v?.Def.Hero == null ? v?.Owner : null).A(0.22f);   // 교주 카드는 넣은 사도의 성격(2026-10-12 밤)
 
             // ── 위 띠 — 주인 얼굴 · 종류 아이콘 · 분류 글 · (목록이면) 몇째 ──
             var top = Ui.Rect("top", ui).Band(1, topH, Theme.Gutter + 8, Theme.Gutter + 8, 0);

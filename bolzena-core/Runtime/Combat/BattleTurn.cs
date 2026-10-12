@@ -142,6 +142,13 @@ namespace Bolzena.Core
 
             DrawCards(R.DRAW_PER_TURN + (Turn == 1 ? Opening : 0), false);
             AfterTurnDraw();
+            // 정신 붕괴(판) — 뽑기가 끝난 손에 「망령의 속삭임」 1장(손이 가득하면 버린 더미로)
+            if (Over == null && MindWhisper)
+            {
+                if (Hand.Count < R.HAND_MAX) { Hand.Add(R.MIND_CARD); CardCue(R.MIND_CARD, "new", "hand", "mind"); }
+                else { Discard.Add(R.MIND_CARD); CardCue(R.MIND_CARD, "new", "discard", "mind"); }
+                Say($"유령의 장난 — 「{Data.Card(R.MIND_CARD)?.Name}」 이 귓가에 맴돈다");
+            }
             if (Over == null) LaterTurn();
             if (Over == null) FormTurnStart();   // (엘다인 ▶E6) 변신 중 — 매 턴 변신 카드
             if (Over == null) FoePassives("afterDraw", null);
@@ -212,6 +219,7 @@ namespace Bolzena.Core
             Discard.AddRange(toss);
             Used.Clear();   // 이번 턴에 낸 카드 — 이제 여느 버린 카드(다음 섞기로 돌아간다)
             foreach (var id in toss) BlessDrop(id);
+            foreach (var id in toss) { BulletDrop(id); if (Over != null) return this; }   // 탄환 — 턴 끝 버림도 버린 더미로 가니 쏜다(2026-10-13 사용자 — 카제나 「진혼의 탄환」)
             MergePile(Discard, "discard");
             foreach (var id in Held.Keys.ToList()) if (!keep.Contains(id)) Held.Remove(id);
             foreach (var id in keep.Distinct()) Held[id] = (Held.TryGetValue(id, out var hn) ? hn : 0) + 1;

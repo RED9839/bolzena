@@ -21,10 +21,10 @@ export default hero({
   id: H, name: '우로스', nature: '공명', race: '수인', role: '서포터', star: 3,
   blurb: '백사당의 수호자. 돕는 허물과 압도하는 본성이 번갈아 깨어나며 순환을 돌리고, 쌓인 순환은 파티를 북돋거나 거대한 뱀이 되어 한꺼번에 쏟아집니다.',
   keyword: {
-    name: C, desc: '우로스 카드를 낼 때마다 허물 ↔ 본성이 바뀌고, 허물 → 본성 → 허물로 한 바퀴 돌면 +1(비수는 태세를 안 바꿈)', carrier: 'self', cap: 3,
+    name: C, desc: '허물과 본성이 한 바퀴 돈 자취', carrier: 'self', cap: 3,
     per: [{ stat: 'atk', v: 0.05, who: 'allies' }],
   },
-  keywords: [{ name: U, desc: '우로스가 영역 위에 세운 동료 — 그 동료의 피해가 커진다', carrier: 'hero', cap: 1, hunt: true, per: [{ stat: 'dealt', v: 0.1, who: 'holder' }] }],
+  keywords: [{ name: U, desc: '우로스가 영역 위에 세운 동료', carrier: 'hero', cap: 1, hunt: true, per: [{ stat: 'dealt', v: 0.1, who: 'holder' }] }],
   // 자동 규칙 둘: 한 바퀴마다 순환 · AP(한 턴 1번 — 태세 한 바퀴 formLap 예외) · 순환이 다 차면 파티 사기
   passives: [
     { name: '순환', when: { on: 'formLap' }, fx: [lap(1), { k: 'ap', v: 1 }] },   // 10-11 사용자: 턴당 조건 없앰 — 「우로스는 사기인 걸로」(한 바퀴에 우로스 카드 2장이 들어 무한은 아님)
@@ -35,7 +35,7 @@ export default hero({
     { id: GOOD, name: '허물', desc: '벗어 놓은 내면(슈로) — 돕는 얼굴(우로스 카드를 내면 본성으로)', stance: true, toggle: EVIL },
     { id: EVIL, name: '본성', desc: '타락한 뱀 — 압도하는 얼굴(우로스 카드를 내면 허물로)', stance: true, toggle: GOOD },
   ],
-  ult: { name: '압도', cost: 300, fx: [dmg(0.8, 'allEnemies', { hits: 2 }), lap(3), up()] },
+  ult: { name: '압도', cost: 250, fx: [dmg(0.8, 'allEnemies', { hits: 2 }), lap(3), up(), status('사기', 2)] },   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 사기 2 더함   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로
 }, {
   basicNames: ['검기 날리기', '백사 일섬', '슈로의 인사'], deck: 'heavy',
   uniques: [
@@ -44,7 +44,7 @@ export default hero({
       fx: [up(), G, shield(0.8), E, empower(0.3, { who: 'other' })],
       oracles: [
         { fx: [up(), G, shield(1.2), E, empower(0.4, { who: 'other' })] },
-        { fx: [up(), draw(1), keep, E, empower(0.2, { who: 'other' })] },
+        { fx: [up(), draw(1), keep, E, empower(0.3, { who: 'other' })] },   // 10-13 신탁 점검
         { fx: [up(), G, draw(1), E, empower(0.3, { who: 'other' })] },
         { fx: [up(), per, shield(0.4), E, { k: 'takenMod', v: 0.1, turns: 2, target: 'oneEnemy' }] },
         { cost: 0, fx: [up(), G, shield(0.6), E, empower(0.2, { who: 'other' })] },
@@ -56,7 +56,7 @@ export default hero({
       fx: [status('약화', 1, { target: 'oneEnemy' }), G, draw(1), E, { k: 'takenMod', v: 0.1, turns: 2, target: 'oneEnemy' }],
       oracles: [
         { fx: [status('약화', 1, { target: 'allEnemies' }), G, draw(1), E, dmg(0.5, 'allEnemies')] },
-        { fx: [status('약화', 1, { target: 'oneEnemy' }), draw(1), keep] },
+        { fx: [status('약화', 1, { target: 'oneEnemy' }), draw(2), keep] },   // 10-13 신탁 점검: 드로우 1→2
         { type: '공격', fx: [dmg(0.7, 'allEnemies'), G, draw(1), E, status('약화', 1, { target: 'allEnemies' })] },
         { cost: 0, fx: [status('약화', 1, { target: 'oneEnemy' }), G, draw(1), E, status('취약', 1, { target: 'oneEnemy' })] },
         { fx: [status('약화', 1, { target: 'oneEnemy' }), G, draw(1, { who: 'other' }), E, lap(1)] },
@@ -68,10 +68,10 @@ export default hero({
       fx: [dmg(1), per, dmg(0.3), E, dmg(0.6)],
       oracles: [
         { fx: [dmg(1.2), per, dmg(0.4), E, dmg(0.6)] },
-        { fx: [dmg(1), per, dmg(0.3), G, empower(0.3, { who: 'other' })] },
+        { fx: [dmg(1), per, dmg(0.3), G, empower(0.5, { who: 'other' })] },   // 10-13 신탁 점검
         { cost: 0, fx: [dmg(0.6), per, dmg(0.2), E, dmg(0.4)] },
         { fx: [dmg(0.6, 'allEnemies'), per, dmg(0.2, 'allEnemies'), E, status('약화', 1, { target: 'allEnemies' })] },
-        { fx: [dmg(1), per, dmg(0.3), keep] },
+        { fx: [dmg(1.2), per, dmg(0.4), keep] },   // 10-13 신탁 점검
       ],
       blesses: ['power', 'cost', [lap(1)]],
     },
@@ -80,10 +80,10 @@ export default hero({
       fx: [dmg(1, 'allEnemies'), E, dmg(0.4, 'allEnemies'), ...full, dmg(1.6, 'allEnemies')],
       oracles: [
         { fx: [dmg(1.2, 'allEnemies'), E, dmg(0.4, 'allEnemies'), ...full, dmg(1.8, 'allEnemies')] },
-        { fx: [dmg(2), E, dmg(0.8), ...full, dmg(3.2)] },
-        { type: '스킬', fx: [shield(0.8), ...full, shield(1.6), status('사기', 1)] },
-        { cost: 1, fx: [dmg(0.6, 'allEnemies'), ...full, dmg(1.2, 'allEnemies')] },
-        { fx: [dmg(0.8, 'allEnemies'), ...full, dmg(1.2, 'allEnemies'), { k: 'nextAp', v: 1 }] },
+        { fx: [dmg(2.4), E, dmg(1), ...full, dmg(3.8)] },   // 10-13 신탁 점검
+        { type: '스킬', fx: [shield(2), ...full, shield(2.4), status('사기', 1)] },   // 10-13 신탁 점검
+        { cost: 1, fx: [dmg(1, 'allEnemies'), ...full, dmg(2, 'allEnemies')] },   // 10-13 신탁 점검
+        { fx: [dmg(1, 'allEnemies'), ...full, dmg(1.6, 'allEnemies'), { k: 'nextAp', v: 1 }] },   // 10-13 신탁 점검
       ],
       blesses: ['power', 'cost', [lap(1)]],
     },
@@ -93,7 +93,7 @@ export default hero({
       oracles: [
         { fx: [dmg(0.5, 'randomEnemy', { hits: 2 }), keep, E, dmg(0.3, 'randomEnemy')] },
         { fx: [dmg(0.4, 'randomEnemy', { hits: 2 }), keep, E, { k: 'takenMod', v: 0.1, turns: 2, target: 'oneEnemy' }] },
-        { fx: [dmg(0.4, 'randomEnemy', { hits: 2 }), keep, G, up()] },
+        { fx: [dmg(0.5, 'randomEnemy', { hits: 2 }), keep, G, up()] },
         { fx: [dmg(0.3, 'randomEnemy', { hits: 2 }), per, dmg(0.1, 'randomEnemy'), keep] },
         { fx: [dmg(0.4, 'randomEnemy', { hits: 3 }), keep] },
       ],

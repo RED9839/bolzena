@@ -32,6 +32,14 @@ namespace Bolzena.RunUI
             yield return Press("zoom.var0", 0.8f);
             yield return Press("zoom.look:냉정", 0.8f);
             yield return Shot("foedex_monster_detail_cool");
+            // 실제 전투 수치(2026-10-13) — 행동 패턴의 층별 피해 · 2층에만 나오는 적
+            var dsr = f.Stage.ModalLayer.GetComponentsInChildren<UnityEngine.UI.ScrollRect>().FirstOrDefault();
+            if (dsr != null) { dsr.verticalNormalizedPosition = 0f; yield return Wait(0.4f); yield return Shot("foedex_monster_detail_acts"); }
+            CloseModals(); yield return Wait(0.4f);
+            f.EnemyDetail("marshmallowdealer"); yield return Wait(1.0f);
+            yield return Shot("foedex_monster_floor2");
+            dsr = f.Stage.ModalLayer.GetComponentsInChildren<UnityEngine.UI.ScrollRect>().FirstOrDefault();
+            if (dsr != null) { dsr.verticalNormalizedPosition = 0f; yield return Wait(0.4f); yield return Shot("foedex_monster_floor2_acts"); }
             CloseModals(); yield return Wait(0.4f);
             yield return Press("nat:광기", 0.8f);   // 다시 누르면 풀린다
             // 검색 — 초성

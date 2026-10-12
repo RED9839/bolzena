@@ -14,7 +14,7 @@
       "blurb": "만년설의 현자, 영원살이 맏이. 서리와 동상으로 적을 얼려 약점을 드러내고, 금이 간 자리를 빙설화도로 깨뜨립니다.",
       "keyword": {
         "name": "서리",
-        "desc": "아야가 새긴 서리 — 금이 가 강인도가 잘 깎인다",
+        "desc": "아야가 새긴 서리 — 강인도가 잘 깎임",
         "carrier": "enemy",
         "cap": 5,
         "per": [
@@ -27,7 +27,7 @@
       "keywords": [
         {
           "name": "만년설",
-          "desc": "현자가 쌓아 온 만년설 — 얼음 결정 깨기가 강인도를 더 깊이 깬다",
+          "desc": "현자가 쌓아 온 만년설",
           "carrier": "self",
           "cap": 3
         }
@@ -183,7 +183,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.5,
               "target": "randomEnemy",
               "hits": 3,
               "hitFx": [
@@ -194,6 +194,12 @@
                   "target": "oneEnemy"
                 }
               ]
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -222,6 +228,12 @@
               "ratio": 0.5,
               "target": "oneEnemy",
               "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
@@ -337,6 +349,11 @@
               "id": "서리",
               "v": 1,
               "target": "allEnemies"
+            },
+            {
+              "k": "stack",
+              "id": "만년설",
+              "v": 1
             }
           ]
         },
@@ -374,6 +391,11 @@
               "id": "서리",
               "v": 1,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "만년설",
+              "v": 1
             }
           ]
         },
@@ -387,8 +409,7 @@
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "서리",
+              "k": "rushDown",
               "v": 1,
               "target": "oneEnemy"
             },
@@ -495,12 +516,17 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.7,
               "target": "allEnemies"
             },
             {
               "k": "status",
               "id": "약점 노출",
+              "v": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "tough",
               "v": 1,
               "target": "allEnemies"
             }
@@ -798,6 +824,10 @@
               "k": "dmg",
               "ratio": 2.4,
               "target": "oneEnemy"
+            },
+            {
+              "k": "tough",
+              "v": 1
             },
             {
               "k": "ifFoe",

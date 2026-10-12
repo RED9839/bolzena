@@ -28,6 +28,8 @@ namespace Bolzena.Core
         /// <summary>적 체력 배율(없으면 R.ENEMY_HP) · 피해 배율(없으면 1).</summary>
         public double? EnemyHp, EnemyDmg;
         public NextFight Next;
+        /// <summary>정신 붕괴(판) — 이 싸움의 매 턴 시작에 손패로 「망령의 속삭임」(R.MIND_CARD) 1장.</summary>
+        public bool Mind;
         public int Gauge;
         public bool Elite;
         /// <summary>판 단위 사도 성장(공격 · 방어 · 치명) — 장비처럼 더한다.</summary>
@@ -154,6 +156,8 @@ namespace Bolzena.Core
         int autoDepth, senseDepth;
         List<string> discardPick;
         public int FirstRushDown, FoeQuiet;
+        /// <summary>정신 붕괴(판)가 걸린 싸움 — 매 턴 시작에 「망령의 속삭임」.</summary>
+        public bool MindWhisper;
         /// <summary>이 싸움의 적 체력 · 피해 배율 · 엘리트(소환한 적도 같은 눈금).</summary>
         public double EnemyHpx = 1, EnemyDmgx = 1;
         public bool EliteFight;
@@ -295,6 +299,7 @@ namespace Bolzena.Core
                 if (nx.Quiet != 0) { FoeQuiet = nx.Quiet; Say($"이벤트 — 적 패시브가 {nx.Quiet}턴 동안 잠잠하다"); }
                 if (nx.HpCut > 0) { Pool.Hp = Math.Max(1, Pool.Hp - Num.Round(Pool.MaxHp * nx.HpCut)); Say($"이벤트 — 파티 HP -{Num.Round(nx.HpCut * 100)}%"); }
             }
+            if (st.Mind && Data.Card(R.MIND_CARD) != null) { MindWhisper = true; Say($"유령의 장난 — 이 전투 동안 매 턴 「{Data.Card(R.MIND_CARD).Name}」 이 손에 든다"); }
             var opener = AliveParty().FirstOrDefault();
             if (opener != null) Talk(opener, "start");
             Emit("fightStart", new EmitInfo());

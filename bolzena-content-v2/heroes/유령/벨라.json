@@ -7,27 +7,26 @@
       "race": "유령",
       "role": "탱커",
       "star": 3,
-      "hp": 810,
+      "hp": 900,
       "atk": 115,
-      "def": 48,
+      "def": 65,
       "crit": 5,
-      "blurb": "경계선 위를 떠도는 앳된 유령. 동료 한 명에게 존속의 촛불을 켜 주면, 그 동료가 움직일 때마다 촛불이 타며 파티를 감싸고 상처를 아물게 합니다.",
+      "blurb": "경계선 위를 떠도는 앳된 유령. 파티에 존속의 촛불을 켜 두면, 동료들이 움직일 때마다 촛불이 타며 파티를 감싸고 상처를 아물게 합니다.",
       "keyword": {
         "name": "존속",
-        "desc": "벨라가 동료에게 켜 준 존속의 촛불",
-        "carrier": "hero",
+        "desc": "벨라가 파티에 켜 둔 존속의 촛불",
+        "carrier": "self",
         "cap": 7,
-        "hunt": true,
         "burn": {
           "on": "play",
-          "shield": 0.8,
-          "heal": 0.3
+          "shield": 0.5,
+          "heal": 0.15
         }
       },
       "keywords": [
         {
           "name": "존재의 불꽃",
-          "desc": "촛불이 남긴 불꽃 — 벨라의 실드가 두꺼워진다",
+          "desc": "촛불이 남긴 존재의 불꽃",
           "carrier": "self",
           "cap": 5,
           "per": [
@@ -42,7 +41,8 @@
         {
           "name": "영속",
           "when": {
-            "on": "endure"
+            "on": "lowHp",
+            "pct": 0.5
           },
           "fx": [
             {
@@ -77,16 +77,15 @@
           {
             "k": "stack",
             "id": "존속",
-            "v": 3,
-            "target": "holder"
+            "v": 3
           },
           {
             "k": "shield",
-            "ratio": 1.2
+            "ratio": 1.8
           },
           {
             "k": "heal",
-            "ratio": 1.2
+            "ratio": 1.8
           }
         ]
       },
@@ -160,8 +159,7 @@
         {
           "k": "stack",
           "id": "존속",
-          "v": 3,
-          "target": "oneAlly"
+          "v": 3
         }
       ],
       "oracles": [
@@ -178,8 +176,7 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 4,
-              "target": "oneAlly"
+              "v": 4
             }
           ]
         },
@@ -194,9 +191,13 @@
               "ratio": 2
             },
             {
-              "k": "moveMark",
+              "k": "stack",
               "id": "존속",
-              "target": "oneAlly"
+              "v": 3
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
@@ -208,10 +209,13 @@
           ],
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
               "k": "stack",
               "id": "존속",
-              "v": 2,
-              "target": "oneAlly"
+              "v": 3
             }
           ]
         },
@@ -220,10 +224,13 @@
           "power": true,
           "fx": [
             {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
               "k": "stack",
               "id": "존속",
-              "v": 1,
-              "target": "oneAlly"
+              "v": 2
             },
             {
               "k": "power",
@@ -231,14 +238,14 @@
                 {
                   "when": {
                     "on": "play",
-                    "who": "other"
+                    "who": "other",
+                    "every": 2
                   },
                   "fx": [
                     {
                       "k": "stack",
                       "id": "존속",
-                      "v": 1,
-                      "target": "holder"
+                      "v": 1
                     }
                   ]
                 }
@@ -260,8 +267,7 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 2,
-              "target": "oneAlly"
+              "v": 2
             }
           ]
         }
@@ -281,8 +287,7 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 1,
-              "target": "holder"
+              "v": 1
             }
           ]
         }
@@ -299,8 +304,7 @@
         {
           "k": "stack",
           "id": "존속",
-          "v": 2,
-          "target": "holder"
+          "v": 2
         },
         {
           "k": "stack",
@@ -310,9 +314,7 @@
         {
           "k": "ifStack",
           "id": "존속",
-          "n": 1,
-          "who": "any",
-          "not": true
+          "n": 5
         },
         {
           "k": "heal",
@@ -326,8 +328,12 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 2,
-              "target": "holder"
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "존재의 불꽃",
+              "v": 1
             },
             {
               "k": "draw",
@@ -342,12 +348,16 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 1,
-              "target": "holder"
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "존재의 불꽃",
+              "v": 1
             },
             {
               "k": "empower",
-              "ratio": 0.2,
+              "ratio": 0.3,
               "who": "other"
             }
           ]
@@ -361,8 +371,12 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 3,
-              "target": "holder"
+              "v": 4
+            },
+            {
+              "k": "stack",
+              "id": "존재의 불꽃",
+              "v": 1
             }
           ]
         },
@@ -373,12 +387,16 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 2,
-              "target": "holder"
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "존재의 불꽃",
+              "v": 1
             },
             {
               "k": "shield",
-              "ratio": 2
+              "ratio": 2.8
             }
           ]
         },
@@ -388,8 +406,12 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 1,
-              "target": "holder"
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "존재의 불꽃",
+              "v": 1
             },
             {
               "k": "status",
@@ -414,8 +436,7 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 1,
-              "target": "holder"
+              "v": 1
             }
           ]
         }
@@ -440,8 +461,7 @@
         {
           "k": "stack",
           "id": "존속",
-          "v": 2,
-          "target": "holder"
+          "v": 2
         },
         {
           "k": "stack",
@@ -455,7 +475,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.1
+              "ratio": 4.3
             },
             {
               "k": "when",
@@ -464,8 +484,12 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 2,
-              "target": "holder"
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "존재의 불꽃",
+              "v": 1
             }
           ]
         },
@@ -474,7 +498,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.9
+              "ratio": 4.5
             },
             {
               "k": "status",
@@ -489,7 +513,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.3
+              "ratio": 2.9
             },
             {
               "k": "when",
@@ -498,8 +522,7 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 1,
-              "target": "holder"
+              "v": 2
             }
           ]
         },
@@ -508,7 +531,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.6
+              "ratio": 4.5
             },
             {
               "k": "when",
@@ -517,13 +540,18 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 3,
-              "target": "holder"
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "존재의 불꽃",
+              "v": 1
             }
           ]
         },
         {
           "name": "신탁 5",
+          "cost": 1,
           "fx": [
             {
               "k": "status",
@@ -533,8 +561,7 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 2,
-              "target": "holder"
+              "v": 4
             }
           ]
         }
@@ -554,8 +581,7 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 1,
-              "target": "holder"
+              "v": 1
             }
           ]
         }
@@ -577,8 +603,7 @@
         },
         {
           "k": "perStack",
-          "id": "존속",
-          "who": "any"
+          "id": "존속"
         },
         {
           "k": "dmg",
@@ -599,8 +624,7 @@
             },
             {
               "k": "perStack",
-              "id": "존속",
-              "who": "any"
+              "id": "존속"
             },
             {
               "k": "dmg",
@@ -617,8 +641,7 @@
             {
               "k": "spend",
               "id": "존속",
-              "all": true,
-              "who": "any"
+              "all": true
             },
             {
               "k": "perEvent",
@@ -641,8 +664,7 @@
             },
             {
               "k": "perStack",
-              "id": "존속",
-              "who": "any"
+              "id": "존속"
             },
             {
               "k": "dmg",
@@ -664,8 +686,7 @@
             },
             {
               "k": "perStack",
-              "id": "존속",
-              "who": "any"
+              "id": "존속"
             },
             {
               "k": "dmg",
@@ -686,8 +707,7 @@
             },
             {
               "k": "perStack",
-              "id": "존속",
-              "who": "any"
+              "id": "존속"
             },
             {
               "k": "dmg",
@@ -717,8 +737,7 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 1,
-              "target": "holder"
+              "v": 1
             }
           ]
         }
@@ -748,8 +767,7 @@
                 {
                   "k": "stack",
                   "id": "존속",
-                  "v": 1,
-                  "target": "holder"
+                  "v": 1
                 }
               ]
             }
@@ -776,8 +794,7 @@
                     {
                       "k": "stack",
                       "id": "존속",
-                      "v": 1,
-                      "target": "holder"
+                      "v": 1
                     }
                   ]
                 }
@@ -824,6 +841,11 @@
               "v": 1
             },
             {
+              "k": "stack",
+              "id": "존속",
+              "v": 1
+            },
+            {
               "k": "power",
               "rules": [
                 {
@@ -834,8 +856,7 @@
                     {
                       "k": "stack",
                       "id": "존속",
-                      "v": 1,
-                      "target": "holder"
+                      "v": 1
                     }
                   ]
                 }
@@ -862,8 +883,7 @@
                     {
                       "k": "stack",
                       "id": "존속",
-                      "v": 1,
-                      "target": "holder"
+                      "v": 1
                     }
                   ]
                 },
@@ -889,7 +909,7 @@
             {
               "k": "status",
               "id": "피해 감소",
-              "v": 2
+              "v": 3
             },
             {
               "k": "power",
@@ -902,8 +922,7 @@
                     {
                       "k": "stack",
                       "id": "존속",
-                      "v": 1,
-                      "target": "holder"
+                      "v": 1
                     }
                   ]
                 }
@@ -927,8 +946,7 @@
             {
               "k": "stack",
               "id": "존속",
-              "v": 1,
-              "target": "holder"
+              "v": 1
             }
           ]
         }

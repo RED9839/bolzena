@@ -28,7 +28,7 @@
       "keywords": [
         {
           "name": "사수의 긍지",
-          "desc": "쏟아 낸 마탄만큼 굳어지는 사수의 자부심 — 마탄이 더 아프게 박힌다",
+          "desc": "쏟아 낸 마탄만큼 굳는 사수의 자부심",
           "carrier": "self",
           "cap": 5
         }
@@ -70,13 +70,25 @@
         "fx": [
           {
             "k": "dmg",
-            "ratio": 1.8,
+            "ratio": 2.2,
             "target": "allEnemies"
           },
           {
             "k": "make",
             "id": "시온더다크불릿_t1",
-            "v": 3
+            "v": 1
+          },
+          {
+            "k": "pull",
+            "from": "draw",
+            "n": 9,
+            "tag": "시온더다크불릿_t1"
+          },
+          {
+            "k": "pull",
+            "from": "discard",
+            "n": 9,
+            "tag": "시온더다크불릿_t1"
           }
         ]
       },
@@ -132,7 +144,7 @@
         {
           "k": "make",
           "id": "시온더다크불릿_t1",
-          "v": 3
+          "v": 2
         }
       ],
       "oracles": [
@@ -147,7 +159,7 @@
             {
               "k": "make",
               "id": "시온더다크불릿_t1",
-              "v": 4
+              "v": 3
             }
           ]
         },
@@ -174,7 +186,7 @@
             {
               "k": "make",
               "id": "시온더다크불릿_t1",
-              "v": 1
+              "v": 2
             },
             {
               "k": "power",
@@ -206,7 +218,7 @@
             {
               "k": "make",
               "id": "시온더다크불릿_t1",
-              "v": 2
+              "v": 1
             },
             {
               "k": "ifNth",
@@ -304,7 +316,12 @@
             {
               "k": "make",
               "id": "시온더다크불릿_t1",
-              "v": 3
+              "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "사수의 긍지",
+              "v": 1
             }
           ]
         },
@@ -319,6 +336,11 @@
               "k": "make",
               "id": "시온더다크불릿_t1",
               "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "사수의 긍지",
+              "v": 1
             }
           ]
         },
@@ -327,12 +349,11 @@
           "fx": [
             {
               "k": "discard",
-              "v": 1,
-              "all": true
+              "v": 3
             },
             {
               "k": "draw",
-              "v": 4
+              "v": 3
             }
           ]
         },
@@ -347,7 +368,7 @@
             {
               "k": "make",
               "id": "시온더다크불릿_t1",
-              "v": 2
+              "v": 3
             },
             {
               "k": "nextCheaper",
@@ -379,7 +400,7 @@
                     {
                       "k": "stack",
                       "id": "이 몸, 등장★",
-                      "v": 1
+                      "v": 2
                     }
                   ]
                 }
@@ -428,7 +449,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.6,
+          "ratio": 1,
           "target": "oneEnemy"
         }
       ],
@@ -447,7 +468,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 1.3,
               "target": "oneEnemy"
             }
           ]
@@ -462,30 +483,33 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 1.4,
               "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 3",
-          "tags": [
-            "보존"
-          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.3,
+              "ratio": 3,
               "target": "oneEnemy"
             },
             {
-              "k": "when",
-              "on": "handEnd"
+              "k": "exileFrom",
+              "from": "discard",
+              "n": 1,
+              "tag": "시온더다크불릿_t1"
             },
             {
-              "k": "make",
-              "id": "시온더다크불릿_t1",
-              "v": 1
+              "k": "ifEvent",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.6,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -493,14 +517,22 @@
           "name": "신탁 4",
           "fx": [
             {
-              "k": "exileFrom",
-              "from": "hand",
-              "all": true,
+              "k": "discard",
+              "v": 1,
               "tag": "시온더다크불릿_t1"
             },
             {
               "k": "dmg",
-              "ratio": 4.4,
+              "ratio": 3.4,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifEvent",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.6,
               "target": "oneEnemy"
             }
           ]
@@ -519,7 +551,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.5,
               "target": "allEnemies"
             }
           ]
@@ -558,6 +590,11 @@
       ],
       "fx": [
         {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "oneEnemy"
+        },
+        {
           "k": "discard",
           "all": true,
           "tag": "시온더다크불릿_t1"
@@ -568,13 +605,8 @@
         },
         {
           "k": "dmg",
-          "ratio": 1.4,
+          "ratio": 2.2,
           "target": "oneEnemy"
-        },
-        {
-          "k": "stack",
-          "id": "사수의 긍지",
-          "v": 1
         }
       ],
       "oracles": [
@@ -586,6 +618,11 @@
               "k": "make",
               "id": "시온더다크불릿_t1",
               "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "사수의 긍지",
+              "v": 1
             },
             {
               "k": "power",
@@ -614,19 +651,24 @@
           ],
           "fx": [
             {
-              "k": "perTag",
-              "id": "시온더다크불릿_t1",
+              "k": "dmg",
+              "ratio": 1.2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "exileFrom",
+              "from": "discard",
+              "all": true,
+              "tag": "시온더다크불릿_t1"
+            },
+            {
+              "k": "perEvent",
               "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 1.3,
+              "ratio": 0.8,
               "target": "oneEnemy"
-            },
-            {
-              "k": "burn",
-              "all": true,
-              "tag": "시온더다크불릿_t1"
             }
           ]
         },
@@ -638,7 +680,7 @@
           "fx": [
             {
               "k": "discard",
-              "v": 2,
+              "v": 3,
               "tag": "시온더다크불릿_t1"
             },
             {
@@ -647,14 +689,22 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.7,
+              "ratio": 2.6,
               "target": "oneEnemy"
+            },
+            {
+              "k": "stack",
+              "id": "사수의 긍지",
+              "v": 1
             }
           ]
         },
         {
           "name": "신탁 4",
-          "cost": 1,
+          "cost": 0,
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
               "k": "discard",
@@ -666,13 +716,16 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.6,
               "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 5",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
               "k": "discard",
@@ -685,17 +738,17 @@
             },
             {
               "k": "dmg",
-              "ratio": 1.4,
+              "ratio": 2.9,
               "target": "oneEnemy"
             },
             {
               "k": "ifEvent",
-              "n": 5
+              "n": 3
             },
             {
               "k": "status",
               "id": "사기",
-              "v": 1
+              "v": 2
             }
           ]
         }
@@ -735,6 +788,20 @@
           "v": 2
         },
         {
+          "k": "discard",
+          "v": 1,
+          "tag": "시온더다크불릿_t1"
+        },
+        {
+          "k": "ifEvent",
+          "n": 1
+        },
+        {
+          "k": "stack",
+          "id": "사수의 긍지",
+          "v": 1
+        },
+        {
           "k": "draw",
           "v": 1
         }
@@ -759,9 +826,10 @@
           "cost": 0,
           "fx": [
             {
-              "k": "make",
-              "id": "시온더다크불릿_t1",
-              "v": 1
+              "k": "pull",
+              "from": "discard",
+              "n": 3,
+              "tag": "시온더다크불릿_t1"
             },
             {
               "k": "stack",
@@ -794,6 +862,11 @@
           "power": true,
           "fx": [
             {
+              "k": "stack",
+              "id": "이 몸, 등장★",
+              "v": 2
+            },
+            {
               "k": "power",
               "rules": [
                 {
@@ -819,6 +892,10 @@
               "k": "stack",
               "id": "이 몸, 등장★",
               "v": 2
+            },
+            {
+              "k": "draw",
+              "v": 1
             },
             {
               "k": "make",
@@ -855,16 +932,16 @@
       "token": true,
       "id": "시온더다크불릿_t1",
       "name": "마탄",
-      "cost": 0,
+      "cost": 1,
       "type": "공격",
       "tags": [
-        "탄환",
-        "소멸"
+        "탄환"
       ],
+      "handMax": 9,
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.2,
+          "ratio": 2.4,
           "target": "oneEnemy"
         },
         {
@@ -873,8 +950,13 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.1,
+          "ratio": 0.2,
           "target": "oneEnemy"
+        },
+        {
+          "k": "stack",
+          "id": "이 몸, 등장★",
+          "v": 1
         },
         {
           "k": "when",
@@ -895,7 +977,7 @@
           "v": 1
         }
       ],
-      "blurb": "1+1 로 받은 덤 한 발입니다"
+      "blurb": "1+1 로 받은 덤 한 발입니다. 손에는 9발까지 — 넘치면 그 자리에서 쏩니다"
     }
   ]
 }

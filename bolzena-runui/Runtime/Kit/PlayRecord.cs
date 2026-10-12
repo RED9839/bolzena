@@ -127,7 +127,7 @@ namespace Bolzena.RunUI
             {
                 var rec = RunRecord.Of(run, new RecordMeta
                 {
-                    Anon = Anon, Ver = Application.version, Build = BuildStamp,
+                    Anon = Anon, Ver = PatchNotes.Version, Build = BuildStamp,   // 버전 = 로비에 보이는 것(패치노트 맨 위 판)
                     Os = Application.isEditor ? "editor" : Application.platform == RuntimePlatform.WebGLPlayer ? "web" : "pc",
                     Phone = Application.isMobilePlatform, Low = DisplayOptions.LowSpec, Result = result, Board = BoardCells(), Ended = DateTime.UtcNow,
                 });
@@ -226,9 +226,12 @@ namespace Bolzena.RunUI
         /// <summary>처음 실행 때 로비에서 한 번 — 무엇을 왜 · 개인 정보 없음 · 설정에서 끄기.</summary>
         public static void NoticeOnce()
         {
-            if (PlayerPrefs.GetInt(KNoticed, 0) == 1 || Demo.Active) return;
+            if (Noticed || Demo.Active) return;
             PlayerPrefs.SetInt(KNoticed, 1); PlayerPrefs.Save();
             Toast.Show(NOTICE, 7f);
         }
+
+        /// <summary>안내를 이미 봤는가 — 한 번이라도 로비에 와 본 사람인가(업데이트 내용 창이 처음 온 사람을 가른다).</summary>
+        public static bool Noticed => PlayerPrefs.GetInt(KNoticed, 0) == 1;
     }
 }

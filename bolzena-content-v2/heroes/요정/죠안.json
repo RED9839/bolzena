@@ -21,7 +21,7 @@
       "keywords": [
         {
           "name": "분산",
-          "desc": "죠안이 나눠 지키는 아군 — 노려진 피해를 덜고 그만큼 파티 실드로",
+          "desc": "죠안이 힘을 나눠 지키는 아군",
           "carrier": "hero",
           "cap": 1,
           "endDecay": 1,
@@ -61,7 +61,7 @@
         {
           "id": "죠안_꿈결",
           "name": "꿈결 형상",
-          "desc": "꿈결에 든 주교 — 죠안이 적을 칠 때마다 파티를 고친다",
+          "desc": "꿈결에 든 주교",
           "stance": true,
           "anim": "Idle_DreamForm",
           "turns": 3,
@@ -116,7 +116,11 @@
           },
           {
             "k": "shield",
-            "ratio": 2.4
+            "ratio": 3
+          },
+          {
+            "k": "heal",
+            "ratio": 1.8
           },
           {
             "k": "form",
@@ -165,7 +169,7 @@
       "name": "빵이 있으라",
       "hero": "죠안",
       "unique": true,
-      "cost": 0,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
@@ -209,7 +213,7 @@
             {
               "k": "stack",
               "id": "주교의 경전",
-              "v": 1
+              "v": 2
             }
           ]
         },
@@ -255,7 +259,7 @@
             {
               "k": "stack",
               "id": "주교의 경전",
-              "v": 1
+              "v": 2
             }
           ]
         },
@@ -349,7 +353,7 @@
             {
               "k": "stack",
               "id": "주교의 경전",
-              "v": 1
+              "v": 2
             }
           ]
         },
@@ -358,7 +362,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.9
+              "ratio": 2.4
             },
             {
               "k": "stack",
@@ -468,12 +472,22 @@
               "k": "stack",
               "id": "주교의 경전",
               "v": 1
+            },
+            {
+              "k": "ifPile",
+              "from": "record",
+              "n": 1,
+              "not": true
+            },
+            {
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
           "name": "신탁 2",
-          "cost": 1,
+          "cost": 0,
           "fx": [
             {
               "k": "castOther",
@@ -493,7 +507,7 @@
             {
               "k": "castOther",
               "from": "last",
-              "ratio": 0.6
+              "ratio": 0.8
             },
             {
               "k": "draw",
@@ -507,7 +521,7 @@
             {
               "k": "castOther",
               "from": "last",
-              "ratio": 0.6
+              "ratio": 0.8
             },
             {
               "k": "stack",
@@ -527,7 +541,7 @@
             {
               "k": "castOther",
               "from": "last",
-              "ratio": 0.6
+              "ratio": 0.8
             },
             {
               "k": "stack",
@@ -601,6 +615,12 @@
           "power": true,
           "fx": [
             {
+              "k": "make",
+              "id": "죠안_t1",
+              "v": 1,
+              "owner": "other"
+            },
+            {
               "k": "stack",
               "id": "주교의 경전",
               "v": 1
@@ -636,12 +656,12 @@
             {
               "k": "ifStack",
               "id": "주교의 경전",
-              "n": 4
+              "n": 3
             },
             {
               "k": "spend",
               "id": "주교의 경전",
-              "v": 4
+              "v": 3
             },
             {
               "k": "form",
@@ -665,12 +685,12 @@
             {
               "k": "ifStack",
               "id": "주교의 경전",
-              "n": 4
+              "n": 3
             },
             {
               "k": "spend",
               "id": "주교의 경전",
-              "v": 4
+              "v": 3
             },
             {
               "k": "form",
@@ -693,12 +713,12 @@
             {
               "k": "ifStack",
               "id": "주교의 경전",
-              "n": 4
+              "n": 3
             },
             {
               "k": "spend",
               "id": "주교의 경전",
-              "v": 4
+              "v": 3
             },
             {
               "k": "form",
@@ -727,7 +747,7 @@
             {
               "k": "formExtend",
               "id": "죠안_꿈결",
-              "v": 1,
+              "v": 2,
               "max": 4
             }
           ]
@@ -795,8 +815,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 1.2,
               "target": "allEnemies"
+            },
+            {
+              "k": "make",
+              "id": "죠안_t1",
+              "v": 1,
+              "owner": "other"
             },
             {
               "k": "stack",
@@ -814,6 +840,12 @@
               "target": "allEnemies"
             },
             {
+              "k": "make",
+              "id": "죠안_t1",
+              "v": 1,
+              "owner": "other"
+            },
+            {
               "k": "ifForm",
               "id": "죠안_꿈결"
             },
@@ -829,7 +861,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2,
+              "ratio": 2.4,
               "target": "oneEnemy"
             },
             {
@@ -846,13 +878,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.7,
               "target": "allEnemies"
             },
             {
-              "k": "stack",
-              "id": "주교의 경전",
-              "v": 1
+              "k": "make",
+              "id": "죠안_t1",
+              "v": 1,
+              "owner": "other"
             }
           ]
         }

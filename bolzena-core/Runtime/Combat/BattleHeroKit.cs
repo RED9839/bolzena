@@ -251,7 +251,8 @@ namespace Bolzena.Core
                         for (int k = 0; k < f.NOr1 && src.Count > 0; k++)
                         {
                             var used = src == Discard ? UsedAt() : null;
-                            var okIdx = Enumerable.Range(0, src.Count).Where(i => FxMatch(f, src[i], owner) && !(from == "discarded" && used.Contains(i))).ToList();
+                            var okIdx = Enumerable.Range(0, src.Count).Where(i => FxMatch(f, src[i], owner) && !(from == "discarded" && used.Contains(i))
+                                && (f.To == "top" || !(Data.Card(src[i]) is CardDef hd && hd.HandMax > 0 && Hand.Count(h => Data.Card(h)?.Id == hd.Id) >= hd.HandMax))).ToList();   // (2026-10-13 시온 마탄) 손 최대 장수 — 넘게는 꺼내지 않는다
                             if (okIdx.Count == 0) break;
                             int at = f.At == "bottom" ? okIdx[0] : f.At == "random" ? okIdx[Rng.Int(okIdx.Count)] : okIdx[okIdx.Count - 1];
                             ctx.Pulled = src[at];

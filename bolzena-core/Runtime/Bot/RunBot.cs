@@ -293,6 +293,7 @@ namespace Bolzena.Core
                     case "curse": v -= plan != null ? 30 : 25; break;
                     case "gift": v += 8; break;
                     case "scout": v += 2; break;
+                    case "mindBreak": v -= 15 * Math.Max(1, o.N); break;   // 다음 전투(들) 매 턴 「망령의 속삭임」 — AP 1 또는 약화 2
                     case "shopGift": v += (GRADE_V.TryGetValue(o.Grade ?? "", out var sg) ? sg : 10) * 0.8; break;
                     case "rewardFlash": v += 8; break;
                     case "next":
