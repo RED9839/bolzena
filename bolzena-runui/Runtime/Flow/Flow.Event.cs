@@ -185,7 +185,7 @@ namespace Bolzena.RunUI
             var size = Stage.Size;
             var opts = P.Options(ev);
             int nc = opts.Count(o => !o.Leave);
-            float roundS = Theme.C(116, 96);
+            float roundS = LeaveW;
             float availW = size.x - Theme.Gutter * 2 - roundS - 30;
             int perRow = column ? 1 : nc <= 3 ? Mathf.Max(1, nc) : Mathf.CeilToInt(nc / 2f);
             float gap = 22, cw = column ? Mathf.Min(Theme.C(600, 520), size.x * 0.4f) : Mathf.Min(Theme.C(520, 440), (availW - gap * (perRow - 1)) / perRow);
@@ -202,7 +202,7 @@ namespace Bolzena.RunUI
             var opts = P.Options(ev);
             var cards = Enumerable.Range(0, opts.Count).Where(i => !opts[i].Leave).ToList();
             int leaveIdx = opts.FindIndex(o => o.Leave);
-            float roundS = Theme.C(116, 96);
+            float roundS = LeaveW;
             float availW = size.x - Theme.Gutter * 2 - roundS - 30;
             int perRow = column ? 1 : cards.Count <= 3 ? Mathf.Max(1, cards.Count) : Mathf.CeilToInt(cards.Count / 2f);
             int rows = Mathf.CeilToInt(cards.Count / (float)perRow);
@@ -302,13 +302,26 @@ namespace Bolzena.RunUI
             if (leaveIdx >= 0)
             {
                 var lo = opts[leaveIdx];
-                var lb = Btn.Icon(root, Theme.S("ic_back"), () => DecideEvent(root, leaveIdx), roundS, "leaveround");
-                lb.GetComponent<RectTransform>().At(1, 0, -Theme.Gutter, bottom + 18, roundS, roundS);
-                var ll = Ui.Title(root, lo.Label ?? "떠나기", Theme.FsSm, Theme.Ink, TextAlignmentOptions.Top, "leavelabel"); ll.rectTransform.At(1, 0, -Theme.Gutter - roundS / 2 + 80, bottom - 30, 160, 44);
-                ll.textWrappingMode = TextWrappingModes.Normal; ll.overflowMode = TextOverflowModes.Overflow; ll.Outline(0.3f);
+                var lb = LeavePill(root, lo.Label ?? "떠나기", false, "ic_back", () => DecideEvent(root, leaveIdx), "leaveround");
+                lb.GetComponent<RectTransform>().At(1, 0, -Theme.Gutter, bottom, roundS, Theme.BtnMainH);
                 Stage.Hot["event.leaveopt"] = lb;
             }
             return bottom + total;   // 선택지 묶음 위 끝(아래 기준)
+        }
+
+        // 오른쪽 아래 「떠나기」 — 보상 화면 「떠나기」(Flow.Fight)와 같은 알약: 동그라미 속 아이콘 + 글. 고르기 전 선택지는 남색(보조), 결과 뒤는 금빛(주 동작)
+        static float LeaveW => Theme.C(220, 190);
+        static Btn LeavePill(RectTransform root, string label, bool gold, string icon, System.Action onClick, string name)
+        {
+            var b = Btn.Make(root, null, gold ? BtnStyle.PillGold : BtnStyle.PillDark, onClick, 0, name);
+            var rt = b.GetComponent<RectTransform>();
+            var ink = gold ? Theme.Brown : Theme.Ink;
+            var disc = Ui.Img(rt, Theme.S("circle"), gold ? Theme.Brown.A(0.18f) : Theme.Gold.A(0.16f), "disc"); disc.rectTransform.At(0, 0.5f, 10, 0, 44, 44);
+            var ic = Ui.Img(disc.transform, Theme.S(icon), gold ? Theme.Brown : Theme.Gold, "ic"); ic.rectTransform.Fill(12, 11, 12, 11); ic.preserveAspect = true;
+            var t = Ui.Title(rt, label, Theme.FsMd + 2, ink, TextAlignmentOptions.Center); t.rectTransform.Fill(58, 4, 16, 4);
+            t.textWrappingMode = TextWrappingModes.NoWrap; t.enableAutoSizing = true; t.fontSizeMin = Theme.FsSm - 2; t.fontSizeMax = Theme.FsMd + 2;
+            b.Label = t;
+            return b;
         }
 
         // ── 특별 이벤트(Resources/RunUI/event_style.json — 겨우살이 축복 …): 파티 장면 없이 NPC 스탠딩 하나 + 말풍선 + 선택지(오른쪽 세로) ──
@@ -507,7 +520,7 @@ namespace Bolzena.RunUI
         {
             var size = Stage.Size;
             var E = P.S.Event;
-            float roundS = Theme.C(116, 96), bottom = Theme.C(30, 16);
+            float roundS = LeaveW, bottom = Theme.C(30, 16);
             float listW = Mathf.Min(size.x - Theme.Gutter * 2 - roundS - 40, Theme.C(1500, 1400)), listH = Mathf.Min(floorY - bottom - 20, Theme.C(280, 230));
             var (cx0, crowW, cavail) = ChoiceRow0(ev, column);
             float boxX = cx0;
@@ -650,11 +663,8 @@ namespace Bolzena.RunUI
                 return;
             }
             if (P.S.Bag.Count > 0) { Settle(() => BuildEvent(root, -1)); return; }
-            var lb = Btn.Icon(root, Theme.S("ic_play"), () => { evSnap = null; P.LeaveEvent(); MapStep(); }, roundS, "leave");
-            lb.GetComponent<RectTransform>().At(1, 0, -Theme.Gutter, bottom + 18, roundS, roundS);
-            lb.Bg.color = Theme.Gold; lb.SetColor(Theme.Gold);
-            var ic2 = lb.transform.Find("icon")?.GetComponent<Image>(); if (ic2 != null) ic2.color = Theme.Brown;
-            var ll = Ui.Title(root, "떠나기", Theme.FsMd, Theme.Gold, TextAlignmentOptions.Center, "leavelabel"); ll.rectTransform.At(1, 0, -Theme.Gutter - roundS / 2 + 70, bottom - 10, 140, 26); ll.Outline(0.3f);
+            var lb = LeavePill(root, "떠나기", true, "ic_play", () => { evSnap = null; P.LeaveEvent(); MapStep(); }, "leave");
+            lb.GetComponent<RectTransform>().At(1, 0, -Theme.Gutter, bottom, roundS, Theme.BtnMainH);
             Stage.Hot["event.leave"] = lb;
             Tw.Breathe(lb.transform, 0.04f, 1.2f);
         }

@@ -46,6 +46,7 @@ namespace Bolzena.UI
         public float DecoHalf => deco != null && deco.sprite != null ? deco.transform.localScale.x * deco.sprite.bounds.size.x / 2 : W * 0.275f;
         // 다음 카드 강화 표시(2026-10-08) — 주황 가는 테 + 옅은 빛 + 윗변에 걸친 작은 「강화 ×1.5」 배지. 신탁(금 별) · 축복(연보라 마름모) · 연두 · 청록 책과 겹치지 않는 색
         SpriteRenderer empRim, empGlow, empBadgeBg, empBadgeIc;
+        SpriteRenderer finRim, finBg, finIc; TextMeshPro finTx;   // 종극 — 내면 턴이 끝나는 카드(붉은 테 + 아랫변 띠)
         TextMeshPro empBadgeTx;
         SpriteRenderer valBg, valIc; TextMeshPro valTx; float valT;   // 카드 값 배지(시간 · 새싹 · 성장) — 윗변, 강화 배지 왼쪽
         float empT;
@@ -161,6 +162,11 @@ namespace Bolzena.UI
             empBadgeIc = Make.Box("empic", t, Res.UI("ic_up"), Vector3.zero, new Vector2(0.13f, 0.13f), 0, Tone.Emp);
             empBadgeTx = Make.Text("emptx", t, "", Vector3.zero, 0.105f, 0, new Color(1f, 0.82f, 0.58f));
             Make.Outline(empBadgeTx, 0.3f, Tone.Outline);
+            finRim = Make.Box("finrim", t, Res.UI("card_mask"), Vector3.zero, new Vector2(W + 0.08f, H + 0.08f), 0, FinRed);
+            finBg = Make.Sliced("finbg", t, Res.UI("bar_fill_9s"), Vector3.zero, new Vector2(1f, 0.32f), 0, new Color(0.62f, 0.1f, 0.08f, 0.97f));
+            finIc = Make.Box("finic", t, Res.UI("EndTurn/hourglass"), Vector3.zero, new Vector2(0.14f, 0.14f), 0, new Color(1f, 0.85f, 0.8f));
+            finTx = Make.Text("fintx", t, "내면 턴 종료", Vector3.zero, 0.16f, 0, new Color(1f, 0.9f, 0.86f));
+            Make.Outline(finTx, 0.3f, Tone.Outline);
             valBg = Make.Sliced("valbg", t, Res.UI("bar_fill_9s"), Vector3.zero, new Vector2(0.6f, 0.2f), 0, new Color(0.05f, 0.08f, 0.18f, 0.96f));
             valIc = Make.Box("valic", t, Res.UI("ic_clock"), Vector3.zero, new Vector2(0.13f, 0.13f), 0, new Color(0.75f, 0.85f, 1f));
             valTx = Make.Text("valtx", t, "", Vector3.zero, 0.105f, 0, new Color(0.88f, 0.92f, 1f));
@@ -290,6 +296,7 @@ namespace Bolzena.UI
             PlaceCostMark(info);
             PlaceEmpower(info);
             PlaceValue(info);
+            PlaceFinale(info);
             bool epi = info.Epiphany;
             bool bl0 = !string.IsNullOrEmpty(info.MarkBless);
             rays.enabled = false;   // 손패의 신탁 카드는 은은한 테두리 빛(epiGlow) · 금 테만(띠 글은 뺌)(2026-10-07 사용자 「신탁 연출이 너무 화려」 — 빛줄기 뺌)
@@ -324,6 +331,22 @@ namespace Bolzena.UI
                 blessWingR.transform.localPosition = at;
                 blessWingR.color = new Color(1f, 1f, 1f, blessWingR.color.a);
             }
+        }
+
+        // 종극 — 내면 바로 턴이 끝난다. 손패에선 효과 글이 감춰져 실수로 내는 일이 있어(2026-10-12 사용자) 붉은 테 + 아랫변 띠로 늘 보이게
+        static readonly Color FinRed = new Color(1f, 0.36f, 0.3f);
+        void PlaceFinale(CardInfo info)
+        {
+            bool on = info.Tags != null && info.Tags.Contains("종극");
+            finRim.enabled = finBg.enabled = finIc.enabled = finTx.enabled = on;
+            if (!on) return;
+            finTx.ForceMeshUpdate();
+            float bw = finTx.preferredWidth + 0.46f, cy = -H / 2 + 0.62f;   // 손패에서 이웃 카드에 덜 가리는 그림 아래쪽
+            finBg.size = new Vector2(bw, 0.32f);
+            finBg.transform.localPosition = new Vector3(0, cy, 0);
+            finIc.transform.localPosition = new Vector3(-bw / 2 + 0.19f, cy, 0);
+            Make.Fit(finIc, new Vector2(0.2f, 0.2f));
+            finTx.transform.localPosition = new Vector3(0.1f, cy - 0.005f, 0);
         }
 
         // 다음 카드 강화 — 윗변에 걸친 배지(오른쪽 맞춤. 이름 · 종류 줄은 안 가린다)
@@ -598,6 +621,7 @@ namespace Bolzena.UI
             oraRim.sortingOrder = o - 1;
             empGlow.sortingOrder = o - 2; empRim.sortingOrder = o - 1;
             empBadgeBg.sortingOrder = o + 9; empBadgeIc.sortingOrder = o + 10; empBadgeTx.sortingOrder = o + 10;
+            finRim.sortingOrder = o - 1; finBg.sortingOrder = o + 9; finIc.sortingOrder = o + 10; finTx.sortingOrder = o + 10;
             valBg.sortingOrder = o + 9; valIc.sortingOrder = o + 10; valTx.sortingOrder = o + 10;
             epiBg.sortingOrder = blessBg.sortingOrder = copyBg.sortingOrder = o + 6;
             epiIcon.sortingOrder = blessIcon.sortingOrder = copyIcon.sortingOrder = o + 7;
@@ -692,6 +716,12 @@ namespace Bolzena.UI
                 bool ready = valTx.color.b < 0.7f;
                 float vk = ready && !(Bolzena.RunUI.Settings.ReduceMotion || LowSpecFx.On) ? 0.8f + 0.2f * Mathf.Sin(valT * 4f) : 1f;
                 Make.Alpha(valBg, 0.96f * a * vk); Make.Alpha(valIc, a); valTx.alpha = a;
+            }
+            if (finRim.enabled)
+            {   // 붉은 테는 천천히 숨쉰다(움직임 줄이기 · 저사양이면 멈춤)
+                bool calmF = Bolzena.RunUI.Settings.ReduceMotion || LowSpecFx.On;
+                float fk = calmF ? 0.85f : 0.7f + 0.3f * Mathf.Sin(Time.unscaledTime * 3f);
+                Make.Alpha(finRim, 0.95f * fk * a); Make.Alpha(finBg, 0.97f * a); Make.Alpha(finIc, a); finTx.alpha = a;
             }
             if (empRim.enabled)
             {

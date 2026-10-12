@@ -161,12 +161,12 @@ namespace Bolzena.UI
             speedBg = Make.Sliced("speed", tr, Res.UI("bar_fill_9s"), SpeedAt, new Vector2(PillW, PillH), O + 1, new Color(0.08f, 0.1f, 0.2f, 0.85f));
             speedIcon = Make.Box("speedi", tr, Res.UI("ic_clock"), SpeedAt + new Vector3(-0.2f, 0, 0), new Vector2(0.26f, 0.26f), O + 2, new Color(0.95f, 0.93f, 0.88f));
             speedText = Txt("speedt", tr, "1×", SpeedAt + new Vector3(0.14f, -0.01f, 0), Tone.Sm, O + 2, Tone.Ink, TextAlignmentOptions.Center, 0.24f);
-            { var sb = speedBg.gameObject.AddComponent<Button>(); sb.Size = new Vector2(PillW + 0.04f, PillH + 0.06f); sb.OnClick = () => OnSpeed?.Invoke(); TipZone.Add(speedBg, sb.Size, () => "전투 배속 1× · 2× — 단축키 Tab", 2); }
+            { var sb = speedBg.gameObject.AddComponent<Button>(); sb.Size = new Vector2(PillW + 0.04f, PillH + 0.06f); sb.OnClick = () => OnSpeed?.Invoke(); TipZone.Add(speedBg, sb.Size, () => "전투 배속 1× · 2× — 단축키 Tab", 2).Button = true; }
             // 자동 전투 토글 — 알약 트랙 + 손잡이(켜면 금빛, 손잡이 위 자동 아이콘)
             autoTrack = Make.Sliced("autotrack", tr, Res.UI("bar_fill_9s"), AutoAt, new Vector2(PillW, PillH), O + 1, new Color(0.08f, 0.1f, 0.2f, 0.85f));
             autoKnob = Make.Box("autoknob", tr, Res.UI("circle"), AutoAt + new Vector3(-0.22f, 0, 0), new Vector2(0.36f, 0.36f), O + 2, new Color(0.85f, 0.87f, 0.95f));
             autoIcon = Make.Box("autoi", tr, Res.UI("ic_auto"), AutoAt + new Vector3(-0.22f, 0, 0), new Vector2(0.24f, 0.24f), O + 3, new Color(0.1f, 0.12f, 0.2f));
-            { var ab = autoTrack.gameObject.AddComponent<Button>(); ab.Size = new Vector2(0.9f, 0.46f); ab.OnClick = () => OnAuto?.Invoke(); TipZone.Add(autoTrack, ab.Size, () => "자동 전투 — 카드 · 고학년을 저절로 냅니다 · 단축키 Q", 2); }
+            { var ab = autoTrack.gameObject.AddComponent<Button>(); ab.Size = new Vector2(0.9f, 0.46f); ab.OnClick = () => OnAuto?.Invoke(); TipZone.Add(autoTrack, ab.Size, () => "자동 전투 — 카드 · 고학년을 저절로 냅니다 · 단축키 Q", 2).Button = true; }
             Make.Box("sep", tr, Res.UI("white"), (SpeedAt + MenuAt) / 2 + new Vector3(0.1f, 0, 0), new Vector2(0.015f, 0.36f), O + 1, new Color(1, 1, 1, 0.3f));
             menuBg = IconBtn("menu", tr, MenuAt, "ic_menu", () => OnPause?.Invoke(), "메뉴 — 일시정지 · 설정 · 화면 · Esc");
             // 전투 기록 — 막대 셋 아이콘(그림 없이 흰 막대). 누르면 위 가운데에 사도별 피해 · 실드 · 회복 표(MeterPanel)를 여닫는다
@@ -220,7 +220,7 @@ namespace Bolzena.UI
 
             // ── 오른쪽 아래 — 턴 종료(금 테 메달 + 다음 턴 화살 + 「턴 종료」 이름표 — EndTurnButton, 점검 인자 -endturnstyle) ──
             endTurn = EndTurnButton.Create(br, EndAt, O, s.Heroes.Count > 0 ? s.Heroes[0].Nature : null, EndTurnButton.Chosen);
-            TipZone.Add(endTurn.Body, new Vector2(endTurn.Half.x * 2 / endTurn.Body.transform.localScale.x, endTurn.Half.y * 2 / endTurn.Body.transform.localScale.y), () => "턴을 넘깁니다 — 손패를 버리고 적의 차례 · 단축키 E", 2);
+            TipZone.Add(endTurn.Body, new Vector2(endTurn.Half.x * 2 / endTurn.Body.transform.localScale.x, endTurn.Half.y * 2 / endTurn.Body.transform.localScale.y), () => "턴을 넘깁니다 — 손패를 버리고 적의 차례 · 단축키 E", 2).Button = true;
 
             Anchor();
         }
@@ -236,7 +236,7 @@ namespace Bolzena.UI
             b.Size = Vector2.one * (d + 0.06f) / bg.transform.localScale.x;
             b.OnClick = click;
             b.Highlight = hl;
-            TipZone.Add(bg, b.Size, () => tip, 2);
+            TipZone.Add(bg, b.Size, () => tip, 2).Button = true;
             return bg;
         }
 
@@ -250,7 +250,7 @@ namespace Bolzena.UI
             b.Size = new Vector2(size + 0.5f, size + 0.1f);
             b.Offset = new Vector2((right ? 1 : -1) * (size / 2 + 0.06f - 0.05f), size * 0.12f);
             b.OnClick = () => OnPile?.Invoke(which);
-            TipZone.Add(txt, b.Size, () => tip, 2, b.Offset);
+            TipZone.Add(txt, b.Size, () => tip, 2, b.Offset).Button = true;
             return txt;
         }
 

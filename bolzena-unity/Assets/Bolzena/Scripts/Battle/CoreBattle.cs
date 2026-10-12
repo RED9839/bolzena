@@ -48,7 +48,7 @@ namespace Bolzena.Battle
                 if (only != null)
                 {
                     var keep = only.Split(',').ToList();
-                    f.Deck = f.Deck.Where(keep.Contains).Distinct().Concat(f.Deck.Where(id => !keep.Contains(id)).Distinct().Take(3)).ToList();
+                    f.Deck = keep.Where(id => d.Card(id) != null).Distinct().Concat(f.Deck.Where(id => !keep.Contains(id)).Distinct().Take(3)).ToList();
                 }
                 f.Waves.Add(foes.Split(',').ToList());
                 f.EnemyNature = Arg("-nature");

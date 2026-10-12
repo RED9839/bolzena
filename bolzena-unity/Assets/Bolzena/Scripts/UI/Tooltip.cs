@@ -112,10 +112,13 @@ namespace Bolzena.UI
             if (best != hot) { hot = best; hotT = 0; }
             hotT += Time.unscaledDeltaTime;
             // 누를 때만 뜬다(2026-10-09 사용자) — 올리기만 해서는 안 뜨고, 같은 곳을 다시 누르거나 다른 곳을 누르면 닫힌다
-            if (PointerInput.Down) pinnedZone = best != null && pinnedZone != best ? best : null;
+            // 단추 자리(Button)는 눌러도 고정하지 않는다 — 턴 종료를 누르면 그 설명이 다음 누름까지 남았다(2026-10-12)
+            if (PointerInput.Down) pinnedZone = best != null && pinnedZone != best && !best.Button ? best : null;
             if (PointerInput.Down && Environment.GetCommandLineArgs().Length > 0 && Array.IndexOf(Environment.GetCommandLineArgs(), "-tipdebug") >= 0) Debug.Log($"[Tip] 누름 best={(best != null ? best.name : "-")} pinned={(pinnedZone != null ? pinnedZone.name : "-")} sup={Suppress} pri={(best != null ? best.Priority : -1)} modal={(Modal.Open != null)} pos={p}");
             if (pinnedZone != null && (!pinnedZone.isActiveAndEnabled || (Suppress && pinnedZone.Priority < 100))) pinnedZone = null;
-            var act = pinnedZone;
+            // 단추 자리는 마우스를 올려 두면(0.45초) 뜨고 누르면 닫힌다 — 터치는 올려 두기가 없어 뜨지 않는다
+            if (PointerInput.Down) hotT = -999f;
+            var act = pinnedZone ?? (hot != null && hot.Button && !PointerInput.Touch && !PointerInput.Held && hotT > 0.45f ? hot : null);
             bool want = act != null;
             if (want)
             {
@@ -150,6 +153,7 @@ namespace Bolzena.UI
         public int Priority;
         public float Delay = 0.3f;
         public bool PreferLeft;
+        public bool Button;   // 누르는 단추 위 — 올려 두면 뜨고, 눌러도 고정되지 않는다
 
         public static TipZone Add(Component on, Vector2 size, Func<string> text, int priority = 0, Vector2 offset = default)
         {

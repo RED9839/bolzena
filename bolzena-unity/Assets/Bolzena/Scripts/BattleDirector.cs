@@ -622,7 +622,8 @@ namespace Bolzena
             Hud.EndHover = Hud.OverEnd(p) && !PointerInput.Touch;
 
             // 단축키
-            if (PointerInput.Key(Key.Tab)) ToggleSpeed();
+            // 알탭(Alt+Tab)의 Tab 은 배속으로 받지 않는다
+            if (PointerInput.Key(Key.Tab) && !(Keyboard.current.leftAltKey.isPressed || Keyboard.current.rightAltKey.isPressed)) ToggleSpeed();
             if (PointerInput.Key(Key.Q)) Hud.OnAuto?.Invoke();
             if (PointerInput.Key(Key.Escape)) { if (Hand.HasSelection) Hand.Cancel(); else if (UltSel >= 0) SetUltSel(-1); else OpenPause(); return; }
             if (PointerInput.Key(Key.E)) { RequestEnd(); return; }

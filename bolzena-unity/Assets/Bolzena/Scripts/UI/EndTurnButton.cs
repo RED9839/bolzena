@@ -19,7 +19,7 @@ namespace Bolzena.UI
     /// </summary>
     public class EndTurnButton : MonoBehaviour
     {
-        public enum Style { Soft, Mint, Bubble, Medal, Hourglass, Pill, Old }
+        public enum Style { Soft, Mint, Bubble, Run, Medal, Hourglass, Pill, Old }
 
         public static Style Chosen
         {
@@ -36,8 +36,10 @@ namespace Bolzena.UI
                         case "medal": case "a": return Style.Medal;
                         case "mint": return Style.Mint;
                         case "bubble": return Style.Bubble;
+                        case "soft": return Style.Soft;
                     }
-                return Style.Soft;
+                // 판 화면 단추와 같은 결(2026-10-12 사용자 「이벤트 · 턴 종료 단추가 따로 논다」) — 남색 + 금 테, 끝낼 때는 금빛
+                return Style.Run;
             }
         }
 
@@ -94,6 +96,7 @@ namespace Bolzena.UI
                 case Style.Soft:
                 case Style.Mint:
                 case Style.Bubble:
+                case Style.Run:
                     BuildSoft(f, O, kind);
                     break;
                 case Style.Pill:
@@ -179,11 +182,16 @@ namespace Bolzena.UI
         }
         static readonly Color Brown = new Color(0.43f, 0.26f, 0.15f), Cream = new Color(1f, 0.957f, 0.855f);
         Color fillOn, fillGrey = new Color(0.8f, 0.76f, 0.72f);
+        // 판 화면(Bolzena.RunUI.Theme) 색 — 남색 칸 · 금 테 · 금빛 주 동작 · 갈색 글
+        bool run;
+        static readonly Color RunNavy = new Color(0.102f, 0.137f, 0.251f), RunNavyHi = new Color(0.16f, 0.21f, 0.36f), RunEdge = new Color(0.788f, 0.639f, 0.353f),
+            RunGold = new Color(0.949f, 0.812f, 0.478f), RunInk = new Color(0.933f, 0.945f, 0.98f), RunBrown = new Color(0.165f, 0.102f, 0.02f), RunDim = new Color(0.36f, 0.38f, 0.45f);
 
         void BuildSoft(Transform f, int O, Style kind)
         {
             bool bubble = kind == Style.Bubble;
-            fillOn = kind == Style.Mint ? new Color(0.66f, 0.9f, 0.78f) : bubble ? new Color(1f, 0.88f, 0.5f) : new Color(1f, 0.72f, 0.7f);
+            run = kind == Style.Run;
+            fillOn = run ? RunGold : kind == Style.Mint ? new Color(0.66f, 0.9f, 0.78f) : bubble ? new Color(1f, 0.88f, 0.5f) : new Color(1f, 0.72f, 0.7f);
             var add = Res.SpriteMat(true, 1.4f);
             halo = Make.Box("halo", f, Res.UI("soft"), Vector3.zero, bubble ? new Vector2(2.3f, 2.3f) : new Vector2(2.9f, 1.5f), O, A(fillOn, 0), add);
             if (!bubble)
@@ -196,7 +204,7 @@ namespace Bolzena.UI
                 sFill = RBox("fill", f, new Vector3(0, -0.005f, 0), new Vector2(W - 0.22f, H - 0.22f), O + 4, fillOn);
                 sGloss = RBox("gloss", f, new Vector3(0, 0.085f, 0), new Vector2(W - 0.42f, 0.13f), O + 5, new Color(1, 1, 1, 0.45f));
                 label = Make.Text("label", f, "턴 종료", new Vector3(-0.12f, -0.01f, 0), 0.26f, O + 6, Color.white);
-                Make.Outline(label, 0.38f, Brown);
+                Make.Outline(label, run ? 0.2f : 0.38f, run ? Tone.Outline : Brown);
                 chev = Make.Box("chev", f, S("chev"), new Vector3(W * 0.33f, -0.005f, 0), new Vector2(0.3f, 0.3f), O + 6, Color.white);
                 disc = sOuter;
             }
@@ -223,12 +231,16 @@ namespace Bolzena.UI
             // 말랑한 눌림 — 누르면 납작해지고, 떼면 위로 튀었다 가라앉는다(스프링). 잔잔 모드는 튐 없음
             if (prevPress > 0.5f && pressF < prevPress && !calm) bounceV = 6f;
             prevPress = pressF;
-            bounceV += (-bounce * 90f - bounceV * 9f) * dt;
-            bounce += bounceV * dt * 0.1f;
+            // 스프링은 프레임 간격을 1/30초로 자른다 — 웹에서 알탭하면 간격이 1초 가까이 벌어져 적분이 터지고(무한 · NaN) 단추가 사라졌다(2026-10-12)
+            float sdt = Mathf.Min(dt, 1f / 30f);
+            bounceV += (-bounce * 90f - bounceV * 9f) * sdt;
+            bounce += bounceV * sdt * 0.1f;
+            if (float.IsNaN(bounce) || float.IsInfinity(bounce) || float.IsNaN(bounceV) || float.IsInfinity(bounceV)) bounce = bounceV = 0;
             float sx = 1 + 0.05f * hoverF + 0.04f * pressF + bounce * 0.6f + (calm ? 0 : readyF * 0.02f * Mathf.Sin(Clock.Now * 3f));
             float sy = 1 + 0.05f * hoverF - 0.1f * pressF - bounce;
             face.localScale = new Vector3(sx, sy, 1);
             face.localPosition = new Vector3(0, -0.03f * pressF, 0);
+            if (run) { UpdateRun(pulse); return; }
             var fill = Color.Lerp(Color.Lerp(fillOn, Color.Lerp(fillOn, Color.white, 0.35f), Mathf.Max(hoverF * 0.6f, pulse)), fillGrey, lockF);
             fill = Color.Lerp(fill, fill * 0.88f, pressF); fill.a = 1;
             sFill.color = fill;
@@ -247,13 +259,36 @@ namespace Bolzena.UI
             if (tag != null) tag.color = Color.Lerp(Brown, new Color(0.5f, 0.42f, 0.36f), lockF);
         }
 
+        // 판 화면 결 — 평소 남색 칸 + 금 테 + 흰 글(보조 단추), 낼 것이 없어 끝낼 때는 금빛 바탕 + 갈색 글(주 동작), 잠기면 흐린 남색
+        void UpdateRun(float pulse)
+        {
+            float gold = readyF;
+            var body = Color.Lerp(Color.Lerp(RunNavy, RunNavyHi, hoverF), Color.Lerp(RunGold, Color.Lerp(RunGold, Color.white, 0.3f), Mathf.Max(hoverF * 0.6f, pulse - 0.55f)), gold);
+            body = Color.Lerp(body, Color.Lerp(RunNavy, Color.black, 0.25f), lockF);
+            body = Color.Lerp(body, body * 0.85f, pressF); body.a = 1;
+            sFill.color = body;
+            sCream.color = body;
+            sOuter.color = Color.Lerp(Color.Lerp(RunEdge, RunGold, Mathf.Max(hoverF, gold)), RunDim, lockF);
+            sShadow.color = new Color(0, 0, 0, 0.35f);
+            sGloss.color = A(Color.white, (0.06f + 0.14f * gold) * (1 - lockF));
+            if (halo != null) halo.color = A(RunGold, (0.12f * hoverF + 0.5f * pulse) * (1 - lockF));
+            var ink = Color.Lerp(Color.Lerp(RunInk, RunBrown, gold), RunDim, lockF);
+            label.color = ink;
+            if (chev != null)
+            {
+                chev.color = Color.Lerp(Color.Lerp(RunGold, RunBrown, gold), RunDim, lockF);
+                float push = Calm ? 0 : readyF * 0.04f * Mathf.Max(0, Mathf.Sin(Clock.Now * 4f));
+                chev.transform.localPosition = new Vector3(Half.x * 0.66f - 0.02f + push, chev.transform.localPosition.y, 0);
+            }
+        }
+
         static Color A(Color c, float a) { c.a = a; return c; }
 
         /// <summary>월드 점이 단추 위인가(메달은 원 + 이름표, 알약은 둥근 사각).</summary>
         public bool Over(Vector2 world)
         {
             var lp = transform.InverseTransformPoint(world);
-            if (Kind == Style.Pill || Kind == Style.Soft || Kind == Style.Mint) return Mathf.Abs(lp.x) < Half.x && Mathf.Abs(lp.y) < Half.y;
+            if (Kind == Style.Pill || Kind == Style.Soft || Kind == Style.Mint || Kind == Style.Run) return Mathf.Abs(lp.x) < Half.x && Mathf.Abs(lp.y) < Half.y;
             if (Kind == Style.Bubble) return Mathf.Abs(lp.x) < Half.x && lp.y > -Half.y - 0.3f && lp.y < Half.y;
             if (tag != null && Mathf.Abs(lp.x) < D * 0.47f && lp.y < -D * 0.4f && lp.y > -D * 0.53f - 0.17f) return true;
             return lp.magnitude < Half.x;
@@ -289,10 +324,10 @@ namespace Bolzena.UI
             string want = EnemyTurn ? "적 차례" : Auto ? "자동 전투" : "턴 종료";
             if (want != labelNow) { label.text = want; labelNow = want; }
             float dim = Mathf.Lerp(1f, 0.5f, lockF);
-            if (Kind > Style.Bubble) label.color = Color.Lerp(Color.Lerp(Kind == Style.Old ? Tone.Sub : Tone.Ink, Gold, Mathf.Max(readyF, hoverF * 0.6f)), Tone.Dim, lockF);
+            if (Kind > Style.Run) label.color = Color.Lerp(Color.Lerp(Kind == Style.Old ? Tone.Sub : Tone.Ink, Gold, Mathf.Max(readyF, hoverF * 0.6f)), Tone.Dim, lockF);
 
             if (Kind == Style.Old) { UpdateOld(pulse); return; }
-            if (Kind <= Style.Bubble) { UpdateSoft(pulse, dt, calm); return; }
+            if (Kind <= Style.Run) { UpdateSoft(pulse, dt, calm); return; }
 
             var acc = Color.Lerp(accent, Gold, readyF);
             Color grey = new Color(0.55f, 0.58f, 0.66f);
