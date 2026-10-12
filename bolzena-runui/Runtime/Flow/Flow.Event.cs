@@ -50,7 +50,7 @@ namespace Bolzena.RunUI
             var evd = P.Data.Event(E.Id);
             if (evd == null) { P.LeaveEvent(); MapStep(); return; }
             var size = Stage.Size;
-            W.StatusBar(root, this, true, true, false, null, null);
+            W.StatusBar(root, this, true, true, true, null, null);
             var style = EventStyleOf(evd.Id);
             if (style != null) { BuildStandingEvent(root, evd, E, picked, style); return; }
 
@@ -403,7 +403,7 @@ namespace Bolzena.RunUI
         // 「지도 공개」 — 두 이야기 가운데 하나
         void EventFork(RectTransform root, EventState E)
         {
-            W.StatusBar(root, this, true, true, false, "갈림길", "두 이야기 가운데 하나를 고릅니다");
+            W.StatusBar(root, this, true, true, true, "갈림길", "두 이야기 가운데 하나를 고릅니다");
             var row = Ui.Rect("pick", root).At(0.5f, 0.5f, 0, -20, Mathf.Min(1100, Stage.Size.x - 60), Theme.C(340, 300));
             Ui.Row(row, 24, TextAnchor.MiddleCenter, null, true, true);
             int i = 0;

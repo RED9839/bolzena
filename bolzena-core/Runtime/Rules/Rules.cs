@@ -37,7 +37,7 @@ namespace Bolzena.Core
         /// <summary>층별 일반 싸움(엘리트 · 보스가 아닌 싸움, 이벤트 일반 싸움 포함) 적 체력 배율 — FLOOR_HP 위에 곱한다. 일반 싸움 턴만 늘리는 손잡이(2026-10-11 엘다인 4차, _measure/난이도_재조정_20261010.md §12)</summary>
         public static readonly Dictionary<int, double> FIGHT_HP = new() { [1] = 1.5, [2] = 1.15 };
         /// <summary>층별 보스 피해 배율 — FLOOR_DMG 위에 곱한다. 보스 체력을 줄여 턴을 줄일 때 쓰러짐을 지키는 손잡이(2026-10-11 엘다인 4차 뒤, §13)</summary>
-        public static readonly Dictionary<int, double> BOSS_DMG = new() { [1] = 0.84, [2] = 0.92 };   // 2026-10-12 사용자 「보스 잡기 너무 빡세다 — 데미지 20% 줄여」(1.05 · 1.15 × 0.8)
+        public static readonly Dictionary<int, double> BOSS_DMG = new() { [1] = 0.75, [2] = 0.92 };   // 2026-10-12 「데미지 20% 줄여」(1.05 · 1.15 × 0.8) 뒤 사용자 「1층 보스 딜도 좀 줄여야」 — 1층 0.84 → 0.75
         /// <summary>보스(층 보스 · 보스 클론) 강인도 — 데이터가 더 높아도 이 칸으로(2026-10-12 사용자 「보스 강인도 5로 너프」).</summary>
         public const double BOSS_TOUGH = 7;   // 2026-10-12 사용자 「보스들 강인도 다시 7로」(5 → 7)
         /// <summary>엘리트 강인도(2026-10-12 사용자 「엘리트 · 보스 5」 뒤 보스만 7).</summary>
@@ -54,7 +54,7 @@ namespace Bolzena.Core
         /// 2026-10-11 엘다인 4차 최종(일반 싸움 FIGHT_HP 1.5 · 1.15 · 보스 BOSS_HP 1.0 · 0.7 와 함께) — 2.0 · 1.9 → 1.85 · 2.0, 완주 38.1%(§12)
         /// 2026-10-11 사도 8장(고유 5) · 변신 → 태세 뒤 — 2층 2.0 → 1.95(보스 체력 · 피해 조정과 함께), 완주 38.3%(§13)
         /// 2026-10-11 고유 효과 2개씩 · 시작 덱 4장(시동 필수) 뒤 — 1.85 · 1.95 → 2.1 · 2.35(보스 피해 1층 1.05 와 함께), 완주 63.6 → 38.3%(§14)
-        public static readonly Dictionary<int, double> FLOOR_DMG = new() { [1] = 2.1, [2] = 2.35 };
+        public static readonly Dictionary<int, double> FLOOR_DMG = new() { [1] = 1.9, [2] = 2.35 };   // 2026-10-12 사람 기록 24판(완주 31.8% · 끝난 판의 41% 가 1층에서 쓰러짐) — 1층만 2.1 → 1.9
         public const double ELITE_HP = 1.5;
 
         /// <summary>층(0부터) · 보스 · 엘리트 → 적 체력 배율 · 피해 배율.</summary>

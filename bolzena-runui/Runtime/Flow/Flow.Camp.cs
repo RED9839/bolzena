@@ -22,7 +22,7 @@ namespace Bolzena.RunUI
         {
             Ui.Clear(root);
             string used = P.CampChoice;
-            W.StatusBar(root, this, true, false, false, withShop ? "휴식 · 골디의 좌판" : "휴식", $"{P.Floor.Name} — 모닥불 곁에서 한숨 돌립니다 · 쉬기 · 수련 가운데 하나를 꼭 고릅니다");
+            W.StatusBar(root, this, true, false, true, withShop ? "휴식 · 골디의 좌판" : "휴식", $"{P.Floor.Name} — 모닥불 곁에서 한숨 돌립니다 · 쉬기 · 수련 가운데 하나를 꼭 고릅니다");
             // 휴식은 쉬기 · 수련 가운데 하나를 반드시 고른다(2026-10-06 사용자) — 고르기 전에는 출발 단추가 없고 뒤로 키도 듣지 않는다(Stage.OnBack 없음).
             //   수련할 카드가 없거나(고유 · 교주 카드에 붙일 신탁이 없음) 정신 붕괴면 쉬기만 고를 수 있다. 상점(좌판)은 고르기와 상관없이 드나든다.
             float optH = Theme.C(150, 132);

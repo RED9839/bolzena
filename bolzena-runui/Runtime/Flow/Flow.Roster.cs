@@ -139,10 +139,11 @@ namespace Bolzena.RunUI
             }
             st.Quiet = false;
             // 위 오른쪽 — 무작위 편성 · 프리셋 · 최근 편성
-            var tools = Ui.Rect("partytools", root).At(1, 1, -Theme.Gutter, -20, 520, 52);
+            var tools = Ui.Rect("partytools", root).At(1, 1, -Theme.Gutter, -20, 590, 52);
             Ui.Row(tools, 10, TextAnchor.MiddleRight, null, false, true);
             Stage.Hot["party.random"] = NavyPill(tools, "ic_refresh", "무작위 편성", () => PartyRandom(st, root), "random", 170);
             Stage.Hot["party.presets"] = NavyPill(tools, "ic_copy", "프리셋 · 최근 편성", () => PartyPresets(st, root), "presets", 230);
+            Stage.Hot["settings"] = Btn.Icon(tools, Theme.S("ic_menu"), () => SettingsPanel(false), 52, "menu");   // 2026-10-12 플레이어 의견 「소리 설정을 어디서든」 — 첫 대사를 듣는 편성 화면에도
             var dragHint = Ui.Text(root, count > 0 ? "칸을 끌어 자리를 바꿀 수 있습니다" : "칸을 눌러 사도를 고릅니다", Theme.FsSm, Theme.Dim, TextAlignmentOptions.MidlineLeft);
             dragHint.rectTransform.At(0, 1, Theme.Gutter + 72 + 250, -34, 460, 24); dragHint.textWrappingMode = TextWrappingModes.NoWrap;
 

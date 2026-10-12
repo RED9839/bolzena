@@ -27,7 +27,7 @@ namespace Bolzena.RunUI
         {
             Ui.Clear(root);
             var shop = P.S.Shop;
-            W.StatusBar(root, this, true, false, false, "골디의 상점", "황금에서 태어난 용족 상인 · 정품만 팝니다");
+            W.StatusBar(root, this, true, false, true, "골디의 상점", "황금에서 태어난 용족 상인 · 정품만 팝니다");
             var size = Stage.Size;
             float L = Theme.C(430, 380);          // 왼쪽 상인 자리
             float top = 104, foot = Theme.C(100, 92);

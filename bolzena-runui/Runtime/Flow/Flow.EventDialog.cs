@@ -140,10 +140,10 @@ namespace Bolzena.RunUI
             float textW = boxW - EvTextInset * 2 - Theme.C(60, 44);
             // 높이 — 모든 줄 가운데 가장 긴 줄에 맞춘다(줄을 넘겨도 상자가 출렁이지 않게)
             var probe = Ui.Text(root, "", Theme.FsLg, Theme.Ink, TextAlignmentOptions.TopLeft);
-            probe.textWrappingMode = TextWrappingModes.Normal;
+            probe.textWrappingMode = TextWrappingModes.Normal; probe.lineSpacing = 4;   // 2026-10-12 플레이어 의견 「이벤트 대사 칸이 넘친다」 — 실제 줄(lineSpacing 4)과 같게 잰다
             float need = lines.Select(l => probe.GetPreferredValues(l.Text, textW, 0).y).DefaultIfEmpty(40).Max();
             Destroy(probe.gameObject);
-            float boxH = Mathf.Max(Theme.C(190, 104), need + Theme.C(64, 40));
+            float boxH = Mathf.Max(Theme.C(190, 104), need + Theme.C(76, 50));
             float boxX = (size.x - boxW) / 2;
 
             var box = Btn.Make(root, null, BtnStyle.Ghost, null, 0, "evdialog");
@@ -160,6 +160,7 @@ namespace Bolzena.RunUI
 
             var t = Ui.Text(brt, "", Theme.FsLg, Theme.Ink, TextAlignmentOptions.TopLeft, false, "line");
             t.textWrappingMode = TextWrappingModes.Normal; t.overflowMode = TextOverflowModes.Overflow; t.lineSpacing = 4;
+            t.enableAutoSizing = true; t.fontSizeMax = t.fontSize; t.fontSizeMin = t.fontSize * 0.75f;   // 그래도 넘치면(글자 크게 · 좁은 화면) 글자를 조금 줄인다
             var trt = t.rectTransform; trt.anchorMin = new Vector2(0, 0); trt.anchorMax = new Vector2(1, 1);
             trt.offsetMin = new Vector2(EvTextInset, Theme.C(20, 12)); trt.offsetMax = new Vector2(-EvTextInset - Theme.C(60, 44), -Theme.C(30, 20));
             var ty = t.gameObject.AddComponent<TypeOn>();

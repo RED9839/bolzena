@@ -17,6 +17,9 @@ namespace Bolzena.RunUI
             Stage.SetBg(f0.Bg != null && f0.Bg.TryGetValue("fight", out var bg) ? bg : "stage3_2", 0.55f);
             Stage.Show("village", root =>
             {
+                var vset = Btn.Icon(root, Theme.S("ic_menu"), () => SettingsPanel(false), Theme.IconBtn, "menu");   // 2026-10-12 「소리 설정을 어디서든」
+                vset.GetComponent<RectTransform>().At(1, 1, -Theme.Gutter, -18, Theme.IconBtn, Theme.IconBtn);
+                Stage.Hot["settings"] = vset;
                 var panel = Ui.Panel(root, Theme.Panel, null, "card").rectTransform;
                 bool hasNat = !string.IsNullOrEmpty(FoeNature);
                 // 적 속성이 있으면 오른쪽에 「이번 판 적 속성 + 층 보스 초상」 칸을 붙인다(이걸 보고 약점에 맞춰 파티를 짠다)

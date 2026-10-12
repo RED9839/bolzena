@@ -23,7 +23,7 @@ namespace Bolzena.RunUI
             var foes = ev ? P.S.EventFight.Enemies : P.Run.CurrentEnemies();
             Stage.Show("fight", root =>
             {
-                W.StatusBar(root, this, true, true, false, $"{(node != null ? P.StageName(node) + " · " : "")}{kind}", ev ? P.S.EventFight.Name : $"{P.VillageDef.Name} · {f.Name}");
+                W.StatusBar(root, this, true, true, true, $"{(node != null ? P.StageName(node) + " · " : "")}{kind}", ev ? P.S.EventFight.Name : $"{P.VillageDef.Name} · {f.Name}");
 
                 // 맞설 적
                 var foeBox = Ui.Rect("foes", root).At(0.5f, 0.5f, 220, 60, 820, 420);
@@ -402,7 +402,7 @@ namespace Bolzena.RunUI
             ids = CardOrder.Sort(ids, P.Data, P.S.Party);
             Stage.Show("bosscopy", root =>
             {
-                W.StatusBar(root, this, true, true, false, "층 보스의 몫", "고유 카드 하나를 복제합니다 — 지금 신탁 · 축복 그대로, 그 뒤로는 받을 수 없습니다");
+                W.StatusBar(root, this, true, true, true, "층 보스의 몫", "고유 카드 하나를 복제합니다 — 지금 신탁 · 축복 그대로, 그 뒤로는 받을 수 없습니다");
                 // 2026-10-12 사용자 「원하는 사도 카드 복제로」 — 무작위 셋 대신 덱의 파티 사도 고유 카드 전부를 사도별로(수련 화면과 같은 꼴 · 스크롤)
                 float mw = Mathf.Min(1240, Stage.Size.x - 40);
                 var area = Ui.Rect("cards", root).At(0.5f, 0.5f, 0, Theme.C(4, 2), mw, Stage.Size.y - Theme.C(250, 190));
