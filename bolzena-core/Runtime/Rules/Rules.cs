@@ -28,7 +28,7 @@ namespace Bolzena.Core
         public const int HAND_MAX = 10;
 
         // ── 눈금 · 적 세기 ───────────────────────────────────────────
-        public const double ENEMY_HP = 0.85;
+        public const double ENEMY_HP = 0.72;   // 2026-10-12 사용자 「적 체력 15% 정도 감소」(0.85 × 0.85)
         public const int SCALE = 10;
         /// <summary>층별 적 체력 배율. 2026-10-10 적 수치 재조정 — 2층 3.25 → 4.3(2층 일반 싸움 2.35턴 → 2.9턴, _measure/난이도_재조정_20261010.md §8)</summary>
         public static readonly Dictionary<int, double> FLOOR_HP = new() { [1] = 2.0, [2] = 4.3 };
