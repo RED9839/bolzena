@@ -151,6 +151,17 @@ namespace Bolzena.RunUI
             var dic = Ui.Img(deckB.transform, Theme.S("ic_deck"), Theme.Gold, "ic"); dic.rectTransform.At(0, 0.5f, 18, 0, 26, 26); dic.preserveAspect = true;
             var dl = Ui.Title(deckB.transform, $"덱 보기 <size=80%><color={Theme.SubTag}>{f.P.S.Deck.Count}</color></size>", Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft); dl.rectTransform.Fill(52, 0, 10, 0);
             st.Hot[o.Hot + ".deck"] = deckB;
+            // 지금 카드 — 신탁 전 모습을 상세로(2026-10-12 사용자 「신탁 받을 때 전 카드가 뭔지」). 덱 보기와 같은 알약, 왼쪽 위
+            string baseId = o.BaseCardId ?? (o.Picks.Count > 0 ? o.Picks[0].CardId : null);   // 캠프는 갈라지는 연출 없이(BaseCardId 없음) — 후보의 카드 id(덱의 지금 모습)
+            if (baseId != null)
+            {
+                var baseView = o.BaseCardId != null ? o.BaseView : null;
+                var curB = Btn.Make(root, null, BtnStyle.PillDark, () => { if (Phase == "choose") { if (baseView != null) f.CardZoomView(baseId, baseView); else f.CardZoom(baseId); } }, 0, "curbtn");
+                curB.GetComponent<RectTransform>().At(0, 1, Theme.Gutter, compact ? -78 : -96, compact ? 150 : 176, compact ? 46 : 54);
+                var cic = Ui.Img(curB.transform, Theme.S("ic_info"), Theme.Gold, "ic"); cic.rectTransform.At(0, 0.5f, 18, 0, 26, 26); cic.preserveAspect = true;
+                var cl = Ui.Title(curB.transform, "지금 카드", Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft); cl.rectTransform.Fill(52, 0, 10, 0);
+                st.Hot[o.Hot + ".cur"] = curB;
+            }
             if (st.Hot.TryGetValue("deck", out var hudDeck) && hudDeck != null)
             {
                 var hb = Ui.Rect("huddeck", root); var hr = (RectTransform)hudDeck.transform;
@@ -240,6 +251,7 @@ namespace Bolzena.RunUI
             title.transform.SetAsLastSibling(); subBg.transform.SetAsLastSibling();
             if (close) close.transform.SetAsLastSibling();
             deckB.transform.SetAsLastSibling();
+            { var cb2 = root.Find("curbtn"); if (cb2) cb2.SetAsLastSibling(); }
             var baseG = baseCard ? baseCard.parent.Group() : null;
             Burst(root, new Vector2(0, cy), N(26), 90, 260, new Color(1f, 0.85f, 0.4f), 0.25f, 0.45f);
             yield return Lerp(root, 0.45f, t =>

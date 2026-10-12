@@ -34,6 +34,7 @@ namespace Bolzena.UI
         // 길게 누르기 확대(카제나식) — 손패 카드를 누른 채 HoldZoomT 초 움직이지 않으면 그 카드를 화면 가운데 위에 크게(키워드 판은 오른쪽).
         //   떼면 접힌다(이 누름은 탭으로 치지 않는다). 누른 채 PointerInput 끌기 거리(0.18) 넘게 움직이면 접고 지금처럼 끌어 낸다.
         public const float HoldZoomT = 0.3f;
+        public const float HoverZoomT = 2.2f;   // 마우스 올려 두기 확대
         float pressT;
         bool holdZoom;
         bool hoverMute;                                // 길게 눌러 본 뒤 뗐다 — 마우스가 그 카드 위에 그대로 있어도 올려 두기 확대를 다시 열지 않는다(떼면 닫힘)
@@ -396,9 +397,9 @@ namespace Bolzena.UI
                     Layout();
                 }
                 hoverT += Time.unscaledDeltaTime;
-                if (PointerInput.Down) { press = CardAt(p); pressT = 0; holdZoom = false; }
-                // 누른 채 가만히 — 길게 누르기 확대
-                if (PointerInput.Held && press >= 0 && !PointerInput.Moved)
+                if (PointerInput.Down) { press = CardAt(p); pressT = 0; holdZoom = false; hoverMute = true; }   // 누르면 올려 두기 확대는 접는다
+                // 누른 채 가만히 — 길게 누르기 확대(터치만. 마우스는 올려 두기 — 2026-10-12 사용자)
+                if (PointerInput.Held && press >= 0 && !PointerInput.Moved && PointerInput.Touch)
                 {
                     pressT += Time.unscaledDeltaTime;
                     if (!holdZoom && pressT >= HoldZoomT) { holdZoom = true; Sfx.Play("card_hover", 0.4f, 1.1f); }
@@ -433,7 +434,9 @@ namespace Bolzena.UI
             // 카드 확대(모두 CardZoom 한 판 · 언제나 화면 가운데 위 · 키워드 판은 카드 오른쪽, 넘치면 왼쪽) —
             //   길게 누른 카드(마우스 · 터치 같게), 마우스를 잠깐 올려 둔 카드(PC). 고른 카드 · 끄는 카드는 확대하지 않는다(적 · 화살표를 가리지 않게)
             int holdCard = HoldZooming && press < Cards.Count ? press : -1;
-            int tipCard = drag >= 0 ? -1 : holdCard >= 0 ? holdCard : -1;   // 올려 두기만으로는 확대 · 낱말 판을 띄우지 않는다(2026-10-09 사용자 — 길게 누를 때만)
+            // 마우스는 카드 위에 HoverZoomT 초 가만히 올려 두면 확대(2026-10-12 사용자 「꾹 누르기 말고 2~3초 올려 두면」) · 터치는 길게 누르기
+            int hoverCard = !PointerInput.Touch && !PointerInput.Held && sel < 0 && !hoverMute && hover >= 0 && hover < Cards.Count && hoverT >= HoverZoomT ? hover : -1;
+            int tipCard = drag >= 0 ? -1 : holdCard >= 0 ? holdCard : hoverCard;
             if (tipCard >= 0 && tipCard < Cards.Count)
             {
                 var c = Cards[tipCard];

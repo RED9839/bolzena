@@ -126,6 +126,18 @@ namespace Bolzena.UI
                 if (!string.IsNullOrEmpty(options[i].BlessName) && !Bolzena.RunUI.BlessFx.Old) AddBless(c, options[i], O + 10 + i * 10, sparkles);
             }
             if (sparkles.Count > 0) Clock.Run(Sparkle(sparkles, live));
+            // 지금 카드(신탁 전 모습) — 후보 옆에 작게(2026-10-12 사용자 「신탁 받을 때 전 카드가 뭔지」). 누르면 상세. 겨우살이 그림이 왼쪽에 깔리면 오른쪽으로
+            var baseInfo = card.Info.Clone(); baseInfo.Epiphany = false;
+            float halfW0 = Camera.main != null ? Camera.main.orthographicSize * Camera.main.aspect : 8f;
+            float side = anyBless ? 1 : -1;
+            float origS = 1.0f, origX = side * Mathf.Min(halfW0 - CardView.W * origS / 2 - 0.15f, (options.Count - 1) / 2f * 3.7f + CardView.W * 1.55f / 2 + CardView.W * origS / 2 + 0.35f);
+            var orig = CardView.Create(root, baseInfo);
+            orig.ShowPin = false; orig.ShowDesc = true;
+            orig.TargetPos = new Vector3(origX, -0.15f, 0); orig.TargetRot = 0; orig.TargetScale = origS; orig.Snap();
+            orig.SetOrder(O + 6); orig.SetAlpha(0);
+            var origLb = Make.Text("origlb", root, "지금 카드", new Vector3(origX, -0.15f + CardView.H * origS / 2 + 0.25f, 0), 0.24f, O + 41, new Color(0.82f, 0.84f, 0.9f));
+            Make.Outline(origLb, 0.3f, Color.black); origLb.alpha = 0;
+            Clock.Run(Clock.Tween(0.25f, t => { if (orig) orig.SetAlpha(0.92f * t); if (origLb) origLb.alpha = t; }, true));
             // 「고르기」 단추 — 카드 아래(카드를 누르면 상세가 뜨고, 고르기는 이 단추로. 2026-10-12 사용자)
             var pickAt = new List<Vector3>();
             var pickBg = new List<SpriteRenderer>(); var pickTx = new List<TextMeshPro>();
@@ -169,6 +181,7 @@ namespace Bolzena.UI
                     var local = opts[i].transform.InverseTransformPoint(p);
                     if (Mathf.Abs(local.x) < CardView.W / 2 && Mathf.Abs(local.y) < CardView.H / 2) h = i;
                 }
+                bool onOrig = orig != null && Mathf.Abs(p.x - origX) < CardView.W * origS / 2 && Mathf.Abs(p.y + 0.15f) < CardView.H * origS / 2;
                 if (h >= 0) keyHover = -1;
                 else h = keyHover;
                 if (h != hover)
@@ -190,15 +203,16 @@ namespace Bolzena.UI
                 {
                     if (zoomed) { zoomed = false; press = -1; }
                     else if (onPick >= 0) { choice = onPick; press = -1; }
-                    else press = hover;
+                    else press = onOrig ? -2 : hover;
                 }
                 if (PointerInput.RightDown && hover >= 0) { press = hover; zoomed = !zoomed; }
                 if (PointerInput.Up)
                 {
-                    if (!zoomed && press >= 0 && press == hover && !PointerInput.Moved) { zoomed = true; Sfx.Play("card_hover", 0.5f); }
+                    if (!zoomed && ((press >= 0 && press == hover) || (press == -2 && onOrig)) && !PointerInput.Moved) { zoomed = true; Sfx.Play("card_hover", 0.5f); }
                     else press = zoomed ? press : -1;
                 }
-                if (zoomed && press >= 0 && press < opts.Count) CardZoom.Show(root, options[press], new Vector3(0, 0.25f, 0), 1.7f);
+                if (zoomed && press == -2) CardZoom.Show(root, baseInfo, new Vector3(0, 0.25f, 0), 1.7f);
+                else if (zoomed && press >= 0 && press < opts.Count) CardZoom.Show(root, options[press], new Vector3(0, 0.25f, 0), 1.7f);
                 else CardZoom.Hide();
                 if (hover >= 0 && (PointerInput.Key(UnityEngine.InputSystem.Key.Enter) || PointerInput.Key(UnityEngine.InputSystem.Key.NumpadEnter) || PointerInput.Key(UnityEngine.InputSystem.Key.Space))) choice = hover;
                 waited += Time.unscaledDeltaTime;
@@ -206,6 +220,7 @@ namespace Bolzena.UI
                 yield return null;
             }
             Options = null; PickAt = null; live[0] = false;
+            if (orig) Object.Destroy(orig.gameObject); if (origLb) Object.Destroy(origLb.gameObject);
             for (int i = 0; i < pickBg.Count; i++) { if (pickBg[i]) pickBg[i].enabled = false; if (pickTx[i]) pickTx[i].alpha = 0; }
             CardZoom.Hide();
             if (deckBg != null) { deckBg.enabled = false; deckTx.alpha = 0; }

@@ -1303,7 +1303,7 @@ namespace Bolzena
             else if (info.Epiphany)
             {
                 var opts = Battle.EpiphanyOptions(handIndex);
-                if (opts.Count > 0) yield return EpiphanyWindow.Run(ScreenRoot, cv, opts, c => choice = c, DemoEpiphanyPick, () => OpenPile(0));   // 덱 보기 — 뽑을 더미 창(사도별 묶음)
+                if (opts.Count > 0) yield return EpiphanyWindow.Run(ScreenRoot, cv, opts, c => choice = c, DemoEpiphanyPick, () => OpenParty(2));   // 덱 보기 — 이번 전투의 덱 전부(파티 창 ③ 카드 탭, 2026-10-12 사용자 「자기 덱 풀」)
             }
             int branch = 0;
             if (info.Choices != null && info.Choices.Count == 2)

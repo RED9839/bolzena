@@ -181,6 +181,7 @@ namespace Bolzena.Core
             if (St(Pool, "은방울") > 0 && Pool.Block + Pool.Shield > 0) SilverBell("턴 끝에 실드가 남음");   // (▶E65)
             ApLeft = Ap;
             Ending = true;
+            var handAtEnd = Hand.ToList();   // 턴 끝 처리 중에 손에 생긴 카드(알바 · 「턴 끝에 손에 있으면」 마탄 …)는 다음 턴으로 넘긴다 — 아래에서 함께 버려 「안 생긴다」 로 보였다(2026-10-12 사용자)
             Emit("turnEnd", new EmitInfo());
             // 아껴 두기형 공용 계기 — AP 를 남기거나 보존 카드를 쥐고 턴을 마치면(N = 남긴 AP · Kept = 쥐고 넘기는 보존 카드 수(증발 빼고), 일의 값 = 둘의 합)
             int kept = Hand.Count(id => HasTagB(id, Tag.Keep) && !HasTagB(id, Tag.Evaporate));
@@ -197,8 +198,14 @@ namespace Bolzena.Core
             // 증발 — 턴 끝에 손에 있으면 이 전투에서 사라진다(보존보다 앞선다) · 보존은 손에 남는다
             var gone = Hand.Where(id => HasTagB(id, Tag.Evaporate)).ToList();
             if (gone.Count > 0) Say($"증발 — {string.Join(" ", gone.Select(id => $"「{CardOf(id).Name}」"))} 사라진다");
+            var madeAtEnd = Hand.ToList();
+            foreach (var id in handAtEnd) madeAtEnd.Remove(id);   // 여러 장 같은 id 도 장수대로 뺀다
             var keep = Hand.Where(id => !gone.Contains(id) && HasTagB(id, Tag.Keep)).ToList();
-            var toss = Hand.Where(id => !keep.Contains(id) && !gone.Contains(id)).ToList();
+            foreach (var id in madeAtEnd) if (!gone.Contains(id) && !HasTagB(id, Tag.Keep)) keep.Add(id);
+            // 버릴 것 = 손 − 남길 것 − 증발(같은 id 가 여러 장이면 장수대로)
+            var toss = Hand.ToList();
+            foreach (var id in keep) toss.Remove(id);
+            toss.RemoveAll(id => gone.Contains(id));
             Hand = keep;
             foreach (var id in gone) { Exile(id, "hand", "evaporate"); Emit("exhaust", new EmitInfo { Hero = CardOf(id)?.Hero, Id = id }); if (Over != null) return this; }
             foreach (var id in toss) CardCue(id, "hand", "discard", "turnEnd");

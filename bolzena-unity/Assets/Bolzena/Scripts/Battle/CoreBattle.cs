@@ -387,24 +387,28 @@ namespace Bolzena.Battle
             double mul = !cv.IsStatus && !cv.IsCurse ? 1 + b.EmpowerOf(cv.Hero) / 100.0 : 1;
             int pe = cv.Fx.FindIndex(si + 1, f => f.K == FxK.PerEvent);
             CoreFx eff = pe >= 0 && pe + 1 < cv.Fx.Count ? cv.Fx[pe + 1] : null;
-            if (eff != null && eff.K != FxK.Dmg && eff.K != FxK.Shield && eff.K != FxK.Block && eff.K != FxK.Heal) eff = null;
+            if (eff != null && eff.K != FxK.Dmg && eff.K != FxK.Shield && eff.K != FxK.Block && eff.K != FxK.Heal && eff.K != FxK.Make) eff = null;
             int per = pe >= 0 ? Math.Max(1, cv.Fx[pe].Per) : 1;
             string what = eff == null ? null : eff.K == FxK.Dmg ? (eff.Fixed || eff.OfEvent > 0 ? "고정 피해" : "피해") : eff.K == FxK.Shield ? (eff.Fixed || eff.OfEvent > 0 ? "고정 실드" : "실드") : eff.K == FxK.Block ? "방어" : "회복";
+            // 카드를 만드는 소모(클로에 「런웨이 오프닝」 — 1개당 「맞춤옷」 1장)는 「「맞춤옷」 N장」 으로(2026-10-12 사용자: 무엇이 생기는지 몰랐다)
+            string madeName = eff != null && eff.K == FxK.Make ? (data.Card(eff.Id)?.Name ?? eff.Id) : null;
+            if (madeName != null) what = $"「{madeName}」";
             string Val(int n, double m)
             {
+                if (madeName != null) return Math.Max(1, (int)Math.Round((double)(n / per) * Math.Max(1, eff.V))) + "장";
                 if (eff.OfEvent > 0) return Math.Max(1, (int)Math.Round(n * eff.OfEvent * m, MidpointRounding.AwayFromZero)).ToString();
                 return (int)Math.Round(eff.Ratio * eff.HitsOr1 * (n / per) * 100 * m, MidpointRounding.AwayFromZero) + "%";
             }
             var sp = new SpendPrompt { Kw = sf.Id, Have = have };
             if (eff != null)
-                sp.PerUnit = eff.OfEvent > 0 ? $"1개당 {what} {Val(per, 1)}" : $"{(per > 1 ? per + "개" : "1개")}당 {what} {(int)Math.Round(eff.Ratio * eff.HitsOr1 * 100)}%";
+                sp.PerUnit = madeName != null ? $"{(per > 1 ? per + "개" : "1개")}당 {what} {Math.Max(1, (int)eff.V)}장" : eff.OfEvent > 0 ? $"1개당 {what} {Val(per, 1)}" : $"{(per > 1 ? per + "개" : "1개")}당 {what} {(int)Math.Round(eff.Ratio * eff.HitsOr1 * 100)}%";
             foreach (var n in opts)
             {
                 var o = new SpendOption { N = n, Name = n >= have ? "전부" : n == 1 ? "1개" : "절반" };
                 if (eff != null)
                 {
                     o.Result = what + " " + Val(n, 1);
-                    if (mul > 1.0001) o.Boosted = what + " " + Val(n, mul);
+                    if (mul > 1.0001 && madeName == null) o.Boosted = what + " " + Val(n, mul);
                 }
                 sp.Options.Add(o);
             }
@@ -1256,7 +1260,7 @@ namespace Bolzena.Battle
                     {
                         Key = look.Art, Id = u.Key, Name = u.Name, Tint = look.Tint, UltName = h?.Ult?.Name, UltText = hb.UltText,
                         Atk = u.Atk, Def = u.Def, Crit = u.Crit, AtkNow = b.AtkNow(u), DefNow = b.DefNow(u), CritNow = u.Crit + Mathf.RoundToInt((float)b.StatMod(u, "crit") * 100),
-                        Role = u.Role, Nature = u.Nature, Slot = u.Idx, Blurb = h?.Blurb, Ult = b.Gauge, UltMax = h?.Ult?.Cost ?? 999, Dead = u.Dead,
+                        Role = u.Role, Nature = u.Nature, Slot = u.Idx, Blurb = h?.Blurb, Ult = b.Gauge, UltMax = h?.Ult != null ? b.UltCostOf(u.Key) : 999, Dead = u.Dead,
                         KeywordName = h?.Keyword?.Name, KeywordText = hb.KeywordText,
                         KeywordStacks = h?.Keyword != null ? b.StackOf(u.Key, h.Keyword.Name) : 0,
                     };
