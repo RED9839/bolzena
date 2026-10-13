@@ -303,6 +303,12 @@ namespace Bolzena.Core
             var opener = AliveParty().FirstOrDefault();
             if (opener != null) Talk(opener, "start");
             Emit("fightStart", new EmitInfo());
+            foreach (var kw in Kw.Values.ToList())   // 키워드 startMake — 전투 시작에 그 카드를 손에(규칙 아님, 2026-10-13 시온 마탄 2장)
+                if (kw.Def.StartMake != null && HeroUnit(kw.Owner) is Unit so && !so.Dead && Over == null)
+                {
+                    var (prev, seq0) = (Acting, ActSeq); Acting = so.Key; ActSeq = ++SeqN;
+                    try { Make(kw.Def.StartMake, Math.Max(1, kw.Def.StartMakeN), so); } finally { Acting = prev; ActSeq = seq0; }
+                }
             FoePassives("fightStart", null);
             StartForms();   // 전투 시작 태세(엘다인 4차 — 우로스 startForm)
             BeginTurn();
@@ -455,6 +461,7 @@ namespace Bolzena.Core
         /// <summary>카드 이동 쪽지 — 사람 자리 없이(Side · Idx 는 쓰지 않는다).</summary>
         void CardCue(string id, string from, string to, string why = null)
         {
+            if (from == "hand" || to == "hand") HandKwSync();   // 손 따라가기 고유 효과(2026-10-13 시온 「탄창」)
             if (Cues == null && OnCue == null) return;
             var c = new Cue { K = "card", CardId = id, Pile = from, ToPile = to, Label = why, Idx = -1 };
             Cues?.Add(c); OnCue?.Invoke(c);

@@ -10,6 +10,7 @@ const ANY = (r) => empower(r, { who: 'any' });
 const OT = (r, x) => empower(r, { who: 'other', ...x });   // 다른 아군의 다음 카드
 const SKY = ['천상', '보존'];
 // 10-13 사용자: 옛 나타 레이저(laser) · 회피 1(dodge) 뺌 — 꿈의 막은 패시브 「꿈에서 깨지 않았다」 가 가득 차면 터뜨린다
+const BORDER = { inHand: '이드_u1', add: 1 };   // 10-13 꿈속의 나타: 손에 「흐릿한 경계」 가 있으면 비용 +1(원작 대검 아퀼라)
 const hold = [{ k: 'when', on: 'handEnd' }, status('실드 보존', 1)];   // 쥐고 넘기면: 실드 보존 1(남은 실드를 다음 턴으로 — 4차 측정 뒤 실드 유지에서 바꿈)
 
 export default hero({
@@ -35,7 +36,7 @@ export default hero({
   basicNames: ['몽중탄', '몽중 연사', '나타 격벽'], deck: 'heavy',
   uniques: [
     // 2026-10-13 칼리페식 교체(사용자 「칼리페처럼 변경」): 카드 5장 = 카제나 칼리페 시동 · 고유 2~4 · 완성형, 신탁 5갈래 = 칼리페 번뜩임(수치 카제나 그대로).
-    //   엔진에 없는 것 — 「손패 수만큼 실드」 · 「비용 1 증가」 · 「행동 카운트」 · 「손 전체 보존」 은 줄마다 가까운 꼴로. 이전 판: C:\projects\_backup\id_before_20261013
+    //   엔진에 없는 것 — 「손패 수만큼 실드」 · 「행동 카운트」 · 「손 전체 보존」 은 줄마다 가까운 꼴로(「비용 1 증가」 는 10-13 costIf 로 들임). 이전 판: C:\projects\_backup\id_before_20261013
     { // 시동 ← 벌쳐 사출 — 천상 · 보존: 비용 2 이상 카드가 나가면 손에서 저절로
       name: '흐릿한 경계', cost: 3, type: '공격', tags: SKY,
       fx: [ddmg(1.2, 'allEnemies'), shield(1), S(1)],
@@ -72,27 +73,30 @@ export default hero({
       ],
       blesses: ['guard', 'draw', [status('실드 보존', 1)]],
     },
-    { // 완성형 ← 절대 수호 — 종극: 남은 AP 1개당 실드(= X)
-      name: '나타로 들이받기', cost: 0, type: '스킬', tags: ['종극'],
-      fx: [{ k: 'perApLeft' }, shield(1)],
+    { // 완성형 ← 절대 수호 — X 코스트: AP 를 모두 써서 X 1당 실드
+      // 10-13 사용자 「X 카드로」: 옛 0코 · 종극 · 남은 AP 1당(perApLeft) → x: true · perX(X = 쓴 AP). 종극(턴 끝)은 X 가 AP 를 다 써 겹쳐 뺌.
+      //   X 가 2 이상이면 쓴 비용이 2 이상이라 손의 「흐릿한 경계」(천상)도 깨운다. 축복 「비용 -1」 은 X 에 뜻이 없어 「방어」 로.
+      name: '나타로 들이받기', cost: 0, x: true, type: '스킬',
+      fx: [{ k: 'perX' }, shield(1)],
       oracles: [
-        { tags: ['종극', '보존'], fx: [{ k: 'perApLeft' }, shield(1.2)] },                 // 에고 발현 1 — 보존 · 실드 +20%
-        { tags: ['종극'], fx: [{ k: 'perApLeft' }, shield(1), S(1)] },
-        { tags: ['종극'], fx: [{ k: 'perApLeft' }, shield(0.8), status('실드 보존', 1)] },  // 원작 「손 전체 보존」 대신 실드 보존
-        { type: '공격', tags: ['종극'], fx: [{ k: 'perApLeft' }, ddmg(1, 'allEnemies')] },
-        { tags: ['종극'], fx: [{ k: 'perApLeft' }, shield(1), stack('나타', 1)] },
+        { tags: ['보존'], fx: [{ k: 'perX' }, shield(1.2)] },                 // 에고 발현 1 — 보존 · 실드 +20%
+        { fx: [{ k: 'perX' }, shield(1), S(1)] },
+        { fx: [{ k: 'perX' }, shield(0.8), status('실드 보존', 1)] },          // 원작 「손 전체 보존」 대신 실드 보존
+        { type: '공격', fx: [{ k: 'perX' }, ddmg(1, 'allEnemies')] },
+        { fx: [{ k: 'perX' }, shield(1), stack('나타', 1)] },
       ],
-      blesses: ['cost', 'draw', [status('실드 보존', 1)]],
+      blesses: ['guard', 'draw', [status('실드 보존', 1)]],
     },
-    { // 고유 2 ← 대검 아퀼라 — 적 전체, 손에 경계가 있으면 더 세게
-      name: '꿈속의 나타', cost: 1, type: '공격',
-      fx: [ddmg(1.5, 'allEnemies'), { k: 'ifInHand', id: '이드_u1' }, ddmg(1, 'allEnemies')],   // 원작 「비용 1 증가」 는 엔진에 없어 뺌
+    { // 고유 2 ← 대검 아퀼라 — 적 전체, 손에 경계가 있으면 비용 +1 · 더 세게
+      // 10-13 사용자 「칼리페처럼」: 엔진 costIf(손에 그 카드가 있으면 비용 +N) — 오른 비용 2 로 손의 「흐릿한 경계」(천상)도 깨운다
+      name: '꿈속의 나타', cost: 1, type: '공격', costIf: BORDER,
+      fx: [ddmg(1.5, 'allEnemies'), { k: 'ifInHand', id: '이드_u1' }, ddmg(1, 'allEnemies')],
       oracles: [
-        { fx: [ddmg(2.1, 'allEnemies'), { k: 'ifInHand', id: '이드_u1' }, ddmg(1.2, 'allEnemies')] },   // I
+        { costIf: BORDER, fx: [ddmg(2.1, 'allEnemies'), { k: 'ifInHand', id: '이드_u1' }, ddmg(1.2, 'allEnemies')] },   // I
         { fx: [ddmg(2.2, 'allEnemies')] },                                           // II(원작 2코 · 「쓸 때마다 +40%」 — 1코 수치로)
-        { fx: [ddmg(1.5, 'allEnemies'), { k: 'ifInHand', id: '이드_u1' }, S(1)] },   // III 손에 경계가 있으면 꿈의 막 1(원작 2코 상황 — 1코로)
+        { costIf: BORDER, fx: [ddmg(1.5, 'allEnemies'), { k: 'ifInHand', id: '이드_u1' }, S(1)] },   // III 손에 경계가 있으면 비용 +1 · 꿈의 막 1
         { tags: ['보존'], fx: [ddmg(1.5, 'allEnemies'), { k: 'when', on: 'handEnd' }, stack('나타', 1)] },   // IV
-        { tags: ['회수 3'], fx: [ddmg(1.5, 'allEnemies'), { k: 'ifInHand', id: '이드_u1' }, ddmg(1, 'allEnemies')] },   // V
+        { tags: ['회수 3'], fx: [ddmg(1.5, 'allEnemies'), { k: 'ifInHand', id: '이드_u1' }, ddmg(1, 'allEnemies')] },   // V(비용 +1 은 글 45자를 넘어 뺌 — 회수 3 이 몫)
       ],
       blesses: ['power', 'cost', [status('실드 보존', 1)]],
     },

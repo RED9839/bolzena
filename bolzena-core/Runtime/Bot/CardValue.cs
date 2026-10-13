@@ -99,8 +99,8 @@ namespace Bolzena.Core
                     case FxK.NoForget: break;
                     // 엘다인 3차 — 반격 모양 · 증감 · 게이지 잠금 · 기록 · 낭독 · 적마다 깎기
                     case FxK.CounterHits: v += 0.4 + 0.1 * Math.Max(2, f.V); break;
-                    case FxK.CounterAll: v += 0.8; break;
-                    case FxK.CounterMod: v += 0.6 * Math.Abs(f.V) * Math.Min(f.TurnsOr1, 3); break;
+                    case FxK.CounterAll: v += f.Turns > 0 ? 0.3 * Math.Min(f.Turns, 3) : 0.8; break;   // turns — n턴간(2026-10-13 비비)
+                    case FxK.CounterMod: v += 0.6 * Math.Abs(f.V) * (f.Run ? 3 : Math.Min(f.TurnsOr1, 3)); break;
                     case FxK.GaugeLock: v -= 0.3; break;
                     case FxK.Record: v += 0.5 * Math.Max(1, f.V); break;
                     case FxK.Replay: v += 0.9 * (f.Ratio > 0 ? f.Ratio : 1) * (f.All ? 2 : Math.Max(1, f.V)); break;
@@ -147,6 +147,8 @@ namespace Bolzena.Core
                     case FxK.PerPaid: per = PAID_PER; break;
                     case FxK.PerDebuff: per = DEBUFF_PER; break;
                     case FxK.PerApLeft: per = 1; break;
+                    case FxK.PerFoe: per = 2; break;   // (2026-10-13 비비) 적 수 — 보통 2명으로 친다
+                    case FxK.PerX: per = 3; break;   // (2026-10-13 이드) X 코스트는 3 으로 친다(BaseValue 와 같은 셈)
                     case FxK.Feed: v += 0.3 * f.V * (f.Target == "oneAlly" || f.Target == "self" ? 1 : 1.6); break;
                     case FxK.NextAp: v += 0.9 * f.V * (f.V < 0 ? 0.7 : 0.8); break;
                     case FxK.Burn: v += 0.05 * Math.Max(1, f.V); break;

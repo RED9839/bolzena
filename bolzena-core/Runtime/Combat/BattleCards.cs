@@ -216,7 +216,17 @@ namespace Bolzena.Core
             if (CardStOf(cardId, "침체") > 0) return "침체";
             if (CardStOf(cardId, "비용") > 0) return "비용 증가 효과";
             if (CostMods.Count > 0 && CostModOf(cardId) > 0) return "적이 바꾼 비용";
+            if (CostIfAdd(CardOf(cardId), cardId, null) > 0) return $"손의 「{Data.Card(CardOf(cardId).CostIf.InHand)?.Name}」";   // (2026-10-13 이드) costIf
             return null;
+        }
+        /// <summary>(2026-10-13 이드) costIf — 손에 그 카드(이 카드 자신은 빼고)가 있으면 비용 +add. 아니면 0.</summary>
+        int CostIfAdd(CardView c, string cardId, int? handIdx)
+        {
+            var ci = c?.CostIf;
+            if (ci?.InHand == null) return 0;
+            for (int i = 0; i < Hand.Count; i++)
+                if (i != handIdx && Hand[i] != cardId && GameData.BaseId(Hand[i]) == ci.InHand) return ci.Add;
+            return 0;
         }
         public int CostOf(string cardId, int? handIdx = null)
         {
@@ -224,7 +234,7 @@ namespace Bolzena.Core
             if (FreeOnce.Contains(cardId) || GraceFree(cardId, handIdx)) return 0;
             int divine = ShinKind(Data.Card(cardId), ShinOf(cardId)) == "cost" ? 1 : 0;
             int lead = LeadOn.Contains(cardId) && PlayedThisTurn <= 0 ? 1 : 0;
-            int adj = (CardStOf(cardId, "침체") > 0 ? 1 : 0) + CardStOf(cardId, "비용") + (CostMods.Count > 0 ? CostModOf(cardId) : 0) + CardValueCost(cardId);   // 카드 값 1당 비용(엘다인 4차 리뉴아 「시간」)   // 침체 +1 · 적이 바꾼 비용(착란 …)
+            int adj = (CardStOf(cardId, "침체") > 0 ? 1 : 0) + CardStOf(cardId, "비용") + (CostMods.Count > 0 ? CostModOf(cardId) : 0) + CardValueCost(cardId) + CostIfAdd(c, cardId, handIdx);   // costIf — 손에 그 카드가 있으면 +N(2026-10-13 이드)   // 카드 값 1당 비용(엘다인 4차 리뉴아 「시간」)   // 침체 +1 · 적이 바꾼 비용(착란 …)
             return Math.Max(0, c.Cost - divine - lead - NextCheaper + adj);
         }
 
@@ -309,6 +319,7 @@ namespace Bolzena.Core
             bool grace = !FreeOnce.Contains(cardId) && GraceFree(cardId, handIdx);
             var def0 = Data.Card(cardId);
             int cost0 = c.X ? Ap : CostOf(cardId, handIdx);
+            int costUp = c.X ? 0 : CostIfAdd(c, cardId, handIdx);   // (2026-10-13 이드) costIf 로 오른 비용 — 천상 · 「비용 N 이상」 계기도 오른 비용으로 센다
             int paid = cost0;
             bool payKw = def0?.PayWith != null && !c.X;
             if (payKw)
@@ -356,7 +367,7 @@ namespace Bolzena.Core
             // 다음 카드 강화(empower · onMax empower) — 그 사도 몫 · 파티 몫을 이 카드가 쓴다(상태 카드 · 저주는 안 쓴다)
             if (!c.IsStatus && !c.IsCurse && Counts.Count > 0 && EmpowerOf(c.Hero) > 0) ctx.Scale *= EmpowerUse(c.Hero);
             // 다른 아군이 걸어 둔 다음 카드 강화(empower who other · minCost — 엘다인 4차 요청)
-            if (!c.IsStatus && !c.IsCurse && Counts.Count > 0) { int eo = EmpowerOther(c.Hero, c.X ? paid : Math.Max(c.Cost, c.CountAs), true); if (eo > 0) { ctx.Scale *= 1 + eo / 100.0; Say($"동료 강화 +{eo}% — 이 카드에"); } }
+            if (!c.IsStatus && !c.IsCurse && Counts.Count > 0) { int eo = EmpowerOther(c.Hero, c.X ? paid : Math.Max(c.Cost + costUp, c.CountAs), true); if (eo > 0) { ctx.Scale *= 1 + eo / 100.0; Say($"동료 강화 +{eo}% — 이 카드에"); } }
             bool sealedNow = HasTagB(cardId, Tag.Seal) && !Unsealed.Contains(cardId);
             bool blockedNow = CardStOf(cardId, "봉쇄") > 0;
             if (blockedNow) DelCardSt(cardId, "봉쇄");
@@ -462,7 +473,7 @@ namespace Bolzena.Core
             if (Over == null && c.Hero != null && !c.IsStatus && !c.IsCurse) CardValueAllyPlay(c.Hero);
             if (Over == null && c.Hero != null && !c.IsStatus && !c.IsCurse && !mute) MarkBurn(c.Hero);   // 붙은 표시가 탐(벨라 존속의 촛불)
             if (Over == null && !mute) ShieldLeftArm(c, owner, targetIdx);   // 낸 뒤 적 차례가 끝날 때 실드가 남았으면   // 아군이 카드를 냄 — 손의 그 사도 카드 값 +1(엘다인 4차)
-            Emit("play", new EmitInfo { Id = cardId, Hero = c.Hero, Actor = owner?.Key, Type = c.Type, Nth = PlayedThisTurn, Target = tgt, Cost = c.X ? paid : c.Cost, CostNow = c.X ? paid : cost0, Sig = c.Signature, Repeat = repeat, Who = owner, Tags = c.Tags, Chain = ctx.Chain, SameHero = ctx.Link });
+            Emit("play", new EmitInfo { Id = cardId, Hero = c.Hero, Actor = owner?.Key, Type = c.Type, Nth = PlayedThisTurn, Target = tgt, Cost = c.X ? paid : c.Cost + costUp, CostNow = c.X ? paid : cost0, Sig = c.Signature, Repeat = repeat, Who = owner, Tags = c.Tags, Chain = ctx.Chain, SameHero = ctx.Link });
             // 계산형 공용 계기 — 이 카드의 셈 조건이 섰으면 「셈이 맞으면」(카드가 다 끝난 뒤)
             if (ctx.Tallied && Over == null) Emit("tally", new EmitInfo { Id = cardId, Hero = c.Hero, By = owner?.Key, Target = tgt });
             Acting = null; ModSrc = null;
@@ -500,7 +511,7 @@ namespace Bolzena.Core
                 }
             }
             // 천상 셈 — 저절로 나간 카드는 0(천상을 다시 깨우지 않는다), countAs 가 있으면 그 비용으로(엘다인 ▶E2)
-            if (Over == null) HandAuto("play", new AutoInfo { Target = tgt, Hero = c.Hero, Cost = opts.Auto ? 0 : c.X ? paid : Math.Max(c.Cost, c.CountAs) });
+            if (Over == null) HandAuto("play", new AutoInfo { Target = tgt, Hero = c.Hero, Cost = opts.Auto ? 0 : c.X ? paid : Math.Max(c.Cost + costUp, c.CountAs) });
             if (Over == null && HasTagB(cardId, Tag.Finale)) { FinaleLock = true; Say($"「{c.Name}」 — 종극: 턴이 끝난다"); return new PlayResult { Ok = true, Finale = true }; }
             return new PlayResult { Ok = true };
         }

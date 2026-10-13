@@ -225,7 +225,7 @@ namespace Bolzena.Core
                     if (w.CardSt != null && CardStOf(info.Id, w.CardSt) <= 0) return false;
                     if (w.Basic) { var pc = Data.Card(GameData.BaseId(info.Id)); if (pc == null || pc.Hero == null || pc.Unique || pc.Token || GameData.IsCopy(info.Id) || GameData.IsPlain(info.Id)) return false; }   // 시작 카드만(2026-10-08)
                     return true;
-                case "guard": return info.Who != null && info.Who.Side == Side.Party && (w.Kind == null || info.Kind == w.Kind);
+                case "guard": return info.Who != null && info.Who.Side == Side.Party && (w.Kind == null || info.Kind == w.Kind) && (!w.Mine || info.By == owner.Key);   // mine — 자신의 카드로 얻었을 때만(2026-10-13 비비 원작 「능력으로 실드 획득 시」)
                 case "kill":
                 case "break":
                     // who other(엘다인) — 다른 아군이 쓰러뜨림 · 격파 / any — 누구든
@@ -311,6 +311,7 @@ namespace Bolzena.Core
         /// <summary>일이 났다 — 맞는 규칙을 모두 돌린다. 패시브가 패시브를 부르는 고리는 다섯 겹에서 끊는다.</summary>
         void Emit(string ev, EmitInfo info)
         {
+            HandKwSync();   // 손 따라가기 고유 효과(2026-10-13 시온 「탄창」) — 카드 이동 쪽지 없이 손이 바뀐 곳(손 모두 버리고 섞기 …)도 사건마다 맞춘다
             // 셈(perPile broken · drawn · discards — 패시브가 없어도 센다)
             if (ev == "break") Counts[N_BROKEN] = (Counts.TryGetValue(N_BROKEN, out var nb) ? nb : 0) + 1;
             else if (ev == "drawn") Counts[N_DRAWN] = (Counts.TryGetValue(N_DRAWN, out var nd) ? nd : 0) + 1;
@@ -321,7 +322,7 @@ namespace Bolzena.Core
                 CountGoneTurn(info.Id);   // 이번 턴 소멸 장수 · 그 카드(엘다인 ▶E34)
                 if (info.Hero != null) Counts["gone|" + info.Hero] = GoneOf(info.Hero) + 1;   // 그 사도의 카드 — perGone who self(시범 16 니콜)
             }
-            if ((ev == "play" || ev == "discard") && Over == null) TallyAdd(ev, info);   // 엔진이 세는 수(키워드 tally — 규칙 아님, 엘다인 3차)
+            if ((ev == "play" || ev == "discard" || ev == "exhaust") && Over == null) TallyAdd(ev, info);   // 엔진이 세는 수(키워드 tally — 규칙 아님, 엘다인 3차)
             if (Passives.Count == 0 || Over != null) return;
             if (depth > 4) return;
             // 연쇄 상한(1단계) — 예약 계기 안에서 난 예약 계기는 패시브를 깨우지 않는다(재촉 ↔ reserveFire 순환 · 깊이 1)

@@ -40,35 +40,17 @@
           }
         ]
       },
-      "keywords": [
-        {
-          "name": "수은 갑주",
-          "desc": "되갚을수록 두꺼워지는 수은 갑주",
-          "carrier": "self",
-          "cap": 5,
-          "per": [
-            {
-              "stat": "counter",
-              "v": 0.2
-            }
-          ]
-        }
-      ],
       "passives": [
         {
-          "name": "소녀가 보호하겠사와요",
+          "name": "되갚을 준비",
           "when": {
-            "on": "turnEnd"
+            "on": "turnStart"
           },
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.6
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
+              "k": "counterMod",
+              "v": 1,
+              "turns": 1
             }
           ]
         }
@@ -85,7 +67,7 @@
           },
           {
             "k": "perStack",
-            "id": "수은 갑주"
+            "id": "반격"
           },
           {
             "k": "dmg",
@@ -159,19 +141,13 @@
       ],
       "fx": [
         {
+          "k": "status",
+          "id": "결정화",
+          "v": 4
+        },
+        {
           "k": "power",
           "rules": [
-            {
-              "when": {
-                "on": "turnEnd"
-              },
-              "fx": [
-                {
-                  "k": "shield",
-                  "ratio": 0.5
-                }
-              ]
-            },
             {
               "when": {
                 "on": "turnStart"
@@ -196,19 +172,13 @@
           ],
           "fx": [
             {
+              "k": "status",
+              "id": "결정화",
+              "v": 7
+            },
+            {
               "k": "power",
               "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 1.2
-                    }
-                  ]
-                },
                 {
                   "when": {
                     "on": "turnStart"
@@ -233,19 +203,13 @@
           ],
           "fx": [
             {
+              "k": "status",
+              "id": "결정화",
+              "v": 5
+            },
+            {
               "k": "power",
               "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.7
-                    }
-                  ]
-                },
                 {
                   "when": {
                     "on": "turnStart"
@@ -270,24 +234,18 @@
           ],
           "fx": [
             {
-              "k": "stack",
-              "id": "수은 갑주",
-              "v": 1
+              "k": "status",
+              "id": "결정화",
+              "v": 5
+            },
+            {
+              "k": "counterMod",
+              "v": 0.3,
+              "run": true
             },
             {
               "k": "power",
               "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.7
-                    }
-                  ]
-                },
                 {
                   "when": {
                     "on": "turnStart"
@@ -314,6 +272,11 @@
           ],
           "fx": [
             {
+              "k": "status",
+              "id": "결정화",
+              "v": 5
+            },
+            {
               "k": "power",
               "rules": [
                 {
@@ -321,10 +284,6 @@
                     "on": "turnEnd"
                   },
                   "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 0.7
-                    },
                     {
                       "k": "dmg",
                       "ratio": 2,
@@ -339,7 +298,7 @@
         },
         {
           "name": "신탁 5",
-          "power": true,
+          "type": "스킬",
           "tags": [
             "주도"
           ],
@@ -350,21 +309,9 @@
               "v": 4
             },
             {
-              "k": "power",
-              "rules": [
-                {
-                  "when": {
-                    "on": "turnStart"
-                  },
-                  "fx": [
-                    {
-                      "k": "counterMod",
-                      "v": 1,
-                      "turns": 1
-                    }
-                  ]
-                }
-              ]
+              "k": "counterMod",
+              "v": 1,
+              "turns": 1
             }
           ]
         }
@@ -400,7 +347,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 2.2
+          "ratio": 2.9
         },
         {
           "k": "status",
@@ -408,7 +355,8 @@
           "v": 2
         },
         {
-          "k": "counterAll"
+          "k": "counterAll",
+          "turns": 1
         }
       ],
       "oracles": [
@@ -425,7 +373,8 @@
               "v": 3
             },
             {
-              "k": "counterAll"
+              "k": "counterAll",
+              "turns": 2
             }
           ]
         },
@@ -434,7 +383,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 4.6
+              "ratio": 3.6
             },
             {
               "k": "status",
@@ -442,9 +391,12 @@
               "v": 2
             },
             {
-              "k": "stack",
-              "id": "수은 갑주",
-              "v": 1
+              "k": "perStack",
+              "id": "반격"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.4
             }
           ]
         },
@@ -470,12 +422,12 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.4
+              "ratio": 2.4
             },
             {
               "k": "dmg",
-              "ratio": 1.7,
-              "base": "def",
+              "ofShield": true,
+              "ofEvent": 1,
               "target": "allEnemies"
             }
           ]
@@ -485,7 +437,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.4
+              "ratio": 2.9
             },
             {
               "k": "status",
@@ -493,7 +445,8 @@
               "v": 3
             },
             {
-              "k": "counterAll"
+              "k": "counterAll",
+              "turns": 2
             }
           ]
         }
@@ -535,7 +488,9 @@
           "rules": [
             {
               "when": {
-                "on": "guard"
+                "on": "guard",
+                "kind": "shield",
+                "mine": true
               },
               "fx": [
                 {
@@ -562,7 +517,9 @@
               "rules": [
                 {
                   "when": {
-                    "on": "guard"
+                    "on": "guard",
+                    "kind": "shield",
+                    "mine": true
                   },
                   "fx": [
                     {
@@ -588,7 +545,9 @@
               "rules": [
                 {
                   "when": {
-                    "on": "guard"
+                    "on": "guard",
+                    "kind": "shield",
+                    "mine": true
                   },
                   "fx": [
                     {
@@ -627,7 +586,9 @@
               "rules": [
                 {
                   "when": {
-                    "on": "guard"
+                    "on": "guard",
+                    "kind": "shield",
+                    "mine": true
                   },
                   "fx": [
                     {
@@ -670,7 +631,9 @@
               "rules": [
                 {
                   "when": {
-                    "on": "guard"
+                    "on": "guard",
+                    "kind": "shield",
+                    "mine": true
                   },
                   "fx": [
                     {
@@ -699,7 +662,9 @@
               "rules": [
                 {
                   "when": {
-                    "on": "guard"
+                    "on": "guard",
+                    "kind": "shield",
+                    "mine": true
                   },
                   "fx": [
                     {
@@ -745,7 +710,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.2
+          "ratio": 1.7
         },
         {
           "k": "status",
@@ -767,6 +732,13 @@
               "id": "취약",
               "v": 3,
               "target": "allEnemies"
+            },
+            {
+              "k": "perFoe"
+            },
+            {
+              "k": "shield",
+              "ratio": 0.7
             }
           ]
         },
@@ -790,19 +762,13 @@
           "power": true,
           "fx": [
             {
+              "k": "status",
+              "id": "결정화",
+              "v": 6
+            },
+            {
               "k": "power",
               "rules": [
-                {
-                  "when": {
-                    "on": "turnEnd"
-                  },
-                  "fx": [
-                    {
-                      "k": "shield",
-                      "ratio": 1
-                    }
-                  ]
-                },
                 {
                   "when": {
                     "on": "counter"
@@ -829,13 +795,14 @@
               "ratio": 1,
               "base": "def",
               "target": "randomEnemy",
-              "hits": 3
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "randomEnemy"
+              "hits": 3,
+              "hitFx": [
+                {
+                  "k": "status",
+                  "id": "취약",
+                  "v": 1
+                }
+              ]
             }
           ]
         },
@@ -893,7 +860,7 @@
         },
         {
           "k": "shield",
-          "ratio": 1.8
+          "ratio": 2.4
         }
       ],
       "oracles": [
@@ -908,7 +875,7 @@
             },
             {
               "k": "shield",
-              "ratio": 1.8
+              "ratio": 2.4
             }
           ]
         },
@@ -917,7 +884,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.6,
+              "ratio": 3,
               "base": "def",
               "target": "oneEnemy"
             },
@@ -982,8 +949,8 @@
             },
             {
               "k": "status",
-              "id": "반격",
-              "v": 2
+              "id": "실드 보존",
+              "v": 1
             }
           ]
         }

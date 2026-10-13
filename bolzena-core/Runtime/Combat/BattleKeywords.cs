@@ -234,7 +234,9 @@ namespace Bolzena.Core
             var owner = CardOf(id)?.Hero;
             var hero = owner != null && HeroUnit(owner) is Unit h && !h.Dead ? h : AliveParty().OrderByDescending(AtkNow).FirstOrDefault();
             var foes = AliveEnemies().ToList();
-            ExtraHit(hero, foes.Count > 0 ? foes[Rng.Int(foes.Count)] : null, R.SV("탄환"), null, "탄환!");
+            double ratio = CardOf(id)?.Def?.BulletRatio is double br && br > 0 ? br : R.SV("탄환");   // 카드마다 배율(2026-10-13 시온)
+            ExtraHit(hero, foes.Count > 0 ? foes[Rng.Int(foes.Count)] : null, ratio, null, "탄환!");
+            if (Over == null) TallyAdd("bullet", new EmitInfo { Id = id, By = hero?.Key });   // 키워드 tally bullet — 탄환으로 쏠 때마다(시온 「탄창」)
         }
 
         /// <summary>공명 — 카드를 버리면 추가 공격 80%(버린 카드 한 장에 1). 치는 사도는 버린 사도, 없으면 공격력이 가장 높은 사도.</summary>

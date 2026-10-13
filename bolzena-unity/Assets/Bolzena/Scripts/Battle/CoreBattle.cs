@@ -981,6 +981,7 @@ namespace Bolzena.Battle
                 ? new Term("은총", "빛나는 카드 — 내면 그 사도의 고유 카드 하나를 손에 얻습니다(그 턴 비용 0)", "flash")
                 : new Term("신탁", "빛나는 카드 — 내는 순간 바뀔 모습을 고릅니다(이번에는 비용 0)", "flash"));
             info.BaseCost = cv.Cost;
+            info.X = cv.X;   // (2026-10-13) X 코스트 — 비용 자리에 「X」
             if (info.Cost > info.BaseCost)
             {
                 info.CostUpWhy = b.CostUpWhy(cv.Id) ?? "효과";

@@ -449,6 +449,8 @@ namespace Bolzena.Core
         public int CountAs => Oracle?.CountAs ?? Def.CountAs;
         /// <summary>(엘다인 4차 태세) 그 변신 · 태세 중에만 낼 수 있다 — 신탁의 needForm · 카드의 needForm · 없으면 null.</summary>
         public string NeedForm => Oracle?.NeedForm ?? Def.NeedForm;
+        /// <summary>(2026-10-13 이드) 「손에 그 카드가 있으면 비용 +N」 — 신탁이면 신탁의 것만(없으면 없음), 아니면 카드의 것.</summary>
+        public CostIfDef CostIf => Oracle != null ? Oracle.CostIf : Def.CostIf;
         /// <summary>이 카드를 내는 사도 — 사도 카드면 그 사도, 교주 카드면 주인(Owner). 피해 · 실드 · 연계 · 「다른 사도 카드」 가 이것을 본다.</summary>
         public string Hero => Owner ?? Def.Hero;
         /// <summary>교주 카드인가(주인이 있어도).</summary>

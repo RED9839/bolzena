@@ -37,7 +37,7 @@ namespace Bolzena.RunUI
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Boot() => FirstRun = !PlayRecord.Noticed;
 
-        /// <summary>글 → 판들. 「@ 버전 | 제목 | 날짜」 로 판을 열고, 「## 분류」 · 「- 항목」 · 그 밖의 글(소개)을 그 판에 붙인다. # 줄 · 빈 줄은 건너뛴다.</summary>
+        /// <summary>글 → 판들. 「@ 버전 | 제목 | 날짜」 로 판을 열고, 「## 분류」 · 「### 작은 머리」 · 「- 항목」 · 「-- 딸린 항목」 · 그 밖의 글(소개)을 그 판에 붙인다. # 줄 · 빈 줄은 건너뛴다.</summary>
         public static List<Entry> Parse(string text)
         {
             var list = new List<Entry>();
@@ -48,7 +48,13 @@ namespace Bolzena.RunUI
             {
                 var line = raw.Trim();
                 if (line.Length == 0) continue;
-                if (line.StartsWith("##"))
+                if (line.StartsWith("###"))   // 작은 머리(사도 이름 등) — 항목 줄에 「###」 를 붙여 둔다(2026-10-13 가독성)
+                {
+                    if (e == null) continue;
+                    if (s == null) { s = new Section { Name = "" }; e.Sections.Add(s); }
+                    s.Items.Add("###" + line.Substring(3).Trim());
+                }
+                else if (line.StartsWith("##"))
                 {
                     if (e == null) continue;
                     s = new Section { Name = line.Substring(2).Trim() };
@@ -65,6 +71,11 @@ namespace Bolzena.RunUI
                     list.Add(e);
                 }
                 else if (e == null) continue;
+                else if (line.StartsWith("--"))   // 딸린 항목 — 「--」 를 붙여 둔다(창에서 한 칸 더 들여 씀)
+                {
+                    if (s == null) { s = new Section { Name = "" }; e.Sections.Add(s); }
+                    s.Items.Add("--" + line.Substring(2).Trim());
+                }
                 else if (line.StartsWith("- ") || line == "-")
                 {
                     if (s == null) { s = new Section { Name = "" }; e.Sections.Add(s); }

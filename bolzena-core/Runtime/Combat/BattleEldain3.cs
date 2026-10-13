@@ -35,9 +35,15 @@ namespace Bolzena.Core
                     if (f.Ratio > 0) Counts["ctr|ratio"] = Num.Round(f.Ratio * 100); else Counts.Remove("ctr|ratio");
                     Say($"반격 — {Math.Max(1, f.IV)}대로 나눠 친다");
                     return true;
-                case FxK.CounterAll: Counts["ctr|all"] = 1; Say("반격 — 적 전체로"); return true;
-                case FxK.CounterMod:   // 반격 피해 ×(1+v) — n턴(파티 사도 모두에게 걸어 반격을 건 사도가 누구든 든다)
-                    foreach (var u in Party) AddMod(u, "counter", f.V, f.TurnsOr1, ModSrc, f.Run);
+                case FxK.CounterAll:
+                    {   // (2026-10-13 비비 원작 「빙벽」) turns 가 있으면 n턴간(내 턴 + 그 적의 차례) — 「ctr|all」 은 그 턴 다음 값(이 전투 내내는 int.MaxValue). 긴 쪽을 남긴다
+                        int until = f.Turns > 0 ? Turn + f.Turns : int.MaxValue;
+                        if (!Counts.TryGetValue("ctr|all", out var had) || had < until) Counts["ctr|all"] = until;
+                        Say(f.Turns > 0 ? $"반격 — {f.Turns}턴간 적 전체로" : "반격 — 적 전체로");
+                        return true;
+                    }
+                case FxK.CounterMod:   // 반격 피해 ×(1+v) — n턴(파티 사도 모두에게 걸어 반격을 건 사도가 누구든 든다) · run 이면 이 전투 내내(2026-10-13 비비)
+                    foreach (var u in Party) AddMod(u, "counter", f.V, f.Run ? R.BOON_TURNS : f.TurnsOr1, ModSrc, f.Run);
                     Say($"반격 피해 {(f.V >= 0 ? "+" : "")}{Num.Round(f.V * 100)}%");
                     return true;
                 case FxK.GaugeLock:
@@ -49,14 +55,16 @@ namespace Bolzena.Core
             return FxEldain4(f, ctx, ref gate);
         }
 
-        /// <summary>키워드 tally — play(그 사도가 카드를 내면 +1) · discardBy(그 사도 효과로 카드가 버려지면 +1). 규칙이 아니라 엔진이 센다.</summary>
+        /// <summary>키워드 tally — play(그 사도가 카드를 내면 +1) · discardBy(그 사도 효과로 카드가 버려지면 +1). 규칙이 아니라 엔진이 센다.
+        /// tallyTag 가 있으면 그 카드만 — play · discard · exhaust · bullet(탄환으로 쏠 때, BulletDrop 이 부른다).</summary>
         void TallyAdd(string ev, EmitInfo info)
         {
             foreach (var kw in Kw.Values)
             {
                 var t = kw.Def.Tally;
                 if (t == null || t.Count == 0 || kw.Carrier != "self") continue;
-                bool hit = ev == "play" ? t.Contains("play") && info.Hero == kw.Owner : t.Contains("discardBy") && info.By == kw.Owner;
+                bool hit = kw.Def.TallyTag != null ? t.Contains(ev) && info.Id != null && HasTagB(info.Id, kw.Def.TallyTag)   // (2026-10-13 시온) 그 카드 · 태그만 — 누구의 효과든
+                    : ev == "play" ? t.Contains("play") && info.Hero == kw.Owner : ev == "discard" && t.Contains("discardBy") && info.By == kw.Owner;
                 if (!hit) continue;
                 var o = HeroUnit(kw.Owner);
                 if (o != null && !o.Dead) StackFx(new Fx { K = FxK.Stack, Id = kw.Id, V = 1 }, new FxCtx { Owner = o });
@@ -73,7 +81,7 @@ namespace Bolzena.Core
         {
             var g = GiverOf("반격") ?? PartyGuard();
             int hits = Counts.TryGetValue("ctr|hits", out var hv) && hv > 1 ? hv : 1;
-            bool all = Counts.ContainsKey("ctr|all");
+            bool all = Counts.TryGetValue("ctr|all", out var allUntil) && allUntil > Turn;
             double baseR = full ? R.SV("반격Full") : R.SV("반격");
             double ratio = Counts.TryGetValue("ctr|ratio", out var rv) && rv > 0 ? rv / 100.0 * (full ? R.SV("반격Full") / R.SV("반격") : 1) : baseR / hits;
             double mult = 1 + (g != null ? StatMod(g, "counter") : 0);

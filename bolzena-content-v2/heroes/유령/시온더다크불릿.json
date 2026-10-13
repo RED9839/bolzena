@@ -23,14 +23,32 @@
             "stat": "dealt",
             "v": 0.1
           }
-        ]
+        ],
+        "tally": [
+          "play",
+          "discard",
+          "exhaust"
+        ],
+        "tallyTag": "시온더다크불릿_t1"
       },
       "keywords": [
         {
-          "name": "사수의 긍지",
-          "desc": "쏟아 낸 마탄만큼 굳는 사수의 자부심",
+          "name": "탄창",
+          "desc": "쏟아 낸 탄환만큼 달아오르는 총신",
           "carrier": "self",
-          "cap": 5
+          "cap": 10,
+          "tally": [
+            "bullet"
+          ],
+          "tallyTag": "시온더다크불릿_t1",
+          "startMake": "시온더다크불릿_t1",
+          "startMakeN": 2,
+          "per": [
+            {
+              "stat": "dealt",
+              "v": 0.05
+            }
+          ]
         }
       ],
       "passives": [
@@ -38,8 +56,7 @@
           "name": "어.둠.의.구.원.자★",
           "when": {
             "on": "discard",
-            "by": "other",
-            "once": true
+            "by": "other"
           },
           "fx": [
             {
@@ -278,7 +295,7 @@
       "fx": [
         {
           "k": "discard",
-          "v": 2
+          "v": 3
         },
         {
           "k": "perDiscarded"
@@ -290,7 +307,7 @@
         },
         {
           "k": "stack",
-          "id": "사수의 긍지",
+          "id": "이 몸, 등장★",
           "v": 1
         }
       ],
@@ -300,7 +317,7 @@
           "fx": [
             {
               "k": "discard",
-              "v": 3
+              "all": true
             },
             {
               "k": "perDiscarded"
@@ -312,8 +329,8 @@
             },
             {
               "k": "stack",
-              "id": "사수의 긍지",
-              "v": 1
+              "id": "이 몸, 등장★",
+              "v": 2
             }
           ]
         },
@@ -372,13 +389,8 @@
             {
               "k": "pull",
               "from": "discard",
-              "n": 3,
+              "n": 4,
               "tag": "시온더다크불릿_t1"
-            },
-            {
-              "k": "stack",
-              "id": "사수의 긍지",
-              "v": 1
             }
           ]
         }
@@ -947,47 +959,17 @@
       "cost": 1,
       "type": "공격",
       "tags": [
-        "탄환"
+        "탄환",
+        "소멸"
       ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 3,
+          "ratio": 1.6,
           "target": "oneEnemy"
-        },
-        {
-          "k": "perStack",
-          "id": "사수의 긍지"
-        },
-        {
-          "k": "dmg",
-          "ratio": 0.2,
-          "target": "oneEnemy"
-        },
-        {
-          "k": "stack",
-          "id": "이 몸, 등장★",
-          "v": 1
-        },
-        {
-          "k": "when",
-          "on": "discard"
-        },
-        {
-          "k": "stack",
-          "id": "이 몸, 등장★",
-          "v": 1
-        },
-        {
-          "k": "when",
-          "on": "burn"
-        },
-        {
-          "k": "stack",
-          "id": "이 몸, 등장★",
-          "v": 1
         }
       ],
+      "bulletRatio": 1.5,
       "blurb": "1+1 로 받은 덤 한 발입니다"
     }
   ]

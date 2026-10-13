@@ -217,7 +217,7 @@ namespace Bolzena.UI
             band.color = rc;
             glow.color = new Color(Mathf.Lerp(rc.r, 1f, 0.3f), Mathf.Lerp(rc.g, 1f, 0.3f), Mathf.Lerp(rc.b, 1f, 0.3f), glow.color.a);   // 올림 빛도 성격 빛
             SetArt(info, rc);
-            costText.text = info.Unplayable && info.Cost <= 0 ? "-" : info.Cost.ToString() + (info.CostUpWhy != null && info.Cost > info.BaseCost ? "<size=40%><voffset=0.5em>▲</voffset></size>" : "");
+            costText.text = info.X ? "X" : info.Unplayable && info.Cost <= 0 ? "-" : info.Cost.ToString() + (info.CostUpWhy != null && info.Cost > info.BaseCost ? "<size=40%><voffset=0.5em>▲</voffset></size>" : "");
             nameText.text = info.Name;
             typeText.text = info.TypeName ?? (info.Type == CardType.Attack ? "공격" : info.Type == CardType.Power ? "강화" : "스킬");   // 「공격」 · 「스킬」 · 「강화」 그대로(머리말 없이 — 판 화면 W.TypeLabel 과 같은 글)
             typeText.color = TypeColor(info);

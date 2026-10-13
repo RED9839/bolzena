@@ -214,13 +214,17 @@ namespace Bolzena.Core
         public const string MoveMark = "moveMark";
         // 아야 「만년설의 앎」 — 적의 지금 수 종류를 적음
         public const string Learn = "learn";
+        // (2026-10-13 이드) X 코스트 카드 — 이 카드에 쓴 AP(X) 1당
+        public const string PerX = "perX";
+        // (2026-10-13 비비 원작 「냉기 충전 I」) 살아 있는 적 1당
+        public const string PerFoe = "perFoe";
 
         public static readonly HashSet<string> Conditions = new() { IfBroken, IfTune, IfChain, IfLink, IfPrev, IfRhythm, IfSwitched, IfStack, When,
             IfRepeat, IfHeld, IfPlayedMax, IfApLeft, IfSpent, IfBalanced, IfHunted, IfDebuffs, IfHp, IfKill, IfBreak, IfWounded,
             IfChoice, IfRandom, IfHand, IfPile, IfNth, IfStreak, IfAllHeroes, IfFoe, IfCardSt,
             IfRoll, IfPrevSame, IfInHand, IfBond, IfLastMine, IfPulled, IfShield, IfDebt, IfTypeNew, IfPricier, IfGained, IfForm, IfEvent, IfHitTaken, IfCost };
         /// <summary>「… 1개당」 — 바로 뒤 피해 · 방어 · 실드 · 회복 한 줄을 그 수만큼.</summary>
-        public static readonly HashSet<string> Pers = new() { PerStack, PerRhythm, PerDiscarded, PerPaid, PerDebuff, PerApLeft, PerTag, PerPlayed, PerPile, PerCardSt, PerEvent, PerGuarded, PerOverheal, PerGone, PerShield };
+        public static readonly HashSet<string> Pers = new() { PerStack, PerRhythm, PerDiscarded, PerPaid, PerDebuff, PerApLeft, PerTag, PerPlayed, PerPile, PerCardSt, PerEvent, PerGuarded, PerOverheal, PerGone, PerShield, PerX, PerFoe };
         /// <summary>카드의 때 붙은 마디(when on) — 영감(능력으로 뽑힘) · 감응(뽑힘) · 안식(버려짐) · 턴 끝에 손에 · 소각(소멸할 때) · 열정(손에 있을 때 열정 카드가 나가면).</summary>
         public static readonly string[] WHEN_ON = { "draw", "drawAny", "discard", "handEnd", "burn", "passion", "handHurtBig", "shieldLeft" };   // shieldLeft(엘다인 4차 벨라) — 낸 뒤 이번 적 차례가 끝날 때 파티 실드가 남았으면   // handHurtBig(엘다인 3차) — 손에 있는 동안 아군이 한 대에 최대 HP pct 넘게 잃으려 하면
         /// <summary>옛 운영 방식 부품(리듬 · 전환 · 재촉/예약 · 잇기 · 앞이 … · 되풀이 …) — 지우지 않는다. 새 콘텐츠는 키워드 사전(Docs/키워드.md)의 것을 쓴다.</summary>
@@ -243,7 +247,7 @@ namespace Bolzena.Core
             SpendShield, PerShield, IfForm, FormExtend, NoForget,
             CounterHits, CounterAll, CounterMod, GaugeLock, Record, Replay, IfEvent,
             Taunt, CritNext, Execute, StackLock,
-            NthNext, UltCostMod, SwiftTurn, CritDmg, IfHitTaken, FormKeep, IfCost, NoToggle, MoveMark, Learn,
+            NthNext, UltCostMod, SwiftTurn, CritDmg, IfHitTaken, FormKeep, IfCost, NoToggle, MoveMark, Learn, PerX, PerFoe,
         };
         public static string ModStat(string k) => k switch
         {
@@ -321,12 +325,16 @@ namespace Bolzena.Core
         public bool PayMix;
         /// <summary>(2026-10-13 시온 마탄) 손에 쥘 수 있는 이 카드의 최대 장수 — 0 이면 제한 없음. 넘게 만들면 손에 안 들고 탄환이면 바로 쏜다(Battle.Make).</summary>
         public int HandMax;
+        /// <summary>(2026-10-13 시온 — 버려서 쏘기) 이 카드의 탄환 추가 공격 배율(공격력 ×) — 0 이면 R.SV("탄환"). 카드마다 따로 키운다(교주 카드는 그대로).</summary>
+        public double BulletRatio;
         /// <summary>두 갈래로 내기 — 갈래 이름(둘). 낼 때 PlayOpts.Choice(1 · 2)로 고르고 효과는 ifChoice n 으로 가른다.</summary>
         public List<string> Choices;
         /// <summary>(엘다인 ▶E2) 천상 계기에서만 이 카드를 비용 N 으로 센다(직접 낼 때). 0 이면 적힌 비용.</summary>
         public int CountAs;
         /// <summary>(엘다인 4차 태세) 그 변신 · 태세 중에만 낼 수 있다(변신 id · 「*」 = 아무 변신).</summary>
         public string NeedForm;
+        /// <summary>(2026-10-13 이드) 손에 그 카드가 있으면 이 카드 비용 +add — Battle.CostOf 가 센다.</summary>
+        public CostIfDef CostIf;
 
         [Newtonsoft.Json.JsonIgnore] public bool Neutral => Hero == null && (Type == "공격" || Type == "스킬" || Type == "강화") && !Gift && !Token;
         /// <summary>얻을 때 주인 사도를 고르는 카드 — 교주 카드 · 선물 카드 · 골칫거리(저주) · 상태 카드처럼 사도가 없는 것(만든 카드 제외).
@@ -359,6 +367,15 @@ namespace Bolzena.Core
         public int? CountAs;
         /// <summary>(엘다인 4차 태세) 이 신탁을 얹으면 그 변신 · 태세 중에만 낼 수 있다.</summary>
         public string NeedForm;
+        /// <summary>(2026-10-13 이드) 이 신탁의 「손에 그 카드가 있으면 비용 +add」 — 신탁은 제 것만 본다(카드의 costIf 를 물려받지 않음).</summary>
+        public CostIfDef CostIf;
+    }
+
+    /// <summary>(2026-10-13 이드) 「손에 inHand 카드가 있으면 비용 +add」(이 카드 자신은 빼고 센다).</summary>
+    public sealed class CostIfDef
+    {
+        public string InHand;
+        public int Add = 1;
     }
 
     /// <summary>그 카드만의 축복 — 배율 하나(kind) · 덤 효과 · 덤 태그.</summary>
@@ -535,6 +552,10 @@ namespace Bolzena.Core
         public List<PerStat> Per = new();
         /// <summary>(엘다인 3차) 엔진이 세는 수 — 규칙이 아니다(자동 규칙 수에 안 든다): play(그 사도가 카드를 내면 +1) · discardBy(그 사도 효과로 카드가 버려지면 장마다 +1).</summary>
         public List<string> Tally;
+        /// <summary>(2026-10-13 시온 「이 몸, 등장★」) tally 를 이 카드 id · 태그 카드에만 — 그때 tally 는 play · discard · exhaust(누구의 효과든 그 카드를 내거나 · 버려지거나 · 소멸하면 +1).</summary>
+        public string TallyTag;
+        /// <summary>(2026-10-13 시온 「탄창」) 손 따라가기 — 손에 쥔 이 카드 id · 태그의 장수가 곧 겹(cap 까지, 없으면 손 한도). 엔진이 맞춘다 — 규칙이 아니다 · carrier self 에만.</summary>
+        public string Hand;
         /// <summary>(▶E69 분산) 아군 표시(carrier hero) — 그 표시가 붙은 아군을 노린 적의 공격 피해 -share, 깎인 양만큼 파티 실드.</summary>
         public double Share;
         /// <summary>(▶E73) 순환 칸에 닿을 때 그 칸의 효과(1번째 칸부터) — 규칙 하나로 센다.</summary>
@@ -543,6 +564,9 @@ namespace Bolzena.Core
         public List<StageBonus> StageBonus;
         /// <summary>(엘다인 3차) 전투 시작 값 — 규칙이 아니다(E62 규칙 수에 안 든다). 순환이면 단계(1부터).</summary>
         public int? Start;
+        /// <summary>(2026-10-13 시온 — 초반 보강) 전투 시작에 이 카드를 startMakeN 장(기본 1) 손에 만든다(주인은 그 사도). 규칙이 아니다 · carrier self.</summary>
+        public string StartMake;
+        public int StartMakeN;
         /// <summary>(엘다인 3차) 이 이름의 카드 값 — grow handEnd(그 사도 고유 카드가 턴 끝 손에 있으면 +1) · reset play(그 사도 카드를 낸 뒤 0). 규칙이 아니다.</summary>
         public CardValueDef CardValue;
         /// <summary>규칙 문장(「X」가 N개가 되면 · 사라지면 · 다 닳으면 …).</summary>

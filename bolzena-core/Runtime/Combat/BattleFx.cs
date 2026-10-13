@@ -86,7 +86,7 @@ namespace Bolzena.Core
     public sealed partial class Battle
     {
         const string RHYTHM_PER = "\u0000리듬", DISC_PER = "\u0000버림", PAID_PER = "\u0000치름", DEBUFF_PER = "\u0000흠", APLEFT_PER = "\u0000남은AP", TAG_PER = "\u0000태그",
-            GUARD_PER = "\u0000막음", OVERHEAL_PER = "\u0000넘침", ANYHERO_PER = "\u0000아무동료";
+            GUARD_PER = "\u0000막음", OVERHEAL_PER = "\u0000넘침", ANYHERO_PER = "\u0000아무동료", X_PER = "\u0000X", FOE_PER = "\u0000적";
         /// <summary>그 아군 표시(carrier hero)가 파티에 붙은 겹 합(동료 누구에게든).</summary>
         int AnyHeroStack(string id) { int n = 0; foreach (var u in Party) n += StackOf(u.Key, id); return n; }
 
@@ -179,7 +179,29 @@ namespace Bolzena.Core
             return list.Where(t => t.Side != Side.Party || (!seen && (seen = true))).ToList();
         }
 
-        public int StackOf(string heroKey, string id) => heroKey != null && Stacks.TryGetValue(heroKey, out var b) && b.TryGetValue(id, out var v) ? v : 0;
+        public int StackOf(string heroKey, string id) => heroKey == null ? 0
+            : Kw.TryGetValue(id, out var hk) && hk.Def.Hand != null && hk.Owner == heroKey ? HandKwCount(hk)   // 손 따라가기 — 늘 지금 손에서 센다
+            : Stacks.TryGetValue(heroKey, out var b) && b.TryGetValue(id, out var v) ? v : 0;
+
+        /// <summary>(2026-10-13 시온 「탄창」) 손 따라가기 고유 효과(keyword hand)의 겹 — 손에 쥔 그 카드 id · 태그 장수(cap 까지).</summary>
+        int HandKwCount(KwRt kw)
+        {
+            int n = 0;
+            foreach (var id in Hand) if (HasTagB(id, kw.Def.Hand)) n++;
+            return Math.Min(n, kw.Def.Cap ?? R.HAND_MAX);
+        }
+
+        /// <summary>손 따라가기 겹을 주머니(Stacks)에 맞춰 둔다 — 상태 칩 · 봇이 주머니를 읽는다. 카드가 옮겨질 때(CardCue) · 사건(Emit)마다.</summary>
+        void HandKwSync()
+        {
+            foreach (var kw in Kw.Values)
+            {
+                if (kw.Def.Hand == null || kw.Owner == null) continue;
+                int n = HandKwCount(kw);
+                if (!Stacks.TryGetValue(kw.Owner, out var bag)) { if (n == 0) continue; Stacks[kw.Owner] = bag = new Dictionary<string, int>(); }
+                if (n > 0) bag[kw.Id] = n; else bag.Remove(kw.Id);
+            }
+        }
         void AddStack(string heroKey, string id, int v)
         {
             if (!Stacks.TryGetValue(heroKey, out var bag)) Stacks[heroKey] = bag = new Dictionary<string, int>();
@@ -205,6 +227,8 @@ namespace Bolzena.Core
             if (id.StartsWith(ANYHERO_PER, StringComparison.Ordinal)) return AnyHeroStack(id.Substring(ANYHERO_PER.Length));
             if (id == DISC_PER) return ctx.Discarded;
             if (id == APLEFT_PER) return Ap;
+            if (id == X_PER) return ctx.X;   // (2026-10-13 이드) X 코스트 카드에 쓴 AP
+            if (id == FOE_PER) return AliveEnemies().Count;   // (2026-10-13 비비) 살아 있는 적 수
             if (id.StartsWith(GUARD_PER, StringComparison.Ordinal)) return GuardedVal / Math.Max(1, int.Parse(id.Substring(GUARD_PER.Length)));
             if (id.StartsWith(OVERHEAL_PER, StringComparison.Ordinal))
             {
@@ -216,6 +240,7 @@ namespace Bolzena.Core
             if (id.StartsWith(TAG_PER, StringComparison.Ordinal)) { var tg = id.Substring(TAG_PER.Length); return Hand.Count(h => HasTagB(h, tg)); }
             if (id.StartsWith(PAID_PER, StringComparison.Ordinal)) return PaidHp / System.Math.Max(1, int.Parse(id.Substring(PAID_PER.Length)));
             if (id == DEBUFF_PER) { var t = ctx.Holder != null && ctx.Holder.Side == Side.Enemy ? ctx.Holder : Resolve(ctx, "oneEnemy").FirstOrDefault(); return t != null ? DebuffKinds(t) : 0; }
+            if (!Kw.ContainsKey(id) && R.BUFF_ST.Contains(id)) return St(R.IsHeroSt(id) ? ctx.Owner : Pool, id);   // (2026-10-13 비비) 파티 상태 겹(「반격」 1당) — spend 상태 쓰기와 같은 자리
             Kw.TryGetValue(id, out var kw);
             if (kw != null && kw.Carrier == "enemy")
             {
@@ -312,6 +337,8 @@ namespace Bolzena.Core
                         gate = DebuffKinds(Resolve(ctx, "oneEnemy").FirstOrDefault()) >= System.Math.Max(1, f.N); break;
                     case FxK.PerDiscarded: ctx.PerStack = DISC_PER; ctx.PerMin = f.N; ctx.PerMax = f.Max; break;   // n · max — 최소 · 최대(엘다인 3차)
                     case FxK.PerApLeft: ctx.PerStack = APLEFT_PER; break;
+                    case FxK.PerX: ctx.PerStack = X_PER; break;   // (2026-10-13 이드) X 1당
+                    case FxK.PerFoe: ctx.PerStack = FOE_PER; ctx.PerMax = f.Max; break;   // (2026-10-13 비비) 살아 있는 적 1당 · max — 최대
                     case FxK.PerGuarded: ctx.PerStack = GUARD_PER + (f.Per > 0 ? f.Per : 1); ctx.PerMax = f.Max; break;   // 막아 낸 양 per 당(1단계) · max — 최대(118명 3단계)
                     case FxK.PerOverheal: ctx.PerStack = OVERHEAL_PER + Num.Round(f.Pct * 100) + "|" + (f.Per > 0 ? f.Per : 1); ctx.PerMax = f.Max; break;   // 이번 판 넘친 회복 per 당(pct 면 그 선 넘은 몫)
                     case FxK.Empower:
@@ -520,7 +547,7 @@ namespace Bolzena.Core
                                 if (t.Side == Side.Party) TallyShield(owner, v);   // 전투 기록 — 파티에 얹은 방어 · 실드
                                 GainCue(t, f.K, v);
                                 if (v > 0) Punish(t);
-                                if (v > 0 && t.Side == Side.Party && !t.Dead) Emit("guard", new EmitInfo { Who = t, Kind = f.K, Seq = ActSeq });
+                                if (v > 0 && t.Side == Side.Party && !t.Dead) Emit("guard", new EmitInfo { Who = t, Kind = f.K, Seq = ActSeq, By = ctx.Card ? owner.Key : null });   // By — 그 사도의 카드로 얻었을 때만(2026-10-13 비비 guard mine)
                             }
                             break;
                         }

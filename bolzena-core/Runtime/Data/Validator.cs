@@ -105,6 +105,9 @@ namespace Bolzena.Core
                 if (f.Keep && f.K != FxK.CardStatus && f.K != FxK.Replay) E($"{w}: keep 은 cardStatus(붙은 동안 보존) · replay(쪽을 지우지 않음)에만");
                 if (f.K == FxK.CounterHits && f.V < 2) E($"{w}: counterHits 의 v 는 2 이상(나눠 칠 대 수)");
                 if (f.K == FxK.CounterMod && f.V == 0) E($"{w}: counterMod 에 v(반격 피해 ±비율)가 없다");
+                // (2026-10-13 비비 원작) counterAll turns — n턴간(없으면 이 전투 동안) · perFoe — 살아 있는 적 1명당
+                if (f.K == FxK.CounterAll && f.Turns > 3) W($"{w}: counterAll turns {f.Turns} — 길면 빼서 이 전투 동안으로");
+                if (f.K == FxK.PerFoe && (f.Each || f.Who != null || f.Id != null)) E($"{w}: perFoe 는 id · each · who 없이(살아 있는 적 수 · max 만)");
                 if (f.K == FxK.Replay && f.Ratio < 0) E($"{w}: replay 의 ratio 는 0 이상(없으면 100%)");
                 if (f.K == FxK.IfEvent && f.N <= 0) E($"{w}: ifEvent 에 n 이 없다(일의 값 n 이상)");
                 // 원작 검토(E63~E75)
@@ -129,7 +132,7 @@ namespace Bolzena.Core
                 if (f.K == FxK.IfPile && f.From == "record") { }
                 switch (f.K)
                 {
-                    case FxK.Dmg: if (!(f.Ratio > 0)) E($"{w}: ratio 가 없다"); if (f.Base != null && f.Base != "def") E($"{w}: base 는 def 만"); effects++; break;
+                    case FxK.Dmg: if (!(f.Ratio > 0) && !(f.OfEvent > 0) && !(f.OfForm > 0)) E($"{w}: ratio 가 없다"); if (f.Base != null && f.Base != "def") E($"{w}: base 는 def 만"); effects++; break;   // ofEvent · ofForm(일의 값 고정 피해)이면 ratio 를 안 쓴다(2026-10-13 비비 「파티 실드만큼」)
                     case FxK.Block: case FxK.Shield: case FxK.Heal: if (!(f.Ratio > 0)) E($"{w}: ratio 가 없다"); effects++; break;
                     case FxK.Status:
                         if (f.Id == null || !R.ALL_ST.Contains(f.Id)) E(R.IsCardSt(f.Id) ? $"{w}: 「{f.Id}」 는 카드에 붙는 상태 — cardStatus 로" : $"{w}: 모르는 상태 {f.Id}");
@@ -237,7 +240,8 @@ namespace Bolzena.Core
                         if (f.K == FxK.Stack && f.V == 0 && !f.Carry && f.Set == null && !f.Pick) E($"{w}: v(또는 carry · set)가 없다");   // 음수 v 는 조용히 깎기(▶E21 — spend 계기를 안 깨운다)
                         effects++; break;
                     case FxK.IfStack: case FxK.PerStack:
-                        if (f.Id == null || !keywords.Contains(f.Id)) E($"{w}: 사도 키워드가 아니다 — 「{f.Id}」");
+                        // (2026-10-13 비비) perStack 은 파티 버프 상태 겹도(「반격」 1당 — spend 상태 쓰기와 같은 자리) — each · who 없이
+                        if (f.Id == null || !(keywords.Contains(f.Id) || (f.K == FxK.PerStack && R.BUFF_ST.Contains(f.Id) && !f.Each && f.Who == null))) E($"{w}: 사도 키워드가 아니다 — 「{f.Id}」{(f.K == FxK.PerStack ? "(상태 겹이면 파티 버프 상태 이름 · each · who 없이)" : "")}");
                         break;
                     case FxK.Make: if (d.Card(f.Id) == null) E($"{w}: 만들 카드가 없다 — {f.Id}"); if (f.To != null && f.To != "hand" && f.To != "draw" && f.To != "top" && f.To != "discard") E($"{w}: to 는 hand · draw · top · discard"); effects++; break;
                     case FxK.IfPrev: if (f.Type != "공격" && f.Type != "스킬" && f.Type != "강화") E($"{w}: type 은 공격 · 스킬 · 강화"); break;
@@ -337,6 +341,7 @@ namespace Bolzena.Core
                 if (r.When.CardSt != null && r.When.On != "play") E($"{at}: cardSt 는 play 에만");
                 foreach (var c in r.Conds) if (c.C == "ally" && d.Hero(c.Id) == null) W($"{at}: 조건 ally 의 사도 {c.Id} 가 없다");
                 if (r.When.Guarded && r.When.On != "hurt") E($"{at}: guarded 는 hurt 에만");
+                if (r.When.Mine && !new[] { "guard", "kill", "break", "shieldBreak", "foeShieldBreak" }.Contains(r.When.On)) E($"{at}: mine 은 guard(자신의 카드로 얻음) · kill · break · shieldBreak · foeShieldBreak 에만");   // (2026-10-13 비비) guard mine — 엔진이 mine 을 읽는 계기만
                 if (r.When.Marked != null && (!keywords.Contains(r.When.Marked) || d.CarrierOf(r.When.Marked) != "hero")) E($"{at}: marked 는 사도 표시(carrier hero) 고유 효과 이름 — 「{r.When.Marked}」");
                 if (r.When.Tag != null && Array.IndexOf(Tag.All, r.When.Tag) < 0 && d.Card(r.When.Tag) == null) E($"{at}: 모르는 태그 「{r.When.Tag}」(태그 이름 · 카드 id)");
                 if (r.When.By != null && ((r.When.By != "self" && r.When.By != "other") || (r.When.On != "discard" && r.When.On != "exhaust"))) E($"{at}: by 는 discard · exhaust 에 self · other");
@@ -699,7 +704,7 @@ namespace Bolzena.Core
             {
                 if (string.IsNullOrEmpty(k.Name)) E($"{at}: 키워드 name 이 없다");
                 else if (R.ALL_ST.Contains(k.Name) || R.IsCardSt(k.Name) || Array.IndexOf(Tag.All, k.Name) >= 0) E($"{at}: 고유 효과 이름 「{k.Name}」 이 엔진 키워드(상태 · 태그)와 같다 — 새 이름으로");
-                else if (!Used(h, k.Name)) W($"{at}: 고유 효과 「{k.Name}」 이 어디에도 안 쓰인다(카드 · 패시브 · 고학년 · 규칙의 stack · spend · ifStack · perStack · payWith …)");
+                else if (k.Hand == null && (k.Tally == null || k.Tally.Count == 0) && !Used(h, k.Name)) W($"{at}: 고유 효과 「{k.Name}」 이 어디에도 안 쓰인다(카드 · 패시브 · 고학년 · 규칙의 stack · spend · ifStack · perStack · payWith …)");
                 if (!CARRIERS.Contains(k.Carrier)) E($"{at}: 키워드 carrier 는 self · enemy · ally · hero");
                 if (k.Wrap && k.Cap == null) E($"{at}: wrap(순환)은 cap 이 있어야 한다");
                 if (k.Stages != null && (k.Cap == null || k.Stages.Count != k.Cap || k.Stages.Any(string.IsNullOrWhiteSpace))) E($"{at}: 「{k.Name}」 stages(단계 이름)는 cap 과 개수가 같아야 한다");
@@ -710,6 +715,7 @@ namespace Bolzena.Core
                 if (k.TagWhile != null && Array.IndexOf(Tag.All, k.TagWhile) < 0) E($"{at}: tagWhile 은 태그 이름 — 「{k.TagWhile}」");
                 if (k.Spread && k.Carrier != "self") E($"{at}: spread 는 carrier self 에만");
                 if (k.Tally != null && (k.Carrier ?? "self") != "self") E($"{at}: tally(엔진이 세는 수)는 carrier self 에만");
+                if (k.Hand != null && ((k.Carrier ?? "self") != "self" || (d.Card(k.Hand) == null && Array.IndexOf(Tag.All, k.Hand) < 0))) E($"{at}: hand(손 따라가기)는 carrier self 에 카드 id · 태그 — 「{k.Hand}」");   // 2026-10-13 시온 「탄창」
                 if (k.Share != 0 && (k.Carrier != "hero" || k.Share < 0 || k.Share >= 1)) E($"{at}: 「{k.Name}」 share 는 아군 표시(carrier hero)에 0~1");
                 if (k.OnStage != null) { if (!k.Wrap || k.Cap == null || k.OnStage.Count > k.Cap) E($"{at}: 「{k.Name}」 onStage 는 순환(wrap · cap) 고유 효과에 cap 개까지"); else foreach (var (sf, si) in k.OnStage.Select((x, i) => (x, i))) if (sf != null && sf.Count > 0) FxList($"{at} 「{k.Name}」 칸{si + 1}", sf); }
                 foreach (var sb in k.StageBonus ?? new List<StageBonus>())
@@ -729,7 +735,9 @@ namespace Bolzena.Core
                     if (cv.Cost > 0) W($"{at}: 「{k.Name}」 cardValue.cost 가 양수 — 값 1당 비용이 오른다");
                 }
                 if (k.Start != null && (k.Start < 0 || (k.Cap != null && k.Start > k.Cap) || (k.Carrier ?? "self") != "self")) E($"{at}: 「{k.Name}」 start 는 0~cap(carrier self)");
-                foreach (var tl in k.Tally ?? new List<string>()) if (tl != "play" && tl != "discardBy") E($"{at}: tally 는 play · discardBy — 「{tl}」");
+                foreach (var tl in k.Tally ?? new List<string>()) if (tl != "play" && tl != "discardBy" && !(k.TallyTag != null && (tl == "discard" || tl == "exhaust" || tl == "bullet"))) E($"{at}: tally 는 play · discardBy(tallyTag 가 있으면 discard · exhaust · bullet 도) — 「{tl}」");
+                if (k.StartMake != null && ((k.Carrier ?? "self") != "self" || d.Card(k.StartMake) == null || k.StartMakeN < 0 || k.StartMakeN > 3)) E($"{at}: startMake 는 carrier self 에 있는 카드 id · startMakeN 0~3 — 「{k.StartMake}」");   // 2026-10-13 시온
+                if (k.TallyTag != null && (k.Tally == null || k.Tally.Count == 0 || (d.Card(k.TallyTag) == null && Array.IndexOf(Tag.All, k.TallyTag) < 0))) E($"{at}: tallyTag 는 tally 와 같이 · 카드 id · 태그 — 「{k.TallyTag}」");   // 2026-10-13 시온
                 foreach (var p in k.Per) { if (p.From != null && ((p.From != "owner" && p.From != "marked") || k.Carrier != "enemy" || (p.From == "marked" && (p.Mark == null || d.CarrierOf(p.Mark) != "hero")))) E($"{at}: per.from 은 owner · marked(+ mark = 아군 표시) — 적 표식에만"); if (p.Stat == "tough" && k.Carrier != "enemy") E($"{at}: per stat tough 는 적 표식에만"); }
                 foreach (var p in k.Per) if (!PER_STAT.Contains(p.Stat)) E($"{at}: 키워드 1개당 — 모르는 stat {p.Stat}");
                 foreach (var p in k.Per)
@@ -894,6 +902,16 @@ namespace Bolzena.Core
             if (c.Cost == 0 && !c.X && c.Fx.Any(f => f.K == FxK.Burn || f.K == FxK.ExileFrom) && c.Fx.Any(f => f.K == FxK.Draw || f.K == FxK.Pull) && !c.Tags.Any(t => Tag.Parse(t).id == Tag.Exhaust || Tag.Parse(t).id == Tag.Evaporate))
                 W($"{at}: 0코 태우기 + 뽑기 카드는 「소멸」 태그를 단다(소멸 더미 되살리기와 0코 순환이 된다)");
             if (c.Fx.Any(f => f.XHits) && !c.X) E($"{at}: xHits 는 X 코스트 카드에만");
+            // (2026-10-13 이드) perX — X 1당 · costIf — 손에 그 카드가 있으면 비용 +add
+            if (!c.X && (c.Fx.Any(f => f.K == FxK.PerX) || c.Oracles.Any(o => o.Fx.Any(f => f.K == FxK.PerX)))) E($"{at}: perX 는 X 코스트 카드에만");
+            foreach (var (ci, w) in new[] { (c.CostIf, "") }.Concat(c.Oracles.Select((o, i) => (o.CostIf, $" 신탁{i + 1}"))))
+            {
+                if (ci == null) continue;
+                if (ci.InHand == null || d.Card(ci.InHand) == null) E($"{at}{w}: costIf.inHand 카드가 없다 — {ci.InHand}");
+                else if (ci.InHand == GameData.BaseId(c.Id)) E($"{at}{w}: costIf.inHand 가 이 카드 자신");
+                if (ci.Add < 1 || ci.Add > 3) E($"{at}{w}: costIf.add 는 1 ~ 3");
+                if (c.X) E($"{at}{w}: X 코스트 카드에는 costIf 를 쓰지 않는다");
+            }
             if (c.Oracles.Count != 0 && c.Oracles.Count != 5) E($"{at}: 신탁은 다섯(①~⑤) — 지금 {c.Oracles.Count}");
             if (c.Unique && c.Hero != null && c.Oracles.Count == 0 && !c.Complete) W($"{at}: 고유 카드에 신탁이 없다(완성형이면 complete)");
             if (c.Complete && c.Oracles.Count > 0) E($"{at}: 완성형(complete)은 신탁이 없어야 한다");
@@ -904,7 +922,7 @@ namespace Bolzena.Core
             if (c.Type == "강화" && c.Hero != null && c.Unique)
             {
                 if (!HasLasting(c.Fx)) W($"{at}: 강화 카드에 전투 동안 남는 효과가 없다 — power 규칙 · 세기형 버프 · 전투 내내 증감 가운데 하나");
-                for (int i = 0; i < c.Oracles.Count; i++) if (!HasLasting(c.Oracles[i].Fx)) W($"{at} 신탁{i + 1}: 강화 카드에 전투 동안 남는 효과가 없다");
+                for (int i = 0; i < c.Oracles.Count; i++) if (!(c.Oracles[i].Type != null && c.Oracles[i].Type != "강화" && !c.Oracles[i].Power) && !HasLasting(c.Oracles[i].Fx)) W($"{at} 신탁{i + 1}: 강화 카드에 전투 동안 남는 효과가 없다");   // 신탁이 스킬 · 공격으로 바뀌면 빼고(2026-10-13 비비 원작 「얼음 파편 V」)
             }
             if (c.Oracles.Count == 5) OracleRules(c);
             if (c.Blesses.Count > 3) E($"{at}: 축복은 셋까지");
@@ -929,6 +947,7 @@ namespace Bolzena.Core
             if (c.Tags.Contains(Tag.SealedTaboo) && c.Becomes == null) E($"{at}: 봉인된 금기는 becomes(보스를 처치하면 바뀔 금기 카드)가 있어야 한다");
             if (c.PayRate < 0) E($"{at}: payRate 는 1 이상");
             if (c.HandMax < 0) E($"{at}: handMax(손 최대 장수)는 0 이상");
+            if (c.BulletRatio < 0 || c.BulletRatio > 5 || (c.BulletRatio > 0 && !c.Tags.Contains(Tag.Bullet))) E($"{at}: bulletRatio 는 0~5 · 「탄환」 태그 카드에만");   // 2026-10-13 시온
             if (c.PayWith != null && (c.Hero == null || !d.Hero(c.Hero)?.AllKeywords.Any(k => k.Name == c.PayWith && (k.Carrier ?? "self") == "self") == true)) E($"{at}: payWith 는 그 사도의 고유 효과(carrier self) 이름 — 「{c.PayWith}」");
             if (c.Choices != null && c.Choices.Count != 2) E($"{at}: choices 는 갈래 이름 둘");
             if (c.Choices != null && !c.Fx.Any(f => f.K == FxK.IfChoice)) W($"{at}: choices 가 있는데 효과에 ifChoice 가 없다");

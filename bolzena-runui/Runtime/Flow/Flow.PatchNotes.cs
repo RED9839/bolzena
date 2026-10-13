@@ -72,7 +72,17 @@ namespace Bolzena.RunUI
                     }
                     foreach (var it in s.Items)
                     {
-                        var item = Ui.Text(content, $"<indent=0.5em>·</indent><indent=1.5em>{it}</indent>", Theme.FsBody, Theme.Ink, TextAlignmentOptions.TopLeft, false, "item");
+                        if (it.StartsWith("###"))   // 작은 머리(사도 이름 등)
+                        {
+                            var sp2 = Ui.Rect("sp", content); sp2.Pref(-1, 4);
+                            var sub = Ui.Title(content, $"<indent=0.5em>{it.Substring(3)}</indent>", Theme.FsMd, i == 0 ? Theme.Gold : Theme.Ink, TextAlignmentOptions.TopLeft, "sub");
+                            sub.overflowMode = TextOverflowModes.Overflow;
+                            continue;
+                        }
+                        bool deep = it.StartsWith("--");   // 딸린 항목 — 한 칸 더 들이고 흐린 글
+                        var item = deep
+                            ? Ui.Text(content, $"<indent=1.5em>-</indent><indent=2.5em>{it.Substring(2)}</indent>", Theme.FsBody, Theme.Sub, TextAlignmentOptions.TopLeft, false, "item")
+                            : Ui.Text(content, $"<indent=0.5em>·</indent><indent=1.5em>{it}</indent>", Theme.FsBody, Theme.Ink, TextAlignmentOptions.TopLeft, false, "item");
                         item.overflowMode = TextOverflowModes.Overflow;
                         item.lineSpacing = 2;
                     }

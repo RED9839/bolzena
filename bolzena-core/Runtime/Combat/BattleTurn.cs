@@ -193,6 +193,11 @@ namespace Bolzena.Core
             // 아껴 두기형 공용 계기 — AP 를 남기거나 보존 카드를 쥐고 턴을 마치면(N = 남긴 AP · Kept = 쥐고 넘기는 보존 카드 수(증발 빼고), 일의 값 = 둘의 합)
             int kept = Hand.Count(id => HasTagB(id, Tag.Keep) && !HasTagB(id, Tag.Evaporate));
             if ((ApLeft > 0 || kept > 0) && Over == null) Emit("keepAp", new EmitInfo { N = ApLeft, Kept = kept, V = ApLeft + kept });
+            // 탄환 — 턴 끝에 버려질 탄환은 이번 턴 고유 효과(endClear 장전 …)가 사라지고 손을 비우기 「전에」 쏜다(2026-10-13 시온 — 버려서 쏘기).
+            //   턴 끝에 생긴 카드(다음 턴으로 넘김) · 보존 · 증발은 빼고, 아래 버림에서는 다시 쏘지 않는다.
+            var preShot = new List<string>(); var atEnd = handAtEnd.ToList();
+            foreach (var id in Hand) if (atEnd.Remove(id) && HasTagB(id, Tag.Bullet) && !HasTagB(id, Tag.Keep) && !HasTagB(id, Tag.Evaporate)) preShot.Add(id);
+            foreach (var id in preShot) { BulletDrop(id); if (Over != null) return this; }
             TickTurnEnd();
             KwEndDecay();
             CheckOver(); if (Over != null) return this;
@@ -219,7 +224,7 @@ namespace Bolzena.Core
             Discard.AddRange(toss);
             Used.Clear();   // 이번 턴에 낸 카드 — 이제 여느 버린 카드(다음 섞기로 돌아간다)
             foreach (var id in toss) BlessDrop(id);
-            foreach (var id in toss) { BulletDrop(id); if (Over != null) return this; }   // 탄환 — 턴 끝 버림도 버린 더미로 가니 쏜다(2026-10-13 사용자 — 카제나 「진혼의 탄환」)
+            foreach (var id in toss) { if (preShot.Remove(id)) continue; BulletDrop(id); if (Over != null) return this; }   // 위에서 먼저 쏜 탄환은 빼고   // 탄환 — 턴 끝 버림도 버린 더미로 가니 쏜다(2026-10-13 사용자 — 카제나 「진혼의 탄환」)
             MergePile(Discard, "discard");
             foreach (var id in Held.Keys.ToList()) if (!keep.Contains(id)) Held.Remove(id);
             foreach (var id in keep.Distinct()) Held[id] = (Held.TryGetValue(id, out var hn) ? hn : 0) + 1;
