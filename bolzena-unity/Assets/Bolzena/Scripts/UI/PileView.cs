@@ -9,12 +9,12 @@ using UnityEngine.InputSystem;
 namespace Bolzena.UI
 {
     // 더미 보기 — 화면 전체를 어둠으로 덮고(배치는 카제나 더미 창을 따른다 · 그림 · 아이콘 · 글은 우리 것):
-    //   왼쪽 세로 탭 줄(뽑을 · 무덤 · 소멸 — 아이콘만, 고른 탭은 빛 + 세로선 위 점) │ 위 왼쪽 제목 · 오른쪽 위 큰 ×
-    //   큰 그림 카드를 가로로 한 줄씩(넘치면 다음 줄 · 휠 / 끌어서 스크롤). 무덤 탭은 「버린 더미」 머리 띠 아래 카드.
+    //   왼쪽 세로 탭 줄(뽑을 · 버린 · 소멸 — 아이콘만, 고른 탭은 빛 + 세로선 위 점) │ 위 왼쪽 제목 · 오른쪽 위 큰 ×
+    //   큰 그림 카드를 가로로 한 줄씩(넘치면 다음 줄 · 휠 / 끌어서 스크롤). 버린 더미 탭은 「버린 더미」 머리 띠 아래 카드.
     //   뽑을 더미는 차례를 숨기려고 코스트 · 이름 차례로 늘어놓는다.
     public static class PileView
     {
-        static readonly string[] Titles = { "뽑을 더미", "무덤", "소멸" };
+        static readonly string[] Titles = { "뽑을 더미", "버린 더미", "소멸" };
         static readonly string[] Icons = { "ic_pile_up", "ic_pile_down", "ic_skull" };
         static readonly string[] Bands = { null, "버린 더미", "사라진 카드" };
         static readonly string[] Why = { "차례는 감춥니다 — 사도별 기본 → 고유 차례", "덱이 바닥나면 섞여서 뽑을 더미로 돌아갑니다", "소멸했거나 손이 넘쳐 빠진 카드 — 이 전투에서 다시 나오지 않습니다" };

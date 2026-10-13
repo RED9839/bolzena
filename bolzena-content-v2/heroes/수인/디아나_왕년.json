@@ -14,58 +14,16 @@
       "blurb": "전성기의 디아나. 평소엔 귀찮아서 도끼만 휘두르지만, 기혈이 차오르면 도끼를 박살 내고 맨주먹으로 땅과 하늘을 호령합니다.",
       "keyword": {
         "name": "나른한 삶",
-        "desc": "귀찮아, 단순하게 — 도끼질로 모이는 기혈",
+        "desc": "도끼질로 모이는 기혈",
         "carrier": "self",
-        "cap": 6
+        "cap": 5
       },
-      "keywords": [
-        {
-          "name": "힘, 그 자체",
-          "desc": "맨주먹으로 잇달아 칠수록 쌓이는 연격",
-          "carrier": "self",
-          "cap": 9,
-          "per": [
-            {
-              "stat": "dealt",
-              "v": 0.05
-            }
-          ]
-        }
-      ],
       "passives": [
         {
-          "name": "연속",
+          "name": "귀찮아도 도끼질",
           "when": {
             "on": "play",
-            "chain": true
-          },
-          "fx": [
-            {
-              "k": "ifForm",
-              "id": "디아나_왕년_백수공권",
-              "not": true
-            },
-            {
-              "k": "stack",
-              "id": "나른한 삶",
-              "v": 1
-            },
-            {
-              "k": "ifForm",
-              "id": "디아나_왕년_백수공권"
-            },
-            {
-              "k": "stack",
-              "id": "힘, 그 자체",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "나른한 삶",
-          "when": {
-            "on": "keepAp",
-            "kind": "ap"
+            "type": "공격"
           },
           "fx": [
             {
@@ -80,68 +38,13 @@
         {
           "id": "디아나_왕년_백수공권",
           "name": "백수공권",
-          "desc": "도끼를 부순 맨주먹 전성기",
+          "desc": "도끼를 부순 맨주먹 전성기 — 2턴",
           "stance": true,
           "anim": "Idle_Change",
-          "until": {
-            "on": "play",
-            "who": "other",
-            "type": "공격"
-          },
-          "onEnter": [
-            {
-              "k": "spend",
-              "id": "나른한 삶",
-              "all": true
-            },
-            {
-              "k": "stack",
-              "id": "힘, 그 자체",
-              "v": 1,
-              "ofEvent": 1
-            }
-          ],
-          "bonus": [
-            {
-              "type": "공격",
-              "ratio": 2,
-              "fx": [
-                {
-                  "k": "stack",
-                  "id": "힘, 그 자체",
-                  "v": 1
-                }
-              ]
-            }
-          ],
-          "passives": [
-            {
-              "name": "맨주먹 전성기",
-              "when": {
-                "on": "turnStart"
-              },
-              "fx": [
-                {
-                  "k": "draw",
-                  "v": 2
-                }
-              ]
-            }
-          ],
-          "off": [
-            {
-              "k": "spend",
-              "id": "힘, 그 자체",
-              "all": true
-            }
-          ],
-          "offEnd": [
-            {
-              "k": "stack",
-              "id": "나른한 삶",
-              "v": 3
-            }
-          ]
+          "turns": 2,
+          "mods": {
+            "dealt": 0.5
+          }
         }
       ],
       "ult": {
@@ -204,6 +107,11 @@
       "type": "공격",
       "fx": [
         {
+          "k": "dmg",
+          "ratio": 1.2,
+          "target": "allEnemies"
+        },
+        {
           "k": "status",
           "id": "취약",
           "v": 1,
@@ -214,16 +122,9 @@
           "id": "디아나_왕년_백수공권"
         },
         {
-          "k": "perStack",
-          "id": "힘, 그 자체"
-        },
-        {
           "k": "dmg",
-          "ratio": 1.2,
+          "ratio": 0.6,
           "target": "allEnemies"
-        },
-        {
-          "k": "formEnd"
         }
       ],
       "oracles": [
@@ -232,7 +133,13 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.6,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
               "target": "allEnemies"
             },
             {
@@ -240,16 +147,9 @@
               "id": "디아나_왕년_백수공권"
             },
             {
-              "k": "perStack",
-              "id": "힘, 그 자체"
-            },
-            {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.6,
               "target": "allEnemies"
-            },
-            {
-              "k": "formEnd"
             }
           ]
         },
@@ -258,7 +158,13 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
               "target": "allEnemies"
             },
             {
@@ -271,12 +177,8 @@
               "id": "디아나_왕년_백수공권"
             },
             {
-              "k": "perStack",
-              "id": "힘, 그 자체"
-            },
-            {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.7,
               "target": "allEnemies"
             }
           ]
@@ -294,6 +196,15 @@
               "v": 0.2,
               "turns": 2,
               "target": "allEnemies"
+            },
+            {
+              "k": "ifForm",
+              "id": "디아나_왕년_백수공권"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "allEnemies"
             }
           ]
         },
@@ -302,7 +213,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 1.2,
+              "target": "allEnemies",
+              "hits": 2
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
               "target": "allEnemies"
             },
             {
@@ -310,21 +228,26 @@
               "id": "디아나_왕년_백수공권"
             },
             {
-              "k": "spend",
-              "id": "힘, 그 자체",
-              "v": 3
-            },
-            {
               "k": "dmg",
-              "ratio": 0.9,
-              "target": "allEnemies",
-              "hits": 3
+              "ratio": 0.6,
+              "target": "allEnemies"
             }
           ]
         },
         {
           "name": "신탁 5",
           "fx": [
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 1,
+              "target": "allEnemies"
+            },
             {
               "k": "nextAp",
               "v": 1
@@ -334,16 +257,9 @@
               "id": "디아나_왕년_백수공권"
             },
             {
-              "k": "perStack",
-              "id": "힘, 그 자체"
-            },
-            {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 0.6,
               "target": "allEnemies"
-            },
-            {
-              "k": "formEnd"
             }
           ]
         }
@@ -382,14 +298,13 @@
           "v": 2
         },
         {
-          "k": "ifForm",
-          "id": "디아나_왕년_백수공권",
-          "not": true
+          "k": "draw",
+          "v": 2
         },
         {
           "k": "stack",
           "id": "나른한 삶",
-          "v": 2
+          "v": 1
         },
         {
           "k": "ifForm",
@@ -397,7 +312,7 @@
         },
         {
           "k": "stack",
-          "id": "힘, 그 자체",
+          "id": "나른한 삶",
           "v": 2
         }
       ],
@@ -410,14 +325,13 @@
               "v": 2
             },
             {
-              "k": "ifForm",
-              "id": "디아나_왕년_백수공권",
-              "not": true
+              "k": "draw",
+              "v": 2
             },
             {
               "k": "stack",
               "id": "나른한 삶",
-              "v": 3
+              "v": 2
             },
             {
               "k": "ifForm",
@@ -425,7 +339,7 @@
             },
             {
               "k": "stack",
-              "id": "힘, 그 자체",
+              "id": "나른한 삶",
               "v": 2
             }
           ]
@@ -435,18 +349,16 @@
           "fx": [
             {
               "k": "discard",
-              "v": 1,
-              "all": true
+              "v": 3
             },
             {
-              "k": "ifForm",
-              "id": "디아나_왕년_백수공권",
-              "not": true
+              "k": "draw",
+              "v": 3
             },
             {
               "k": "stack",
               "id": "나른한 삶",
-              "v": 3
+              "v": 1
             },
             {
               "k": "ifForm",
@@ -454,8 +366,8 @@
             },
             {
               "k": "stack",
-              "id": "힘, 그 자체",
-              "v": 3
+              "id": "나른한 삶",
+              "v": 2
             }
           ]
         },
@@ -463,22 +375,18 @@
           "name": "신탁 3",
           "fx": [
             {
-              "k": "ifForm",
-              "id": "디아나_왕년_백수공권",
-              "not": true
-            },
-            {
               "k": "stack",
               "id": "나른한 삶",
-              "v": 2
+              "v": 3
             },
             {
               "k": "ifForm",
               "id": "디아나_왕년_백수공권"
             },
             {
-              "k": "formKeep",
-              "turns": 1
+              "k": "stack",
+              "id": "나른한 삶",
+              "v": 2
             }
           ]
         },
@@ -492,7 +400,16 @@
             },
             {
               "k": "draw",
+              "v": 3
+            },
+            {
+              "k": "stack",
+              "id": "나른한 삶",
               "v": 2
+            },
+            {
+              "k": "ifForm",
+              "id": "디아나_왕년_백수공권"
             },
             {
               "k": "stack",
@@ -506,21 +423,16 @@
           "power": true,
           "fx": [
             {
-              "k": "discard",
-              "v": 2
-            },
-            {
               "k": "stack",
               "id": "나른한 삶",
-              "v": 2
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "discard",
-                    "who": "other"
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
@@ -572,10 +484,6 @@
         {
           "k": "form",
           "id": "디아나_왕년_백수공권"
-        },
-        {
-          "k": "formKeep",
-          "turns": 1
         }
       ],
       "oracles": [
@@ -584,16 +492,12 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 4.1,
+              "ratio": 4.3,
               "target": "oneEnemy"
             },
             {
               "k": "form",
               "id": "디아나_왕년_백수공권"
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         },
@@ -625,8 +529,9 @@
               "id": "디아나_왕년_백수공권"
             },
             {
-              "k": "formKeep",
-              "turns": 2
+              "k": "stack",
+              "id": "나른한 삶",
+              "v": 2
             }
           ]
         },
@@ -635,17 +540,12 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.9,
+              "ratio": 2.6,
               "target": "allEnemies"
             },
             {
               "k": "form",
               "id": "디아나_왕년_백수공권"
-            },
-            {
-              "k": "stack",
-              "id": "힘, 그 자체",
-              "v": 2
             }
           ]
         },
@@ -654,7 +554,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 4.5,
+              "ratio": 3.7,
               "target": "oneEnemy"
             },
             {
@@ -662,8 +562,8 @@
               "id": "디아나_왕년_백수공권"
             },
             {
-              "k": "formKeep",
-              "turns": 1
+              "k": "draw",
+              "v": 1
             }
           ]
         }
@@ -699,7 +599,21 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 3.6,
+          "ratio": 1.5,
+          "target": "oneEnemy"
+        },
+        {
+          "k": "spend",
+          "id": "나른한 삶",
+          "all": true
+        },
+        {
+          "k": "perEvent",
+          "n": 1
+        },
+        {
+          "k": "dmg",
+          "ratio": 0.4,
           "target": "oneEnemy"
         },
         {
@@ -707,12 +621,8 @@
           "id": "디아나_왕년_백수공권"
         },
         {
-          "k": "perStack",
-          "id": "힘, 그 자체"
-        },
-        {
           "k": "dmg",
-          "ratio": 0.5,
+          "ratio": 1.5,
           "target": "oneEnemy"
         }
       ],
@@ -722,13 +632,31 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.2,
+              "ratio": 2,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
+              "k": "spend",
               "id": "나른한 삶",
-              "v": 3
+              "all": true
+            },
+            {
+              "k": "perEvent",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifForm",
+              "id": "디아나_왕년_백수공권"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.5,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -737,54 +665,86 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 3.2,
-              "target": "oneEnemy"
+              "ratio": 1.2,
+              "target": "allEnemies"
             },
             {
-              "k": "ifForm",
-              "id": "디아나_왕년_백수공권",
-              "not": true
+              "k": "spend",
+              "id": "나른한 삶",
+              "all": true
             },
             {
-              "k": "perStack",
-              "id": "나른한 삶"
+              "k": "perEvent",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.4,
+              "target": "allEnemies"
+            },
+            {
+              "k": "ifForm",
+              "id": "디아나_왕년_백수공권"
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.8,
               "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 3",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
-              "target": "allEnemies"
+              "ratio": 2,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "나른한 삶",
+              "all": true
+            },
+            {
+              "k": "perEvent",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
             },
             {
               "k": "ifForm",
               "id": "디아나_왕년_백수공권"
             },
             {
-              "k": "perStack",
-              "id": "힘, 그 자체"
-            },
-            {
               "k": "dmg",
-              "ratio": 0.5,
-              "target": "allEnemies"
+              "ratio": 1.5,
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 4",
+          "cost": 0,
           "fx": [
             {
+              "k": "spend",
+              "id": "나른한 삶",
+              "all": true
+            },
+            {
+              "k": "perEvent",
+              "n": 1
+            },
+            {
               "k": "dmg",
-              "ratio": 3.2,
+              "ratio": 0.4,
               "target": "oneEnemy"
             },
             {
@@ -792,32 +752,41 @@
               "id": "디아나_왕년_백수공권"
             },
             {
-              "k": "spend",
-              "id": "힘, 그 자체",
-              "v": 3
-            },
-            {
               "k": "dmg",
-              "ratio": 1.3,
-              "target": "oneEnemy",
-              "hits": 3
+              "ratio": 1.5,
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 5",
-          "cost": 0,
-          "needForm": "디아나_왕년_백수공권",
           "fx": [
             {
-              "k": "perStack",
-              "id": "힘, 그 자체",
+              "k": "dmg",
+              "ratio": 2.1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "나른한 삶",
+              "all": true
+            },
+            {
+              "k": "perEvent",
               "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 0.9,
+              "ratio": 0.6,
               "target": "oneEnemy"
+            },
+            {
+              "k": "ifForm",
+              "id": "디아나_왕년_백수공권"
+            },
+            {
+              "k": "tough",
+              "v": 2
             }
           ]
         }
@@ -864,6 +833,14 @@
           "k": "stack",
           "id": "나른한 삶",
           "v": 1
+        },
+        {
+          "k": "ifForm",
+          "id": "디아나_왕년_백수공권"
+        },
+        {
+          "k": "tough",
+          "v": 1
         }
       ],
       "oracles": [
@@ -872,7 +849,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.9,
+              "ratio": 2.8,
               "target": "oneEnemy"
             },
             {
@@ -882,6 +859,14 @@
             {
               "k": "stack",
               "id": "나른한 삶",
+              "v": 1
+            },
+            {
+              "k": "ifForm",
+              "id": "디아나_왕년_백수공권"
+            },
+            {
+              "k": "tough",
               "v": 1
             }
           ]
@@ -899,13 +884,16 @@
               "v": 1
             },
             {
-              "k": "ifForm",
-              "id": "디아나_왕년_백수공권",
-              "not": true
-            },
-            {
               "k": "stack",
               "id": "나른한 삶",
+              "v": 1
+            },
+            {
+              "k": "ifForm",
+              "id": "디아나_왕년_백수공권"
+            },
+            {
+              "k": "tough",
               "v": 1
             }
           ]
@@ -921,6 +909,14 @@
             {
               "k": "tough",
               "v": 2
+            },
+            {
+              "k": "ifForm",
+              "id": "디아나_왕년_백수공권"
+            },
+            {
+              "k": "tough",
+              "v": 1
             }
           ]
         },
@@ -938,13 +934,16 @@
               "v": 1
             },
             {
-              "k": "ifForm",
-              "id": "디아나_왕년_백수공권",
-              "not": true
-            },
-            {
               "k": "stack",
               "id": "나른한 삶",
+              "v": 1
+            },
+            {
+              "k": "ifForm",
+              "id": "디아나_왕년_백수공권"
+            },
+            {
+              "k": "tough",
               "v": 1
             }
           ]
@@ -954,7 +953,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.3,
+              "ratio": 2.4,
               "target": "oneEnemy"
             },
             {
@@ -962,12 +961,17 @@
               "v": 1
             },
             {
-              "k": "ifChain"
+              "k": "stack",
+              "id": "나른한 삶",
+              "v": 2
             },
             {
-              "k": "dmg",
-              "ratio": 1.3,
-              "target": "oneEnemy"
+              "k": "ifForm",
+              "id": "디아나_왕년_백수공권"
+            },
+            {
+              "k": "tough",
+              "v": 1
             }
           ]
         }

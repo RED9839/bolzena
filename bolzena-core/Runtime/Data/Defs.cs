@@ -992,7 +992,7 @@ namespace Bolzena.Core
 
     /// <summary>
     /// 이벤트 결과 한 조각. k: none · gold(v) · hp(v 비율) · maxHp(v) · remove(n) · dupe(n) · unique · neutral(grade?) · equip(grade, slot?) ·
-    /// flash(all · swap) · shin(v 확률) · noShin · shinNow · shinPick(n, kind?) · curse(id) · gift(id) · flag(id — 연속 이벤트 깃발) · scout · shopGift(grade) · rewardFlash ·
+    /// flash(all · swap) · shin(v 확률) · noShin · shinNow · shinPick(n, kind?, random?) · curse(id) · gift(id) · flag(id — 연속 이벤트 깃발) · scout · shopGift(grade) · rewardFlash ·
     /// next(ap · gauge · hand · weak · hpCut · rush · foeVuln · quiet · buff).
     /// </summary>
     public sealed class Outcome
@@ -1009,6 +1009,8 @@ namespace Bolzena.Core
         public NextFight Next;
         /// <summary>remove — 시작(기본) 카드만 고를 수 있다.</summary>
         public bool Basic;
+        /// <summary>shinPick — 축복 종류 · 신탁 번호를 무작위로(이벤트 글에 「무작위」 라고 적힌 것만 켠다). 끄면(기본) 카드를 고른 뒤 축복 → 신탁을 차례로 고른다(2026-10-13 사용자).</summary>
+        public bool Random;
     }
 
     /// <summary>「다음 전투:」 효과 — 그 전투 하나에 한 번.</summary>

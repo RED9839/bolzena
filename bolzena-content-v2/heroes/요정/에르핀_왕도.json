@@ -11,7 +11,7 @@
       "atk": 140,
       "def": 40,
       "crit": 10,
-      "blurb": "요정 왕국의 여왕이 된 에르핀. 남은 왕마력을 마력 난타로 모두 쏟아붓고, 적이 쓰러질 때마다 한 발 더 — 부지런한 여왕은 쓰러뜨린 만큼 숨을 돌립니다.",
+      "blurb": "요정 왕국의 여왕이 된 에르핀. 왕마력탄으로 모은 왕마력을 마력 난타로 한꺼번에 쏟아붓습니다. 부지런한 여왕은 쓰러뜨린 만큼 숨을 돌립니다.",
       "keyword": {
         "name": "축복의 왕관",
         "desc": "여왕이 쓴 축복의 왕관",
@@ -537,7 +537,12 @@
           "ratio": 1.4,
           "target": "randomEnemy",
           "xHits": true,
-          "killMore": true
+          "xStack": "왕마력"
+        },
+        {
+          "k": "spend",
+          "id": "왕마력",
+          "all": true
         }
       ],
       "oracles": [
@@ -546,18 +551,22 @@
           "power": true,
           "fx": [
             {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 2
+            },
+            {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "kill",
-                    "mine": true
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 1.2,
-                      "target": "randomEnemy"
+                      "k": "stack",
+                      "id": "왕마력",
+                      "v": 1
                     }
                   ]
                 }
@@ -578,7 +587,12 @@
               "ratio": 1.6,
               "target": "oneEnemy",
               "xHits": true,
-              "killMore": true
+              "xStack": "왕마력"
+            },
+            {
+              "k": "spend",
+              "id": "왕마력",
+              "all": true
             }
           ]
         },
@@ -587,16 +601,20 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.4,
-              "target": "randomEnemy",
-              "hits": 2
+              "ratio": 1.5,
+              "target": "allEnemies"
             },
             {
               "k": "dmg",
-              "ratio": 1.4,
+              "ratio": 1.5,
               "target": "randomEnemy",
               "xHits": true,
-              "killMore": true
+              "xStack": "왕마력"
+            },
+            {
+              "k": "spend",
+              "id": "왕마력",
+              "all": true
             }
           ]
         },
@@ -608,15 +626,15 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.9,
+              "ratio": 1.6,
               "target": "randomEnemy"
             },
             {
               "k": "dmg",
-              "ratio": 1.4,
+              "ratio": 1.6,
               "target": "randomEnemy",
               "xHits": true,
-              "killMore": true
+              "xStack": "왕마력"
             }
           ]
         },
@@ -633,7 +651,12 @@
               "ratio": 2,
               "target": "randomEnemy",
               "xHits": true,
-              "killMore": true
+              "xStack": "왕마력"
+            },
+            {
+              "k": "spend",
+              "id": "왕마력",
+              "all": true
             }
           ]
         }
@@ -651,8 +674,8 @@
           "name": "축복 3",
           "fx": [
             {
-              "k": "status",
-              "id": "근면",
+              "k": "stack",
+              "id": "왕마력",
               "v": 1
             }
           ]

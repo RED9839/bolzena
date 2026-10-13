@@ -117,6 +117,13 @@ namespace Bolzena.Core
             if (f == null || !Kw.TryGetValue(f.Id, out var kw) || !(kw.Def.Cap > 0)) return new List<int>();
             return Enumerable.Range(1, kw.Def.Cap.Value).ToList();
         }
+        /// <summary>단계를 고르는 쌓기(stack pick)가 든 효과 목록이면 단계 이름들(1단계부터 — 화면 고르는 창의 버튼 글). 아니면 빈 목록(2026-10-13 고학년 · 신탁 모습에도 쓰게).</summary>
+        public List<string> StagePickNames(List<Fx> fx)
+        {
+            var f = fx?.FirstOrDefault(x => x.K == FxK.Stack && x.Pick);
+            if (f == null || !Kw.TryGetValue(f.Id, out var kw) || !(kw.Def.Cap > 0)) return new List<string>();
+            return Enumerable.Range(1, kw.Def.Cap.Value).Select(n => StageLabel(kw.Def, n)).ToList();
+        }
         /// <summary>그 사도의 그 고유 효과가 고정돼 있나(stack lock — 그 턴들 동안 쌓기 · 감소가 안 든다).</summary>
         bool StackLocked(string heroKey, string id) => Counts.Count > 0 && Counts.TryGetValue("lock|" + heroKey + "|" + id, out var until) && until >= Turn;
 

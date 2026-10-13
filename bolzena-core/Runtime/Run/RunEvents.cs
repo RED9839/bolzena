@@ -262,7 +262,7 @@ namespace Bolzena.Core
                     case "shinPick":
                         {
                             if (ShinAble(o.Kind).Count == 0) { E.Log.Add("축복을 얹을 카드가 없습니다"); break; }
-                            for (int i = 0; i < Math.Max(1, o.N); i++) E.Pending.Add(new Pending { K = "shinPick", Kind = o.Kind });
+                            for (int i = 0; i < Math.Max(1, o.N); i++) E.Pending.Add(new Pending { K = "shinPick", Kind = o.Kind, Random = o.Random });
                             break;
                         }
                     case "shinNow":
@@ -334,12 +334,33 @@ namespace Bolzena.Core
                         var own = Enumerable.Range(0, c.Blesses.Count).Select(i => i == 0 ? "own" : "own" + i).ToList();
                         var pool = own.Count > 0 ? own : p.Kind != null ? new List<string> { p.Kind } : DivineKindsFor(ViewOf(id));
                         if (pool.Count == 0) return "축복을 얹을 수 없는 카드입니다";
-                        S.Shin[id] = pool[RndInt(pool.Count)];
-                        if (c.Complete) { E.Log.Add($"{R.DIVINE_NAME}! 「{c.Name}」(완성형)"); break; }   // 완성형 — 신탁 없이 축복만
                         var oks = Enumerable.Range(1, c.Oracles.Count).Where(n => FlashOk(id, n)).ToList();   // 축복 받은 카드는 신탁도 늘 함께(2026-10-09 사용자)
-                        int on = oks[RndInt(oks.Count)];
-                        TakeFlash(id, on);
-                        E.Log.Add($"{R.DIVINE_NAME}! 「{c.Name}」 — 신탁 {on}도 함께");
+                        if (p.Random)
+                        {   // 이벤트에 「무작위」 라고 적힌 것 — 축복 종류 · 신탁 번호를 무작위로
+                            S.Shin[id] = pool[RndInt(pool.Count)];
+                            if (c.Complete) { E.Log.Add($"{R.DIVINE_NAME}! 「{c.Name}」(완성형)"); break; }   // 완성형 — 신탁 없이 축복만
+                            int on = oks[RndInt(oks.Count)];
+                            TakeFlash(id, on);
+                            E.Log.Add($"{R.DIVINE_NAME}! 「{c.Name}」 — 신탁 {on}도 함께");
+                            break;
+                        }
+                        // 기본은 고르기(2026-10-13 사용자 「무작위라는 말이 없으면 선택이 디폴트」) — 축복 종류 → 신탁을 차례로 고른다(이 고르기 바로 뒤에 끼운다)
+                        var next = new List<Pending>();
+                        if (pool.Count == 1) { S.Shin[id] = pool[0]; E.Log.Add($"{R.DIVINE_NAME}! 「{c.Name}」{(c.Complete ? "(완성형)" : "")}"); }   // 후보가 하나면 묻지 않는다
+                        else next.Add(new Pending { K = "bless", Offer = new FlashOffer { CardId = id }, Cards = pool });
+                        if (!c.Complete && oks.Count > 0) next.Add(new Pending { K = "flash", Kind = "shin", Offer = new FlashOffer { CardId = id, Picks = oks } });   // 완성형 — 신탁 없이 축복만
+                        E.Pending.InsertRange(1, next);
+                        break;
+                    }
+                case "bless":
+                    {
+                        // shinPick 에서 고른 카드에 얹을 축복 종류(Cards 가운데 하나). null(데모 · 봇 — 고르지 못한다)이면 판 난수로 무작위
+                        var cid = p.Offer?.CardId; var c = Data.Card(cid);
+                        if (c == null || p.Cards == null || p.Cards.Count == 0) return "축복을 얹을 카드가 없습니다";
+                        if (id == null) { id = p.Cards[RndInt(p.Cards.Count)]; value = id; }
+                        if (!p.Cards.Contains(id)) return "고를 수 없는 축복입니다";
+                        S.Shin[cid] = id;
+                        E.Log.Add($"{R.DIVINE_NAME}! 「{c.Name}」{(c.Complete ? "(완성형)" : "")}");
                         break;
                     }
                 case "grace":
@@ -376,12 +397,15 @@ namespace Bolzena.Core
                     }
                 case "flash":
                     {
+                        bool withShin = p.Kind == "shin";   // 축복 고르기에서 이어진 신탁 — 받지 않기 · 축복 확률 굴림이 없다. null(데모 · 봇)이면 판 난수로 무작위
+                        if (value == null && withShin && p.Offer.Picks.Count > 0) value = p.Offer.Picks[RndInt(p.Offer.Picks.Count)];
                         if (value == null) { E.Log.Add("신탁 — 받지 않았습니다"); break; }
                         int n = Convert.ToInt32(value);
                         if (!p.Offer.Picks.Contains(n)) return "고를 수 없는 신탁입니다";
                         if (GameData.IsCopy(p.Offer.CardId)) return "복제본은 신탁 · 축복을 받을 수 없습니다";
                         if (!TakeOffer(p.Offer, n)) S.Flash[p.Offer.CardId] = n;
                         var c = Data.Card(p.Offer.CardId);
+                        if (withShin) { E.Log.Add($"「{c.Name}」 — 신탁 {n}도 함께"); break; }
                         E.Log.Add($"「{c.Name}」 — 신탁");
                         if (E.ShinChance > 0 && !S.NoShin && Rnd() < E.ShinChance)
                         {
@@ -400,8 +424,8 @@ namespace Bolzena.Core
                         return null;
                     }
             }
-            Pick("ev." + p.K, p.K == "flash" ? GameData.NoInst(p.Offer?.CardId) : null,
-                p.K == "card" ? p.Cards : p.K == "flash" ? p.Offer?.Picks.Select(x => x.ToString()) : null, value?.ToString());
+            Pick("ev." + p.K, p.K == "flash" || p.K == "bless" ? GameData.NoInst(p.Offer?.CardId) : null,
+                p.K == "card" || p.K == "bless" ? p.Cards : p.K == "flash" ? p.Offer?.Picks.Select(x => x.ToString()) : null, value?.ToString());
             E.Pending.RemoveAt(0);
             return null;
         }
@@ -428,6 +452,28 @@ namespace Bolzena.Core
                 && ((c.Oracles.Count == 5 && Enumerable.Range(1, 5).Any(n => FlashOk(id, n))) || (c.Complete && c.Oracles.Count == 0))).ToList();   // 완성형은 신탁 없이 축복만   // 신탁도 함께 붙으니 신탁 다섯이 있고 붙일 수 있는 카드만
             if (kind == "cost") return ids.Where(id => ViewOf(id).Cost >= 1).ToList();
             return kind != null ? ids : ids.Where(id => DivineKindsFor(ViewOf(id)).Count > 0).ToList();
+        }
+
+        /// <summary>축복 고르기 창의 후보(Pending bless) — 그 카드에 축복 종류마다 얹은 모습(신탁 고르기 창과 같은 OracleOption · N = 0).</summary>
+        public List<OracleOption> BlessOptions(Pending p)
+        {
+            var o = new List<OracleOption>();
+            var c = Data.Card(p?.Offer?.CardId);
+            if (c == null || p.Cards == null) return o;
+            var tx = new CardText(Data);
+            var v0 = ViewOf(p.Offer.CardId);
+            foreach (var k in p.Cards)
+            {
+                var b = Battle.BlessOf(c, k);
+                var v = GameData.WithBless(v0, b);
+                o.Add(new OracleOption
+                {
+                    N = 0, Shin = k, View = v, ToAttack = v != v0, Name = b?.Name ?? R.DIVINE_NAME,
+                    BlessName = b?.Name ?? R.DIVINE_NAME,
+                    BlessText = b != null ? tx.Bless(b) : (R.DIVINE_KO.TryGetValue(k, out var ko) ? (ko.Contains("—") ? ko.Substring(ko.IndexOf('—') + 1).Trim() : ko) : k),
+                });
+            }
+            return o;
         }
 
         string OwnRandom(CardDef c)

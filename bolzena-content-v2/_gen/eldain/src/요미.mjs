@@ -32,7 +32,7 @@ export default hero({
   // 사용자 10-11: 20명 모두 고유 능력 2개
   passives: [
     { name: '소망을 머금은 꽃', when: { on: 'fightStart' }, fx: [fl(2)] },   // 원작 2성 — 전투 시작 꽃밭 2
-    { name: '지극정성', when: { on: 'turnStart' }, conds: [{ c: 'stack', id: M, n: 2 }], fx: [heal(0.3)] },   // 반달 · 보름 · 그믐이면 매 턴 회복(초승 빼고)
+    { name: '지극정성', when: { on: 'turnStart' }, fx: [half, heal(0.3), dark, heal(0.3)] },   // 10-13 사용자: 반달 · 그믐에서만 매 턴 회복(보름 · 초승 빼고) — 조건이 AND 뿐이라 두 갈래(gate 는 조건마다 새로 선다)
   ],
   ult: { name: '지극정성의 마중', cost: 250, fx: [dmg(0.5, 'allEnemies', { hits: 4 }), pick, status('둔화', 1, { target: 'allEnemies' }), { k: 'ap', v: 2 }] },   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 다음 턴 AP 1 → 지금 AP 2
 }, {
@@ -75,7 +75,7 @@ export default hero({
       blesses: ['power', 'cost', [fl(1)]],
     },
     { // 마무리 — 보름 메인딜 / 반달 · 그믐 서포터 갈래
-      name: '달님께 비는 운석', cost: 2, type: '공격', tags: KEEP,   // 10-13 신탁 점검: 신탁 1 · 2 · 3 · 5 올림(운석은 다음 턴 · 보름 고정 340%)
+      name: '달님께 비는 운석', cost: 2, type: '공격', tags: ['유일', ...KEEP],   // 10-13 저녁 사용자: 유일(덱에 한 장 · 복제 안 됨). 10-13 신탁 점검: 신탁 1 · 2 · 3 · 5 올림(운석은 다음 턴 · 보름 고정 340%)
       fx: [dmg(2.2, 'allEnemies')],
       oracles: [
         { power: true, fx: [fl(2), power([rule({ on: 'play' }, [moon(3), dmg(1.2, 'randomEnemy')])])] },   // 메인딜

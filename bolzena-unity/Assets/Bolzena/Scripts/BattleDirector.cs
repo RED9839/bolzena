@@ -914,7 +914,7 @@ namespace Bolzena
                     continue;
                 }
                 if (e.Kind == EventKind.Draw && e.Text != null && e.Text.StartsWith("grace"))
-                {   // 은총으로 얻은 카드 — 크게 보인 뒤 손패로(손이 가득하면 버림 더미로)
+                {   // 은총으로 얻은 카드 — 크게 보인 뒤 손패로(손이 가득하면 버린 더미로)
                     yield return GraceIn(e);
                     i++;
                     continue;
@@ -1311,6 +1311,17 @@ namespace Bolzena
                 yield return ChoiceWindow.Run(UiRoot, info, b => branch = b, DemoBranchPick);
                 if (branch <= 0) { Hand.Cards.Insert(Mathf.Min(handIndex, Hand.Cards.Count), cv); Hand.Layout(); yield break; }   // 물렀다
             }
+            // 단계를 고르는 쌓기(stack pick — 요미 「달님께 비는 기도」) — 사람은 창에서 단계를 고르고, 자동 전투는 창 없이 다음 단계(2026-10-13)
+            int stagePick = 0;
+            if (!Auto && Battle is CoreBattle cbs)
+            {
+                var stageNames = cbs.StagePickNames(handIndex, choice);
+                if (stageNames.Count > 0)
+                {
+                    yield return ChoiceWindow.Run(UiRoot, info, stageNames, "단계를 고르세요", v => stagePick = v, DemoBranchPick);
+                    if (stagePick <= 0) { Hand.Cards.Insert(Mathf.Min(handIndex, Hand.Cards.Count), cv); Hand.Layout(); yield break; }   // 물렀다
+                }
+            }
             int spend = 0;
             var spendPrompt = Battle.SpendPromptOf(handIndex);   // 소모량을 고르는 카드(spend pick) — 자동 전투는 창 없이 가장 많이(전부), 사람은 창에서
             if (spendPrompt != null && spendPrompt.Options.Count > 0)
@@ -1347,6 +1358,7 @@ namespace Bolzena
                 }
             }
             skipPlayed = info.Id;
+            if (stagePick > 0 && Battle is CoreBattle cbs2) cbs2.PendingStage = stagePick;   // 뒤 창(소모 · 버리기)에서 물러도 남지 않게 낼 때 바로 넘긴다
             var evs = Battle.PlayCard(handIndex, target, choice, branch, spend);
             if (choice >= 0) Bolzena.Fx.BolzenaFx.Common("oracle", Heroes[Mathf.Clamp(info.Hero >= 0 ? info.Hero : info.Owner, 0, Heroes.Count - 1)].Fx);   // 신탁을 골랐다
             StartCoroutine(CardUse(cv, Heroes[Mathf.Clamp(info.Hero >= 0 ? info.Hero : info.Owner, 0, Heroes.Count - 1)]));

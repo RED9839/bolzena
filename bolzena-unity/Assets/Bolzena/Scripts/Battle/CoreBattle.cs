@@ -355,17 +355,32 @@ namespace Bolzena.Battle
             st["비용"] = st.TryGetValue("비용", out var v) ? v + 1 : 1;
         }
         public int[] PendingDiscard;   // 낼 카드와 함께 넘길 손패 번호(규칙 쪽) — PlayCard 가 한 번 쓰고 비운다
+        public int PendingStage;       // 단계를 고르는 쌓기(stack pick)의 고른 단계(1부터, 0 = 고르지 않음 → 다음 단계) — PlayCard · UseUlt 가 한 번 쓰고 비운다(2026-10-13)
+
+        /// <summary>낼 카드가 단계를 고르는 쌓기(stack pick)면 단계 이름들(1단계부터), 아니면 빈 목록. 신탁을 고른 카드(choice ≥ 0)는 그 신탁의 모습으로 본다.</summary>
+        public List<string> StagePickNames(int i, int choice = -1)
+        {
+            if (over || b == null || i < 0 || i >= b.Hand.Count) return new List<string>();
+            var id = b.Hand[i];
+            var g = b.GlowOf(id);
+            var fx = g != null && g.Kind == "card" && choice >= 0 && choice < g.Picks.Count ? data.View(id, g.Picks[choice].N)?.Fx : b.CardOf(id)?.Fx;
+            return b.StagePickNames(fx);
+        }
+        /// <summary>고학년이 단계를 고르는 쌓기(stack pick)면 단계 이름들, 아니면 빈 목록.</summary>
+        public List<string> UltStagePickNames(int hero) =>
+            over || b == null || hero < 0 || hero >= b.Party.Count ? new List<string>() : b.StagePickNames(b.UltOf(b.Party[hero].Key)?.Fx);
 
         public IReadOnlyList<BattleEvent> PlayCard(int i, int target, int choice = -1, int branch = 0, int spend = 0)
         {
             var evs = new List<BattleEvent>();
+            int ps = PendingStage; PendingStage = 0;   // 못 내도 남지 않게 먼저 비운다
             if (!CanPlay(i, out _)) return evs;
             cues.Clear();
             var id = b.Hand[i];
             if (b.GlowOf(id) != null) b.ApplyEpiphany(id, Math.Max(0, choice));
             lastTarget = b.CardOf(id)?.Target == "아군" ? -1 : target;   // 아군 카드의 target 은 사도 번호(코어 oneAlly) — 연출의 적 번호로 쓰지 않는다
             var pd = PendingDiscard; PendingDiscard = null;
-            b.PlayCard(i, target, branch > 0 || spend > 0 || pd != null ? new PlayOpts { Choice = branch > 0 ? branch : (int?)null, Spend = spend > 0 ? spend : (int?)null, Discard = pd?.Select(j => b.Hand[j]).ToList() } : null);
+            b.PlayCard(i, target, branch > 0 || spend > 0 || pd != null || ps > 0 ? new PlayOpts { Choice = branch > 0 ? branch : (int?)null, Spend = spend > 0 ? spend : (int?)null, Discard = pd?.Select(j => b.Hand[j]).ToList(), Stage = ps > 0 ? ps : (int?)null } : null);
             Translate(evs);
             After(evs);
             return evs;
@@ -505,10 +520,11 @@ namespace Bolzena.Battle
         public IReadOnlyList<BattleEvent> UseUlt(int hero, int target)
         {
             var evs = new List<BattleEvent>();
+            int ps = PendingStage; PendingStage = 0;   // 못 써도 남지 않게 먼저 비운다
             if (!CanUlt(hero, out _)) return evs;
             cues.Clear();
             lastTarget = target;
-            b.UseUlt(b.Party[hero].Key, target);
+            b.UseUlt(b.Party[hero].Key, target, ps > 0 ? ps : (int?)null);
             Translate(evs);
             After(evs);
             return evs;

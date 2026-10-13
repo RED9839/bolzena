@@ -146,10 +146,37 @@ namespace Bolzena.UI
             Options = opts;
 
             // 고르기 — 손가락(진짜 · 데모)으로 올려 누른다
+            //   두 번 누르기(2026-10-13 사용자 「누르면 설명, 다시 누르면 확정 — 닫기 없이」 · 판 화면 신탁 · 축복 창과 같은 규칙):
+            //   후보를 누르면 골라 두고 그 자리에 상세(CardZoom)가 크게 뜬다. 상세 카드를 누르면 결정, 다른 후보를 누르면 그 카드로 바꿔 골라 두고,
+            //   상세 낱말 판은 그대로(끌어 내려 읽는다), 그 밖을 누르면 상세만 닫힌다(골라 둔 것 해제). 「지금 카드」를 누르면 그 상세만.
             int choice = -1;
-            int hover = -1, keyHover = -1, press = -1;
-            bool zoomed = false; int sel = -1;
+            int hover = -1, keyHover = -1;
+            int sel = -1, downAt = int.MinValue; bool baseZoom = false;   // sel — 골라 둔 후보 · downAt — 누른 자리(HitAt) · baseZoom — 「지금 카드」 상세
             float waited = 0;
+            float PickX(int i) => (i - (opts.Count - 1) / 2f) * 3.7f;
+            // 누른 자리 — 0 이상 후보 · -2 지금 카드 · -3 상세 카드 · -4 상세 낱말 판 · -1 그 밖. 상세가 맨 위라 먼저 본다
+            int HitAt(Vector3 q)
+            {
+                if (CardZoom.Shown)
+                {
+                    var za = CardZoom.At; float zs = CardZoom.Scale;
+                    if (Mathf.Abs(q.x - za.x) < CardView.W * zs / 2 && Mathf.Abs(q.y - za.y) < CardView.H * zs / 2) return -3;
+                    var pn = root.Find("CardZoom/panels");
+                    if (pn != null)
+                        foreach (var r in pn.GetComponentsInChildren<Renderer>())
+                        {
+                            var bb = r.bounds;
+                            if (r.enabled && q.x >= bb.min.x && q.x <= bb.max.x && q.y >= bb.min.y && q.y <= bb.max.y) return -4;
+                        }
+                }
+                for (int i = opts.Count - 1; i >= 0; i--)
+                {
+                    var l = opts[i].transform.InverseTransformPoint(q);
+                    if (Mathf.Abs(l.x) < CardView.W / 2 && Mathf.Abs(l.y) < CardView.H / 2) return i;
+                }
+                if (orig != null && Mathf.Abs(q.x - origX) < CardView.W * origS / 2 && Mathf.Abs(q.y + 0.15f) < CardView.H * origS / 2) return -2;
+                return -1;
+            }
             while (choice < 0)
             {
                 if (Modal.Open != null) { waited = 0; yield return null; continue; }   // 덱 보기가 열린 동안은 고르기 멈춤(건너뛰는 길 없음)
@@ -170,7 +197,6 @@ namespace Bolzena.UI
                     var local = opts[i].transform.InverseTransformPoint(p);
                     if (Mathf.Abs(local.x) < CardView.W / 2 && Mathf.Abs(local.y) < CardView.H / 2) h = i;
                 }
-                bool onOrig = orig != null && Mathf.Abs(p.x - origX) < CardView.W * origS / 2 && Mathf.Abs(p.y + 0.15f) < CardView.H * origS / 2;
                 if (h >= 0) keyHover = -1;
                 else h = keyHover;
                 if (h != hover)
@@ -184,29 +210,38 @@ namespace Bolzena.UI
                     opts[i].TargetScale = up ? 1.65f : 1.55f;
                     opts[i].TargetPos = new Vector3((i - (opts.Count - 1) / 2f) * 3.7f, up ? 0.1f : 0f, 0);
                 }
-                // 카드를 누르면(떼면) 상세(CardZoom) — 다시 아무 데나 누르면 닫힌다. 고르기는 아래 「고르기」 단추 · 숫자 · 엔터. PC 는 우클릭으로도 상세
-                if (PointerInput.Down)
+                // 누를 때 자리를 재 두고, 끌지 않고 떼면 그 자리대로 한다(위 두 번 누르기 규칙). PC 는 우클릭도 골라 두기
+                if (PointerInput.Down) downAt = HitAt(p);
+                if (PointerInput.RightDown)
                 {
-                    // 상세가 떠 있으면 닫는다 — 고른 카드를 다시 누른 것이면 결정
-                    if (zoomed) { zoomed = false; if (sel >= 0 && hover == sel) choice = sel; press = -1; }
-                    else press = onOrig ? -2 : hover;
+                    int rh = HitAt(p);
+                    if (rh >= 0) { sel = rh; baseZoom = false; }
+                    else if (rh == -2) { baseZoom = true; sel = -1; }
+                    else if (rh == -1) { sel = -1; baseZoom = false; }
                 }
-                if (PointerInput.RightDown && hover >= 0) { press = hover; zoomed = !zoomed; }
                 if (PointerInput.Up)
                 {
-                    if (!zoomed && press >= 0 && press == hover && !PointerInput.Moved)
+                    int at = downAt; downAt = int.MinValue;
+                    if (at != int.MinValue && !PointerInput.Moved)
                     {
-                        if (sel == press) choice = sel;                                   // 고른 카드를 한 번 더 — 결정
-                        else { sel = press; zoomed = true; Sfx.Play("card_hover", 0.5f); }   // 처음 — 상세 + 골라 둠
+                        if (at == -3) { if (sel >= 0) choice = sel; else baseZoom = false; }   // 상세 위 — 골라 둔 카드 결정(지금 카드 상세면 닫기)
+                        else if (at >= 0)
+                        {
+                            if (at == sel) choice = sel;                                                       // 골라 둔 카드를 한 번 더 — 결정
+                            else { sel = at; baseZoom = false; Sfx.Play("card_hover", 0.5f); }                 // 처음 · 다른 후보 — 그 카드로 골라 두고 상세
+                        }
+                        else if (at == -2) { baseZoom = !baseZoom; sel = -1; if (baseZoom) Sfx.Play("card_hover", 0.5f); }
+                        else if (at == -1) { sel = -1; baseZoom = false; }                                     // 그 밖 — 상세만 닫는다
                     }
-                    else if (!zoomed && press == -2 && onOrig && !PointerInput.Moved) { zoomed = true; Sfx.Play("card_hover", 0.5f); }
-                    else if (!zoomed) press = -1;
                 }
                 for (int i = 0; i < opts.Count; i++) opts[i].Hovered = i == hover || i == sel;   // 골라 둔 카드는 올린 모습 그대로
-                if (zoomed && press == -2) CardZoom.Show(root, baseInfo, new Vector3(0, 0.25f, 0), 1.7f);
-                else if (zoomed && press >= 0 && press < opts.Count) CardZoom.Show(root, options[press], new Vector3(0, 0.25f, 0), 1.7f);
+                // 상세 — 골라 둔 카드 자리에 그대로 크게(같은 자리를 한 번 더 누르면 결정). 낱말 판은 화면 가운데 쪽으로
+                if (baseZoom) CardZoom.Show(root, baseInfo, new Vector3(origX, -0.15f, 0), 1.7f, origX > 0);
+                else if (sel >= 0) CardZoom.Show(root, options[sel], new Vector3(PickX(sel), 0.1f, 0), 1.7f, PickX(sel) > 0.01f);
                 else CardZoom.Hide();
-                if (hover >= 0 && (PointerInput.Key(UnityEngine.InputSystem.Key.Enter) || PointerInput.Key(UnityEngine.InputSystem.Key.NumpadEnter) || PointerInput.Key(UnityEngine.InputSystem.Key.Space))) choice = hover;
+                bool enter = PointerInput.Key(UnityEngine.InputSystem.Key.Enter) || PointerInput.Key(UnityEngine.InputSystem.Key.NumpadEnter) || PointerInput.Key(UnityEngine.InputSystem.Key.Space);
+                if (enter && hover >= 0) choice = hover;
+                else if (enter && sel >= 0) choice = sel;
                 waited += Time.unscaledDeltaTime;
                 if (demoPick >= 0 && waited > 3f) choice = demoPick;   // 데모 손가락이 못 누른 때의 안전판
                 yield return null;

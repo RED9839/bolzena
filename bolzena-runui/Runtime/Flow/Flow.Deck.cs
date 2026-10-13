@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Bolzena.RunUI
@@ -195,6 +196,7 @@ namespace Bolzena.RunUI
         void OracleRow(RectTransform row, string cardId, List<Core.OracleOption> opts, float cw, Action<int> pick, string hotPrefix)
         {
             Ui.Row(row, 26, TextAnchor.MiddleCenter, null, false, false);
+            var tap = new TwoTap(this, pick);   // 두 번 누르기 — 신탁 창(OracleReveal)과 같은 규칙
             for (int i = 0; i < opts.Count; i++)
             {
                 int idx = i;
@@ -212,10 +214,121 @@ namespace Bolzena.RunUI
                     var bt = Ui.Text(holder, o.ToAttack ? o.BlessText + "\n" + Core.OracleOption.ATTACK_LINE : $"{o.BlessText}", Theme.FsCap, Theme.Ink, TextAlignmentOptions.Top);
                     bt.rectTransform.At(0.5f, 0, 0, 0, cw + 20, 48); bt.enableAutoSizing = true; bt.fontSizeMin = 10; bt.fontSizeMax = Theme.FsCap;
                 }
-                var b = face.gameObject.AddComponent<Btn>();
-                b.OnClick = () => pick(idx);
+                var b = tap.Add(face, cardId, view);
+                b.OnHold = () => CardZoomView(cardId, view);
                 Stage.Hot[hotPrefix + i] = b;
                 Tw.Pop(holder, 0.1f + i * 0.08f, 0.6f, 0.4f);
+            }
+        }
+
+        /// <summary>
+        /// 두 번 눌러 고르기 — 신탁 · 축복 고르는 창 공통(2026-10-13 사용자 「누르면 카드 설명, 다시 누르면 확정 — 닫기 없이, 신탁 고를 때도 같은 UI」).
+        /// 첫 탭 = 그 카드 골라 두기(금빛 테) + 카드 옆에 낱말 판(상세), 같은 카드 다시 = 결정, 다른 카드 = 그 카드로 바꿔 골라 두기, 빈 곳 = 상세만 닫기(골라 둔 것 해제).
+        /// 골라 둔 동안은 창을 덮는 투명 판이 누름을 받아 자리로 가른다(낱말 판 위는 그대로). 창이 닫히면 판도 같이 사라진다.
+        /// 자동 데모는 한 번에 고른다. 길게 누르기(카드 상세)는 부르는 쪽이 단다.
+        /// </summary>
+        internal sealed class TwoTap
+        {
+            readonly Flow f;
+            readonly Action<int> decide;
+            readonly Func<bool> can;
+            readonly List<RectTransform> cards = new List<RectTransform>();
+            readonly List<string> ids = new List<string>();
+            readonly List<Core.CardView> views = new List<Core.CardView>();
+            RectTransform shade;
+            Image mark;
+            /// <summary>골라 둔 후보(없으면 -1).</summary>
+            public int Marked { get; private set; } = -1;
+
+            public TwoTap(Flow f, Action<int> decide, Func<bool> can = null) { this.f = f; this.decide = decide; this.can = can; }
+
+            /// <summary>후보 카드 하나를 단다(번호 = 단 차례). 카드의 Btn(없으면 붙인다)을 돌려준다.</summary>
+            public Btn Add(RectTransform card, string id, Core.CardView view = null)
+            {
+                int i = cards.Count;
+                cards.Add(card); ids.Add(id); views.Add(view);
+                var b = card.GetComponent<Btn>();
+                if (b == null) b = card.gameObject.AddComponent<Btn>();
+                b.OnClick = () => Tap(i);
+                return b;
+            }
+
+            void Tap(int i)
+            {
+                if (can != null && !can()) return;
+                if (i == Marked || Demo.Active) { Clear(); decide(i); return; }
+                Mark(i);
+            }
+
+            public void Clear()
+            {
+                Marked = -1;
+                if (shade) UnityEngine.Object.Destroy(shade.gameObject);
+                if (mark) UnityEngine.Object.Destroy(mark.gameObject);
+                shade = null; mark = null;
+            }
+
+            void Mark(int i)
+            {
+                Clear();
+                var card = cards[i];
+                if (!card) return;
+                Marked = i;
+                Sfx.Play("reveal_hover", 0.5f);
+                mark = Ui.Img(card, Theme.S("frame_thick", 24), Theme.Gold, "marked");
+                mark.rectTransform.Fill(-5, -5, -5, -5);
+                // 창(모달 층 바로 아래 조상)을 덮는 투명 판 — 누른 자리로 가른다
+                Transform win = card;
+                while (win.parent != null && win.parent != f.Stage.ModalLayer) win = win.parent;
+                var sh = Ui.Img(win, Theme.White, new Color(0, 0, 0, 0.001f), "twotap", true);
+                shade = sh.rectTransform; shade.Fill();
+                sh.gameObject.AddComponent<Catch>().On = e =>
+                {
+                    var cam = e.pressEventCamera;
+                    for (int k = cards.Count - 1; k >= 0; k--)
+                    {
+                        var c = cards[k];
+                        if (!c || !c.gameObject.activeInHierarchy || !RectTransformUtility.RectangleContainsScreenPoint(c, e.position, cam)) continue;
+                        var clip = c.GetComponentInParent<RectMask2D>();   // 스크롤 밖으로 잘린 칸은 없는 것으로
+                        if (clip != null && !RectTransformUtility.RectangleContainsScreenPoint((RectTransform)clip.transform, e.position, cam)) continue;
+                        Tap(k);
+                        return;
+                    }
+                    Clear();
+                };
+                // 낱말 판(상세) — 카드 오른쪽 위 끝에 맞춰 세로로(넘치면 왼쪽), 화면보다 길면 묶음을 줄인다(글을 자르지 않게)
+                var v = views[i] ?? f.P.View(ids[i]);
+                var terms = v != null ? CardTerms.Of(f.P.Data, f.P.Text, v, f.P.Text.Card(v)) : null;
+                if (terms == null || terms.Count == 0) return;
+                var stack = Ui.Rect("terms", shade);
+                stack.anchorMin = stack.anchorMax = new Vector2(0.5f, 0.5f); stack.pivot = new Vector2(0, 1);
+                float bw = Theme.C(400, 440), y = 0;
+                foreach (var t in terms)
+                {
+                    var bx = TermPop.Box(stack, t, bw);
+                    bx.anchoredPosition = new Vector2(0, -y);
+                    y += bx.sizeDelta.y + 8;
+                }
+                float total = Mathf.Max(1, y - 8);
+                stack.sizeDelta = new Vector2(bw, total);
+                var cn = new Vector3[4]; card.GetWorldCorners(cn);
+                Vector2 bl = shade.InverseTransformPoint(cn[0]), tr = shade.InverseTransformPoint(cn[2]);
+                Vector2 size = shade.rect.size;
+                float s = Mathf.Min(1f, (size.y - 24) / total);
+                stack.localScale = Vector3.one * s;
+                float w = bw * s, h = total * s;
+                float x = tr.x + 14;
+                if (x + w > size.x / 2 - 12) x = bl.x - 14 - w;
+                if (x < -size.x / 2 + 12) x = -size.x / 2 + 12;
+                float top = Mathf.Min(tr.y, size.y / 2 - 12);
+                if (top - h < -size.y / 2 + 12) top = -size.y / 2 + 12 + h;
+                stack.anchoredPosition = new Vector2(x, top);
+            }
+
+            sealed class Catch : MonoBehaviour, IPointerClickHandler
+            {
+                public Action<PointerEventData> On;
+                public void OnPointerClick(PointerEventData e) => On?.Invoke(e);
             }
         }
 

@@ -15,7 +15,9 @@ namespace Bolzena.UI
     //   오른쪽 클릭 · Esc — 내려놓기. 단축키 1~9 고르기 · ←→ 대상 · Space/Enter 내기
     //   길게 누르기(0.3초 · 마우스 · 터치 같게) — 그 카드를 화면 가운데 위에 손패의 약 2.5배로 + 오른쪽 키워드 판(넘치면 왼쪽).
     //     손패의 그 자리는 흐리게. 그 자리에서 떼면 닫기(내지 않음), 누른 채 끌면 확대를 닫고 바로 끌어 내기로 이어진다
-    //   카드 확대(상세 보기)는 언제나 화면 가운데 위 — 고른 카드는 확대하지 않는다(손패에서 들어 올린 카드 글로 본다 · 적을 가리지 않게)
+    //   카드 확대(상세 보기)는 화면 가운데 위 — 마우스로 고른 카드는 확대하지 않는다(손패에서 들어 올린 카드 글로 본다 · 적을 가리지 않게)
+    //   터치(2026-10-13 사용자 「폰에서 설명란이 너무 작다」) — 첫 탭으로 고르면 확대도 같이 띄운다(화면 왼쪽 절반 · 키워드 판은 카드 왼쪽 — 적은 오른쪽이라 가리지 않는다).
+    //     같은 카드 · 확대 카드를 한 번 더 탭(또는 적에게 끌기) = 내기. 다른 곳 탭 · 다른 카드 탭 · 끌기 시작 · 냄이면 닫힌다(다른 카드면 그 카드 확대로)
     public class HandView : MonoBehaviour
     {
         public readonly List<CardView> Cards = new List<CardView>();
@@ -38,6 +40,14 @@ namespace Bolzena.UI
         float pressT;
         bool holdZoom;
         bool hoverMute;                                // 길게 눌러 본 뒤 뗐다 — 마우스가 그 카드 위에 그대로 있어도 올려 두기 확대를 다시 열지 않는다(떼면 닫힘)
+        CardView zoomFor;                              // 터치 첫 탭으로 고른 카드 — 고르며 확대도 띄운다(고른 카드가 바뀌거나 내려놓으면 저절로 꺼진다)
+        bool pressZoom;                                // 이 누름이 고른 카드 확대 위에서 시작했다(끌면 그 카드를 끌어 낸다)
+        /// <summary>지금 터치로 고른 카드의 확대를 띄우고 있나(점검).</summary>
+        public bool SelZooming => zoomFor != null && drag < 0 && sel >= 0 && sel < Cards.Count && Cards[sel] == zoomFor;
+        // 드로우 — 뽑을 더미에서 아직 날아오는 카드. 이 동안은 올려 두기를 막는다(2026-10-13 사용자: 다 받았는데 위아래로만 되풀이 —
+        //   부채가 다시 펼쳐지는 사이 올림 · 밀림이 손가락 · 마우스 밑에서 켜졌다 꺼졌다 했다)
+        readonly List<CardView> arriving = new List<CardView>();
+        float arriveT;
         /// <summary>점검 — 마지막 탭이 무엇을 했나.</summary>
         public string LastTap { get; private set; }
         /// <summary>지금 길게 누르기로 카드를 크게 띄우고 있나(자동 데모 · 점검).</summary>
@@ -90,6 +100,8 @@ namespace Bolzena.UI
                 c.transform.localPosition = DeckPos;
                 c.transform.localScale = Vector3.one * 0.3f;
                 c.transform.localRotation = Quaternion.Euler(0, 0, 30);
+                arriving.Add(c);
+                arriveT = 0;
             }
             Cards.Add(c);
             Layout();
@@ -100,6 +112,7 @@ namespace Bolzena.UI
         {
             int i = Cards.IndexOf(c);
             Cards.Remove(c);
+            arriving.Remove(c);
             if (i >= 0)
             {
                 if (sel == i) sel = -1; else if (sel > i) sel--;
@@ -163,7 +176,7 @@ namespace Bolzena.UI
         {
             int n = Cards.Count;
             float wide = Mathf.Clamp01((HalfSpan - 4.55f) / 1.7f);
-            float maxS = Mathf.Lerp(0.92f, 1.04f, wide) * (Tone.Compact ? 1.1f : 1f);   // 폰 — 카드 글이 읽히게 조금 더 크게
+            float maxS = Mathf.Lerp(0.92f, 1.04f, wide);   // 폰도 같게(2026-10-13 사용자 「카드가 도리어 크다」 — 글은 탭 확대 · 카드 글자 크기로 읽는다)
             float span = HalfSpan * 2;
             float s = n > 0 ? Mathf.Clamp((span - Gap * (n - 1)) / (n * CardView.W), MinScale, maxS) : maxS;
             HandScale = s;
@@ -205,6 +218,10 @@ namespace Bolzena.UI
                 float sc = s;
                 float y = Bottom + CardView.H * sc / 2 - off * off * 0.018f;
                 float rot = -off * 1.1f;
+                // 쉬는 자리(밀림까지 · 들림 · 화면 안 밀어 넣기 · 신탁 숨쉬기 전) — 올려 두기 · 탭 판정은 이 자리로 잰다(CardAt)
+                c.RestPos = new Vector3(x, y - (Hidden ? 4.5f : 0f), 0);
+                c.RestRot = rot;
+                c.RestScale = s;
                 int order = 500 + i * 10 + (c.Info.Epiphany ? 60 : 0);   // 신탁 카드는 빛이 이웃 위로 번지게
                 if (i == up)
                 {
@@ -287,10 +304,20 @@ namespace Bolzena.UI
             return t;
         }
 
+        // 판정은 움직이는 지금 자리가 아니라 쉬는 자리(RestPos)로 — 지금 자리로 재면 끝 카드가 올라가며 안쪽으로 밀려(Clamp)
+        //   손가락 · 마우스 밖으로 빠지고, 그러면 내려와 다시 걸려 위아래로 되풀이했다(2026-10-13).
+        //   올린 카드(고른 카드 · 올려 둔 카드)는 올라간 목표 자리(TargetPos — 멈춰 있는 값)도 같이 친다
         bool Inside(CardView c, Vector2 p)
         {
-            var local = c.transform.InverseTransformPoint(p);
-            return Mathf.Abs(local.x) < CardView.W / 2 && Mathf.Abs(local.y) < CardView.H / 2;
+            var lp = transform.InverseTransformPoint(p);
+            if (InRect(c.RestPos, c.RestRot, c.RestScale, lp)) return true;
+            return c.Hovered && InRect(c.TargetPos, c.TargetRot, c.TargetScale, lp);
+        }
+
+        static bool InRect(Vector3 at, float rot, float sc, Vector3 lp)
+        {
+            var d = Quaternion.Euler(0, 0, -rot) * (lp - at);
+            return Mathf.Abs(d.x) < CardView.W * sc / 2 && Mathf.Abs(d.y) < CardView.H * sc / 2;
         }
 
         int CardAt(Vector2 p)
@@ -301,6 +328,29 @@ namespace Bolzena.UI
             return best;
         }
 
+        // 고른 카드 확대(터치) 위인가 — 확대 카드 · 키워드 판
+        bool OnZoomCard(Vector2 p)
+        {
+            if (!CardZoom.Shown) return false;
+            var a = CardZoom.At;
+            float s = CardZoom.Scale;
+            return Mathf.Abs(p.x - a.x) < CardView.W * s / 2 && Mathf.Abs(p.y - a.y) < CardView.H * s / 2;
+        }
+
+        bool OnZoomPanels(Vector2 p)
+        {
+            var z = transform.parent != null ? transform.parent.Find("CardZoom") : null;
+            var pn = z != null ? z.Find("panels") : null;
+            if (pn == null) return false;
+            foreach (var r in pn.GetComponentsInChildren<Renderer>())
+            {
+                if (!r.enabled) continue;
+                var b = r.bounds;
+                if (p.x >= b.min.x && p.x <= b.max.x && p.y >= b.min.y && p.y <= b.max.y) return true;
+            }
+            return false;
+        }
+
         bool NeedsEnemy(int i) => i >= 0 && i < Cards.Count && Cards[i].Info.Target == TargetKind.Enemy;
 
         public void Cancel()
@@ -309,6 +359,7 @@ namespace Bolzena.UI
             sel = -1;
             press = -1;
             holdZoom = false;
+            zoomFor = null;
             aimTarget = -1;
             CancelDrag();
         }
@@ -319,6 +370,7 @@ namespace Bolzena.UI
         public void Select(int i)
         {
             if (i < 0 || i >= Cards.Count) return;
+            zoomFor = null;                          // 터치 탭이면 OnTap 이 고른 뒤 다시 켠다
             if (sel == i) { Cancel(); return; }
             var c = Cards[i];
             if (!c.Playable) { Cant(i); return; }
@@ -355,6 +407,7 @@ namespace Bolzena.UI
         {
             if (NeedsEnemy(i) && target < 0) return;
             sel = -1; press = -1;
+            zoomFor = null;
             aimTarget = -1;
             arrow.Hide();
             reticle.enabled = false;
@@ -367,6 +420,15 @@ namespace Bolzena.UI
         void Update()
         {
             Layout();
+            // 날아오는 카드 — 제자리 가까이 오면 뺀다(1.5초 넘게 남으면 다 비운다 — 숨긴 손패 따위로 끝내 못 오는 경우)
+            arriveT += Time.unscaledDeltaTime;
+            for (int i = arriving.Count - 1; i >= 0; i--)
+            {
+                var a = arriving[i];
+                if (a == null || !Cards.Contains(a) || (a.transform.localPosition - a.TargetPos).sqrMagnitude < 0.25f * 0.25f) arriving.RemoveAt(i);
+            }
+            if (arriveT > 1.5f) arriving.Clear();
+            bool dealing = arriving.Count > 0;
             if (!Interactive || Modal.Open != null)
             {
                 if (!Interactive) { if (drag >= 0) CancelDrag(); sel = -1; press = -1; holdZoom = false; }
@@ -385,9 +447,11 @@ namespace Bolzena.UI
             {
                 int h = CardAt(p);
                 // 올린 카드는 원래 자리 둘레도 올린 채로 둔다(떨리지 않게)
-                if (h < 0 && hover >= 0 && hover < Cards.Count && p.y < LiftY && Mathf.Abs(p.x - Cards[hover].TargetPos.x) < 0.8f) h = hover;
+                if (h < 0 && hover >= 0 && hover < Cards.Count && p.y < LiftY && Mathf.Abs(p.x - Cards[hover].RestPos.x) < 0.8f) h = hover;
                 // 터치에는 올려 두기가 없다(뗀 그 프레임까지는 둔다 — 카드 위 뗌이 싸움터 탭으로 새지 않게)
                 if (PointerInput.Touch && !PointerInput.Held && !PointerInput.Up) h = -1;
+                // 드로우로 카드가 아직 날아오는 동안은 올려 두지 않는다(누르고 있는 손가락 · 단추는 그대로)
+                if (dealing && !PointerInput.Held && !PointerInput.Up) h = -1;
                 if (h != hover)
                 {
                     hover = h;
@@ -397,9 +461,19 @@ namespace Bolzena.UI
                     Layout();
                 }
                 hoverT += Time.unscaledDeltaTime;
-                if (PointerInput.Down) { press = CardAt(p); pressT = 0; holdZoom = false; hoverMute = true; }   // 누르면 올려 두기 확대는 접는다
-                // 누른 채 가만히 — 길게 누르기 확대(터치만. 마우스는 올려 두기 — 2026-10-12 사용자)
-                if (PointerInput.Held && press >= 0 && !PointerInput.Moved && PointerInput.Touch)
+                if (PointerInput.Down)
+                {
+                    press = CardAt(p);
+                    pressZoom = false;
+                    if (SelZooming)
+                    {
+                        if (OnZoomCard(p)) { press = sel; pressZoom = true; }   // 확대 카드를 누름 = 고른 카드를 누름(끌면 그 카드를 끌어 낸다)
+                        else if (OnZoomPanels(p)) press = -1;                   // 키워드 판 — 끌면 판이 내려가고(ZoomScroll) 밑의 손패는 건드리지 않는다
+                    }
+                    pressT = 0; holdZoom = false; hoverMute = true;   // 누르면 올려 두기 확대는 접는다
+                }
+                // 누른 채 가만히 — 길게 누르기 확대(터치만. 마우스는 올려 두기 — 2026-10-12 사용자). 고른 카드 확대가 떠 있는 그 카드는 이미 크게 보고 있다
+                if (PointerInput.Held && press >= 0 && !PointerInput.Moved && PointerInput.Touch && !(SelZooming && press == sel))
                 {
                     pressT += Time.unscaledDeltaTime;
                     if (!holdZoom && pressT >= HoldZoomT) { holdZoom = true; Sfx.Play("card_hover", 0.4f, 1.1f); }
@@ -414,7 +488,8 @@ namespace Bolzena.UI
                     {
                         drag = press;
                         sel = -1;
-                        dragOffset = (Vector2)c.transform.localPosition - p;
+                        zoomFor = null;                    // 끌기 시작 — 확대는 닫는다
+                        dragOffset = pressZoom ? Vector2.zero : (Vector2)c.transform.localPosition - p;   // 확대 카드에서 끌면 카드가 손가락 밑으로
                         c.SetOrder(650);
                         PullFx(c);
                     }
@@ -431,17 +506,22 @@ namespace Bolzena.UI
             RingsEnd();
             PullUpdate();
 
-            // 카드 확대(모두 CardZoom 한 판 · 언제나 화면 가운데 위 · 키워드 판은 카드 오른쪽, 넘치면 왼쪽) —
-            //   길게 누른 카드(마우스 · 터치 같게), 마우스를 잠깐 올려 둔 카드(PC). 고른 카드 · 끄는 카드는 확대하지 않는다(적 · 화살표를 가리지 않게)
+            // 카드 확대(모두 CardZoom 한 판) —
+            //   길게 누른 카드(터치) · 마우스를 잠깐 올려 둔 카드(PC): 화면 가운데 위, 키워드 판은 카드 오른쪽(넘치면 왼쪽)
+            //   터치로 고른 카드: 화면 왼쪽 절반, 키워드 판은 카드 왼쪽(SelZoomAt — 적 · 화살표를 가리지 않게). 마우스로 고른 카드 · 끄는 카드는 확대하지 않는다
             int holdCard = HoldZooming && press < Cards.Count ? press : -1;
             // 마우스는 카드 위에 HoverZoomT 초 가만히 올려 두면 확대(2026-10-12 사용자 「꾹 누르기 말고 2~3초 올려 두면」) · 터치는 길게 누르기
             int hoverCard = !PointerInput.Touch && !PointerInput.Held && sel < 0 && !hoverMute && hover >= 0 && hover < Cards.Count && hoverT >= HoverZoomT ? hover : -1;
-            int tipCard = drag >= 0 ? -1 : holdCard >= 0 ? holdCard : hoverCard;
+            int selCard = SelZooming ? sel : -1;
+            int tipCard = drag >= 0 ? -1 : holdCard >= 0 ? holdCard : selCard >= 0 ? selCard : hoverCard;
             if (tipCard >= 0 && tipCard < Cards.Count)
             {
                 var c = Cards[tipCard];
                 string why = !c.Playable ? WhyNot?.Invoke(tipCard) : null;
-                CardZoom.Show(transform.parent, c.Info, ZoomAt(out float s), s, false, why);
+                bool atSide = tipCard == selCard && holdCard < 0;
+                float s;
+                var at = atSide ? SelZoomAt(out s) : ZoomAt(out s);
+                CardZoom.Show(transform.parent, c.Info, at, s, atSide, why);
                 Tooltip.I?.Unpin();
             }
             else CardZoom.Hide();
@@ -460,9 +540,31 @@ namespace Bolzena.UI
             return new Vector3(cx, bottom + CardView.H * s / 2, 0);
         }
 
+        /// <summary>터치로 고른 카드의 확대 자리 — 화면 왼쪽 절반(오른쪽 끝이 x = -0.4 · 적은 x ≥ 0 이라 가리지 않는다), 키워드 판은 카드 왼쪽에 한 줄로 들 만큼.
+        ///   아래 · 위 끝은 손패 확대(ZoomAt)와 같게. 들어 올린 카드를 가려도 확대 카드를 탭하면 그 카드를 누른 것과 같다.</summary>
+        public Vector3 SelZoomAt(out float s)
+        {
+            float bottom = Bottom + CardView.H * HandScale * 0.45f;
+            float top = Tone.HalfH - 1.0f * Tone.K;
+            var cam = Camera.main;
+            float cx = cam != null && transform.parent != null ? transform.parent.InverseTransformPoint(cam.transform.position).x : 0;
+            float right = cx - 0.4f;
+            float room = right - (cx - Tone.HalfW) - 0.1f - 0.15f - 3.5f * Tone.K - 0.15f;   // 카드 + 틈 + 키워드 판 한 줄(CardZoom.PanelW 3.5 × K)
+            s = Mathf.Min(HandScale * 2.5f, (top - bottom) / CardView.H, room / CardView.W);
+            s = Mathf.Max(s, HandScale * 1.3f);   // 아주 좁은 화면 — 판이 오른쪽으로 넘어가더라도 카드는 손패보다 크게
+            return new Vector3(right - CardView.W * s / 2, bottom + CardView.H * s / 2, 0);
+        }
+
         void OnTap(Vector2 p)
         {
             int at = CardAt(p);
+            // 터치로 고른 카드의 확대가 떠 있으면 — 확대 카드 탭 = 고른 카드를 한 번 더 누름(내기), 키워드 판 탭 = 확대만 닫기(고른 채)
+            if (SelZooming)
+            {
+                if (OnZoomCard(p)) at = sel;
+                else if (OnZoomPanels(p)) { zoomFor = null; LastTap = $"확대 판 탭 — 닫기 · 고른 {sel}"; return; }
+            }
+            zoomFor = null;   // 그 밖의 탭은 모두 확대를 닫는다(다른 카드를 고르면 아래에서 그 카드로 다시 연다)
             LastTap = $"탭 카드 {at} · 고른 {sel} · y {p.y:F2}";
             if (sel >= 0)
             {
@@ -474,7 +576,7 @@ namespace Bolzena.UI
                     else Cancel();
                     return;
                 }
-                if (at >= 0) { Select(at); return; }
+                if (at >= 0) { Select(at); TouchZoom(at); return; }
                 if (NeedsEnemy(sel))
                 {
                     int e = AimAt(p);
@@ -487,7 +589,13 @@ namespace Bolzena.UI
                 else Cancel();
                 return;
             }
-            if (at >= 0) Select(at);
+            if (at >= 0) { Select(at); TouchZoom(at); }
+        }
+
+        // 터치 첫 탭으로 골랐으면 확대도 같이(2026-10-13 사용자 — 폰은 카드 글이 작다). 마우스는 그대로(올려 두기 확대)
+        void TouchZoom(int i)
+        {
+            if (PointerInput.Touch && sel == i && i >= 0 && i < Cards.Count) zoomFor = Cards[i];
         }
 
         void Keys()

@@ -10,7 +10,7 @@ namespace Bolzena
     // 은총 — 빛나는 기본 카드를 내면 그 사도의 고유 카드 하나가 손에 들어온다(core ApplyEpiphany "hero").
     //   고르기가 없으니 신탁 창(EpiphanyWindow)을 열지 않는다(2026-10-07 제보: 은총이 「신탁!」 창으로 떠서 카드를 한 번 더 눌러야 들어왔다).
     //   얻은 카드를 화면 가운데 위에 크게(손패 길게 누르기 확대 크기) 0.9초 보여 준 뒤 그대로 손패 제자리로 날아 들어간다. 누르면 바로 넘어간다.
-    //   손이 가득하면(core: 버림 더미로) 크게 보인 뒤 버림 더미 쪽으로 날아간다.
+    //   손이 가득하면(core: 버린 더미로) 크게 보인 뒤 버린 더미 쪽으로 날아간다.
     public partial class BattleDirector
     {
         /// <summary>은총 연출 단계(grace_show · grace_fly · grace_done) — 점검 캡처가 본다.</summary>
@@ -45,7 +45,7 @@ namespace Bolzena
             var title = Make.Text("title", root, "은총!", new Vector3(zoom.x, Tone.HalfH - 0.62f * Tone.K, 0), 0.7f, O + 40, new Color(1f, 0.95f, 0.75f));
             title.colorGradient = new VertexGradient(Color.white, Color.white, new Color(1f, 0.78f, 0.3f), new Color(1f, 0.78f, 0.3f));
             Make.Outline(title, 0.2f, new Color(0.35f, 0.15f, 0));
-            string what = toHand ? $"{who}의 고유 카드를 손에 얻습니다 · 이번 턴 비용 0" : $"{who}의 고유 카드 — 손이 가득해 버림 더미로";
+            string what = toHand ? $"{who}의 고유 카드를 손에 얻습니다 · 이번 턴 비용 0" : $"{who}의 고유 카드 — 손이 가득해 버린 더미로";
             string line = string.IsNullOrEmpty(graceFrom) ? what : $"<color=#ffd76a>「{graceFrom}」</color>의 은총 — {what}";
             var sub = Make.Text("sub", root, line, new Vector3(zoom.x, Tone.HalfH - 1.28f * Tone.K, 0), 0.22f, O + 40, new Color(1f, 0.92f, 0.8f));
             Make.Outline(sub, 0.25f, Color.black);

@@ -2046,6 +2046,18 @@ namespace Bolzena
         {
             var s = Battle.Snapshot;
             var hs = s.Heroes[hero];
+            // 단계를 고르는 쌓기(stack pick)가 든 고학년(요미 「지극정성의 마중」) — 사람은 컷인 전에 단계를 고른다 · 무르면 고학년도 안 쓴다 · 자동 전투는 다음 단계(2026-10-13)
+            if (!Auto && Battle is CoreBattle cbu)
+            {
+                var stageNames = cbu.UltStagePickNames(hero);
+                if (stageNames.Count > 0)
+                {
+                    int stagePick = 0;
+                    yield return ChoiceWindow.Run(UiRoot, null, stageNames, $"「{hs.UltName}」 — 단계를 고르세요", v => stagePick = v, DemoBranchPick);
+                    if (stagePick <= 0) yield break;   // 물렀다
+                    cbu.PendingStage = stagePick;
+                }
+            }
             InUlt = true;
             Clock.Base = 1f;   // 고학년은 원작 길이 원칙(ULT_MAX · ULT_SPEED_MAX) — 기본 템포를 걸지 않는다(배속은 그대로)
             Emit("ult_start");

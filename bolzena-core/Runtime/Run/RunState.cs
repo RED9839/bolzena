@@ -107,7 +107,7 @@ namespace Bolzena.Core
     /// <summary>
     /// 선택 하나 — K 갈래 · F 층(1 · 2) · S 걸음(RunState.Step) · Card 대상(카드 · 사도 — 신탁 · 은총 · 수련) · Offer 제시된 것 · Pick 고른 것(null = 넘김 · 아직).
     /// 갈래: oracle(신탁 — Offer · Pick 은 신탁 번호) · grace(은총 — 카드 id) · equip(전리품 아티팩트) · grade(진급 보상 — 종류) · shop(진열 — Offer 만) · buy · remove(상점 빼기) · gradeRemove ·
-    /// train(휴식 수련 — 강화) · rest · copy(보스 복제) · event(Offer = 이벤트 id, Pick = 선택지 차례) · ev.card · ev.flash · ev.remove · ev.grace · ev.dupe · ev.shinPick · ev.gambleChoice.
+    /// train(휴식 수련 — 강화) · rest · copy(보스 복제) · event(Offer = 이벤트 id, Pick = 선택지 차례) · ev.card · ev.flash · ev.remove · ev.grace · ev.dupe · ev.shinPick · ev.bless(축복 종류) · ev.gambleChoice.
     /// At — 전투 중에 고른 빛이면 "fight", 끝난 뒤 보상이면 null.
     /// </summary>
     public sealed class PickLog
@@ -202,7 +202,10 @@ namespace Bolzena.Core
         public bool Elite;
     }
 
-    /// <summary>이벤트에서 아직 고를 것 — remove · dupe · card(Cards) · flash(Offer) · shinPick(Kind) · gambleChoice(Options).</summary>
+    /// <summary>
+    /// 이벤트에서 아직 고를 것 — remove · dupe · card(Cards) · flash(Offer) · shinPick(Kind · Random) · bless(Offer.CardId · Cards = 축복 종류 후보) · gambleChoice(Options).
+    /// shinPick 을 고르면(무작위가 아니면) 이어서 bless → flash(Kind "shin" — 그 카드의 신탁 후보 전부, 축복 확률 굴림 · 받지 않기 없음)가 바로 뒤에 끼어든다(2026-10-13).
+    /// </summary>
     public sealed class Pending
     {
         public string K;
@@ -215,6 +218,8 @@ namespace Bolzena.Core
         public bool Basic;
         /// <summary>grace — 고른 사도의 남은 고유 카드 몇 장(1 이상).</summary>
         public int N;
+        /// <summary>shinPick — 이벤트에 「무작위」 라고 적힌 것(Outcome.Random). 축복 종류 · 신탁 번호를 고르지 않고 무작위로 붙인다.</summary>
+        public bool Random;
     }
 
     public sealed class EventState

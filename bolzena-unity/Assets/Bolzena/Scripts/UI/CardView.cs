@@ -28,6 +28,8 @@ namespace Bolzena.UI
         public Color? CostTint;               // 비용 숫자 빛깔 덮기(신탁 축복 — 비용이 내려가면 초록)
         public bool ShowPin = false;           // 오른쪽 위 사도 얼굴(손패는 손 위의 핀이 맡는다)
         public float SlotX;                   // 손 안의 제자리 x(끌어 겨눌 때 그 자리에 띄운다)
+        public Vector3 RestPos;               // 손패의 쉬는 자리(들림 · 신탁 숨쉬기 전) — HandView 가 올려 두기 · 탭 판정에 쓴다
+        public float RestRot, RestScale = 1f;
         SpriteRenderer rim, body, art, iconPlate, icon, descBg, glow, flash, epiGlow, band, shadeT, shadeB, typeIcon, deco, decoDot, pinRim, pin;
         SpriteMask artMask, pinMask;
         SpriteRenderer typeBg;
@@ -236,11 +238,15 @@ namespace Bolzena.UI
             // 글 = 어절 단위 · 덩이 묶음 · 화살표 규칙(조건 → 결과가 칸에 안 들어가면 「→ 결과」 를 다음 줄 맨 앞으로 — CardTerms.Fit)
             string rawDesc = Tone.CardText(info.Text);
             float descW = W - 0.24f, baseH = tags.Length > 0 ? 0.56f : 0.68f, needH = 0;
-            descText.text = Bolzena.RunUI.CardTerms.FitFor(descText, rawDesc, descW, 1.3f);
+            // 폰 — 효과 글을 조금 크게(2026-10-13 사용자 「설명란이 너무 작다」). 칸 높이를 큰 글자로 재고, 칸 상한(baseH + 0.16)을 넘는 긴 글은
+            //   자동 크기가 예전처럼 줄인다(넘치지 않게)
+            float fs0 = Tone.Compact ? 1.42f : 1.3f;
+            descText.fontSizeMax = Tone.Compact ? 1.7f : 1.55f;
+            descText.text = Bolzena.RunUI.CardTerms.FitFor(descText, rawDesc, descW, fs0);
             if (!string.IsNullOrEmpty(descText.text))
             {
                 bool auto = descText.enableAutoSizing; float fs = descText.fontSize;
-                descText.enableAutoSizing = false; descText.fontSize = 1.3f;
+                descText.enableAutoSizing = false; descText.fontSize = fs0;
                 needH = descText.GetPreferredValues(descText.text, descW, 0).y;
                 descText.enableAutoSizing = auto; descText.fontSize = fs;
             }

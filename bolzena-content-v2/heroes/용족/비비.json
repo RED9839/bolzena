@@ -79,23 +79,19 @@
         "fx": [
           {
             "k": "dmg",
-            "ratio": 3.5,
+            "ratio": 3,
             "base": "def",
             "target": "oneEnemy"
           },
           {
-            "k": "dealtMod",
-            "v": -0.3,
-            "target": "allEnemies"
+            "k": "perStack",
+            "id": "수은 갑주"
           },
           {
-            "k": "taunt",
-            "v": 1
-          },
-          {
-            "k": "status",
-            "id": "반격",
-            "v": 5
+            "k": "dmg",
+            "ratio": 0.3,
+            "base": "def",
+            "target": "oneEnemy"
           }
         ]
       },
@@ -157,73 +153,141 @@
       "hero": "비비",
       "unique": true,
       "cost": 1,
-      "type": "스킬",
+      "type": "강화",
+      "tags": [
+        "주도"
+      ],
       "fx": [
         {
-          "k": "shield",
-          "ratio": 2.4
-        },
-        {
-          "k": "status",
-          "id": "반격",
-          "v": 2
-        },
-        {
-          "k": "stack",
-          "id": "수은 갑주",
-          "v": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "turnEnd"
+              },
+              "fx": [
+                {
+                  "k": "shield",
+                  "ratio": 0.5
+                }
+              ]
+            },
+            {
+              "when": {
+                "on": "turnStart"
+              },
+              "fx": [
+                {
+                  "k": "status",
+                  "id": "반격",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
           "name": "신탁 1",
+          "power": true,
+          "tags": [
+            "주도"
+          ],
           "fx": [
             {
-              "k": "shield",
-              "ratio": 2.4
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 3
-            },
-            {
-              "k": "stack",
-              "id": "수은 갑주",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 1.2
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
           "name": "신탁 2",
+          "power": true,
+          "tags": [
+            "주도"
+          ],
           "fx": [
             {
-              "k": "shield",
-              "ratio": 4.7
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.7
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
           "name": "신탁 3",
           "power": true,
+          "tags": [
+            "개전"
+          ],
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.4
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 2
+              "k": "stack",
+              "id": "수은 갑주",
+              "v": 1
             },
             {
               "k": "power",
               "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 0.7
+                    }
+                  ]
+                },
                 {
                   "when": {
                     "on": "turnStart"
@@ -243,28 +307,27 @@
         {
           "name": "신탁 4",
           "power": true,
+          "cost": 2,
+          "tags": [
+            "유일",
+            "주도"
+          ],
           "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.9
-            },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "shieldBreak"
+                    "on": "turnEnd"
                   },
                   "fx": [
                     {
-                      "k": "status",
-                      "id": "취약",
-                      "v": 1,
-                      "target": "allEnemies"
+                      "k": "shield",
+                      "ratio": 0.7
                     },
                     {
                       "k": "dmg",
-                      "ratio": 0.8,
+                      "ratio": 2,
                       "base": "def",
                       "target": "allEnemies"
                     }
@@ -277,23 +340,27 @@
         {
           "name": "신탁 5",
           "power": true,
+          "tags": [
+            "주도"
+          ],
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.9
+              "k": "status",
+              "id": "반격",
+              "v": 4
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "hurt",
-                    "guarded": true
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "shield",
-                      "ratio": 1
+                      "k": "counterMod",
+                      "v": 1,
+                      "turns": 1
                     }
                   ]
                 }
@@ -328,91 +395,29 @@
       "name": "오시려구요?",
       "hero": "비비",
       "unique": true,
-      "cost": 0,
+      "cost": 2,
       "type": "스킬",
-      "tags": [
-        "보존"
-      ],
       "fx": [
         {
-          "k": "taunt",
-          "v": 0.5
+          "k": "shield",
+          "ratio": 2.2
         },
         {
           "k": "status",
           "id": "반격",
-          "v": 1
+          "v": 2
+        },
+        {
+          "k": "counterAll"
         }
       ],
       "oracles": [
         {
           "name": "신탁 1",
-          "tags": [
-            "보존"
-          ],
           "fx": [
             {
-              "k": "taunt",
-              "v": 0.8
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "신탁 2",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "taunt",
-              "v": 0.5
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "신탁 3",
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "taunt",
-              "v": 0.5
-            },
-            {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "status",
-              "id": "취약",
-              "v": 1,
-              "target": "oneEnemy"
-            }
-          ]
-        },
-        {
-          "name": "신탁 4",
-          "cost": 1,
-          "tags": [
-            "보존"
-          ],
-          "fx": [
-            {
-              "k": "taunt",
-              "v": 0.5
+              "k": "shield",
+              "ratio": 3.6
             },
             {
               "k": "status",
@@ -420,17 +425,17 @@
               "v": 3
             },
             {
-              "k": "shield",
-              "ratio": 2
+              "k": "counterAll"
             }
           ]
         },
         {
-          "name": "신탁 5",
-          "tags": [
-            "보존"
-          ],
+          "name": "신탁 2",
           "fx": [
+            {
+              "k": "shield",
+              "ratio": 4.6
+            },
             {
               "k": "status",
               "id": "반격",
@@ -438,8 +443,57 @@
             },
             {
               "k": "stack",
-              "id": "수은 중독",
-              "v": 2
+              "id": "수은 갑주",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "power": true,
+          "tags": [
+            "주도"
+          ],
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.4
+            },
+            {
+              "k": "counterAll"
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "type": "공격",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 3.4
+            },
+            {
+              "k": "dmg",
+              "ratio": 1.7,
+              "base": "def",
+              "target": "allEnemies"
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 2.4
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 3
+            },
+            {
+              "k": "counterAll"
             }
           ]
         }
@@ -472,34 +526,139 @@
       "unique": true,
       "cost": 1,
       "type": "강화",
+      "tags": [
+        "주도"
+      ],
       "fx": [
         {
-          "k": "counterHits",
-          "v": 2,
-          "ratio": 1
+          "k": "power",
+          "rules": [
+            {
+              "when": {
+                "on": "guard"
+              },
+              "fx": [
+                {
+                  "k": "status",
+                  "id": "반격",
+                  "v": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "oracles": [
         {
           "name": "신탁 1",
+          "power": true,
+          "tags": [
+            "주도",
+            "개전"
+          ],
           "fx": [
             {
-              "k": "counterHits",
-              "v": 2,
-              "ratio": 1.1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guard"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
           "name": "신탁 2",
+          "power": true,
+          "tags": [
+            "주도"
+          ],
           "fx": [
             {
-              "k": "counterAll"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guard"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "counter"
+                  },
+                  "fx": [
+                    {
+                      "k": "stack",
+                      "id": "수은 중독",
+                      "v": 1,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
           "name": "신탁 3",
+          "power": true,
+          "tags": [
+            "주도"
+          ],
+          "fx": [
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guard"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "counterMod",
+                      "v": 0.5,
+                      "turns": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "power": true,
+          "tags": [
+            "주도"
+          ],
           "fx": [
             {
               "k": "counterHits",
@@ -511,12 +670,12 @@
               "rules": [
                 {
                   "when": {
-                    "on": "counter"
+                    "on": "guard"
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "수은 중독",
+                      "k": "status",
+                      "id": "반격",
                       "v": 1
                     }
                   ]
@@ -526,25 +685,31 @@
           ]
         },
         {
-          "name": "신탁 4",
-          "fx": [
-            {
-              "k": "counterHits",
-              "v": 4,
-              "ratio": 0.5
-            }
-          ]
-        },
-        {
           "name": "신탁 5",
+          "power": true,
           "tags": [
-            "개전"
+            "주도"
           ],
           "fx": [
             {
-              "k": "counterHits",
-              "v": 2,
-              "ratio": 1.1
+              "k": "counterAll"
+            },
+            {
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "guard"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "반격",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -575,32 +740,18 @@
       "name": "수은 방울",
       "hero": "비비",
       "unique": true,
-      "cost": 0,
+      "cost": 1,
       "type": "스킬",
       "fx": [
         {
-          "k": "status",
-          "id": "반격",
-          "v": 1
-        },
-        {
           "k": "shield",
-          "ratio": 1.4
-        },
-        {
-          "k": "stack",
-          "id": "수은 갑주",
-          "v": 1
-        },
-        {
-          "k": "ifStack",
-          "id": "수은 중독",
-          "n": 2
+          "ratio": 1.2
         },
         {
           "k": "status",
-          "id": "반격",
-          "v": 2
+          "id": "취약",
+          "v": 2,
+          "target": "allEnemies"
         }
       ],
       "oracles": [
@@ -608,96 +759,83 @@
           "name": "신탁 1",
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
-              "v": 2
-            },
-            {
               "k": "shield",
-              "ratio": 1.4
-            },
-            {
-              "k": "stack",
-              "id": "수은 갑주",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "수은 중독",
-              "n": 2
+              "ratio": 2.5
             },
             {
               "k": "status",
-              "id": "반격",
-              "v": 3
+              "id": "취약",
+              "v": 3,
+              "target": "allEnemies"
             }
           ]
         },
         {
           "name": "신탁 2",
-          "type": "공격",
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            },
-            {
               "k": "shield",
-              "ratio": 1.5
+              "ratio": 2.5
             },
             {
-              "k": "ifStack",
-              "id": "수은 중독",
-              "n": 2
-            },
-            {
-              "k": "dmg",
-              "ratio": 1.2,
-              "base": "def",
+              "k": "status",
+              "id": "취약",
+              "v": 4,
               "target": "allEnemies"
             }
           ]
         },
         {
           "name": "신탁 3",
+          "power": true,
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 2
-            },
-            {
-              "k": "ifStack",
-              "id": "수은 중독",
-              "n": 2
-            },
-            {
-              "k": "counterMod",
-              "v": 1,
-              "turns": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnEnd"
+                  },
+                  "fx": [
+                    {
+                      "k": "shield",
+                      "ratio": 1
+                    }
+                  ]
+                },
+                {
+                  "when": {
+                    "on": "counter"
+                  },
+                  "fx": [
+                    {
+                      "k": "status",
+                      "id": "취약",
+                      "v": 3,
+                      "target": "oneEnemy"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
           "name": "신탁 4",
+          "type": "공격",
           "fx": [
             {
+              "k": "dmg",
+              "ratio": 1,
+              "base": "def",
+              "target": "randomEnemy",
+              "hits": 3
+            },
+            {
               "k": "status",
-              "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "id": "취약",
+              "v": 1,
+              "target": "randomEnemy"
             }
           ]
         },
@@ -706,21 +844,14 @@
           "fx": [
             {
               "k": "status",
+              "id": "취약",
+              "v": 3,
+              "target": "allEnemies"
+            },
+            {
+              "k": "status",
               "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "shield",
-              "ratio": 1.6
-            },
-            {
-              "k": "ifStack",
-              "id": "수은 중독",
-              "n": 2
-            },
-            {
-              "k": "shield",
-              "ratio": 3.9
+              "v": 3
             }
           ]
         }
@@ -753,148 +884,106 @@
       "unique": true,
       "cost": 2,
       "type": "공격",
-      "tags": [
-        "보존"
-      ],
       "fx": [
         {
-          "k": "spend",
-          "id": "반격",
-          "all": true
-        },
-        {
-          "k": "perEvent",
-          "n": 1
-        },
-        {
           "k": "dmg",
-          "ratio": 0.7,
+          "ratio": 3,
           "base": "def",
-          "target": "allEnemies"
+          "target": "oneEnemy"
+        },
+        {
+          "k": "shield",
+          "ratio": 1.8
         }
       ],
       "oracles": [
         {
           "name": "신탁 1",
-          "type": "스킬",
-          "tags": [
-            "보존"
-          ],
           "fx": [
             {
-              "k": "spend",
-              "id": "반격",
-              "all": true
-            },
-            {
-              "k": "perEvent",
-              "n": 1
+              "k": "dmg",
+              "ratio": 4.5,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
               "k": "shield",
-              "ratio": 1.3
+              "ratio": 1.8
             }
           ]
         },
         {
           "name": "신탁 2",
-          "tags": [
-            "보존"
-          ],
           "fx": [
             {
-              "k": "spend",
-              "id": "반격",
-              "v": 3
-            },
-            {
-              "k": "perEvent",
-              "n": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 3.6,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
+            },
+            {
+              "k": "status",
+              "id": "취약",
+              "v": 3,
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 3",
-          "tags": [
-            "보존"
-          ],
           "fx": [
             {
-              "k": "spend",
-              "id": "수은 중독",
-              "all": true
+              "k": "dmg",
+              "ratio": 4.5,
+              "base": "def",
+              "target": "oneEnemy"
             },
             {
-              "k": "perEvent",
-              "n": 1
+              "k": "ifShield"
             },
             {
               "k": "dmg",
-              "ratio": 1.4,
+              "ratio": 2.2,
               "base": "def",
-              "target": "allEnemies"
+              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 4",
-          "cost": 1,
-          "tags": [
-            "보존"
-          ],
           "fx": [
             {
-              "k": "spend",
-              "id": "반격",
-              "all": true
-            },
-            {
-              "k": "perEvent",
-              "n": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 3,
               "base": "def",
-              "target": "oneEnemy"
+              "target": "allEnemies"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.8
             }
           ]
         },
         {
           "name": "신탁 5",
           "tags": [
-            "보존"
+            "소멸 2"
           ],
           "fx": [
             {
-              "k": "status",
-              "id": "반격",
-              "v": 1
-            },
-            {
-              "k": "ifFoe",
-              "id": "취약"
-            },
-            {
-              "k": "spend",
-              "id": "반격",
-              "all": true
-            },
-            {
-              "k": "perEvent",
-              "n": 1
-            },
-            {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 4,
               "base": "def",
               "target": "oneEnemy"
+            },
+            {
+              "k": "shield",
+              "ratio": 1.8
+            },
+            {
+              "k": "status",
+              "id": "반격",
+              "v": 2
             }
           ]
         }

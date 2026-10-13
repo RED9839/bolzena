@@ -92,8 +92,8 @@ namespace Bolzena.Core.Tests
             // 강화 카드 — 세기형 버프는 「이 전투 동안」 없이(원래 전투 끝까지), 「매 턴 …」 규칙도 머리 없이
             var pw = C("{'id':'pw2','name':'강화','cost':1,'type':'강화','fx':[{'k':'status','id':'사기','v':1},{'k':'power','rules':[{'when':{'on':'turnStart'},'fx':[{'k':'stack','id':'근력','v':1}]}]}]}");
             string pt = T.Card(pw);
-            Assert.AreEqual("사기 1\n매 턴 시작 시 「근력」 1", pt);
-            Assert.AreEqual("매 턴 시작 시".Length, CardText.HeadEnd(pt.Split('\n')[1]));
+            Assert.AreEqual("유일.\n사기 1\n매 턴 시작 시 「근력」 1", pt);
+            Assert.AreEqual("매 턴 시작 시".Length, CardText.HeadEnd(pt.Split('\n')[2]));
             CollectionAssert.Contains(T.Chips(new CardView("f2", C("{'id':'f2','name':'격파','cost':1,'type':'공격','fx':[{'k':'dmg','ratio':1.0,'target':'oneEnemy'},{'k':'ifFoe','id':'broken'},{'k':'ap','v':1}]}"), null, 0)), "격파 상태");
             Assert.IsNotNull(CardText.Tip("격파 상태"));
         }

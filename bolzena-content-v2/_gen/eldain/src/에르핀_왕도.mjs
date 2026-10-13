@@ -1,6 +1,6 @@
 // 에르핀(왕도) — 딜러 · 순수 · 요정. 설계: _measure/엘다인_엔진/01_사도별.md §12 (4차 10-11 — 다시 짬: X 난타 + 근면, D11)
 // 엔진: 시동 「축복의 왕관」 으로 근면(처치 → AP 1 · 드로우 1, 파티 상태라 누가 처치하든)을 깔고 → 싼 카드 · 약점 공격으로 처치각을 만든 뒤
-//   → X 「마력 난타」 로 남은 AP 를 무작위 적에게 쏟되 처치할 때마다 한 대 더(▶E79) → 근면이 AP · 드로우를 되돌려 다음 카드로 잇는다.
+//   → X 「마력 난타」 로 남은 AP + 왕마력탄으로 모은 왕마력만큼 무작위 적에게 쏟는다(10-13 — 옛 처치마다 한 대 더 뺌) → 근면이 AP · 드로우를 되돌려 다음 카드로 잇는다.
 // 왕관 겹 자원은 없앴다(X 코스트는 에르핀 소유). 자동 규칙 없음.
 // 2026-10-12 밤 사용자 「아군 강화를 모두 없애고 자신만 강화하는 퓨어 딜러로」: 「축복의 왕관」 은 동료에게 씌우던 표시 → 여왕 자신이 쓰는 왕관(자신 · 최대 3 · 1개당 공격력 +10%),
 //   동료 다음 카드 강화 · 동료 드로우 · 동료 게이지 · 고학년 아군 피해 +20% → 자신의 다음 카드 · 드로우 · 게이지 · 왕관으로. 근면(파티 상태 — 처치 엔진)은 그대로.
@@ -11,11 +11,13 @@ const crown = (v = 1) => stack('축복의 왕관', v);   // 여왕 자신의 왕
 const gaugeMe = (v) => ({ k: 'gauge', v, target: 'self' });
 const WK = ['약점 공격'];
 const dil = (v = 1) => status('근면', v);
-const barrage = (ratio, target = 'randomEnemy', x) => dmg(ratio, target, { xHits: true, killMore: true, ...x });
+// 10-13 사용자 「마력 난타 처치하면 1회 더 없애고 리뉴얼」: X(남은 AP) + 쌓인 왕마력 수만큼 쏘고 왕마력을 모두 쓴다 — 왕마력탄으로 모아 난타로 쏟는다
+const barrage = (ratio, target = 'randomEnemy', x) => dmg(ratio, target, { xHits: true, xStack: '왕마력', ...x });
+const dumpMana = spend('왕마력', 'all');
 
 export default hero({
   id: H, name: '에르핀(왕도)', nature: '순수', race: '요정', role: '딜러', star: 3,
-  blurb: '요정 왕국의 여왕이 된 에르핀. 남은 왕마력을 마력 난타로 모두 쏟아붓고, 적이 쓰러질 때마다 한 발 더 — 부지런한 여왕은 쓰러뜨린 만큼 숨을 돌립니다.',
+  blurb: '요정 왕국의 여왕이 된 에르핀. 왕마력탄으로 모은 왕마력을 마력 난타로 한꺼번에 쏟아붓습니다. 부지런한 여왕은 쓰러뜨린 만큼 숨을 돌립니다.',
   keyword: { name: '축복의 왕관', desc: '여왕이 쓴 축복의 왕관', carrier: 'self', cap: 3, per: [{ stat: 'atk', v: 0.1 }] },   // 10-12 밤: 동료에게 씌우던 표시(최대 1) → 자신(최대 3)
   // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
   keywords: [{ name: '왕마력', desc: '마력탄을 줄줄이 부르는 왕마력', carrier: 'self', cap: 5 }],
@@ -64,17 +66,17 @@ export default hero({
       ],
       blesses: ['draw', 'ap', [dil(1)]],
     },
-    { // 마무리 — X: 남은 AP 만큼 · 처치하면 한 대 더(최대 12)
+    { // 마무리 — X: 남은 AP + 왕마력 수만큼 무작위 적에게, 왕마력을 모두 쓴다(10-13 리뉴얼 — 옛 「처치하면 한 대 더」 뺌)
       name: '마력 난타', cost: 0, x: true, type: '공격',
-      fx: [dmg(1.4, 'randomEnemy'), barrage(1.4)],   // X = 0 이어도 한 대(설계 0 자원)
+      fx: [dmg(1.4, 'randomEnemy'), barrage(1.4), dumpMana],   // X = 0 · 왕마력 0 이어도 한 대
       oracles: [
-        { power: true, fx: [power([rule({ on: 'kill', mine: true }, [dmg(1.2, 'randomEnemy')])])] },   // 10-13 신탁 점검: 처치마다 50→120%
-        { fx: [dmg(1.1), barrage(1.1, 'oneEnemy')] },
-        { fx: [dmg(1, 'randomEnemy', { hits: 2 }), barrage(1)] },
-        { tags: ['보존'], fx: [dmg(1, 'randomEnemy'), barrage(1)] },   // 10-11 사용자: X 코스트에 회수는 돌아와도 AP 0 이라 무의미 — 보존(AP 많은 턴까지 쥐기)
-        { fx: [status('면역', 1), barrage(1.2)] },   // 원작 여왕의 의지
+        { power: true, fx: [stack('왕마력', 2), power([rule({ on: 'turnStart' }, [stack('왕마력', 1)])])] },   // 강화 — 턴 시작마다 왕마력 1(옛 「처치마다 120%」 대신)
+        { fx: [dmg(1.1), barrage(1.1, 'oneEnemy'), dumpMana] },   // 적 1명에게 모두
+        { fx: [dmg(1, 'allEnemies'), barrage(1), dumpMana] },   // 적 전체 한 번 + 난타
+        { tags: ['보존'], fx: [dmg(1, 'randomEnemy'), barrage(1)] },   // 보존 · 왕마력을 쓰지 않는다(쌓은 채로 다음 난타)
+        { fx: [status('면역', 1), barrage(1.2), dumpMana] },   // 원작 여왕의 의지
       ],
-      blesses: ['power', 'draw', [dil(1)]],
+      blesses: ['power', 'draw', [stack('왕마력', 1)]],
     },
     { // 4차 8장 — 열기(원작 2성 「모두를 위한 배려」 — 여왕의 의지)
       name: '모두를 위한 배려', cost: 1, type: '스킬',

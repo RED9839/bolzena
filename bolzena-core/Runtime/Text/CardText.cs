@@ -85,7 +85,7 @@ namespace Bolzena.Core
         // ── 카드 ───────────────────────────────────────────────────────
         /// <summary>카드 면의 글 — 태그 + 효과(신탁을 얹은 모습이면 신탁의 글).</summary>
         public string Card(CardView c) { choices = c.Def.Choices; powerCard = c.Type == "강화"; countAs = c.CountAs; needForm = c.NeedForm; bool l0 = lines; lines = true; try { return CardLines(c.Def, c.Tags, c.Fx); } finally { choices = null; powerCard = false; lines = l0; countAs = 0; needForm = null; } }
-        public string Card(CardDef c) { choices = c.Choices; powerCard = c.Type == "강화"; countAs = c.CountAs; needForm = c.NeedForm; bool l0 = lines; lines = true; try { return CardLines(c, c.Tags, c.Fx); } finally { choices = null; powerCard = false; lines = l0; countAs = 0; needForm = null; } }
+        public string Card(CardDef c) { choices = c.Choices; powerCard = c.Type == "강화"; countAs = c.CountAs; needForm = c.NeedForm; bool l0 = lines; lines = true; try { return CardLines(c, c.Type == "강화" && !c.Tags.Contains(Tag.Unique) ? new[] { Tag.Unique }.Concat(c.Tags) : c.Tags, c.Fx); } finally { choices = null; powerCard = false; lines = l0; countAs = 0; needForm = null; } }
         /// <summary>(엘다인 ▶E2) 천상에서 셀 비용 — 카드 글 끝 줄.</summary>
         int countAs;
         /// <summary>(엘다인 4차 태세) 그 변신 · 태세 중에만 낼 수 있는 카드 — 카드 글 첫 줄.</summary>
@@ -144,7 +144,8 @@ namespace Bolzena.Core
             var s = new List<string>();
             if (c.PayWith != null) s.Add($"비용은 {Q(c.PayWith)}로.");
             if (c.Debt) s.Add("AP 빚 가능 — 모자란 AP만큼 다음 턴 AP -.");
-            if (c.Choices != null && c.Choices.Count == 2) s.Add($"갈래 — {c.Choices[0]} / {c.Choices[1]}.");
+            // 효과 줄이 「불: …」 「물: …」 로 두 갈래를 이미 다 말하면 머리 「갈래 — 불 / 물」 은 같은 말이라 뺀다(2026-10-13 벨라 45자)
+            if (c.Choices != null && c.Choices.Count == 2 && !(c.Fx.Any(f => f.K == FxK.IfChoice && f.N == 1) && c.Fx.Any(f => f.K == FxK.IfChoice && f.N == 2))) s.Add($"갈래 — {c.Choices[0]} / {c.Choices[1]}.");
             if (s.Count == 0) return "";
             return lines ? string.Join("\n", s.Select(x => x.TrimEnd('.'))) + "\n" : string.Join(" ", s) + " ";
         }
@@ -712,7 +713,9 @@ namespace Bolzena.Core
                     return $"손의 무작위 {Filt(f)}{(f.Id != null ? Q(f.Id) + " " : "")}카드 {f.NOr1}장 저절로 나감{(f.Ratio > 0 && f.Ratio != 1 ? $"(효과 {P(f.Ratio)})" : "")}";
                 case FxK.CastOther when f.From == "last": return $"이번 턴 바로 앞 다른 아군 카드를 다시({P(f.Ratio > 0 ? f.Ratio : 1)})";
                 case FxK.CastOther: return $"손의 다른 사도 {(f.Id != null ? f.Id + " " : "")}카드 하나를 대신 발동{(f.Ratio > 0 && f.Ratio != 1 ? $"(효과 {P(f.Ratio)})" : "")}(카드는 손에 남음)";
-                case FxK.Pull: return f.From == "draw" && f.To != "top"   // 뽑을 더미 → 손 = 드로우(없으면 섞지 않고 불발)
+                case FxK.Pull:
+                    if (f.All) return $"{PileKo(f.From)}의 {Filt(f)}카드 모두 {(f.To == "top" ? "뽑을 더미 맨 위로" : "손으로")}";   // (2026-10-13 시온 고학년) 맞는 카드 모두
+                    return f.From == "draw" && f.To != "top"   // 뽑을 더미 → 손 = 드로우(없으면 섞지 않고 불발)
                         ? $"뽑을 더미 {(f.At == "bottom" ? "맨 아래" : f.At == "random" ? "무작위" : "맨 위")} {Filt(f)}카드 {f.NOr1}장 드로우(없으면 섞지 않음)"
                         : $"{PileKo(f.From)} {(f.At == "bottom" ? "맨 아래" : f.At == "random" ? "무작위" : "맨 위")} {Filt(f)}카드 {f.NOr1}장을 {(f.To == "top" ? "뽑을 더미 맨 위로" : "손으로")}";
                 case FxK.ExileFrom: return f.From == "pulled" ? "그 카드 소멸" : f.All ? $"{PileKo(f.From)}의 {Filt(f)}카드 모두 소멸" : $"{PileKo(f.From)}에서 무작위 {Filt(f)}{f.NOr1}장 소멸";
@@ -1680,7 +1683,7 @@ namespace Bolzena.Core
                 case "shin": return $"축복 {Num.Round(o.V * 100)}%";
                 case "noShin": return "축복 막힘";
                 case "shinNow": return "축복 1";
-                case "shinPick": return $"축복 카드 {Math.Max(1, o.N)}{(o.Kind == "cost" ? " (비용)" : o.Kind == "power" ? " (위력)" : "")}";
+                case "shinPick": return $"축복 카드 {Math.Max(1, o.N)}{(o.Kind == "cost" ? " (비용)" : o.Kind == "power" ? " (위력)" : "")}{(o.Random ? " (고른 카드에 무작위 축복 · 신탁)" : "")}";   // 무작위는 이벤트에 「무작위」 라고 적힌 것만(2026-10-13) — 기본은 축복 · 신탁도 고른다
                 case "curse": return $"골칫거리 {Q(CardName(o.Id))}";
                 case "gift": return $"카드 {Q(CardName(o.Id))}";
                 case "scout": return "지도 공개";
@@ -1799,7 +1802,7 @@ namespace Bolzena.Core
             // 빛나는 카드(전투마다 run.RollEpiphany) — 한 전투에 사도마다 신탁 · 은총 가운데 하나만(2026-10-06 사용자)
             ["신탁"] = "전투 중 빛나는 고유 · 교주 카드를 내면 신탁 셋 가운데 하나를 얹음(이번에는 비용 0) · 내지 않으면 전투가 끝난 뒤 고름 · 한 전투에 사도마다 신탁 · 은총 가운데 하나만(교주 카드는 주인 사도 몫)",
             ["은총"] = "전투 중 빛나는 시작 카드를 내면 그 사도의 고유 카드를 손에 얻음(그 턴 비용 0) · 내지 않으면 전투가 끝난 뒤 받음 · 한 전투에 사도마다 신탁 · 은총 가운데 하나만",
-            ["분쇄"] = $"실드가 있는 적을 치면 피해 {Pc("분쇄")}% 증가", ["탄환"] = $"사용하면 소멸. 버린 카드 더미로 가면(턴 끝 포함) 무작위 적에게 추가 공격(공격력 {Pc("탄환")}%)",
+            ["분쇄"] = $"실드가 있는 적을 치면 피해 {Pc("분쇄")}% 증가", ["탄환"] = $"사용하면 소멸. 버린 더미로 가면(턴 끝 포함) 무작위 적에게 추가 공격(공격력 {Pc("탄환")}%)",
             ["결속"] = "같은 사도의 결속 카드가 한 장으로 겹침(최대 5) · 3 이상이면 강해진 카드로 · 내면 처음으로",
             // 이로운 효과 — 「파티」 = 파티 하나에 걸려 셋 모두에게 든다
             ["사기"] = $"파티 · 사기 1당 카드 피해량 +{Pc("사기")}%(합연산 — 카드 계수에 더함, 최대 {Mx("사기")}) · 전투 끝까지",

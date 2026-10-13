@@ -437,6 +437,7 @@ namespace Bolzena.Core
             Type = oracle != null && oracle.Power ? "강화" : oracle?.Type != null ? oracle.Type : oracle != null && GameData.TurnsAttack(def.Type, def.Fx, oracle.Fx) ? "공격" : def.Type;   // 기본형에 없던 피해가 신탁으로 생긴 스킬은 공격 카드
             var tags = oracle != null ? oracle.Tags.ToList() : def.Tags.ToList();
             if (oracle != null && def.Tags.Contains(Tag.Unique) && !tags.Contains(Tag.Unique)) tags.Insert(0, Tag.Unique);
+            if (Type == "강화" && !tags.Contains(Tag.Unique)) tags.Insert(0, Tag.Unique);   // (2026-10-13 사용자) 강화 카드는 모두 「유일」 — 덱에 한 장만
             Tags = tags;
             Fx = oracle != null ? oracle.Fx : def.Fx;
         }

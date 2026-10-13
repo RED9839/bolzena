@@ -96,17 +96,19 @@ namespace Bolzena.Core.Tests
             Assert.Pass(string.Join(" · ", notes));
         }
 
-        /// <summary>(2026-10-13 사용자) 마탄은 손에 9장까지 — 넘게 만들면 손에 들지 않고 그 자리에서 탄환으로 쏜다.</summary>
-        [Test] public void 시온_마탄_손에_9장까지()
+        /// <summary>(2026-10-13 사용자) 마탄 「손에 9장까지 · 넘치면 바로 쏜다」 를 없앴다 — 손 한도는 다른 카드와 같고, 넘쳐도 쏘지 않는다.
+        /// 고학년(레노아 「검은 가시」)은 뽑을 · 버린 더미의 마탄을 모두 손으로.</summary>
+        [Test] public void 시온_마탄_손_한도_없음_고학년_모두_손으로()
         {
             var d = Data();
-            Assert.AreEqual(9, d.Card(B).HandMax, "마탄 handMax 9");
+            Assert.AreEqual(0, d.Card(B).HandMax, "마탄 handMax 없음");
             var b = Battle.Start(d, new BattleSetup { Party = new List<string> { H, "클로에" }, Enemies = new List<string> { d.Enemies.Keys.First() }, Deck = d.Hero(H).Starter.ToList(), Gauge = 300, Seed = 7, EnemyHp = 50 });
-            b.Hand.Clear();
-            for (int k = 0; k < 9; k++) b.Hand.Add(B + GameData.PLAIN);
-            Assert.IsTrue(b.UseUlt(H).Ok);   // 고학년 — 마탄 2장
-            Assert.AreEqual(9, b.Hand.Count(x => GameData.BaseId(x) == B), "손의 마탄은 9장 그대로");
-            Assert.IsTrue(b.Log.Any(l => l.Contains("바로 쏜다")), "넘친 마탄은 바로 쏜다");
+            b.Hand.Clear(); b.Draw.Clear(); b.Discard.Clear();
+            for (int k = 0; k < 4; k++) b.Draw.Add(B + GameData.PLAIN);
+            for (int k = 0; k < 5; k++) b.Discard.Add(B + GameData.PLAIN);
+            Assert.IsTrue(b.UseUlt(H).Ok);
+            Assert.AreEqual(9, b.Hand.Count(x => GameData.BaseId(x) == B), "두 더미의 마탄 9장 모두 손으로");
+            Assert.IsFalse(b.Log.Any(l => l.Contains("바로 쏜다")), "넘쳐도 바로 쏘지 않는다");
         }
 
         /// <summary>(2026-10-13 사용자 — 카제나식 탄환) 손에 남은 탄환은 턴 끝에 버려지며 쏘고, 내면(사용) 소멸한다(「소멸」 태그 없이).</summary>

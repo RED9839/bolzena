@@ -28,69 +28,70 @@ export default hero({
     // 10-12 탱커 손질: 옛 「공격을 다 막으면 반격 1」(다 막아야 돌아 거의 안 돎) → 턴이 끝날 때 파티 실드 · 반격 1(적의 차례를 받아 내며 되갚을 준비 — 규칙 2개 한도라 하나로)
     { name: '소녀가 보호하겠사와요', when: { on: 'turnEnd' }, fx: [shield(0.5), ctr(1)] },
   ],
-  ult: { name: '퀵실버 랜스', cost: 200, fx: [ddmg(3.5, 'oneEnemy'), { k: 'dealtMod', v: -0.3, target: 'allEnemies' }, taunt(1), ctr(5)] },   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 적 피해 -20→-30% · 도발 실드 1.5→2배 · 반격 3→5
+  ult: { name: '퀵실버 랜스', cost: 200, fx: [ddmg(3), { k: 'perStack', id: '수은 갑주' }, ddmg(0.3)] },   // 10-13 마그나식(사용자): 「절대 영도」 — 방어 기반 300% + 쌓인 만큼 더(원작 「반격 1개당 +20~30%」 — 엔진은 상태 비례가 없어 수은 갑주 1겹당 30%)
 }, {
   basicNames: ['은빛 발톱', '수은 창', '귀족의 품위'], deck: 'heavy',
   uniques: [
-    { // 시동
-      name: '소녀가 보호하겠사와요', cost: 1, type: '스킬',
-      fx: [shield(2), ctr(2), stack('수은 갑주', 1)],   // 10-11 밸런스(사용자 「다 해 줘」)
+    // 2026-10-13 마그나식 교체(사용자 「비비도 마그나와 같이 만들어 줘」): 카드 5장 = 카제나 마그나 시동 · 고유 2~4 · 완성형, 신탁 5갈래 = 마그나 번뜩임 5갈래(수치 카제나 그대로).
+    //   결정화 N → 턴 끝 실드 20%×N · 「1턴간 반격 전체」 → 이번 전투 반격 전체(엔진은 전투 단위) · 피해 기반 실드 50% → 실드 150% · 엔진에 없는 것은 줄마다 적었다.
+    //   완성형(창 네 자루)은 원작에 번뜩임이 없어 에고 발현 쪽으로 채웠다. 고유 능력 · 수은 중독 · 수은 갑주는 그대로. 이전 판: C:\projects\_backup\bibi_before_magna_20261013
+    { // 시동 ← 얼음 파편 — 열기: 결정화(턴 끝 실드) + 턴 시작 반격
+      name: '소녀가 보호하겠사와요', cost: 1, type: '강화', tags: ['주도'],
+      fx: [power([rule({ on: 'turnEnd' }, [shield(0.4)]), rule({ on: 'turnStart' }, [ctr(1)])])],
       oracles: [
-        { fx: [shield(1.6), ctr(3), stack('수은 갑주', 1)] },   // 10-13 신탁 점검: 수은 갑주 되살림
-        { fx: [shield(2.6), ctr(1)] },
-        { power: true, fx: [shield(1.2), ctr(2), power([rule({ on: 'turnStart' }, [ctr(1)])])] },   // 10-13 신탁 점검 3차   // 10-13 신탁 점검: 실드 140%
-        // 원작 수은 보호막(06 · 08) — 실드가 깨지면 적 전체 취약 · 광역
-        { power: true, fx: [shield(1.6), power([rule({ on: 'shieldBreak' }, [status('취약', 1, { target: 'allEnemies' }), ddmg(0.8, 'allEnemies')])])] },
-        { power: true, fx: [shield(1.6), power([rule({ on: 'hurt', guarded: true }, [shield(0.8)])])] },   // 10-13 신탁 점검: 실드 120→190% · 70→100%
+        { power: true, tags: ['주도'], fx: [power([rule({ on: 'turnEnd' }, [shield(1)]), rule({ on: 'turnStart' }, [ctr(1)])])] },   // I 결정화 5
+        { power: true, tags: ['주도'], fx: [power([rule({ on: 'turnEnd' }, [shield(0.6)]), rule({ on: 'turnStart' }, [ctr(2)])])] },   // II 결정화 3 · 반격 2
+        { power: true, tags: ['개전'], fx: [stack('수은 갑주', 1), power([rule({ on: 'turnEnd' }, [shield(0.6)]), rule({ on: 'turnStart' }, [ctr(1)])])] },   // III 개전 · 반격 피해 +(수은 갑주 — 원작 +30%, 원작 추천)
+        { power: true, cost: 2, tags: ['유일', '주도'], fx: [power([rule({ on: 'turnEnd' }, [shield(0.6), ddmg(2, 'allEnemies')])])] },   // IV 턴 끝 적 전체 방어 기반 200%
+        { power: true, tags: ['주도'], fx: [ctr(4), power([rule({ on: 'turnStart' }, [{ k: 'counterMod', v: 1, turns: 1 }])])] },   // V 반격 4 · 턴 시작마다 그 턴 반격 2배(원작 「다음 반격 +100%」)
       ],
       blesses: ['guard', 'draw', [S(1)]],
     },
-    { // 4차: 0코 · 보존 — 큰 공격이 오는 턴에(결정 지점)
-      name: '오시려구요?', cost: 0, type: '스킬', tags: ['보존'],
-      fx: [taunt(), ctr(1)],
+    { // 고유 3 ← 빙벽 — 굴리기: 실드 + 반격 + 반격이 적 전체로
+      name: '오시려구요?', cost: 2, type: '스킬',
+      fx: [shield(1.8), ctr(2), { k: 'counterAll' }],
       oracles: [
-        { tags: ['보존'], fx: [taunt(0.8), ctr(1)] },
-        { tags: ['보존'], fx: [taunt(), status('약화', 1, { target: 'allEnemies' })] },
-        { tags: ['보존'], fx: [taunt(), ctr(1), status('취약', 1, { target: 'oneEnemy' })] },
-        { cost: 1, tags: ['보존'], fx: [taunt(), ctr(3), shield(1)] },   // 10-13 신탁 점검: 실드 덧붙임
-        { tags: ['보존'], fx: [ctr(2), S(2)] },   // 10-13 신탁 점검
+        { fx: [shield(3), ctr(3), { k: 'counterAll' }] },                                              // I 수치
+        { fx: [shield(3), ctr(2), stack('수은 갑주', 1)] },                                            // II(원작 「반격 1개당 실드 +30%」 대신 수은 갑주)
+        { power: true, tags: ['주도'], fx: [shield(2), { k: 'counterAll' }] },                       // III 강화 — 반격이 적 전체로(원작 BEST)
+        { type: '공격', fx: [shield(2), ddmg(1.2, 'allEnemies')] },                                  // IV 적 전체 피해(원작 「지금 실드만큼」 은 이드의 실드 소모 몫이라 방어 기반으로)
+        { fx: [shield(2), ctr(3), { k: 'counterAll' }] },                                              // V
       ],
       blesses: ['guard', 'draw', [S(1)]],
     },
-    {
-      name: '창 네 자루', cost: 1, type: '강화',
-      fx: [{ k: 'counterHits', v: 2, ratio: 1 }],   // 10-12 탱커 손질 80→100%
+    { // 완성형 ← 혹한의 폭풍 — 주도 강화: 능력으로 실드를 얻을 때마다 반격 1
+      name: '창 네 자루', cost: 1, type: '강화', tags: ['주도'],
+      fx: [power([rule({ on: 'guard' }, [ctr(1)])])],
       oracles: [
-        { fx: [{ k: 'counterHits', v: 2, ratio: 1.1 }] },
-        { fx: [{ k: 'counterAll' }] },
-        { fx: [{ k: 'counterHits', v: 2, ratio: 1 }, power([rule({ on: 'counter' }, [S(1)])])] },
-        { fx: [{ k: 'counterHits', v: 4, ratio: 0.5 }] },
-        { tags: ['개전'], fx: [{ k: 'counterHits', v: 2, ratio: 1.1 }] },   // 10-13 신탁 점검
+        { power: true, tags: ['주도', '개전'], fx: [power([rule({ on: 'guard' }, [ctr(1)])])] },   // 에고 발현 1 — 개전
+        { power: true, tags: ['주도'], fx: [power([rule({ on: 'guard' }, [ctr(1)]), rule({ on: 'counter' }, [S(1, { target: 'oneEnemy' })])])] },   // 반격한 적에 수은 한 겹 더(에고 발현 2 결빙 대신)
+        { power: true, tags: ['주도'], fx: [power([rule({ on: 'guard' }, [ctr(1)]), rule({ on: 'turnStart' }, [{ k: 'counterMod', v: 0.5, turns: 1 }])])] },   // 에고 발현 6 — 턴 시작 반격 강화
+        { power: true, tags: ['주도'], fx: [{ k: 'counterHits', v: 2, ratio: 1 }, power([rule({ on: 'guard' }, [ctr(1)])])] },   // 반격이 두 번 친다(옛 창 네 자루)
+        { power: true, tags: ['주도'], fx: [{ k: 'counterAll' }, power([rule({ on: 'guard' }, [ctr(1)])])] },
       ],
       blesses: ['cost', 'draw', [S(1)]],
     },
-    {
-      name: '수은 방울', cost: 0, type: '스킬',
-      fx: [ctr(1), shield(1.2), stack('수은 갑주', 1), ...brk(2), ctr(2)],   // 10-11 밸런스(사용자 「다 해 줘」)
+    { // 고유 4 ← 냉기 충전 — 굴리기: 실드 + 적 전체 취약
+      name: '수은 방울', cost: 1, type: '스킬',
+      fx: [shield(1), status('취약', 2, { target: 'allEnemies' })],
       oracles: [
-        { fx: [ctr(2), shield(1.2), stack('수은 갑주', 1), ...brk(2), ctr(3)] },   // 10-13 신탁 점검: 실드 · 수은 갑주 되살림
-        { type: '공격', fx: [ctr(1), shield(0.8), ...brk(2), ddmg(0.8, 'allEnemies')] },
-        { fx: [ctr(1), shield(1), ...brk(2), { k: 'counterMod', v: 1, turns: 1 }] },   // 10-13 신탁 점검: 실드 160→190%
-        { fx: [ctr(1), shield(1), draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 · 10-13 신탁 점검: 실드 덧붙임
-        { fx: [ctr(1), shield(0.8), ...brk(2), shield(2)] },
+        { fx: [shield(2.1), status('취약', 3, { target: 'allEnemies' })] },                          // I(원작 「적 수만큼 실드 +60%」 는 빼고)
+        { fx: [shield(2.1), status('취약', 4, { target: 'allEnemies' })] },                          // II
+        { power: true, fx: [power([rule({ on: 'turnEnd' }, [shield(0.8)]), rule({ on: 'counter' }, [status('취약', 3, { target: 'oneEnemy' })])])] },   // III 결정화 4 · 반격한 적에 취약 3(원작 BEST)
+        { type: '공격', fx: [ddmg(1, 'randomEnemy', { hits: 3 }), status('취약', 1, { target: 'randomEnemy' })] },   // IV 무작위 3연타
+        { fx: [status('취약', 3, { target: 'allEnemies' }), ctr(3)] },                                 // V
       ],
       blesses: ['guard', 'draw', [S(1)]],
     },
-    { // 마무리 ◆ — 보존 · 반격을 모두 써서 1개당(최소 1회)
-      name: '세계수 뿌리에 수은을', cost: 2, type: '공격', tags: ['보존'],
-      fx: [dumpCtr, { k: 'perEvent', n: 1 }, ddmg(0.7, 'allEnemies')],   // 10-11 밸런스(사용자 「다 해 줘」)
+    { // 고유 2 ← 빙하의 철권 — 터뜨리기: 방어 기반 큰 한 방 + 실드
+      name: '세계수 뿌리에 수은을', cost: 2, type: '공격',
+      fx: [ddmg(3), shield(1.5)],
       oracles: [
-        { type: '스킬', tags: ['보존'], fx: [dumpCtr, { k: 'perEvent', n: 1 }, shield(0.7)] },   // 10-13 신탁 점검
-        { tags: ['보존'], fx: [{ k: 'spend', id: '반격', v: 3 }, { k: 'perEvent', n: 1 }, ddmg(1.2, 'allEnemies')] },   // 10-13 신탁 점검 3차   // 10-13 신탁 점검: 3개까지 · 1당 60→90%
-        { tags: ['보존'], fx: [{ k: 'spend', id: K, all: true }, { k: 'perEvent', n: 1 }, ddmg(1.4, 'allEnemies')] },   // 10-13 신탁 점검 3차   // 10-13 신탁 점검: 60→100%
-        { cost: 1, tags: ['보존'], fx: [dumpCtr, { k: 'perEvent', n: 1 }, ddmg(1.2)] },   // 10-13 신탁 점검
-        // 취약 정산(비비 소유)
-        { tags: ['보존'], fx: [ctr(1), { k: 'ifFoe', id: '취약' }, dumpCtr, { k: 'perEvent', n: 1 }, ddmg(1.6)] },   // 10-13 신탁 점검 3차
+        { fx: [ddmg(4.5), shield(1.5)] },                                                              // I 수치
+        { fx: [ddmg(3), status('취약', 3, { target: 'oneEnemy' })] },                                 // II 취약 3
+        { fx: [ddmg(4.5), { k: 'ifShield' }, ddmg(2.2)] },                                             // III 실드가 있으면 피해 +50%
+        { fx: [ddmg(3, 'allEnemies'), shield(1.5)] },                                                  // IV 적 전체
+        { tags: ['소멸 2'], fx: [ddmg(4), shield(1.5), ctr(2)] },                                     // V 소멸 2(원작 「1턴 실드 보존」 대신 반격 2)
       ],
       blesses: ['power', 'cost', [S(1)]],
     },

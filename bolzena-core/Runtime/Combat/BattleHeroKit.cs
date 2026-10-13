@@ -248,7 +248,7 @@ namespace Bolzena.Core
                         string from = f.From ?? "discard", pileName = from == "discarded" ? "discard" : from;
                         var src = PileOf(from);
                         if (gk != null && src.Count > 0) Counts[gk] = 1;
-                        for (int k = 0; k < f.NOr1 && src.Count > 0; k++)
+                        for (int k = 0; k < (f.All ? int.MaxValue : f.NOr1) && src.Count > 0 && !(f.All && f.To != "top" && Hand.Count >= R.HAND_MAX); k++)   // all — 맞는 카드 모두(2026-10-13 시온 고학년) · 손이 차면 멈춘다(버린 더미로 되돌아가 끝없이 돌지 않게)
                         {
                             var used = src == Discard ? UsedAt() : null;
                             var okIdx = Enumerable.Range(0, src.Count).Where(i => FxMatch(f, src[i], owner) && !(from == "discarded" && used.Contains(i))

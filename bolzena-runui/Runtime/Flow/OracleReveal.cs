@@ -198,10 +198,16 @@ namespace Bolzena.RunUI
             var holders = new List<RectTransform>();
             var homes = new List<Vector2>();
             var labels = new List<CanvasGroup>();
-            int chosen = -1, marked = -1;   // marked — 한 번 눌러 골라 둔 후보
+            int chosen = -1;
+            // 두 번 누르기(Flow.TwoTap — 이벤트 · 캠프 · 보상 · 축복 고르기 공통): 첫 탭 = 골라 두기 + 옆에 낱말 판, 같은 카드 = 결정, 다른 카드 = 바꾸기, 빈 곳 = 상세만 닫기
+            var tap = new Flow.TwoTap(f, idx =>
+            {
+                var why = o.Try?.Invoke(idx);
+                if (why != null) { Toast.Show(why); return; }
+                chosen = idx;
+            }, () => Phase == "choose" && chosen < 0);
             for (int i = 0; i < n; i++)
             {
-                int idx = i;
                 var p = o.Picks[i];
                 var h = Ui.Rect("pick" + i, root).At(0.5f, 0.5f, 0, cy, cw, ch);
                 W.BlessOverride = anyBless && !string.IsNullOrEmpty(p.BlessName) ? p.BlessText : null;
@@ -231,16 +237,8 @@ namespace Bolzena.RunUI
                     var at = Ui.Text(h, Core.OracleOption.ATTACK_LINE, compact ? 12 : 14, new Color(0.88f, 0.8f, 1f), TextAlignmentOptions.Top);
                     at.rectTransform.At(0.5f, 0, 0, -16, cw * 1.3f, 22); at.enableAutoSizing = true; at.fontSizeMin = 9; at.fontSizeMax = compact ? 12 : 14;
                 }
-                // 한 번 누르면 상세(신탁을 얹은 모습) + 골라 둠, 같은 카드를 한 번 더 누르면 결정(2026-10-12 사용자 — 「고르기」 단추는 뺐다)
-                var b = face.gameObject.AddComponent<Btn>();
-                b.OnClick = () =>
-                {
-                    if (Phase != "choose" || chosen >= 0) return;
-                    if (marked != idx && !Demo.Active) { marked = idx; f.CardZoomView(p.CardId, p.View); return; }   // 자동 데모는 한 번에 고른다
-                    var why = o.Try?.Invoke(idx);
-                    if (why != null) { Toast.Show(why); return; }
-                    chosen = idx;
-                };
+                // 한 번 누르면 골라 둠 + 옆에 낱말 판, 같은 카드를 한 번 더 누르면 결정(2026-10-13 — 닫기 없이 · 「고르기」 단추 없음). 길게 누르면 카드 상세
+                var b = tap.Add(face, p.CardId, p.View);
                 b.OnHold = () => { if (Phase == "choose" && chosen < 0) f.CardZoomView(p.CardId, p.View); };
                 st.Hot[o.Hot + i] = b;
                 holders.Add(h);
@@ -278,7 +276,7 @@ namespace Bolzena.RunUI
                 for (int i = 0; i < holders.Count; i++)
                 {
                     if (!holders[i]) continue;
-                    bool up = i == hover || i == marked;
+                    bool up = i == hover || i == tap.Marked;
                     var want = homes[i] + new Vector2(0, up ? 16 : 0);
                     holders[i].anchoredPosition = Vector2.Lerp(holders[i].anchoredPosition, want, 1 - Mathf.Exp(-14 * Time.unscaledDeltaTime));
                     float sc = Mathf.Lerp(holders[i].localScale.x, up ? 1.08f : 1f, 1 - Mathf.Exp(-14 * Time.unscaledDeltaTime));
@@ -286,6 +284,7 @@ namespace Bolzena.RunUI
                 }
                 yield return null;
             }
+            tap.Clear();
             back.Locked = true;
             if (close) UnityEngine.Object.Destroy(close.gameObject);
             if (deckB) UnityEngine.Object.Destroy(deckB.gameObject);

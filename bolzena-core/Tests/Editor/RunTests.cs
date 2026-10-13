@@ -234,14 +234,63 @@ namespace Bolzena.Core.Tests
             foreach (var id in run.ShinAble(null)) Assert.AreEqual(5, run.Data.Card(id).Oracles.Count);
             var target = run.ShinAble(null).First();
             run.S.Event = new EventState();
-            run.S.Event.Pending.Add(new Pending { K = "shinPick" });
+            run.S.Event.Pending.Add(new Pending { K = "shinPick", Random = true });   // 이벤트에 「무작위」 라고 적힌 것 — 축복 · 신탁이 바로 붙는다
             Assert.IsNull(run.ResolvePending(target));
+            Assert.AreEqual(0, run.S.Event.Pending.Count, "무작위면 더 고를 것이 없다");
             Assert.IsTrue(run.S.Shin.ContainsKey(target), "축복");
             Assert.IsTrue(run.S.Flash.TryGetValue(target, out var n) && n >= 1 && n <= 5, "신탁도 함께");
             CollectionAssert.DoesNotContain(run.FlashTargets(), target);
             CollectionAssert.Contains(run.CampTargets(), target, "휴식 수련은 신탁 · 축복 받은 카드도 다시 뽑을 수 있다(2026-10-12)");
             CollectionAssert.DoesNotContain(run.ShinAble(null), target);
             Assert.IsTrue(run.S.Event.Log.Any(x => x.Contains("신탁") && x.Contains("함께")));
+        }
+
+        /// <summary>(2026-10-13 사용자 「무작위라는 말이 없으면 선택이 디폴트」) 이벤트 축복 카드 — 카드를 고른 뒤 축복 종류 → 신탁을 차례로 고른다.</summary>
+        [Test] public void 이벤트_축복은_축복_종류와_신탁도_고른다()
+        {
+            var run = New();
+            run.S.Deck.AddRange(new[] { "sion_u2", "rico_u1", "carrot_u1" });
+            var target = run.ShinAble(null).First(id => Run.DivineKindsFor(run.ViewOf(id)).Count > 1);
+            run.S.Event = new EventState();
+            run.S.Event.Pending.Add(new Pending { K = "shinPick" });
+            Assert.IsNull(run.ResolvePending(target));
+            Assert.IsFalse(run.S.Shin.ContainsKey(target), "축복은 아직 — 고르기가 이어진다");
+            var pend = run.S.Event.Pending;
+            Assert.AreEqual(new[] { "bless", "flash" }, pend.Select(x => x.K).ToArray(), "축복 고르기 → 신탁 고르기");
+            var bl = pend[0];
+            Assert.AreEqual(target, bl.Offer.CardId);
+            CollectionAssert.AreEqual(Run.DivineKindsFor(run.ViewOf(target)), bl.Cards, "그 카드의 축복 후보 전부");
+            Assert.AreEqual(bl.Cards.Count, run.BlessOptions(bl).Count, "축복 고르기 창 후보 = 축복을 얹은 카드 모습");
+            Assert.IsNotNull(run.ResolvePending("없는축복"), "후보 밖의 축복은 못 고른다");
+            var want = bl.Cards[bl.Cards.Count - 1];
+            Assert.IsNull(run.ResolvePending(want));
+            Assert.AreEqual(want, run.S.Shin[target], "고른 축복");
+            var fl = run.S.Event.Pending[0];
+            Assert.AreEqual("shin", fl.Kind);
+            Assert.AreEqual(Enumerable.Range(1, 5).Where(n => run.FlashOk(target, n)).ToList(), fl.Offer.Picks, "그 카드의 신탁 후보 전부");
+            int on = fl.Offer.Picks.Last();
+            Assert.IsNull(run.ResolvePending(on));
+            Assert.AreEqual(on, run.S.Flash[target], "고른 신탁");
+            Assert.AreEqual(want, run.S.Shin[target], "신탁을 골라도 고른 축복은 그대로");
+            Assert.AreEqual(0, run.S.Event.Pending.Count);
+        }
+
+        [Test] public void 이벤트_축복_고르기를_못_하면_무작위로_붙는다()
+        {
+            // 데모 · 봇은 null 을 넘긴다 — 판 난수로 무작위(같은 시드면 같은 결과)
+            string[] Once()
+            {
+                var run = New();
+                run.S.Deck.AddRange(new[] { "sion_u2", "rico_u1", "carrot_u1" });
+                var target = run.ShinAble(null).First();
+                run.S.Event = new EventState();
+                run.S.Event.Pending.Add(new Pending { K = "shinPick" });
+                Assert.IsNull(run.ResolvePending(target));
+                while (run.S.Event.Pending.Count > 0) Assert.IsNull(run.ResolvePending(null));
+                Assert.IsTrue(run.S.Shin.ContainsKey(target) && run.S.Flash.ContainsKey(target), "축복 · 신탁 둘 다");
+                return new[] { run.S.Shin[target], run.S.Flash[target].ToString() };
+            }
+            CollectionAssert.AreEqual(Once(), Once(), "같은 시드 — 같은 축복 · 신탁");
         }
 
         [Test] public void 상점_사기_새로고침_제거()

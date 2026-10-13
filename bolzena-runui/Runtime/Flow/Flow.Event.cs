@@ -656,19 +656,43 @@ namespace Bolzena.RunUI
             var p = E.Pending.FirstOrDefault();
             if (p != null)
             {
-                // 신탁 — 휴식 담당의 공용 신탁 연출(OracleReveal). 그 밖의 고를 것은 PendingPick 창
+                // 신탁 · 축복 — 휴식 담당의 공용 신탁 연출(OracleReveal). 그 밖의 고를 것은 PendingPick 창
+                //   고르는 동안은 판에 아무것도 안 바뀌어(Pending 에 남아) 끊겼다 불러오면 같은 창이 다시 뜬다
+                void Fin(object v) { var cs = CardSnap(); var why = P.Resolve(v); if (why != null) { Toast.Show(why); return; } GainCards(NewCards(cs), () => { P.Save("event"); BuildEvent(root, -1); }); }
                 if (p.K == "flash" && p.Offer != null)
                 {
-                    var opts = P.Run.FlashOptions(p.Offer);
-                    void Fin(object v) { var cs = CardSnap(); var why = P.Resolve(v); if (why != null) { Toast.Show(why); return; } GainCards(NewCards(cs), () => { P.Save("event"); BuildEvent(root, -1); }); }
+                    // 축복 카드에서 이어진 신탁(Kind "shin" — 2026-10-13) — 방금 고른 축복을 얹은 모습으로 보이고, 받지 않기(×)가 없다
+                    bool withShin = p.Kind == "shin";
+                    var fo = withShin && P.S.Shin.TryGetValue(p.Offer.CardId, out var sh0)
+                        ? new FlashOffer { CardId = p.Offer.CardId, Picks = p.Offer.Picks, Shins = p.Offer.Picks.Select(_ => sh0).ToList() } : p.Offer;
+                    var opts = P.Run.FlashOptions(fo);
+                    var picks = RevealPick.Of(P.Data, p.Offer.CardId, opts);
+                    if (withShin) foreach (var x in picks) { x.BlessName = x.BlessText = null; x.ToAttack = false; }   // 축복은 이미 붙었다 — 후보마다 축복 표시는 빼고 카드 모습만
                     OracleReveal.Show(this, new RevealOpts
                     {
                         BaseCardId = p.Offer.CardId,
-                        Picks = RevealPick.Of(P.Data, p.Offer.CardId, opts),
+                        Sub = PickTwiceSub,
+                        Picks = picks,
                         Hot = "pending",
-                        Cancel = true,
+                        Cancel = !withShin,
                         Cancelled = () => Fin(null),
                         Done = i => Fin(opts[i].N),
+                    });
+                    return;
+                }
+                if (p.K == "bless" && p.Offer != null)
+                {
+                    // 축복 카드(shinPick)로 고른 카드에 얹을 축복 — 축복마다 얹은 카드 모습 중 하나(두 번 누르기). 받지 않기 없음 — 카드를 이미 골랐다
+                    var bo = P.Run.BlessOptions(p);
+                    OracleReveal.Show(this, new RevealOpts
+                    {
+                        Title = "축복!", Awake = "축복",
+                        BaseCardId = p.Offer.CardId,
+                        Sub = PickTwiceSub,
+                        Picks = RevealPick.Of(P.Data, p.Offer.CardId, bo),
+                        Hot = "pending",
+                        Cancel = false,
+                        Done = i => Fin(bo[i].Shin),
                     });
                     return;
                 }
@@ -695,6 +719,9 @@ namespace Bolzena.RunUI
         }
         int removeTotal;
 
+        /// <summary>신탁 · 축복 고르는 창의 안내 — 두 번 누르기(TwoTap · 전투 EpiphanyWindow 와 같은 글).</summary>
+        const string PickTwiceSub = "카드를 누르면 자세히 보고, 한 번 더 누르면 결정합니다.";
+
         void PendingPick(RectTransform root, Pending p)
         {
             if (p.K == "flash" && p.Offer != null && !OracleReveal.IsOpen)
@@ -702,7 +729,7 @@ namespace Bolzena.RunUI
                 var fo = P.Run.FlashOptions(p.Offer);
                 OracleReveal.Show(this, new RevealOpts
                 {
-                    Title = "신탁!", Sub = "카드를 누르면 자세히 보고, 한 번 더 누르면 결정합니다.", Picks = RevealPick.Of(P.Data, p.Offer.CardId, fo), Cancel = false, Hot = "pending",
+                    Title = "신탁!", Sub = PickTwiceSub, Picks = RevealPick.Of(P.Data, p.Offer.CardId, fo), Cancel = false, Hot = "pending",
                     Try = i => null,
                     Done = i =>
                     {
@@ -721,12 +748,13 @@ namespace Bolzena.RunUI
                 "dupe" => "복제할 고유 카드를 고릅니다",
                 "card" => (p.Label ?? "카드") + " — 하나를 고릅니다",
                 "flash" => $"「{P.Data.Card(p.Offer?.CardId)?.Name}」 — 신탁 하나를 고릅니다",
-                "shinPick" => "축복을 얹을 카드를 고릅니다 — 신탁도 무작위로 함께 붙습니다",
+                "shinPick" => p.Random ? "축복을 얹을 카드를 고릅니다 — 축복 · 신탁은 무작위로 붙습니다" : "축복을 얹을 카드를 고릅니다 — 이어서 축복 · 신탁을 고릅니다",   // 무작위는 이벤트에 「무작위」 라고 적힌 것만(2026-10-13)
                 "gambleChoice" => "하나를 고릅니다",
                 _ => "고릅니다",
             };
             float mw = Mathf.Min(Theme.Compact ? 1240 : Mathf.Max(1240, 8 * (170 + 12) + 80), Stage.Size.x - 40);   // 넓은 화면은 카드 고르기 한 줄 6~8칸
-            var (right, closeM, _) = Stage.ModalBox("pending", mw, Mathf.Min(680, Stage.Size.y - 24), title, "이벤트에서 얻은 것 — 하나를 고릅니다", false, null, 0, false);
+            bool twice = p.K == "flash" || p.K == "shinPick";   // 신탁 · 축복 고르기는 두 번 누르기(TwoTap) — 제거 · 복제 · 카드 고르기는 그대로 한 번
+            var (right, closeM, _) = Stage.ModalBox("pending", mw, Mathf.Min(680, Stage.Size.y - 24), title, twice ? PickTwiceSub : "이벤트에서 얻은 것 — 하나를 고릅니다", false, null, 0, false);
             Ui.Col(right, Theme.Gap, TextAnchor.UpperLeft, new RectOffset(4, 4, 0, 4));
             var area = Ui.Rect("pick", right); area.Pref(-1, 200, -1, 1);
             var content = Ui.Scroll(area, out _);
@@ -770,10 +798,13 @@ namespace Bolzena.RunUI
                     "shinPick" => P.ShinAble(p.Kind),
                     _ => new List<string>(),
                 };
+                var tapIds = new List<string>();   // 단 차례대로의 id — CardGroups 가 사도별로 다시 늘어놓아 ids 차례와 다르다
+                var tap = twice ? new TwoTap(this, k => Done(tapIds[k])) : null;   // 축복 고르기만 두 번 누르기
                 CardGroups(content, ids, 170, GridCols(mw - 80, 170, 12, Theme.Compact ? 3 : 6, 8), (c, id, i) =>   // 상점 제거 고르기와 같은 카드(170) — 칸 수는 창 너비에 맞춘다(폰 창이 좁아 6칸이 넘쳤다)
                 {
-                    var b = c.gameObject.AddComponent<Btn>();
-                    b.OnClick = () => Done(id);
+                    Btn b;
+                    if (tap != null) { tapIds.Add(id); b = tap.Add(c, id); }
+                    else { b = c.gameObject.AddComponent<Btn>(); b.OnClick = () => Done(id); }
                     Stage.Hot["pending" + i] = b;
                 });
             }

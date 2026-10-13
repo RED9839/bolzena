@@ -172,7 +172,8 @@ namespace Bolzena.Core
             return null;
         }
 
-        public PlayResult UseUlt(string heroKey, int targetIdx = 0)
+        /// <summary>stage — 단계를 고르는 쌓기(stack pick)가 든 고학년의 고른 단계(PlayOpts.Stage 와 같음 · 없으면 다음 단계, 2026-10-13).</summary>
+        public PlayResult UseUlt(string heroKey, int targetIdx = 0, int? stage = null)
         {
             var why = CanUlt(heroKey);
             if (why != null) return PlayResult.Fail(why);
@@ -189,7 +190,7 @@ namespace Bolzena.Core
             Acting = heroKey; ModSrc = $"{owner.Name} 「{ult.Name}」";
             ActSeq = ++SeqN;
             var tags = new HashSet<string>();
-            RunFx(ult.Fx, new FxCtx { Owner = owner, TargetIdx = targetIdx, HitTags = tags, Card = true, Cost = 2, ToughUnit = R.ToughUnitUlt(ult.Cost) });
+            RunFx(ult.Fx, new FxCtx { Owner = owner, TargetIdx = targetIdx, HitTags = tags, Card = true, Cost = 2, ToughUnit = R.ToughUnitUlt(ult.Cost), StagePick = stage });
             Acting = prev; ModSrc = src0;
             if (St(Pool, "계몽") > 0 && Over == null) { Say("계몽 — 드로우 1"); DrawCards(1); }
             Emit("ult", new EmitInfo { Hero = heroKey });

@@ -114,9 +114,9 @@ namespace Bolzena.Core.Tests
         {
             var d = D();
             var tx = new CardText(d);
-            Assert.AreEqual("드로우 1\n매 턴 시작 시 결의 1", tx.Card(d.Card("pw_t")));
-            Assert.AreEqual("이 전투 동안 자신의 공격 카드를 낼 때마다 고학년 게이지 +5% (턴당 1회)", tx.Card(d.Card("pw_p")));
-            Assert.AreEqual("이 전투 동안 공격력 +10%", tx.Card(d.Card("pw_a")));
+            Assert.AreEqual("유일.\n드로우 1\n매 턴 시작 시 결의 1", tx.Card(d.Card("pw_t")));
+            Assert.AreEqual("유일.\n이 전투 동안 자신의 공격 카드를 낼 때마다 고학년 게이지 +5% (턴당 1회)", tx.Card(d.Card("pw_p")));
+            Assert.AreEqual("유일.\n이 전투 동안 공격력 +10%", tx.Card(d.Card("pw_a")));
             Assert.IsTrue(new CardText(d).Chips(d.View("pw_t")).Contains("결의"), "칩에 규칙 속 상태도");
         }
 
@@ -125,7 +125,7 @@ namespace Bolzena.Core.Tests
             var d = K.Data(cards: @"[{id:'pw_s', name:'다짐', hero:'a', unique:true, cost:1, type:'강화', fx:[{k:'status', id:'결의', v:1}, {k:'status', id:'사기', v:1}, {k:'draw', v:1}]},
                                      {id:'sk_s', name:'다짐 스킬', hero:'a', cost:1, type:'스킬', fx:[{k:'status', id:'결의', v:1}]}]");
             var tx = new CardText(d);
-            Assert.AreEqual("결의 1, 사기 1, 드로우 1", tx.Card(d.Card("pw_s")));
+            Assert.AreEqual("유일.\n결의 1, 사기 1, 드로우 1", tx.Card(d.Card("pw_s")));
             Assert.AreEqual("결의 1", tx.Card(d.Card("sk_s")), "강화가 아니면 그대로");
         }
 
