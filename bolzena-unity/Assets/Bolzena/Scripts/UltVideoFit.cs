@@ -26,7 +26,8 @@ namespace Bolzena
         class FxFix { public string At; public int Ms = -1; public FxFix(string at, int ms = -1) { At = at; Ms = ms; } }
 
         // 길이를 줄이지 않는 사도 — 가운데 타격만으로 길다(원작 길이 그대로, 사용자 2026-10-06)
-        static readonly HashSet<string> ULT_KEEP_LONG = new HashSet<string> { "리뉴아", "키샤" };
+        //   리뉴아는 뺐다(2026-10-13 사용자 「초반 시전 준비 시간을 줄이면 되긴 해」 — 맞춤 표 Skip · End 로 약 6.4초)
+        static readonly HashSet<string> ULT_KEEP_LONG = new HashSet<string> { "키샤" };
 
         static int[] H(params int[] ms) => ms;
         static Dictionary<string, FxFix> F(params (string part, string at, int ms)[] l)
@@ -46,10 +47,10 @@ namespace Bolzena
             ["빅우드"] = new UltFit { Move = "none", Fx = F(("heart", "caster", 4100)), Note = "제자리 · 바닥 기운 뒤 한참 지나 하트 회복(이벤트 4100)" },
             ["스패럿"] = new UltFit { Hits = H(1575, 2048, 2520, 2992, 3465, 3938, 4410, 4882, 5512), Note = "배 돌격 뒤 3초 동안 포격 연타 · 마지막 큰 폭발 따로" },
             ["바롱"] = new UltFit { Hits = H(4033), Add = new[] { "fx_barong_ultimate_thunder_1", "fx_barong_ultimate_burn_lightning_1" }, Note = "휘두르기 끝난 뒤 분홍 번개 폭발(이벤트 4033)" },
-            ["에피카"] = new UltFit { Hits = H(1067, 3400, 5600, 7000), Note = "전차 포격 → 해적선 → 기사 → 착지 번쩍(단계마다 한 박자)" },
+            ["에피카"] = new UltFit { Hits = H(1067, 3400, 5600, 7000), End = 7900, Note = "전차 포격 → 해적선 → 기사 → 착지 번쩍(단계마다 한 박자) · 꼬리 7900 · 2026-10-14 가운데 건너뛰기(3900~5100)를 되돌림 — 원작 8.0초 한 벌, 가운데는 줄이지 않는다(7초 넘는 몫은 배속으로)" },
             ["아르코"] = new UltFit { Hits = H(1766, 2266, 2733, 3133, 3633, 4566, 4966, 5500), Note = "착지 뒤 펀치 8타 약 0.45초 간격(1_2 이벤트)" },
             ["스피키_메이드"] = new UltFit { Hits = H(2467, 3134, 3801, 4468, 5135), Skip = H(5602, 8937), Note = "총 겨눔(2.1초) 뒤 순간이동 사격 5번(원작) — 우리 고리 10번 중 뒤 5번은 건너뜀" },
-            ["리뉴아"] = new UltFit { Hits = H(1133, 2975, 4392, 6375, 7509, 9208, 11050, 13317), End = 14167, Speed = 1.2f, Note = "원작 약 11초 유지(예외) — 타격을 원작 비율(8·21·31·45·53·65·78·94%)로 고르게" },
+            ["리뉴아"] = new UltFit { Hits = H(3333, 4233, 11633, 11967, 12467, 12967, 13467, 13967), Skip = H(4600, 11300), End = 14400, Speed = 1.2f, Note = "2026-10-13 사용자: 시전 준비를 줄인다 — 시계 장판 뒤 이벤트 없이 떠 있는 6.7초를 건너뛰고 연타(이벤트 11633~13967)로 · 11.8→약 6.4초" },
             ["아사나"] = new UltFit { Hits = H(2333, 3333, 4333, 5333, 6333, 7933), Move = "dash", Go = 7200, Land = 7800, Ret = 9300, Back = 300, Dest = "front", Note = "연꽃 속 제자리에서 1초 간격 5타 → 마지막 직전에만 뛰어들어 큰 폭발" },
             ["그윈"] = new UltFit { Hits = H(1400, 1799, 2024, 2233, 2407, 2616, 2841, 2927, 3015, 3622), Move = "none", Note = "10타를 0.4~0.6초 간격으로 넓히고 마지막 큰 휘두르기는 따로" },
             ["다야"] = new UltFit { Hits = H(1838), Fx = F(("ground_ready", "caster", -1), ("sneeze_ground", "caster", 1522)), Note = "날아오른 뒤 하얀 폭발에 타격 · 재채기 구름은 발밑" },
@@ -106,14 +107,14 @@ namespace Bolzena
             ["아네트"] = new UltFit { Hits = H(860, 982, 1105, 1226, 1349, 1471, 1593, 1716, 1838, 1960, 2082, 2205), Note = "다단은 65% 지점까지" },
             ["아야"] = new UltFit { Hits = H(1260, 1811, 2362, 2914, 3465), Note = "연꽃 두 번에 걸쳐 약 0.5초 간격" },
             ["칸타"] = new UltFit { Hits = H(1418, 3150, 3549), Move = "dash", Go = 1102, Land = 1365, Ret = 1838, Back = 300, Dest = "front", Note = "대시 베기 뒤 곧 복귀 · 폭발은 집에서" },
-            ["클로에"] = new UltFit { Hits = H(1714, 2152, 2594, 3034, 3476, 3916, 4305), Note = "토끼들이 0.4초 간격으로" },
-            ["비비_신성"] = new UltFit { Fx = F(("boll", "target", 4725)), Note = "레이저 뒤 약 1초에 적 자리 빛기둥(boll)" },
+            ["클로에"] = new UltFit { Hits = H(1333, 1533, 1733, 1933), Note = "2026-10-13 몸짓(Skill1_1 2초) 안으로 — 세바스티안(1333) 뒤 0.2초 간격 · 원작 대폭발 장은 추출본에 없음(hit · proj 뿐)" },
+            ["비비_신성"] = new UltFit { Hits = H(4400, 5300), Fx = F(("full_default", "caster", 1900), ("boll", "target", 5150), ("full_end", null, 5900)), End = 7300, Note = "2026-10-14 원작 영상(×1.2 = 스파인 ms): 시전 1.4초 → 화면 위로 날아올라 사라짐(1.45~2.4) → 금빛 고리(1.9) → 큰 스탠딩(2.6~5.8 · ULT_STANDING) 손에서 레이저(3.95) · 맞음(4.4) → 빛기둥(5.15~5.75) → 소용돌이(5.9) → 내려와 제자리(6.4~7.2) · 건너뛰기 없앰(날아오름을 살림) · 끝 대기만 7.3초에서" },
             ["실라"] = new UltFit { Move = "dash", Go = 1575, Land = 1785, Ret = 2100, Back = 200, Dest = "front", Note = "짧게 달려들어 휘두르고 곧 돌아옴" },
-            ["에르핀_왕도"] = new UltFit { Fx = F(("crash_1", "caster", 840)), Note = "첫 빛기둥은 사도 자리 · 도약은 길이를 되살려 원작 비율(1.9초)" },
+            ["에르핀_왕도"] = new UltFit { Fx = F(("crash_1", "caster", 840), ("jump_1", "caster", 1933)), End = 6500, Note = "첫 빛기둥은 사도 자리 · 둘째 빛기둥(jump_1)도 뛰어오르는 자리(대상 쪽이면 화면 오른쪽 밖) · 꼬리를 원작 6.21초(영상 한 벌)에 맞춰 6500에서 끊음(1.05배속 → 6.19초)" },
             ["바나"] = new UltFit { Fx = F(("happy", "caster", 4830), ("hit_1", "caster", -1)), Note = "불꽃은 모루 위 · 완성 버프(happy)는 끝에" },
             ["피코라"] = new UltFit { Fx = F(("ultimate_up", "caster", -1)), Note = "하트 방울은 사도를 감쌈" },
             ["로네"] = new UltFit { Move = "none", Note = "제자리 깃발" },
-            ["비비"] = new UltFit { Hits = H(1197), Note = "공중에 떴다 내리꽂기" },
+            ["비비"] = new UltFit { Hits = H(1167, 2067), Move = "teleport", Go = 200, Land = 450, Ret = 3500, Back = 300, Dest = "front", Fx = F(("fire_1", "caster", 150), ("jump_1", "caster", 450), ("jump_screw", "caster", 900), ("jump_2", "target", 2067), ("stomp", "target", 2067)), Note = "2026-10-13 원작 영상: 제자리 섬광(별 · 구체)으로 사라짐 → 0.45초 적 앞에 나타남 → 1.17 내리꽂기 → 2.07 밟기(타격 둘)" },
             ["셰럼"] = new UltFit { Hits = H(2782, 3518, 4358), Move = "none", Note = "제자리 그리기 · 큰 타격 3번 0.7~0.8초 간격" },
             ["시저"] = new UltFit { Hits = H(1024, 1601) },
             ["에슈르_마도"] = new UltFit { Hits = H(2079), Note = "마법진 준비 뒤 불덩이 1타" },
@@ -130,9 +131,10 @@ namespace Bolzena
             ["벨라"] = new UltFit { Hits = H(1302) },
             ["셰이디_역전"] = new UltFit { Hits = H(1890, 2940) },
             ["스피키"] = new UltFit { Fx = F(("raady", "caster", -1), ("ready", "caster", -1), ("circle", "caster", -1), ("ground", "caster", -1), ("pumpkin", "target", 3255)) },
-            ["실비아"] = new UltFit { Move = "none" },
-            ["우로스"] = new UltFit { Hits = H(1312, 2625) },
+            ["실비아"] = new UltFit { Hits = H(667, 1330), Move = "none", Note = "2026-10-13 석상이 떨어져 닿는 때(1.25~1.4초)에 둘째 타격 — 원작 영상 피해 1.37초" },
+            ["우로스"] = new UltFit { Hits = H(1933, 3100), Fx = F(("dash_jolly", "caster", 1400), ("slash_jolly", "target", 1867), ("fire_jolly", "target", 3050), ("snake_jolly", "target", 3050), ("hit_jolly", "target", 3100)), Note = "2026-10-14 한 바퀴: 1.5초 앞으로 사라져 적 무리 뒤에 나타남(1.8) → 왼쪽으로 베며 무리를 가로지름(1.93 타격) → 왼끝까지 갔다 제자리(3.0) → 적 자리 불기둥 · 금빛 용(3.1 타격) · 무리 뒤 자리는 ULT_LOOP" },
             ["코미_수영복"] = new UltFit { Hits = H(300, 2000, 2667, 3333, 4000, 4667), Move = "none", Fx = F(("waterfall", "target", 100)), Note = "물기둥이 시작하자마자 침 · 코미는 제자리에서 뛰어오름" },
+            ["우이"] = new UltFit { Hits = H(1833, 2233, 2633), Move = "none", Note = "2026-10-13 타격이 0ms(몸짓 전)에 들던 것 — 원작 영상 분홍 꽃 폭발(1.8~2.0) · 버섯 연기(2.3)에" },
             ["티그"] = new UltFit { Hits = H(840), Move = "leap", Go = 420, Land = 800, Ret = 3167, Back = 300, Dest = "front", Fx = F(("aura", "caster", 1800)), Note = "뛰어 베기 먼저 · 호랑이 오라는 착지 뒤" },
             ["아일라"] = new UltFit { Hits = H(2433, 3400), Note = "영상: 2.3초 베기는 화상만 · 피해는 4.1초 운석 폭발 → 베기 · 운석 두 박자(운석 장은 없음)" },
             ["롤렛"] = new UltFit { Hits = H(2333), Fx = F(("box", "target", 1300)), Note = "영상: 상자 등장 1.3초 → 걸어가 3.6초 폭발 피해 → 상자 먼저 · 폭발 타격은 둘째 이벤트" },
@@ -193,9 +195,9 @@ namespace Bolzena
                 int slot = Mathf.Min(n - 1, g * n / k);
                 foreach (var e in groups[g])
                 {
-                    if (e.Kind == EventKind.Damage)
+                    if (e.Kind == EventKind.Damage && !IsShot(e))   // 쏘는 한 대는 더하지 않고 그대로
                     {
-                        var same = res[slot].Find(x => x.Kind == EventKind.Damage && x.Target.Side == e.Target.Side && x.Target.Index == e.Target.Index);
+                        var same = res[slot].Find(x => x.Kind == EventKind.Damage && !IsShot(x) && x.Target.Side == e.Target.Side && x.Target.Index == e.Target.Index);
                         if (same != null)
                         {
                             same.Value += e.Value; same.Blocked += e.Blocked; same.HpAfter = e.HpAfter; same.BlockAfter = e.BlockAfter; same.Crit |= e.Crit;

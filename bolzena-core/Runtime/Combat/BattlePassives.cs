@@ -371,7 +371,7 @@ namespace Bolzena.Core
             if (!Matches(owner, r.When, ev, info, rt.KwOf)) return;
             if (firing.Contains(id)) return;
             // 「적에게 디버프를 걸면」 — 한 번의 일에 한 번
-            if ((ONCE_PER_ACT.Contains(ev) || r.When.Once) && info.Seq != 0) { string dk = id + "|" + ev; if (Counts.TryGetValue(dk, out var dv) && dv == info.Seq) return; Counts[dk] = info.Seq; }
+            if ((ONCE_PER_ACT.Contains(ev) && !(ev == "hit" && r.When.Each) || r.When.Once) && info.Seq != 0) { string dk = id + "|" + ev; if (Counts.TryGetValue(dk, out var dv) && dv == info.Seq) return; Counts[dk] = info.Seq; }
             // 「N장 낼 때마다」 — 장수는 조건과 상관없이 세고, N장째에 조건을 본다
             if (r.When.Every > 0)
             {

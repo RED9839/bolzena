@@ -95,7 +95,7 @@ namespace Bolzena.Core
                     int cv = R.FinalDamage(bas, ratio * Math.Max(0.1, mult), crit: isCrit, critX: CritXOf(g ?? u));
                     Say($"파티: 반격{(full ? "(다 막음)" : "")} → {t.Name} ({cv}{(isCrit ? " 치명" : "")})");
                     StatusCue(u, full ? "반격!!" : "반격!", true);
-                    Hurt(t, cv, new HurtOpts { From = g ?? u, Counter = true, Crit = isCrit });
+                    Hurt(t, cv, new HurtOpts { From = g ?? u, Counter = true, Crit = isCrit, Shot = "counter" });
                     if (Over == null) Emit("counter", new EmitInfo { By = g?.Key, Who = u, Target = t, V = cv, Seq = ++SeqN });
                 }
         }

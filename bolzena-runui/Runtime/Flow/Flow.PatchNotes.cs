@@ -105,6 +105,8 @@ namespace Bolzena.RunUI
             "밸런스" => Theme.Bad,
             "편의" => Theme.Good,
             "고친 것" => Theme.Sky,
+            "UI 통일 · 개선" => Theme.Good,   // (2026-10-13) 편의와 같은 초록
+            "연출" => Theme.Gold,
             _ => Theme.Sub,
         });
     }

@@ -906,7 +906,7 @@ namespace Bolzena
                     // 턴 시작 발동 — 뒤따르는 피해를 묶어 그 박자에(미로 광선 V 발 · 오로라 기둥 V 대 · 키샤 · 이드(재활)는 적 전체 한 번)
                     int j = i + 1, dmg = 0, cap = CueCap(e);
                     var group = new List<BattleEvent>();
-                    while (j < evs.Count && dmg < cap && !Boundary(evs[j].Kind) && evs[j].Kind != EventKind.FxCue) { if (evs[j].Kind == EventKind.Damage) dmg++; group.Add(evs[j++]); }
+                    while (j < evs.Count && dmg < cap && !Boundary(evs[j].Kind) && evs[j].Kind != EventKind.FxCue) { if (evs[j].Kind == EventKind.Damage && evs[j].Text != "shot") dmg++; group.Add(evs[j++]); }
                     // 이드(재활) — 꿈이 무너지며 파티 실드(바로 뒤 방어 · 실드)
                     if (e.Text == "ide_wake") while (j < evs.Count && (evs[j].Kind == EventKind.Block || evs[j].Kind == EventKind.Status) && evs[j].Target.Side == Side.Party) group.Add(evs[j++]);
                     yield return e.Text == "miro_beam" ? MiroBeam(e, group) : CUE2.TryGetValue(e.Text, out var c2) ? Cue2Strike(e, group, c2) : CueStrike(e, group);

@@ -292,7 +292,7 @@ namespace Bolzena.Core.Tests
         {
             var w = EldWarns(EldainTests.Eld("벨라", uniqueFx: "{k:'taunt', v:0.5}"));
             Assert.IsTrue(w.Any(x => x.Contains("「도발」은") && x.Contains("소유 키워드")), string.Join("\n", w));
-            Assert.IsFalse(EldWarns(EldainTests.Eld("비비", uniqueFx: "{k:'taunt', v:0.5}")).Any(x => x.Contains("소유 키워드")), "주인은 괜찮다");
+            Assert.IsFalse(EldWarns(EldainTests.Eld("클로에", uniqueFx: "{k:'taunt', v:0.5}")).Any(x => x.Contains("소유 키워드")), "주인은 괜찮다(10-14 도발 주인 비비 → 클로에)");
             Assert.IsTrue(EldWarns(EldainTests.Eld("이드", uniqueFx: "{k:'dmg', ratio:1, target:'oneEnemy'}, {k:'ifFoe', id:'취약'}, {k:'dmg', ratio:1, target:'oneEnemy'}")).Any(x => x.Contains("「취약」")), "취약 정산은 비비만");
             Assert.IsFalse(EldWarns(EldainTests.Eld("이드", uniqueFx: "{k:'status', id:'취약', v:1}")).Any(x => x.Contains("소유 키워드")), "걸어 주기는 괜찮다");
         }

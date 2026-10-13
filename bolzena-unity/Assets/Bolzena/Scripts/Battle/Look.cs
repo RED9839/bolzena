@@ -34,6 +34,33 @@ namespace Bolzena.Battle
         };
         static readonly Dictionary<string, HeroLook> made = new Dictionary<string, HeroLook>();
 
+        // 사도별 맞는 결 · 돌진(2026-10-13) — 서는 줄이 아니라 무기 · 원작 평타 이펙트로 고른다.
+        //   근거: 원작 평타 이펙트 이름(FxLibrary Attack — proj · bullet · lazer 가 있으면 원거리, slash · punch 뿐이면 근접) · 무기 모양.
+        //   표에 없는 사도는 예전처럼 서는 줄(앞줄 둔기 · 근접, 뒷줄 마법, 가운데 베기)
+        static readonly Dictionary<string, (HitKind hit, bool melee)> STYLE = new Dictionary<string, (HitKind hit, bool melee)>
+        {
+            ["비비"] = (HitKind.Slash, true),            // 창 — attack_slash · stomp, 투사체 없음
+            ["비비_신성"] = (HitKind.Magic, false),      // attack_proj
+            ["에르핀_왕도"] = (HitKind.Blunt, false),    // 주먹 — attack1_proj · shockwave(멀리 치는 주먹)
+            ["란"] = (HitKind.Slash, true),              // 칼 — attack_slash, 투사체 없음
+            ["이드"] = (HitKind.Magic, false),           // attackcast · attackheal(시전형)
+            ["디아나_왕년"] = (HitKind.Blunt, false),    // 주먹 — attack_punch · proj
+            ["아야"] = (HitKind.Slash, true),            // attack1_slash, 투사체 없음
+            ["우이_기억"] = (HitKind.Magic, false),      // attack1_proj · explosion
+            ["실비아"] = (HitKind.Slash, true),          // attack_1_slash, 투사체 없음
+            ["클로에"] = (HitKind.Slash, true),          // attack_slash · Point_Attack1_Slash, 투사체 없음
+            ["리뉴아"] = (HitKind.Magic, false),         // attack_lazer · proj
+            ["티그_영웅"] = (HitKind.Slash, false),      // attack_slash · proj(날리는 베기)
+            ["벨라"] = (HitKind.Blunt, true),            // attack1 · hit, 투사체 없음(앞줄 탱커)
+            ["에피카"] = (HitKind.Magic, false),         // music · attack_proj
+            ["네르_빡침"] = (HitKind.Magic, false),      // attack_proj
+            ["우이"] = (HitKind.Magic, false),           // watercast · proj · Point_Attack1_Shot
+            ["요미"] = (HitKind.Magic, false),           // attack_proj
+            ["시온더다크불릿"] = (HitKind.Shot, false),  // 총 — attack_bullet · fire · crosshair
+            ["죠안"] = (HitKind.Magic, false),           // snap · fire · proj(손가락 튕겨 쏘는 불)
+            ["우로스"] = (HitKind.Slash, false),         // attack_slash · proj(날리는 베기)
+        };
+
         // 성격 색(테두리 · 빛에만 쓴다)
         static readonly Dictionary<string, Color> natureTint = new Dictionary<string, Color>
         {
@@ -48,17 +75,20 @@ namespace Bolzena.Battle
             if (made.TryGetValue(id, out h)) return h;
             var info = Bolzena.RunUI.Roster.ByKey(id);
             string art = !string.IsNullOrEmpty(info?.art) ? info.art : id;
-            // 같은 그림의 시범 표가 있으면 그 색 · 결 그대로(콘텐츠의 리코타 = 시범의 rico)
-            foreach (var x in heroes.Values) if (x.Art == art) { made[id] = x; return x; }
+            // 같은 그림의 시범 표가 있으면 그 색 · 결 그대로(콘텐츠의 리코타 = 시범의 rico). 사도별 표(STYLE)가 있으면 색만 빌리고 결 · 돌진은 표대로
+            HeroLook sample = null;
+            foreach (var x in heroes.Values) if (x.Art == art) { sample = x; break; }
+            bool styled = STYLE.TryGetValue(id, out var st);
+            if (sample != null && !styled) { made[id] = sample; return sample; }
             var hd = Data?.CloneHero(id);   // 플레이어 사도 · 클론 전용 사도(보스 클론의 겉모습)
             string nature = hd?.Nature ?? info?.nature;
             string row = info?.row;   // 원작 표의 서는 자리 — 규칙이 아니라 공격 모습(근접 돌진 · 타격 결)만 고른다(사도 열은 코어에 없다)
             h = new HeroLook
             {
                 Art = art,
-                Tint = nature != null && natureTint.TryGetValue(nature, out var c) ? c : Color.white,
-                Melee = row == "front",
-                Hit = row == "front" ? HitKind.Blunt : row == "back" ? HitKind.Magic : HitKind.Slash,
+                Tint = sample != null ? sample.Tint : nature != null && natureTint.TryGetValue(nature, out var c) ? c : Color.white,
+                Melee = styled ? st.melee : row == "front",
+                Hit = styled ? st.hit : row == "front" ? HitKind.Blunt : row == "back" ? HitKind.Magic : HitKind.Slash,
             };
             made[id] = h;
             return h;
@@ -66,8 +96,9 @@ namespace Bolzena.Battle
 
         public static bool MeleeArt(string art)
         {
-            foreach (var h in heroes.Values) if (h.Art == art) return h.Melee;
+            // 만든 것(사도별 표 STYLE 이 든)을 먼저 — 콘텐츠 사도가 시범 표와 그림이 같아도(시온더다크불릿 = sion · 이드 = ed) 표가 앞선다
             foreach (var h in made.Values) if (h.Art == art) return h.Melee;
+            foreach (var h in heroes.Values) if (h.Art == art) return h.Melee;
             return false;
         }
 

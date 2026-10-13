@@ -18,6 +18,11 @@ namespace Bolzena.Core
         public HashSet<string> Tags;
         /// <summary>전투 기록에서 이 피해를 받을 사도(From 이 없을 때만 — 지속 피해 · 응징처럼 상태를 건 사도). 피해 계산에는 쓰지 않는다.</summary>
         public Unit Credit;
+        /// <summary>
+        /// 쏘는 한 대(2026-10-13) — 카드 몸짓 밖에서 사도가 따로 치는 것: extra(추가 공격 · 패시브 피해) · bullet(탄환) · counter(반격) ·
+        /// assist(협공) · resonance(공명) · summon(소환물). hurt 쪽지에 Label(이것) · Hero(쏜 사도 키)로 실려 화면이 쏘는 사도를 보인다. 판에는 영향 없다.
+        /// </summary>
+        public string Shot;
     }
 
     public sealed partial class Battle
@@ -178,7 +183,8 @@ namespace Bolzena.Core
             u.Hp -= d;
             // 전투 기록 — 적에게 실제로 깎인 HP(넘친 피해 빼고) + 벗긴 방어 · 실드. 반격 · 추가 공격 · 소환물 · 지속 피해도 From(없으면 Credit) 사도 몫
             if (u.Side == Side.Enemy) TallyDealt(from ?? o.Credit, Math.Max(0, Math.Min(d, hp0)) + guard);
-            if (d > 0 || guard > 0) Cue("hurt", u, new Cue { V = d, Guard = guard, Crit = o.Crit, From = Math.Max(0, hp0), To = Math.Max(0, u.Hp) });
+            if (d > 0 || guard > 0) Cue("hurt", u, new Cue { V = d, Guard = guard, Crit = o.Crit, From = Math.Max(0, hp0), To = Math.Max(0, u.Hp),
+                Label = o.Shot != null && from != null && from.Side == Side.Party ? o.Shot : null, Hero = o.Shot != null && from != null && from.Side == Side.Party ? from.Key : null });
             if (u.Side == Side.Party && d > 0) Talk(u, "hit");
             if (u.Hp <= 0) { LethalKill(u); return; }
             if (u.Side == Side.Enemy && from != null && from.Side == Side.Party && !o.Dot && (d > 0 || guard > 0)) CounterEvent(u, "hit");

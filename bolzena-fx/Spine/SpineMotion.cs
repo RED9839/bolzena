@@ -290,5 +290,43 @@ namespace Bolzena.Fx
             if (bone == null) return null;
             return () => BoneWorld(sa, bone, tip);
         }
+
+        // 그 사도의 무기 끝 — 표(MotionTables.WEAPON)의 슬롯들에 지금 보이는 그림의 꼭짓점 가운데 가장 앞(적 쪽, 월드). 표에 없으면 null,
+        //   그 순간 보이는 그림이 없으면(무기를 넣은 몸짓) 부를 때 null — 부르는 쪽이 예전 사슬로 간다
+        public static Func<Vector3?> Weapon(SkeletonAnimation sa, string heroKey)
+        {
+            if (sa == null || sa.Skeleton == null || heroKey == null || !MotionTables.WEAPON.TryGetValue(heroKey, out var pat)) return null;
+            var re = new Regex(pat);
+            var sk = sa.Skeleton;
+            var slots = sk.Slots.Where(s => re.IsMatch(s.Data.Name)).ToArray();
+            if (slots.Length == 0) return null;
+            var buf = new float[64];
+            return () =>
+            {
+                if (sa == null || sa.Skeleton == null) return null;
+                if (sa.Skeleton != sk) { sk = sa.Skeleton; slots = sk.Slots.Where(s => re.IsMatch(s.Data.Name)).ToArray(); }   // 다시 만든 스켈레톤(스킨 바꿈)
+                var t = sa.transform;
+                float fw = -sa.Skeleton.ScaleX * t.lossyScale.x >= 0 ? 1f : -1f;   // 원작 SD 는 왼쪽(-x)을 본다 — 월드에서 앞쪽 부호
+                bool got = false; float bestX = float.MinValue; Vector3 best = Vector3.zero;
+                foreach (var s in slots)
+                {
+                    if (s.A <= 0.01f || s.Attachment == null) continue;
+                    int n = 0;
+                    if (s.Attachment is RegionAttachment ra) { n = 8; ra.ComputeWorldVertices(s, buf, 0, 2); }
+                    else if (s.Attachment is VertexAttachment va && va.WorldVerticesLength > 0)
+                    {
+                        n = va.WorldVerticesLength;
+                        if (buf.Length < n) buf = new float[n];
+                        va.ComputeWorldVertices(s, buf);
+                    }
+                    for (int i = 0; i + 1 < n; i += 2)
+                    {
+                        var w = t.TransformPoint(new Vector3(buf[i], buf[i + 1], 0));
+                        if (w.x * fw > bestX) { bestX = w.x * fw; best = w; got = true; }
+                    }
+                }
+                return got ? best : (Vector3?)null;
+            };
+        }
     }
 }

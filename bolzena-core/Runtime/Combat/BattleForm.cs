@@ -88,6 +88,7 @@ namespace Bolzena.Core
                 if (b.Unique && !v.Unique) continue;
                 if (b.Tag != null && !o.HasTag(b.Tag)) continue;
                 var fx = o.Fx.Select(f => b.Ratio > 0 && (f.K == FxK.Dmg || f.K == FxK.Extra) && f.OfEvent <= 0 ? Scaled(f, b.Ratio) : f).ToList();
+                if (b.Hits > 1) { var src = fx; fx = src.Select((f, i) => i > 0 && FxK.Pers.Contains(src[i - 1].K) ? f : MoreHits(f, b.Hits)).ToList(); }   // (2026-10-14 클로에 탑승) n연타 — 「1개당」 피해는 이미 여러 대라 그대로
                 // 덤 효과는 조건 없이 돈다 — 첫 조건 · 때 붙은 마디(when) 앞에 끼운다(뒤에 붙이면 앞 조건에 걸린다)
                 int at = fx.FindIndex(f => FxK.Conditions.Contains(f.K));
                 fx.InsertRange(at < 0 ? fx.Count : at, b.Fx ?? new List<Fx>());
@@ -101,6 +102,12 @@ namespace Bolzena.Core
         }
 
         static Fx Scaled(Fx f, double r) { var c = f.Copy(); c.Ratio = Math.Round(f.Ratio * r, 4); return c; }
+        /// <summary>피해 조각의 친 횟수 × n — 고정 횟수 피해만(일의 값 · 지속 피해 · X · 겹 비례 횟수 · 1개당(per 뒤) 피해는 그대로).</summary>
+        static Fx MoreHits(Fx f, int n)
+        {
+            if (f.K != FxK.Dmg || f.OfEvent > 0 || f.OfForm > 0 || f.OfShield || f.Dot || f.XHits || f.HitsPer != null) return f;
+            var c = f.Copy(); c.Hits = f.HitsOr1 * n; if (c.KnownHits > 0) c.KnownHits *= n; return c;
+        }
 
         /// <summary>봇의 카드 값 캐시 키 — 그 카드의 주인이 든 변신(없으면 "").</summary>
         public string FormKeyOf(string cardId)

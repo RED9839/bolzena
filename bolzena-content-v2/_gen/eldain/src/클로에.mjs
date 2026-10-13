@@ -1,97 +1,97 @@
-// 클로에 — 탱커 · 광기 · 요정. 설계: _measure/엘다인_엔진/01_사도별.md §6 (4차 10-11)
-// 4차 덧붙임(사용자 10-11): 실드를 주는 생성 카드 「맞춤옷」 — 동료 몫으로 지어 주고(그 동료 방어력 실드), 누가 입든 세바스티안 +1.
-// 엔진: 꿰맬수록 곰 인형 집사 「세바스티안」 몸집이 커져 대신 맞고 · 따라 치고 → 몸집을 풀어 손의 동료 카드에 「맞춤 의상」(탐구심 · 보존)을 입힌다.
-// 쁘띠 세바스티안 생성 카드는 뺐다(사용자 10-11). 자동 규칙은 「인형의 의지」 하나. 세바스티안은 적의 공격을 대신 받는 소환물이라 따로 도발을 두지 않는다.
+// 클로에 — 탱커(딜탱) · 광기 · 요정 · 변신 「탑승」.
+// 2026-10-14 리뉴얼(사용자 결정 「메리 고 라운드」 딜탱): 자원 하나 · 변신 하나.
+//   원작: 날개 없는 요정 재단사, 곰 인형 집사 세바스티안과 함께 — 저학년 「메리 고 라운드」 = 세바스티안에 올라타 큰 보호막 + 평타 3연타,
+//   평타가 맞을 때마다 바늘땀(최대 9) · 9면 탑승 연장 · 탑승하지 않을 때는 내려찍기 + 도발, 고학년 = 쁘띠 세바스티안 7마리 돌진.
+//   흐름: 클로에 카드가 적을 칠 때마다(타마다) 「바늘땀」 1 → 「메리 고 라운드」 로 3턴 탑승(큰 실드 · 고유 공격 카드 3연타 — 엔진 변신 덤 hits)
+//         → 탑승 중 바늘땀 9 를 쓰면 탑승 +1턴 → 탑승이 끝나면 내려찍기(적 전체). 「곰 인형 내려찍기」 는 바늘땀을 모두 쏟는 마무리.
+//   걷어 낸 것(10-11~10-13 판): 세바스티안 몸집(cap 5 · 대신 맞기 guard · 따라 치기 summon) · 「바느질」 파티 받는 피해 감소 · 「맞춤옷」 생성 카드와 맞춤 가봉 ·
+//     「맞춤 의상」(탐구심 · 보존) · 「인형의 의지」 매 턴 피해 감소 · 「런웨이 오프닝」 — 자원 셋 · 생성 카드 · 남의 카드 손대기가 겹쳐 「무엇을 하는 사도인지」 가 흐렸다.
+//     원작의 탑승 · 3연타 · 바늘땀 · 내려찍기 한 줄기로(10-14 도발 뺌) 덜어 냈다. 이전 판: C:\projects\_backup\chloe_before_20261014\클로에.mjs
 import { hero, dmg, ddmg, shield, heal, stack, spend, make, draw, discard, status, empower, ifStack, power, rule } from '../lib.mjs';
 
-const H = '클로에', K = '세바스티안', D = '탐구심';
-const S = (v = 1, x) => stack(K, v, x);
-const order = (ratio, target = 'oneEnemy') => ({ k: 'summon', id: K, ratio, target });
-const T = `${H}_t1`;
-const suit = (v = 1, owner = 'other') => make(T, v, { owner });   // 「맞춤옷」 — 동료 몫으로 지어 줌(사용자 10-11)
-const dress = (v = 1, x) => ({ k: 'cardStatus', id: D, v, to: 'hand', n: 1, who: 'other', keep: true, ...x });
-const pickDress = (x) => ({ k: 'cardStatus', id: D, v: 1, to: 'hand', who: 'other', keep: true, pick: true, ...x });
+const H = '클로에', Q = '바늘땀', F = `${H}_탑승`;
+const ride = [{ k: 'form', id: F }];
+const SF = (...x) => [{ k: 'ifForm', id: F }, ...x];   // 「탑승」 : 덤(디아나 「백수공권」 꼴)
+// 10-14 사용자 「도발 시스템 없는 게 좋지 않음?」 → 도발을 뺐다(쓰는 사도가 클로에뿐이고 파티 공격엔 의미가 없어 읽기만 어려웠다)
+const extend = { k: 'formExtend', id: F, v: 1, max: 6 };
+const pour = (r, target = 'allEnemies') => [spend(Q, 'all'), { k: 'perEvent', n: 1 }, ddmg(r, target)];   // 바늘땀을 모두 써서 1개당(효과 3개 규칙이라 기본 피해 없이 — 쌓아 둔 만큼 내려찍는다)
 
 export default hero({
   id: H, name: '클로에', nature: '광기', race: '요정', role: '탱커', star: 3,
-  blurb: '날개 없는 요정 재단사. 실을 꿰맬수록 곰 인형 집사 세바스티안이 커져 동료 대신 맞고, 명령하면 몸집만큼 따라 칩니다. 천을 풀면 동료의 카드에 맞춤 의상을 지어 줍니다.',
-  keyword: {
-    name: K, desc: '클로에의 힘을 넘겨받은 곰 인형 집사', carrier: 'self', cap: 5, guard: true, cut: 0.6,
-    // 자동 규칙 하나 — 누구든 「맞춤옷」 을 입으면(내면) 세바스티안 +1(재단사 ↔ 집사 고리). 옛 「인형의 의지」(넘치면 맞춤 의상)는 뺐다
-    rules: [{ name: '맞춤 가봉', when: { on: 'play', who: 'any', tag: T }, fx: [S(1)] }],
-  },
-  // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
-  keywords: [{ name: '바느질', desc: '꿰맬수록 단단해지는 재단사의 솜씨', carrier: 'self', cap: 3, per: [{ stat: 'taken', v: -0.1, who: 'allies' }] }],   // 10-13 사용자 「어차피 체력 공유잖아」 — 파티가 받는 피해(다른 사도의 피해 감소와 더해짐) · 10-12 탱커 손질(뎀감 정체성) 1개당 5→10% · 최대 4→3(-20% → -30%)
-  // 사용자 10-11: 20명 모두 고유 능력 2개
+  blurb: '날개 없는 요정 재단사. 곰 인형 집사 세바스티안에 올라타 큰 실드를 두르고, 꿰매듯 몰아치는 연타로 바늘땀을 채워 탑승을 이어 갑니다.',
+  keyword: { name: Q, desc: '세바스티안을 꿰매는 재단사의 바늘 자국', carrier: 'self', cap: 9, per: [{ stat: 'taken', v: -0.05, who: 'allies' }] },   // 1개당 파티가 받는 피해 -5%(탱커 — 쌓아 두면 단단하고, 쏟으면 세다)
   passives: [
-    { name: '인형의 의지', when: { on: 'turnStart' }, conds: [{ c: 'stack', id: K, n: 1 }], fx: [status('피해 감소', 1)] },   // 10-12 밤 실드 덧붙임은 봇 측정에서 너무 세 뺐다 · 세바스티안이 있으면 매 턴 피해 감소 1(뎀감 정체성) — // 10-12 탱커 손질 2 이상 → 1 이상
+    { name: '한 땀 한 땀', when: { on: 'hit', each: true }, fx: [stack(Q, 1)] },   // 클로에 카드가 적을 칠 때마다(연타면 타마다) 바늘땀 1 — 엔진 hit each(10-14)
+    { name: '한 바퀴 더', when: { on: 'hit', each: true }, conds: [{ c: 'stack', id: Q, n: 9 }], fx: [...SF(spend(Q, 9), extend)] },   // 탑승 중 바늘땀 9 → 탑승 +1턴(최대 6턴)
   ],
-  ult: { name: 'F/W 클로에록', cost: 250, fx: [ddmg(1.2, 'allEnemies'), S(5), status('피해 감소', 4), status('약화', 1, { target: 'allEnemies' })] },   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 세바스티안 3→5 · 피해 감소 2→4 · 적 전체 약화 1   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로
+  forms: [{
+    id: F, name: '탑승', desc: '세바스티안에 올라탄 클로에 — 3턴', stance: true, anim: 'Idle_Change', turns: 3,
+    bonus: [{ type: '공격', unique: true, ratio: 0.5, hits: 3 }],   // 고유 공격 카드 3연타(한 대 50% — 합 150%) · 엔진 변신 덤 hits(10-14)
+    off: [ddmg(0.8, 'allEnemies')],   // 내려오며 내려찍기(10-14 사용자: 도발 시스템 뺌)
+  }],
+  ult: { name: '쁘띠 세바스티안 돌격', cost: 250, fx: [ddmg(0.6, 'randomEnemy', { hits: 7 }), stack(Q, 9)] },   // 쁘띠 세바스티안 7마리 무작위 돌진 + 바늘땀 가득
 }, {
   basicNames: ['곰 인형 휘두르기', '곰 인형 찌르기', '재단사의 자세'], deck: 'light',
   uniques: [
-    { // 시동
+    { // 시동 — 탑승
       name: '메리 고 라운드', cost: 1, type: '스킬',
-      fx: [status('피해 감소', 2), S(2)],   // 10-12 탱커 손질 피해 감소 1→2 · 클로에 = 피해 감소(사용자 10-11 — 실드 정체성은 이드)
+      fx: [shield(2), ...ride],
       oracles: [
-        { fx: [status('피해 감소', 2), S(3)] },
-        { fx: [status('피해 감소', 1), S(2), empower(0.5)] },   // 10-12 본판 피해 감소 2 에 맞춰 신탁에도
-        { power: true, fx: [status('피해 감소', 1), S(1), power([rule({ on: 'turnStart' }, [S(1)])])] },
-        { fx: [status('피해 감소', 2), S(1), suit(1)] },   // 10-13 신탁 점검: 피해 감소 1→2
-        { cost: 2, fx: [status('피해 감소', 4), S(4), draw(1)] },   // 10-13 신탁 점검: 세바스티안 4 · 드로우 1
+        { fx: [shield(2.6), ...ride] },
+        { fx: [shield(1.6), ...ride, stack(Q, 4)] },
+        { fx: [shield(1.6), ...ride, draw(1)] },
+        { cost: 0, fx: [shield(1), ...ride] },
+        { fx: [shield(1.6), ...ride, status('피해 감소', 1)] },
       ],
-      blesses: ['guard', 'draw', [S(1)]],
+      blesses: ['guard', 'draw', [stack(Q, 1)]],
     },
-    {
-      name: '찢긴 곳 꿰매기', cost: 0, type: '스킬',
-      fx: [discard(1), stack('바느질', 1), suit(1, 'self')],   // 10-12 밤: 「맞춤옷」 이 더 자주(꿰맬 때마다 한 벌) — 옛 세바스티안 +1 은 입으면(맞춤 가봉) 들어온다
-      oracles: [
-        { fx: [discard(1), S(2), suit(1, 'self')] },   // 10-13 신탁 점검: 10-12 밤 본판의 맞춤옷(자신)을 신탁에도
-        { fx: [discard(1, { who: 'other' }), S(2), suit(1, 'self')] },
-        { fx: [shield(1), S(1), suit(1, 'self')] },   // 10-12 밤: 다음 카드 +50% → 실드
-        { cost: 0, fx: [discard(2), S(2), draw(1)] },   // 10-13 신탁 점검: 비용 1 → 0
-        { fx: [{ k: 'pull', from: 'draw', n: 1, who: 'other' }, S(2)] },   // 10-13 신탁 점검 3차: 세바스티안 2
-      ],
-      blesses: ['draw', 'ap', [S(1)]],
-    },
-    {
+    { // 연타 공격 — 탑승 중 3연타
       name: '세바스티안, 공격!', cost: 1, type: '공격',
-      fx: [ddmg(1.2), order(0.7), shield(0.3)],   // 10-12 밤 사용자 「클로에 쉴드 생성할 수 있는 거 더」 — 명령하며 실드(규칙 2개 한도라 카드에)
+      fx: [ddmg(1.2)],
       oracles: [
-        { fx: [ddmg(1.2), order(0.7), shield(0.3)] },   // 10-13 신탁 점검: 실드를 잃고 약하던 신탁 — 본판 꼴로(같은 꼴이라 피해 ×1.3)
-        { fx: [ddmg(0.8), order(0.3, 'allEnemies'), shield(0.3)] },   // 10-13 신탁 점검
-        { fx: [order(0.4), suit(1)] },
-        { cost: 0, fx: [{ k: 'ifStack', id: K, n: 3 }, order(0.6)] },   // 10-13 신탁 점검
-        { fx: [order(0.4), S(1)] },
+        { fx: [ddmg(1.6)] },
+        { fx: [ddmg(0.6, 'oneEnemy', { hits: 2 }), stack(Q, 1)] },   // 바늘땀 갈래 — 탑승 중 6연타(꼴이 본판과 같으면 빌드가 비율을 본판으로 올려 바늘땀 1 을 붙여 꼴을 가른다)
+        { fx: [ddmg(0.7, 'allEnemies')] },
+        { cost: 0, fx: [ddmg(0.8)] },
+        { fx: [ddmg(1), shield(0.6)] },
       ],
-      blesses: ['power', 'cost', [S(1)]],
+      blesses: ['power', 'cost', [stack(Q, 1)]],
     },
-    { // 마무리 — 세바스티안을 고른 만큼 풀어 1개당 「맞춤옷」(동료 몫, 최소 1)
-      name: '런웨이 오프닝', cost: 1, type: '스킬',
-      fx: [spend(K, 'pick'), { k: 'perEvent', n: 1 }, suit(1), draw(1)],
-      oracles: [
-        { power: true, fx: [suit(1), power([rule({ on: 'turnStart' }, [suit(1)])])] },
-        { fx: [spend(K, 'pick'), pickDress(), draw(2)] },   // 옛 「맞춤 의상」(동료 카드에 탐구심 · 보존)은 이 갈래로
-        { fx: [spend(K, 'pick'), { k: 'perEvent', n: 1 }, suit(1, 'self'), draw(1)] },
-        { cost: 0, fx: [spend(K, 'pick'), pickDress()] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 · 10-13 신탁 점검: 같은 비용에 약하기만 해 비용 0
-        { fx: [spend(K, 'pick'), { k: 'cardStatus', id: '비용', v: -1, to: 'hand', who: 'other', pick: true }, draw(1)] },   // 10-13 신탁 점검: 드로우 되살림
-      ],
-      blesses: ['cost', 'draw', [S(1)]],
-    },
-    { // 4차 8장 — 터뜨리기(탱커 메인딜 갈래 · 원작 강화 공격 내려찍기)
+    { // 마무리 — 내려찍기 · 도발 · 바늘땀을 모두 쏟는다
       name: '곰 인형 내려찍기', cost: 2, type: '공격',
-      fx: [ddmg(2.4), { k: 'perStack', id: K }, ddmg(0.3)],
+      fx: [ddmg(0.4, 'allEnemies'), ...pour(0.3)],   // 10-14 사용자: 바늘땀 0 이어도 기본 피해 — 도발 뺀 뒤 혼자 84% 라 60 → 40%
       oracles: [
-        { fx: [ddmg(1.4), { k: 'perStack', id: K }, ddmg(0.4)] },
-        { fx: [ddmg(0.8, 'allEnemies'), { k: 'perStack', id: K }, ddmg(0.2, 'allEnemies')] },
-        { fx: [ddmg(1.4), S(2)] },
-        { cost: 1, fx: [ddmg(1), { k: 'perStack', id: K }, ddmg(0.2)] },
-        { fx: [ddmg(1.4), status('피해 감소', 1)] },
+        { fx: [...pour(0.4)] },
+        { fx: [...pour(0.6, 'oneEnemy')] },
+        { cost: 1, fx: [...pour(0.2)] },
+        { fx: [ddmg(1.2, 'allEnemies'), status('피해 감소', 1)] },   // 쏟지 않는 갈래
+        { fx: [ddmg(1, 'allEnemies'), stack(Q, 3)] },   // 채우는 갈래
       ],
-      blesses: ['power', 'cost', [S(1)]],
+      blesses: ['power', 'cost', [stack(Q, 1)]],
     },
-  ],
-  tokens: [
-    { id: T, name: '맞춤옷', cost: 0, type: '스킬', tags: ['소멸'], fx: [shield(0.8)], blurb: '클로에가 치수를 재어 지어 준 옷' },   // 10-12 탱커 손질 실드 60→80%
+    { // 실드 · 바늘땀
+      name: '건치 스마일', cost: 1, type: '스킬',
+      fx: [shield(1.2), stack(Q, 2)],
+      oracles: [
+        { fx: [shield(1.6), stack(Q, 2)] },
+        { fx: [shield(0.8), stack(Q, 4)] },
+        { power: true, fx: [shield(1.2), power([rule({ on: 'turnStart' }, [stack(Q, 2)])])] },
+        { cost: 0, fx: [shield(0.8), stack(Q, 1)] },
+        { fx: [shield(1), stack(Q, 2), draw(1)] },
+      ],
+      blesses: ['guard', 'draw', [stack(Q, 1)]],
+    },
+    { // 실드 · 회복 — 탑승 중이면 +1턴
+      name: '찢긴 곳 꿰매기', cost: 1, type: '스킬',
+      fx: [shield(0.8), heal(0.6)],
+      oracles: [
+        { fx: [shield(1), heal(0.8)] },
+        { fx: [shield(0.6), heal(0.6), stack(Q, 3)] },
+        { fx: [shield(0.6), heal(0.6), ...SF(extend)] },
+        { cost: 0, fx: [shield(0.5), heal(0.4)] },
+        { fx: [heal(1.2), status('피해 감소', 1)] },
+      ],
+      blesses: ['guard', 'ap', [stack(Q, 1)]],
+    },
   ],
 });

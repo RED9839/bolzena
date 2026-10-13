@@ -25,6 +25,8 @@ namespace Bolzena.Fx
         public string SortingLayer;
         public Transform Parent;
         public Vector3? ShotFrom;            // 투사체가 떠나는 자리(시전 본 — 없으면 From)
+        public bool Aim;                     // 투사체를 나는 쪽으로 돌린다(카드 — 무기 끝에서 맞는 적 몸으로). 고학년은 그대로
+        public bool FitTop;                  // 카드 — 그린 판이 Top 위로 나가면 줄이고 내린다(FxPlayOptions.FitTop). 고학년은 그대로
         public Vector3? ToBody;              // 대상 몸 가운데 — 몸에 맞는 이펙트(UltPart.Body)가 여기
         public Action<FxRun> OnPart;         // 한 장 틀 때마다(시험 · 재기)
         public IList<Func<Vector3>> Allies;
@@ -75,6 +77,19 @@ namespace Bolzena.Fx
         static readonly Regex AGAIN = new Regex("(hit|slash|stab)");
         static readonly Regex SCREEN = new Regex(@"(^|_)(camera|screen|bg|fullscreen)(_|$|\d)");   // 화면 전체(카메라 앞) — 볼제나 추가, 웹판에는 없던 갈래
         static readonly Regex ALLY = new Regex(@"(_a$|_a_|(^|_)(heal|buff|revival)(_|$|\d))");   // 볼제나 추가(2026-10 벨라 고학년 제보)
+        static readonly Regex ALLY2 = new Regex("((?<!de)buff|barrier|shield)");
+        //   (2026-10-14 원작 비교) 낱말 붙은 강화 · 보호막(flowerbuff · startbuff · barrier · shield)도 아군 쪽 — 우이 고학년 거품 · 실비아 고학년 보호막이 적 위에 떴다.
+        //   맞음 · 표식 · 내려찍기(barrier_hit · buff_target · shieldstomp)는 그대로 대상, 약화(debuff)는 맞는 적에
+        static readonly Regex NOT_ALLY = new Regex("(hit|target|stomp)");
+        static readonly Regex DEBUFF = new Regex("debuff");
+        // 이름 낱말로는 자리가 틀리는 고학년 장(원작 영상으로 본 자리) — "ally" 시전자 + 아군 · "caster" 시전자 몸 · "target" 맞는 적
+        //   우이 flower_1 — 초록 클로버 터짐 · 거품(DummyBoll)이 아군 위(원작 1.8~3.0초) · 벨라 end · lantern — 끝의 큰 보라 구체가 벨라 자신을 감싼다(원작 3.3~3.8초)
+        static readonly Dictionary<string, string> AT_FIX = new Dictionary<string, string>
+        {
+            ["fx_uieru_ultimate_flower_1_default"] = "ally",
+            ["fx_vela_ultimate1_end"] = "caster",
+            ["fx_vela_ultimate1_lantern"] = "caster",
+        };
         static readonly Regex SEQ_TAIL = new Regex(@"_\d+$");
         static readonly Regex WORD = new Regex(@"^fx_[a-z0-9]+_(ultimate\d*_|ult_|skill\d*_?|personal_?|attack\d*_?)?");   // attack_ — 카드 attack_hand_1 이 「attack」 낱말로 대상에 가던 것
         public const int MAX_ULT = 8;
@@ -93,7 +108,10 @@ namespace Bolzena.Fx
             ["shasha_ultimate_waterfall"] = 1.6f,
         };
         static readonly Regex NO_BONE = new Regex("vividivine_ultimate_full_laser");
-        static readonly Dictionary<string, int> MAX_BY = new Dictionary<string, int> { ["아일라"] = 10 };
+        // 몸을 덮는 섬광 — 시전자 몸 가운데(Middle 본 · 매 프레임 따라감)에서 크게(배수). 원작은 사도가 그 섬광 속에 「사라진다」
+        //   (2026-10-13 비비: 0.2~0.4초 검은 네 갈래 별 · 주황 구체 — fire_1 의 ImpactShapes_Sharp. 발밑 · 적 자리에 작게 떠 사라짐이 약했다)
+        static readonly Dictionary<string, float> BODY_FLASH = new Dictionary<string, float> { ["vivi_ultimate_fire_1"] = 1.3f };
+        static readonly Dictionary<string, int> MAX_BY = new Dictionary<string, int> { ["아일라"] = 10, ["비비_신성"] = 12 };   // 비비(신성) — 「full」 갈래 12장(빛기둥 4 · 고리 · 끝 · 앞 · 레이저 5): 8장에서 끊겨 레이저가 하나만 나갔다(2026-10-14)
 
         // 이름들로 자리 · 차례를 가른다(고학년 · 카드 같이 쓴다). max 넘으면 가장 큰 갈래 하나만
         public static List<UltPart> PlanNames(List<string> names, UltPick? pick = null, int max = MAX_ULT)
@@ -123,9 +141,11 @@ namespace Bolzena.Fx
             {
                 var w = Word(name);
                 bool proj = PROJ.IsMatch(w), beam = !proj && BEAM.IsMatch(w);
-                bool ally = ALLY.IsMatch(w);   // 아군 쪽 판(벨라 hit_a · proj_a — 적 쪽은 _e) · 회복 · 강화 — 적에게 틀면 엉뚱한 색이 겹친다
-                if (ally) { proj = false; beam = false; }
-                string at = SCREEN.IsMatch(w) ? "screen" : ally ? "caster" : proj ? "move" : beam ? "caster" : AT_TARGET.IsMatch(w) && !CAST_OR_CHARGE.IsMatch(w) ? "target" : AT_CASTER.IsMatch(w) ? "caster" : "target";
+                AT_FIX.TryGetValue(name, out var fix);
+                bool ally = fix == "ally" || (fix == null && (ALLY.IsMatch(w) || (ALLY2.IsMatch(w) && !NOT_ALLY.IsMatch(w))) && !DEBUFF.IsMatch(w));   // 아군 쪽 판(벨라 hit_a · proj_a — 적 쪽은 _e) · 회복 · 강화 · 보호막 — 적에게 틀면 엉뚱한 색이 겹친다
+                if (ally || fix != null) { proj = false; beam = false; }
+                string at = fix != null ? (fix == "ally" ? "caster" : fix) : SCREEN.IsMatch(w) ? "screen" : ally ? "caster" : proj ? "move" : beam ? "caster" : DEBUFF.IsMatch(w) ? "target"
+                    : AT_TARGET.IsMatch(w) && !CAST_OR_CHARGE.IsMatch(w) ? "target" : AT_CASTER.IsMatch(w) ? "caster" : "target";
                 bool pre = !proj && PRE.IsMatch(w);
                 res.Add(new UltPart
                 {
@@ -300,14 +320,14 @@ namespace Bolzena.Fx
 
         static FxRun FirePart(UltPart p, UltOptions o, Vector3 from, Vector3 to, bool flip, float until)
         {
-            var b = new FxPlayOptions { Scale = o.Scale, Top = o.Top, Flip = flip, Until = until, Order = o.Order, SortingLayer = o.SortingLayer, Parent = o.Parent };
+            var b = new FxPlayOptions { Scale = o.Scale, Top = o.Top, Flip = flip, Until = until, Order = o.Order, SortingLayer = o.SortingLayer, Parent = o.Parent, FitTop = o.FitTop };
             if (p.At == "move") { b.At = (o.Muzzle != null ? o.Muzzle() : null) ?? o.ShotFrom ?? from;   // 쏘는 그 순간의 총구 · 쏘는 자리(캬롯 — 몸 가운데에서 나가던 것)
-b.MoveTo = o.ToBody ?? to; b.MoveDur = 0.35f;
+b.MoveTo = o.ToBody ?? to; b.MoveDur = 0.35f; b.Aim = o.Aim && !p.Name.Contains("trail");   // 꼬리(trail)는 제 모양대로
                 if (p.Name.Contains("meteor")) { b.At = (o.ToBody ?? to) + new Vector3(-2.5f, 7f, 0); b.MoveDur = 0.45f; }   // 운석(아일라) — 하늘에서 떨어진다
                 return BolzenaFx.Play(p.Name, b); }
             if (p.Ally && o.Allies != null && o.Allies.Count > 0)
             {
-                b.At = from; b.Flip = false;
+                b.At = o.CasterActor != null ? o.CasterActor.At(FxAnchor.Feet) : from; b.Flip = false;   // 달려가는 고학년도 시전자 실제 몸 발밑(Bottom 본) — from 은 달려갈 자리라 적 앞에 떴다
                 var first = BolzenaFx.Play(p.Name, b);
                 foreach (var a in o.Allies)
                 {
@@ -328,17 +348,41 @@ b.MoveTo = o.ToBody ?? to; b.MoveDur = 0.35f;
                     b.MoveTo = new Vector3(to.x + Mathf.Max(1.2f, o.ToWidth / 2) + 1.5f, to.y, to.z); b.MoveDur = sw.Value;
                     return BolzenaFx.Play(p.Name, b);
                 }
+            // 몸을 덮는 섬광(BODY_FLASH) — 달려가는 사도도 그 순간의 몸에(시전자 자리를 도착점으로 바꾼 FxActor 라도 본은 실제 몸)
+            if (p.At == "caster" && o.CasterActor != null)
+                foreach (var bf in BODY_FLASH)
+                    if (p.Name.Contains(bf.Key))
+                    {
+                        var ca = o.CasterActor;
+                        Func<Vector3?> mid = () => ca.Bone("Middle") ?? ca.Guess(FxAnchor.Body);
+                        b.At = mid().Value; b.Track = mid; b.Bare = true; b.Scale *= bf.Value;
+                        return BolzenaFx.Play(p.Name, b);
+                    }
             // 뼈에 붙이면 엉뚱한 데로 가는 장 — 몸 앞(가슴 높이)에 그대로(비비(신성) 거대 형상의 레이저: 원작은 손끝에서 적 쪽으로 가로)
             if (NO_BONE.IsMatch(p.Name) && o.CasterActor != null) { b.At = o.CasterActor.At(FxAnchor.Front); b.Bare = true; return BolzenaFx.Play(p.Name, b); }
             Vector3? m = p.Muzzle && o.Muzzle != null ? o.Muzzle() : null;
-            if (m.HasValue) { b.At = m.Value; b.Track = o.Muzzle; b.Bare = true; return BolzenaFx.Play(p.Name, b); }
+            if (m.HasValue)
+            {
+                b.At = m.Value; b.Track = o.Muzzle; b.Bare = true;
+                // 카드 — 총구 레이저 · 빛줄기를 맞는 적 몸 쪽으로 돌린다(무기 끝이 머리 위면 오른쪽 위 허공으로 뻗던 것 · 리뉴아 평타 2026-10-13)
+                if (o.Aim) { b.Aim = true; b.AimAt = o.ToBody ?? to; }
+                return BolzenaFx.Play(p.Name, b);
+            }
             // 시전자 쪽 · 이름에 시전자 뼈가 든 대상 쪽 장 — 그 뼈에 붙여 따라간다(전수 조사 B · C · G). 이미 높이 짜인 판(이미터 3 단위 넘게 위)은 발밑 그대로
             if (o.CasterActor != null && FxLibrary.EmitterTop(p.Name) < 3f)
             {
                 var bone = CasterBone(p, o, p.At == "caster");
                 var topY = BolzenaFx.TopY();   // 화면 위로 나간 뼈(네르(빡침) SkillReady)는 안 쓴다
                 if (bone != null) { var at0 = bone(); if (at0.HasValue && (!topY.HasValue || at0.Value.y < topY.Value)) { b.At = at0.Value; b.Track = bone; b.Bare = true; return BolzenaFx.Play(p.Name, b); } }
-                if (p.At == "caster" && !o.Dash) { var a = o.CasterActor; Func<Vector3?> feet = () => a.Feet; b.At = a.Feet; b.Track = feet; return BolzenaFx.Play(p.Name, b); }   // 몸이 움직여도 발밑을 따라
+            }
+            // 시전자 쪽 장은 시전자 실제 몸 발밑(Bottom 본 — 매 프레임 따라감). 전에는 달려가는 몸짓(Dash) · 높이 짜인 판(이미터 3 단위 넘게 위)이면 from(달려갈 자리 = 적 앞)에 깔려
+            //   몸이 아직 제자리인 모으기 기운이 적 앞에 떴다(2026-10-14 디아나(왕년) 고학년 0.3~1.5초). 뒤로 멀리 짜인 모으기 판(cast_1 이미터 x −7)은 몸에 가운데 맞춘다
+            if (p.At == "caster" && o.CasterActor != null)
+            {
+                var a = o.CasterActor;
+                Func<Vector3?> feet = () => a.At(FxAnchor.Feet);
+                b.At = feet().Value; b.Track = feet; b.Center = p.Pre;
+                return BolzenaFx.Play(p.Name, b);
             }
             b.At = p.At == "caster" ? from : p.Body && o.ToBody.HasValue ? o.ToBody.Value : to;
             b.Center = p.At == "target" && !o.Dash && !p.Body;

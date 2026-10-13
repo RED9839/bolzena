@@ -622,6 +622,9 @@ namespace Bolzena.RunUI
         }
 
         // ═════════════════════════════ 사도 상세 ═════════════════════════════
+        /// <summary>모션 확인 화면을 여는 손(코어 사도 id) — 전투 장면이 있는 쪽(본 게임)이 꽂는다. null 이면 단추가 없다.</summary>
+        public static Action<string> MotionLab;
+
         /// <summary>사도 상세 — keys 는 왼쪽 초상 줄(위아래로 넘김), 없으면 그 사도 하나. back 이 없으면 닫기만.</summary>
         public void HeroDetail(string key, List<string> keys, Action back, string tab = "능력치")
         {
@@ -697,6 +700,16 @@ namespace Bolzena.RunUI
                 if (on) { var bar = Ui.Img(b.transform, Theme.Round, Theme.Gold, "bar"); bar.rectTransform.At(0, 0.5f, -8, 0, 4, 30); }
                 Stage.Hot["detail.tab:" + t] = b;
                 ti++;
+            }
+            // 모션 확인(개발 · 점검용, 2026-10-13) — 도감에서 연 상세에만 세로 메뉴 맨 아래 흐린 작은 단추. 전투 쪽(Bolzena.Demo.MotionLab)이 손을 꽂아야 보인다.
+            //   판 진행 중(편성 · 지도의 파티 보기)에는 감춘다 — 전투 장면으로 넘어가면 판 화면이 끊기니까
+            if (MotionLab != null && h != null && h.Playable && Stage.Current == "dex")
+            {
+                string coreId = h.CoreId;
+                var lab = Btn.Make(layer, "모션 확인", BtnStyle.Ghost, () => MotionLab?.Invoke(coreId), Theme.FsSm, "motionlab");
+                lab.GetComponent<RectTransform>().At(0, 0, menuX, Theme.Gutter, menuW, Theme.C(40, 56));
+                if (lab.Label) lab.Label.color = Theme.Dim;
+                Stage.Hot["detail.motionlab"] = lab;
             }
 
             var stage = Ui.Rect("stage", layer); stage.anchorMin = Vector2.zero; stage.anchorMax = Vector2.one;

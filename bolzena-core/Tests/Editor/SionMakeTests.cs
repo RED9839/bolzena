@@ -129,14 +129,14 @@ namespace Bolzena.Core.Tests
             Assert.Greater(b.Log.Count(l => l.Contains("탄환!")), n0, "턴 끝에 손에 남은 마탄이 버려지며 쏜다");
         }
 
-        /// <summary>(2026-10-13 밤 「버려서 쏘기」) 「탄창」 — 마탄이 탄환으로 쏠 때마다 +1(전투 동안 · 턴 끝에도 안 사라짐) · 전투 시작 마탄 2장(startMake).</summary>
+        /// <summary>(2026-10-13 밤 「버려서 쏘기」) 「탄창」 — 마탄이 탄환으로 쏠 때마다 +1(전투 동안 · 턴 끝에도 안 사라짐) · (10-13 밤) 전투 시작 생성은 없앴고 첫 턴은 알바 1장.</summary>
         [Test] public void 탄창_탄환으로_쏠_때마다_쌓이고_전투_시작_마탄_2장()
         {
             var d = Data();
             const string T = "탄창";
             var b = Battle.Start(d, new BattleSetup { Party = new List<string> { H, "클로에" }, Enemies = new List<string> { d.Enemies.Keys.First() }, Deck = new List<string> { H + "_u3", "클로에_s1", "클로에_s1", "클로에_s1", "클로에_s1", "클로에_s1" }, Seed = 7, EnemyHp = 5000 });
             int mags = b.Hand.Count(x => GameData.BaseId(x) == B);
-            Assert.GreaterOrEqual(mags, 2, "전투 시작 마탄 2장");
+            Assert.GreaterOrEqual(mags, 1, "첫 턴 마탄 1장(턴 시작 알바 — 10-13 밤 전투 시작 2장 없앰)");
             Assert.AreEqual(0, b.StackOf(H, T));
             b.Ap = 9;
             Assert.IsTrue(b.PlayCard(b.Hand.FindIndex(x => GameData.BaseId(x) == H + "_u3"), 0).Ok);   // 대물 저격총 — 손의 마탄 1장 버림(탄환)
@@ -171,6 +171,7 @@ namespace Bolzena.Core.Tests
         [Test] public void 탄환_배율은_카드마다()
         {
             var d = Data();
+            d.Card(B).BulletRatio = 1.5;   // 10-13 밤: 시온 데이터는 공통 120% 로 돌아갔다 — 엔진 기능(카드마다 탄환 배율)만 여기서 잰다
             Assert.Greater(d.Card(B).BulletRatio, R.SV("탄환"));
             StringAssert.Contains($"추가 공격 {Num.Round(d.Card(B).BulletRatio * 100)}%", new CardText(d).Card(d.Card(B)));
             if (d.Card("n_coin") is CardDef coin) { Assert.AreEqual(0, coin.BulletRatio); StringAssert.Contains($"추가 공격 {Num.Round(R.SV("탄환") * 100)}%", new CardText(d).Card(coin)); }
@@ -218,6 +219,40 @@ namespace Bolzena.Core.Tests
         {
             var d = Data();
             StringAssert.Contains("버린 더미로 가면 무작위 적에게 추가 공격", new CardText(d).Card(d.Card(B)));
+        }
+
+        /// <summary>(2026-10-13 사용자 「턴 종료했는데 2장 새로 생성된다」) 턴 끝에 마탄은 설계대로만 생긴다 —
+        /// 전투 시작 1장(startMake)은 한 번 + 턴 시작 알바 1장(10-13 밤 사용자 — 옛 「AP 를 남기면」 을 바꿈) — 첫 턴 손에 2장, 그 뒤 턴마다 1장뿐. 턴 끝 손 비우기 · 시온 자신의 버림에는 「어.둠.의.구.원.자★」 가 돌지 않고,
+        /// 동료 카드의 버리기 효과에만 버려진 장수만큼 돈다.</summary>
+        [Test] public void 시온_턴끝_마탄은_설계대로만()
+        {
+            var d = Data();
+            const string SAVIOR = "어.둠.의.구.원.자★", ALBA = "편의점 야간 알바";
+            var deck = new List<string> { H + "_u2", "디아나_왕년_u2" }.Concat(d.Hero(H).Starter).Concat(d.Hero("디아나_왕년").Starter).ToList();   // (10-14) 동료 버리기 카드를 디아나 「귀찮아, 단순하게」 로 — 리뉴얼한 동료 카드가 버리기가 아니게 됨
+            var b = Battle.Start(d, new BattleSetup { Party = new List<string> { H, "디아나_왕년" }, Enemies = new List<string> { d.Enemies.Keys.First() }, Deck = deck, Seed = 7, EnemyHp = 99999 });
+            Assert.AreEqual(1, Mag(b), "첫 턴 마탄 1장(턴 시작 알바 — 전투 시작 생성 없앰)");
+            // 아무것도 안 내고 턴을 네 번 넘긴다 — 손(마탄 · 다른 카드)이 턴 끝마다 버려져도 생기는 것은 알바 1장씩
+            for (int t = 1; t <= 4 && b.Over == null; t++)
+            {
+                int m0 = Mag(b), l0 = b.Log.Count, hand = b.Hand.Count;
+                b.EndTurn();
+                var lines = b.Log.Skip(l0).ToList();
+                Assert.AreEqual(m0 + 1, Mag(b), $"턴 {t} 넘김 — 다음 턴 시작 알바 1장만(손 {hand}장 버림)\n" + string.Join("\n", lines));
+                Assert.AreEqual(1, lines.Count(l => l.EndsWith(ALBA)), $"턴 {t} 끝 알바 한 번");
+                Assert.IsFalse(lines.Any(l => l.EndsWith(SAVIOR)), $"턴 {t} 끝 손 비우기에 구원자가 돌면 안 된다");
+            }
+            // 시온 자신의 버림(다크넷 접속) — 구원자 없음
+            b.Hand.Clear(); b.Hand.AddRange(new[] { H + "_u2", "디아나_왕년_s1", "디아나_왕년_s1", B + GameData.PLAIN });
+            int l1 = b.Log.Count;
+            Assert.IsTrue(b.PlayCard(0, 0).Ok);
+            Assert.IsFalse(b.Log.Skip(l1).Any(l => l.EndsWith(SAVIOR)), "시온 자신이 버리면 구원자 없음");
+            // 동료 카드의 버리기 효과(디아나) — 버려진 장수만큼
+            b.Ap = 3;
+            b.Hand.Clear(); b.Hand.AddRange(new[] { "디아나_왕년_u2", "디아나_왕년_s1" });   // 버릴 것은 1장뿐 → 구원자 1번
+            int l2 = b.Log.Count, m2 = Mag(b);
+            Assert.IsTrue(b.PlayCard(0, 0, new PlayOpts { Discard = new List<string> { "디아나_왕년_s1" } }).Ok);
+            Assert.AreEqual(1, b.Log.Skip(l2).Count(l => l.EndsWith(SAVIOR)), "동료가 1장 버리게 하면 구원자 한 번");
+            Assert.AreEqual(m2 + 1, Mag(b), "그만큼 마탄 1장");
         }
     }
 }

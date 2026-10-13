@@ -17,7 +17,7 @@ namespace Bolzena.UI
         static readonly string[] Titles = { "뽑을 더미", "버린 더미", "소멸" };
         static readonly string[] Icons = { "ic_pile_up", "ic_pile_down", "ic_skull" };
         static readonly string[] Bands = { null, "버린 더미", "사라진 카드" };
-        static readonly string[] Why = { "차례는 감춥니다 — 사도별 기본 → 고유 차례", "덱이 바닥나면 섞여서 뽑을 더미로 돌아갑니다", "소멸했거나 손이 넘쳐 빠진 카드 — 이 전투에서 다시 나오지 않습니다" };
+        static readonly string[] Why = { "차례는 감춥니다 — 사도별 기본 → 고유 차례", "최근에 버린 카드가 맨 앞 — 덱이 바닥나면 섞여서 뽑을 더미로 돌아갑니다", "최근 것이 맨 앞 — 소멸했거나 손이 넘쳐 빠진 카드 — 이 전투에서 다시 나오지 않습니다" };
 
         public static Modal Show(Transform parent, BattleSnapshot s, int tab)
         {
@@ -69,7 +69,8 @@ namespace Bolzena.UI
         List<CardInfo> Pile(int t)
         {
             var l = new List<CardInfo>(t == 0 ? Unlit(snap.DrawPile) : t == 1 ? snap.DiscardPile : snap.GonePile);
-            Order(l);
+            if (t == 0) Order(l);
+            else l.Reverse();   // 버린 · 소멸 — 엔진 리스트는 들어간 순서(뒤가 최근)이니 뒤집어 최근 것이 맨 앞(카제나식)
             return l;
         }
 
@@ -230,7 +231,9 @@ namespace Bolzena.UI
                 return;
             }
             heads.Clear();
-            float bottom = Grid(cards, Grouped(list, snap), snap, areaL, cw, gap, y, cols, OC, k, made, heads);
+            // 뽑을 더미만 사도별 묶음 · 머리표. 버린 · 소멸은 묶지 않고 들어간 순서 한 줄기(머리표 없음)
+            var groups = t == 0 ? Grouped(list, snap) : new List<(Bolzena.RunUI.CardOrder.Group g, List<CardInfo> cards)> { (null, list) };
+            float bottom = Grid(cards, groups, snap, areaL, cw, gap, y, cols, OC, k, made, heads);
             scrollMax = Mathf.Max(0, -hh + 0.3f - bottom);
             // 오른쪽 세로 스크롤 막대(넘칠 때만)
             if (scrollMax > 0)

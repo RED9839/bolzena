@@ -867,7 +867,7 @@ namespace Bolzena.Core
                 case "extra": return $"{WhoSub(w, "아군이", "다른 아군이", "")}추가 공격하면";
                 case "hit":
                     if (w.Marked != null) return $"{Ko.J(Q(w.Marked), "이가")} 붙은 아군의 카드가 {(w.FoeStack != null ? Ko.J(Q(w.FoeStack), "이가") + " 걸린 " : "")}적을 치면";   // (▶E64)
-                    return $"{WhoSub(w, "아군의 카드가", "다른 아군의 카드가", "자신의 카드가 ")}{(w.FoeStack != null ? Ko.J(Q(w.FoeStack), "이가") + " 걸린 " : "")}적을 {(w.Weak ? "약점으로 " : "")}치면".Replace("  ", " ");
+                    return $"{WhoSub(w, "아군의 카드가", "다른 아군의 카드가", "자신의 카드가 ")}{(w.FoeStack != null ? Ko.J(Q(w.FoeStack), "이가") + " 걸린 " : "")}적을 {(w.Weak ? "약점으로 " : "")}{(w.Each ? "칠 때마다(타마다)" : "치면")}".Replace("  ", " ");
                 case "shieldBreak": return w.Mine ? "자신이 준 실드가 적의 공격에 깨지면" : "파티 실드가 적의 공격에 깨지면";
                 case "foeShieldBreak": return w.Mine ? "적의 실드를 깨면" : "적의 실드가 깨지면";
                 case "foeGuard": return "적이 실드를 얻으면";
@@ -1394,6 +1394,7 @@ namespace Bolzena.Core
                 string who = b.Card != null ? Q(CardName(b.Card)) : $"자신의 {(b.Unique ? "고유 " : "")}{(b.Tag != null ? Q(b.Tag) + " " : "")}{(b.Type != null ? b.Type + " " : "")}카드";
                 var add = new List<string>();
                 if (b.Ratio > 0 && b.Ratio != 1) add.Add($"피해 ×{N(b.Ratio)}");
+                if (b.Hits > 1) add.Add($"{b.Hits}연타");
                 foreach (var t in b.Tags ?? new List<string>()) add.Add($"{t}.");
                 if (b.Fx != null && b.Fx.Count > 0) add.Add(Fx(b.Fx));
                 if (add.Count > 0) s.Add($"{Reg($"{Ko.J(who.TrimEnd(), "을를")} 내면")} {string.Join("", add.Select((x, i) => i == 0 ? x : (add[i - 1].EndsWith(".") ? " " : ", ") + x))}");   // 「피해 ×2, 적 1명 강인도 피해 1」(옛 쉼표 빠짐)

@@ -43,6 +43,7 @@ namespace Bolzena.Fx
                 Height = height, Party = party, Key = key,
                 Point = p => { if (tr == null) return null; var n = Find(p); return n != null ? SpineMotion.BoneWorld(sa, n) : null; },
                 Muzzle = SpineMotion.Muzzle(sa, key),
+                Weapon = SpineMotion.Weapon(sa, key),
             };
         }
 

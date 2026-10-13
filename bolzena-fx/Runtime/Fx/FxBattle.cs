@@ -42,6 +42,7 @@ namespace Bolzena.Fx
         public List<int> HitTimes = new List<int>();   // 동작 시작에서 ms — onHit(i) 가 이 시각에 불린다
         public int HitAt => HitTimes.Count > 0 ? HitTimes[0] : 0;
         public int Parts;                               // 계획한 이펙트 장 수(이펙트가 없으면 0 — 맞는 시각만 준다)
+        public int TargetParts;                         // 그중 맞는 적 쪽 장(target) 수 — 사도 고유 맞음 장이 있으면 전투가 공용 타격 낱장을 안 겹친다(2026-10-14)
         public int Played => Runs.Count;                 // 실제로 튼 장 수(다시 틀기 포함)
         public bool Done { get; internal set; }
         // 점검 — 틀어진 장들(이름 · 그때의 Time.time ms(게임 시계) · 대상 쪽인가 · 그 장 안의 터지는 때 ms). 대상 쪽 충격 = ms + ImpactMs
@@ -144,7 +145,7 @@ namespace Bolzena.Fx
 
         static FxCall Launch(List<UltPart> plan, UltOptions o, List<int> hits, Action<int> onHit)
         {
-            var call = new FxCall { HitTimes = hits, Parts = plan.Count };
+            var call = new FxCall { HitTimes = hits, Parts = plan.Count, TargetParts = plan.Count(p => p.At == "target") };
             o.OnFire = (p, ms) => call.Fired.Add((p.Name, Time.time * 1000f, (p.At == "target" && !p.Pre) || p.At == "move", p.At == "move" ? UltFx.PROJ_LAG : 1000f * FxLibrary.ImpactSec(p.Name)));
             var d = FxDriver.I;
             o.OnPart = r => { call.Runs.Add(new KeyValuePair<FxRun, int>(r, r.Gen)); call.Places.Add((Time.time * 1000f, r.Name, r.OriginWorld)); };
@@ -236,13 +237,19 @@ namespace Bolzena.Fx
             int lag = plan.Any(p => p.At == "move") ? UltFx.PROJ_LAG : 0;
             Aim(caster, targets, aoe, out var to, out var body, out var width);
             var castPoint = FxRules.CastPoint(sync?.Anim);
+            // 쏘는 자리는 쏘는 그 순간에 읽는다(무기 끝 → 총구 → 이 동작 시전 본 → 고학년 사슬). 쉬는 자세에서 한 번 읽던 것(전수 조사 D).
+            //   무기 끝(MotionTables.WEAPON, 2026-10-13)이 그 순간 안 보이면(무기를 넣은 몸짓) 예전 사슬
+            var old = caster.Muzzle ?? (castPoint != null && caster.Point != null && caster.Point(castPoint).HasValue ? () => caster.Point(castPoint) : UltCast(caster));
+            var wpn = caster.Weapon;
             var o = new UltOptions
             {
                 From = caster.Feet, To = to, ToBody = body, ToWidth = aoe ? width : 0, Top = TopY(),
-                ShotFrom = caster.At(FxAnchor.Cast, castPoint), CasterActor = caster, CastPoint = castPoint,
+                ShotFrom = wpn?.Invoke() ?? caster.At(FxAnchor.Cast, castPoint), CasterActor = caster, CastPoint = castPoint,
                 Impact = sync?.Impact ?? FxRules.CARD_HIT, End = sync?.End, Marks = sync?.Marks?.Select(x => (float)x).ToList(),
-                // 쏘는 자리는 쏘는 그 순간에 읽는다(총구 → 이 동작 시전 본 → 고학년 사슬). 쉬는 자세에서 한 번 읽던 것(전수 조사 D)
-                Muzzle = caster.Muzzle ?? (castPoint != null && caster.Point != null && caster.Point(castPoint).HasValue ? () => caster.Point(castPoint) : UltCast(caster)),
+                Muzzle = wpn == null ? old : () => wpn() ?? old?.Invoke(),
+                Aim = true,   // 투사체가 맞는 적 쪽을 보게 돌린다
+                Scale = FxRules.CardScale(heroKey, sync?.Anim),   // 강공이 평타 장을 빌린 사도는 크게(FxRules.CARD_SCALE)
+                FitTop = true,   // 화면 위로 나가는 장은 줄이고 · 내린다(FxRun.FitTop)
                 Order = CardOrder, Parent = Parent, HitMs = hitMs, Clock = clock,
             };
             var hits = HitTimes(sync, lag, FxRules.CARD_HIT);
@@ -279,7 +286,8 @@ namespace Bolzena.Fx
                 if (crit) foreach (var n in MotionTables.HIT_FX["crit"]) Play(n, new FxPlayOptions { At = p, Scale = FxRules.CRIT_SCALE, Flip = flip, Order = HitOrder + 1, Parent = Parent });
                 else if (heavy || (ult && first))
                     foreach (var n in MotionTables.HIT_FX[kind == "blunt" ? "bigBlunt" : "big"])
-                        Play(n, new FxPlayOptions { At = p + new Vector3(0, FxRules.BIG_DY, 0), Scale = ult ? FxRules.BIG_SCALE_ULT : FxRules.BIG_SCALE, Flip = flip, Order = HitOrder + 1, Parent = Parent });
+                        Play(n, new FxPlayOptions { At = p + new Vector3(0, FxRules.BIG_DY, 0), Scale = ult ? FxRules.BIG_SCALE_ULT : FxRules.BIG_SCALE, Flip = flip, Order = HitOrder + 1, Parent = Parent,
+                            Cut = kind == "blunt" ? FxRules.BIG_BLUNT_CUT : float.PositiveInfinity });
             }
             if (Sound && sound.HasValue) BolzenaAudio.Land(sound.Value, byHero, byEnemy, ult, heavy, group, kind == "magic");
         }

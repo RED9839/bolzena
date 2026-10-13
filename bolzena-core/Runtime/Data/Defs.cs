@@ -484,6 +484,8 @@ namespace Bolzena.Core
         public string Card, Type, Tag;
         public bool Unique;
         public double Ratio;
+        /// <summary>(2026-10-14 클로에 탑승) 그 카드의 피해 조각(dmg)마다 친 횟수 × hits(2~5) — 「n연타」. ratio 와 함께면 한 대 배율은 ratio.</summary>
+        public int Hits;
         public List<Fx> Fx = new();
         public List<string> Tags = new();
     }
@@ -713,6 +715,8 @@ namespace Bolzena.Core
         public bool Weak, Unique, Basic;
         /// <summary>play — 이 카드 값(cardStatus 이름)이 붙은 카드를 내면.</summary>
         public string CardSt;
+        /// <summary>(2026-10-14 클로에 바늘땀) hit — 카드 한 장에 한 번이 아니라 맞힌 대마다(연타면 타마다).</summary>
+        public bool Each;
     }
 
     /// <summary>

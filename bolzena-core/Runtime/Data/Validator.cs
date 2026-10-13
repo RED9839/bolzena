@@ -334,6 +334,7 @@ namespace Bolzena.Core
                 if (r.When.Seq != null && (r.When.Seq.Count < 2 || r.When.Seq.Count > 3)) E($"{at}: seq 는 종류 2~3");
                 if (r.When.On == "huntDown" && r.When.Id != null && !keywords.Contains(r.When.Id)) E($"{at}: 키워드가 아니다 — 「{r.When.Id}」");
                 if (r.When.Fresh && r.When.On != "debuff") E($"{at}: fresh 는 debuff 에만");
+                if (r.When.Each && r.When.On != "hit") E($"{at}: each(맞힌 대마다)는 hit 에만");
                 if (r.When.Repeat && r.When.On != "play") E($"{at}: repeat 는 play 에만");
                 if ((r.When.Chain || r.When.SameHero) && r.When.On != "play") E($"{at}: chain · sameHero 는 play 에만");
                 if (r.When.Who != null && r.When.Who != "any" && r.When.Who != "other") E($"{at}: who 는 any · other");
@@ -378,7 +379,7 @@ namespace Bolzena.Core
         public static readonly Dictionary<string, string> OWNED_KW = new()
         {
             ["탄환"] = "시온더다크불릿", ["천상"] = "이드", ["실드 소모"] = "이드", ["약점 노출"] = "아야", ["연계"] = "에피카",
-            ["반격"] = "비비", ["도발"] = "비비", ["취약"] = "비비", ["탐구심"] = "클로에", ["넘친 회복"] = "우이", ["연쇄"] = "우이",
+            ["반격"] = "비비", ["도발"] = "클로에", ["취약"] = "비비", ["넘친 회복"] = "우이", ["연쇄"] = "우이",
             ["고학년 게이지"] = "우이_기억", ["신속"] = "리뉴아", ["협공"] = "실비아", ["치명"] = "비비_신성", ["근면"] = "에르핀_왕도", ["X"] = "에르핀_왕도",
             ["약화"] = "란", ["연속"] = "디아나_왕년", ["축복"] = "죠안", ["피해 기반 회복"] = "죠안",
             ["처형"] = "티그_영웅", ["격파"] = "네르_빡침", ["둔화"] = "요미", ["존속"] = "벨라",
@@ -658,7 +659,7 @@ namespace Bolzena.Core
                         if (view.Type == "스킬" && hits) E($"{w}: 스킬인데 적에게 피해를 준다 — 적을 치면 공격 카드로(type 공격 · 신탁이면 type 「공격」)");
                         else if (view.Type == "공격" && !hits && !WalkAll(view.Fx).Any(f => f.K == FxK.Summon)) E($"{w}: 공격인데 적 피해가 없다 — 스킬로(신탁이면 type 「스킬」)");   // 사용자 2026-10-11 — 주의에서 오류로
                     }
-                // ▶E86(4차) — 소유 키워드: 남의 키워드를 정산하면 주의(도발은 비비만 — D13)
+                // ▶E86(4차) — 소유 키워드: 남의 키워드를 정산하면 주의(도발은 클로에만 — 10-14 비비 리뉴얼 뒤 넘김, 옛 D13 은 비비)
                 foreach (var g in OwnedMisuse(h, cards).GroupBy(x => x.kw))
                     W($"{at}: {Ko.J("「" + g.Key + "」", "은는")} {d.Hero(OWNED_KW[g.Key])?.Name ?? OWNED_KW[g.Key]}의 소유 키워드 — 정산 조각은 주인만({string.Join(" · ", g.Select(x => x.loc).Distinct().Take(4))})");
                 // 11. 고유 효과 이름 — 다른 사도 이름 금지
@@ -842,7 +843,9 @@ namespace Bolzena.Core
                 if (b.Type != null && Array.IndexOf(R.CARD_TYPES, b.Type) < 0) E($"{bt}: 모르는 type {b.Type}");
                 if (b.Tag != null && Array.IndexOf(Tag.All, b.Tag) < 0) E($"{bt}: 모르는 태그 「{b.Tag}」");
                 if (b.Ratio < 0 || b.Ratio > 2) E($"{bt}: ratio 는 피해 배율(1.2 = ×1.2, 2 이하)");
-                if (b.Ratio == 0 && (b.Fx == null || b.Fx.Count == 0) && (b.Tags == null || b.Tags.Count == 0)) E($"{bt}: ratio · fx · tags 가운데 하나는 있어야 한다");
+                if (b.Hits != 0 && (b.Hits < 2 || b.Hits > 5)) E($"{bt}: hits 는 n연타(2~5)");
+                if (b.Hits != 0 && b.Type != null && b.Type != "공격") E($"{bt}: hits 는 공격 카드 덤(type 공격 또는 비움)");
+                if (b.Ratio == 0 && b.Hits == 0 && (b.Fx == null || b.Fx.Count == 0) && (b.Tags == null || b.Tags.Count == 0)) E($"{bt}: ratio · hits · fx · tags 가운데 하나는 있어야 한다");
                 Tags(bt, b.Tags);
                 if (b.Fx != null && b.Fx.Count > 0) FxList(bt, b.Fx);
             }

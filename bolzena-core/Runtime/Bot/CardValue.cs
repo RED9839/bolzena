@@ -384,7 +384,7 @@ namespace Bolzena.Core
                         var c = d.View(id);
                         if (c == null || (b.Card != null && b.Card != id) || (b.Type != null && c.Type != b.Type) || (b.Unique && !c.Unique) || (b.Tag != null && !c.HasTag(b.Tag))) continue;
                         double w = c.Unique ? 0.5 : 1;
-                        double dmg = b.Ratio > 0 ? ValueOf(c.Fx.Where(x => x.K == FxK.Dmg || x.K == FxK.Extra).ToList()) * (b.Ratio - 1) : 0;
+                        double dmg = b.Ratio > 0 || b.Hits > 1 ? ValueOf(c.Fx.Where(x => x.K == FxK.Dmg || x.K == FxK.Extra).ToList()) * ((b.Ratio > 0 ? b.Ratio : 1) * Math.Max(1, b.Hits) - 1) : 0;   // hits — n연타(2026-10-14)
                         v += (dmg + ValueOf(b.Fx ?? new List<Fx>(), b.Tags)) * w * T * FORM_DRAWN;
                     }
             }

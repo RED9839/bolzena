@@ -14,8 +14,8 @@ namespace Bolzena.Battle
     // 몸짓 — 사도 SD 의 어느 동작을 쓰는가
     public enum Motion { None, Attack1, Attack2, Skill1, Ultimate }
 
-    // 맞는 결 — 이펙트 · 소리를 고른다
-    public enum HitKind { Slash, Blunt, Magic }
+    // 맞는 결 — 이펙트 · 소리를 고른다(Shot 쏘기 — 총 · 활, 2026-10-13)
+    public enum HitKind { Slash, Blunt, Magic, Shot }
 
     public enum IntentKind { None, Attack, Defend, Heavy, Buff, Debuff }
 
@@ -247,6 +247,7 @@ namespace Bolzena.Battle
         Defeat,
         Revive,         // Target(적) 되살아남 — core revive(재 속 부활 · 가사에서 일어섬) · HpAfter 체력
         FoeCharge,      // 엘리트 · 일반 적 힘 모으기 — Actor(적) · Text warn(모으기 — core foeChargeWarn) · cut(끊김 — 격파로 모은 수를 놓침) · Say 쏟을 수 이름 · Anim 모으기 이름 · Value 다음 턴 피해(warn)
+        Shot,           // 사도가 몸짓 밖에서 따로 치는 한 대(2026-10-13) — Actor(쏘는 사도) · Target(적) · Text 종류(extra · bullet · counter · assist · resonance · summon). 바로 뒤 Damage(Text "shot")가 그 한 대
     }
 
     public class BattleEvent

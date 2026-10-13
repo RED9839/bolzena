@@ -354,6 +354,9 @@ namespace Bolzena.EditorTools
                 // 다른 판의 형식으로 남은 것만 — 압축 없이 남은 것(UI 의 2의 거듭제곱 아닌 밉맵 그림 · 글꼴)은 다시 가져와도 그대로라 건너뛴다
                 if (astc ? (f.StartsWith("DXT") || f.StartsWith("BC")) : f.StartsWith("ASTC")) stale.Add(p);
                 else if (astc && f.StartsWith("ASTC") && WebImport.AstcFormatOf(WebImport.Original(p), k) is string want && !f.StartsWith(want)) stale.Add(p);   // 규칙이 바뀐 것(배경 8×8 등)
+                // 타격류 이펙트 원본의 크런치 품질(WebImport.HitQuality) — 형식은 같은 DXT5Crunched 라 가져오기 설정의 품질로 가린다
+                else if (!astc && WebImport.HitFx(WebImport.Original(p)) && AssetImporter.GetAtPath(p) is TextureImporter hti
+                         && hti.GetPlatformTextureSettings("WebGL").compressionQuality != WebImport.HitQuality) stale.Add(p);
             }
             if (stale.Count > 0)
             {

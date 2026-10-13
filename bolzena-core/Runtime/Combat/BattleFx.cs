@@ -483,7 +483,7 @@ namespace Bolzena.Core
                                     // 처치 일격도 강인도를 깎는다 — 쓰러지기 직전에 이 카드의 강인도 피해(LethalKill)
                                     var (lf0, lt0) = (lethalFor, lethalTough);
                                     if (ctx.Card && t.Side == Side.Enemy) { var ht = t; lethalFor = t; lethalTough = () => CardTough(owner, ht, ctx, dTarget, true); }
-                                    try { Hurt(t, v, new HurtOpts { From = owner, Crit = !f.Fixed && crit, Tags = ctx.HitTags, Card = ctx.Card, Fixed = f.Fixed, Attack = ctx.Type == "공격" }); }
+                                    try { Hurt(t, v, new HurtOpts { From = owner, Crit = !f.Fixed && crit, Tags = ctx.HitTags, Card = ctx.Card, Fixed = f.Fixed, Attack = ctx.Type == "공격", Shot = ctx.Passive != null && !ctx.Card ? "extra" : null }); }   // 패시브 피해(네르 「심판의 벼락」 …)는 쏘는 한 대로 보인다
                                     finally { (lethalFor, lethalTough) = (lf0, lt0); }
                                     if (ctx.Card && t.Side == Side.Enemy && !t.Dead)
                                     {

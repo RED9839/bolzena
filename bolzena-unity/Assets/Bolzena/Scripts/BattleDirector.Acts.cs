@@ -43,7 +43,7 @@ namespace Bolzena
             int cur = -1;
             foreach (var e in group)
             {
-                if (e.Kind == EventKind.Damage || e.Kind == EventKind.PartyHurt)
+                if ((e.Kind == EventKind.Damage && !IsShot(e)) || e.Kind == EventKind.PartyHurt)   // 쏘는 한 대는 박자를 세우지 않고 지금 박자에 붙는다
                 {
                     cur = e.Hit;
                     hits = Mathf.Max(hits, e.Hits);
@@ -85,12 +85,18 @@ namespace Bolzena
             var u = Heroes[act.Actor.Index];
             string key = u.name.Replace("hero_", "");
             Split(group, out var pre, out var byHit, out int hits);
+            // 몸짓의 피해가 모두 쏘는 한 대(추가 공격만 하는 카드)면 — 몸짓의 때리는 순간에 쏜다(시작하자마자 쏘지 않게)
+            if (byHit.Count == 0)
+            {
+                int s0 = pre.FindIndex(x => x.Kind == EventKind.Shot);
+                if (s0 >= 0) { byHit[0] = pre.GetRange(s0, pre.Count - s0); pre.RemoveRange(s0, pre.Count - s0); hits = 1; }
+            }
             ult |= act.Text == "ult";
             int seq = BeginAct(u);   // 이 사도가 앞 수의 뒷정리(복귀) 중이면 그 자리에서 이어받는다
 
             // 대상들
             var targets = new List<int>();
-            foreach (var e in group) if (e.Kind == EventKind.Damage && !targets.Contains(e.Target.Index)) targets.Add(e.Target.Index);
+            foreach (var e in group) if (e.Kind == EventKind.Damage && !IsShot(e) && !targets.Contains(e.Target.Index)) targets.Add(e.Target.Index);   // 쏘는 한 대(다른 적에게 간 탄환 · 협공)는 몸짓 대상이 아니다
             if (targets.Count == 0 && act.Motion != Motion.None && act.Target.Side == Side.Enemy && act.Target.Index < Enemies.Count) targets.Add(act.Target.Index);
             Demo.UltLap.Lap("대상");
             actAim = targets.Count > 0 && targets[0] < Enemies.Count && Enemies[targets[0]] != null ? Enemies[targets[0]].Center : (Vector3?)null;
@@ -124,7 +130,8 @@ namespace Bolzena
             UltPlan = null;
             if (ult && u.SpineArt && u.SkelData != null)
             {
-                try { UltPlan = Bolzena.Fx.SpineMotion.PlanUlt(u.SkelData, Battle.Snapshot.Heroes[act.Actor.Index].Id); }
+                //   란은 늘 Ultimate1_1(달 · 몰이 4타) — 1_2 는 원작이 처치 뒤 다시 쓸 때만 트는 짧은 조각이라 첫 고학년이 1_2 면 달 없이 시작했다(2026-10-14)
+                try { UltPlan = Bolzena.Fx.SpineMotion.PlanUlt(u.SkelData, Battle.Snapshot.Heroes[act.Actor.Index].Id, Battle.Snapshot.Heroes[act.Actor.Index].Id == "란" ? 0 : (int?)null); }
                 catch (System.Exception ex) { Debug.LogWarning("[Ult] 계획 실패 " + key + " — " + ex.Message); }
                 if (UltPlan != null && UltPlan.Anim != null)
                 {
@@ -187,7 +194,7 @@ namespace Bolzena
                 //   앞 N 번의 타격 뒤(+ 회수 몫 CARD_TAIL_KEEP)에서 몸짓을 끊는다. 자기형(강화 표시 이벤트)은 그대로
                 float trimEnd = float.MaxValue;
                 Debug.Log($"[Tempo] 카드 몸짓 {key} {act.Motion} {string.Join(" → ", cardChain)} — 엔진 타수 {byHit.Count} · 애니 타격 {marks.Count} · 애니 {cardTotal:F2}s");
-                if (!OldTempo && !cardSelf && byHit.Count >= 1 && marks.Count > byHit.Count)
+                if (!OldTempo && !cardSelf && byHit.Count >= 1 && marks.Count > byHit.Count && !CARD_SPLIT.Contains(MKey(hidC, act.Motion)))   // 한 번 휘두르는 연타(CARD_SPLIT)는 끊지 않고 아래에서 나눈다
                 {
                     marks = marks.GetRange(0, byHit.Count);
                     trimEnd = Mathf.Min(cardTotal, marks[marks.Count - 1] + CARD_TAIL_KEEP);
@@ -217,8 +224,10 @@ namespace Bolzena
                 //    원작 < 우리 · 불명은 그대로. 횟수가 같아도 원작 시각이 또렷하면(되풀이 이펙트 · 맞는 소리) 그 시각에 맞춘다(셰이디)
                 var uh = split != null ? null : Bolzena.Fx.UltMotion.Hits(hidFx);   // 원작 방식 — 기준표 타수는 발동까지 센 것이라 시전 조각엔 안 맞는다
                 // 무작위 대상 여러 번(셰이디 6타가 적 셋에 흩어짐) — 엔진은 적마다 몇 번째인지로 묶어 2 묶음이 된다. 피해 수가 원작 타수와 같으면 피해 하나를 한 박자로
-                int dmgN = 0; foreach (var e in group) if (e.Kind == EventKind.Damage) dmgN++;
+                int dmgN = 0; foreach (var e in group) if (e.Kind == EventKind.Damage && !IsShot(e)) dmgN++;
                 if (uh != null && uh.N == dmgN && dmgN > byHit.Count) byHit = SeqHits(group);
+                // 란 몰이 사냥 — 처치하면 다음 적에게 4타를 더 준다(ifKill). 엔진 타격 차례가 적마다 0~3 이라 두 적의 피해가 같은 박자 넷에 둘씩 겹쳐 떴다 → 피해 하나를 한 박자로(2026-10-14)
+                else if (hidFx == "란" && byHit.Count > 1 && dmgN > byHit.Count) byHit = SeqHits(group);
                 int strikeAt = UltPlan != null && UltPlan.S != null ? UltPlan.S.At : 0;
                 // 원작이 지금 보이는 수보다 많이 때리면(판정이 「일치」여도 엔진이 타격을 한 묶음으로 준 경우 — 셰이디 6 인데 2 묶음) 나눈다. 원작 < 우리 · 불명은 손대지 않는다
                 bool more = uh != null && uh.N > byHit.Count && uh.Verdict != null && !uh.Verdict.StartsWith("원작 <") && !uh.Verdict.StartsWith("불명");
@@ -270,6 +279,9 @@ namespace Bolzena
                 float reach = targets.Count == 1 ? Enemies[targets[0]].Width() * 0.35f + 1.25f : 2.4f;
                 dest = dash ? new Vector3(tp.x - reach, tp.y - 0.02f, 0) : cardSelf ? u.Home : u.Home + new Vector3(0.5f, 0, 0);   // 자기형은 반 걸음도 안 나간다
             }
+            // 적 뒤로 순간이동하는 카드(CARD_BEHIND — 티그(영웅) 저학년) — 달려가지 않고 제자리에서 시작해, 몸이 숨는 때에 적 뒤로 옮긴다(CardBehindCo)
+            Vector2? behind = cardChain != null && targets.Count > 0 && CARD_BEHIND.TryGetValue(MKey(hidC, act.Motion), out var bh0) ? bh0 : (Vector2?)null;
+            if (behind.HasValue) { dash = false; dest = u.Home; CardMoveLog = "원작 적 뒤 순간이동"; }
             var table = ult && UltPlan != null ? UltPlan.Table : null;   // 고학년 몸짓 표(ult_motion.json)
             if (fit != null && fit.Move != null)   // 원작 영상 맞춤 — 제자리 · 가는 때를 영상대로
             {
@@ -326,6 +338,8 @@ namespace Bolzena
                 if (cutSkips.Count > 0 || cutEnd < float.MaxValue) { u.CutChain(cardChain[0], rest, new List<(float, float)>(cutSkips), cutEnd); duration = Rm(duration * speed) / speed; }
                 CardShownMs = Mathf.RoundToInt(duration * 1000);
                 if (act.Motion == Motion.Skill1) CardOrb(u);   // 저학년 시작 흰 구슬 섬광(원작 공용 연출)
+                if (behind.HasValue) StartCoroutine(CardBehindCo(u, seq, targets, behind.Value, speed));
+                StartCoroutine(CardKeepY(u, seq, duration));   // 뛰어오르는 몸짓이 화면 위로 나가면 몸을 내린다
             }
             float tStart = Time.time;                                  // 몸짓 · 이펙트 · 타격이 같이 보는 시계(게임 시간 — 멈칫 · 배속을 같이 탄다)
             fxClock = fxOn ? new Bolzena.Fx.UltClock() : null;
@@ -335,6 +349,7 @@ namespace Bolzena
             bool auth = ult && AUTH_THUNDER.Contains(hidFx) && times.Count > 0;   // 1성 「교주의 천벌」 — 원작은 사도 장 없이 하늘에서 권능 낙뢰만(스킬 발사체 · 총구 장은 안 튼다)
             bool orig = !auth && OrigFx(act, u, anim, marks, speed, ult, targets, dash ? dest : (Vector3?)null, fxOn ? times : null, cardSelf);
             if (auth) { StartCoroutine(AuthThunder(targets, times[0])); orig = true; }
+            ownHitFx = orig && LastFxCall != null && LastFxCall.TargetParts > 0 && !cardSelf;   // 사도 고유 맞음 장이 적에게 터지면 공용 타격 낱장은 안 겹친다(2026-10-14)
             if (ult) Bolzena.Fx.BolzenaFx.UltTweak = null;
             var hitAtMs = new List<float>();
             Demo.UltLap.Lap("OrigFx");
@@ -354,7 +369,10 @@ namespace Bolzena
 
             // 고학년 카메라 — 시전자에게 당겼다가 첫 타격에 적 쪽으로
             if (ult) StartCoroutine(CamTo(u.Center + new Vector3(1.2f, 0, 0), 1.18f, 0.35f));
-            if (ult && KEEP_ON_SCREEN.Contains(Battle.Snapshot.Heroes[act.Actor.Index].Id)) StartCoroutine(KeepOnScreen(u, duration + 0.3f));   // 몸짓이 몸을 화면 왼쪽 밖으로 끌고 가면(버터 · 우로스 · 셰이디(역전) 루트 이동) 안으로 당긴다
+            if (ult && ULT_LOOP.TryGetValue(Battle.Snapshot.Heroes[act.Actor.Index].Id, out var loop)) StartCoroutine(UltLoopCo(u, loop, duration + 0.3f));   // 적 무리를 한 바퀴(우로스) — 화면 밖 막기도 같이
+            else if (ult && KEEP_ON_SCREEN.Contains(Battle.Snapshot.Heroes[act.Actor.Index].Id)) StartCoroutine(KeepOnScreen(u, duration + 0.3f));   // 몸짓이 몸을 화면 왼쪽 밖으로 끌고 가면(버터 · 우로스 · 셰이디(역전) 루트 이동) 안으로 당긴다
+            if (ult && ULT_KEEP_TOP.Contains(Battle.Snapshot.Heroes[act.Actor.Index].Id)) StartCoroutine(CardKeepY(u, seq, duration));   // 뛰어오른 고학년 몸이 화면 위로 나가면 내린다(카드와 같은 것)
+            if (ult && ULT_STANDING.TryGetValue(hidFx, out var ultSt)) StartCoroutine(UltStandingCo(ultSt, tStart, speed, targets));   // 몸이 화면 밖에 나간 사이 원작 고학년 클로즈업 스파인(비비(신성) vividivineult)
             Demo.UltLap.Lap("이동 · 카메라");
 
             foreach (var e in pre) yield return ApplyConsequence(e, u);
@@ -374,12 +392,19 @@ namespace Bolzena
                 bool aoeFxDone = false;
                 bool last = k == byHit.Count - 1;
                 var hitSfx = HeroSfx(key, act.Motion, true);
+                int dn = 0;
                 foreach (var e in kv.Value)
                 {
-                    if (e.Kind == EventKind.Damage) { Impact(e, u, ult, last, hitSfx, kv.Value.Count > 3, !aoeFxDone); seqTotal += e.Value; if (aoeAt.HasValue) { aoeFxDone = true; aoeHitTotal += e.Value; } }
-                    else yield return ApplyConsequence(e, u);
+                    if (e.Kind == EventKind.Damage && !IsShot(e))
+                    {
+                        // 전체 공격 — 적마다 조금씩 늦게 물결처럼(큰 이펙트는 첫 적에서 무리 가운데에 한 번). 몰리면 간격을 줄이고 합이 AOE_LAG_MAX 를 넘지 않게
+                        if (aoeAt.HasValue && dn > 0) { float lag = AoeLag(targets.Count); if (lag * dn <= AOE_LAG_MAX) yield return Clock.WaitU(lag); }
+                        Impact(e, u, ult, last, hitSfx, kv.Value.Count > 3 || aoeAt.HasValue, !aoeFxDone); seqTotal += e.Value; dn++;   // 무리면 멈칫은 한 번(물결로 늦춘 적마다 다시 멈추지 않게)
+                        if (aoeAt.HasValue) { aoeFxDone = true; aoeHitTotal += e.Value; }
+                    }
+                    else yield return ApplyConsequence(e, u);   // 쏘는 한 대(Shot · Damage "shot")도 여기서 — 카드 타격 뒤에 차례로
                 }
-                if (cardChain != null && !kv.Value.Exists(ev0 => ev0.Kind == EventKind.Damage)) CardGhostHit(targets, act.HitKind);   // 나누어 보인 박자에 피해 조각이 없으면(작은 피해) 맞는 반응만
+                if (cardChain != null && !kv.Value.Exists(ev0 => ev0.Kind == EventKind.Damage || ev0.Kind == EventKind.Shot)) CardGhostHit(targets, act.HitKind);   // 나누어 보인 박자에 피해 조각이 없으면(작은 피해) 맞는 반응만
                 // 전체 공격 — 한 대의 합을 무리 가운데에 크게(적마다 숫자는 그 적 위에 그대로)
                 // 한 적 여러 대 — 마지막 대에 합을 크게(2026-10-06 리빌딩 「다단 합계 숫자 크게」)
                 if (last && !aoeAt.HasValue && byHit.Count > 1 && seqTotal > 0 && targets.Count == 1 && targets[0] < Enemies.Count && Enemies[targets[0]] != null)
@@ -390,6 +415,7 @@ namespace Bolzena
                 aoeAt = null;
                 k++;
             }
+            ownHitFx = null;
             // 남은 몸짓 — 카드는 마지막 타격 뒤 조금 더 보고 돌아온다. 고학년은 몸짓을 끝까지(조각 · 고리 다) 하고 돌아온다
             //   (웹판: 달려간 고학년은 total + back 까지. 전에는 타격 + 0.6초에 Idle 로 끊어 끝 조각이 잘렸다)
             float tail = ult ? Mathf.Max(duration, table != null ? Rm(table.TotalMs / 1000f) / speed : 0) : cardChain != null ? duration : Mathf.Min(duration, elapsed + 0.32f);   // 카드도 애니 끝까지(줄인 길이)
@@ -578,7 +604,131 @@ namespace Bolzena
 
         // 화면 밖 막기 — 고학년 몸짓 동안 몸(메시 경계)의 왼끝이 화면 왼끝 + 여백보다 밖이면 그만큼 몸(Art)을 오른쪽으로 당긴다(부드럽게).
         //   끝나면 0.25초에 제자리로. 몸짓 자체 · 이동(UltTravelCo — 몸 전체 transform)은 그대로 두고 Art 만 민다
-        static readonly HashSet<string> KEEP_ON_SCREEN = new HashSet<string> { "버터", "우로스", "셰이디_역전" };   // 원작 영상 비교: 몸짓 루트 이동이 화면 왼쪽 밖으로
+        // ── 고학년 가운데의 큰 클로즈업(2026-10-14 사용자 「몸이 화면 밖으로 사라지고 화면에 스탠딩이 생기는 연출」 → 「고학년 전용 모션 스탠딩」) ──
+        //   비비(신성) 원작 영상(×1.2 = 스파인 초): 1.75~2.4 몸이 화면 위로 날아가 사라짐 → 2.6 화면이 더 어두워지고 클로즈업이 오른쪽 아래에서 휘돌아 들어와 왼쪽에 섬
+        //   → 3.95 왼손을 적 쪽으로 뻗고 레이저 → 4.4 · 5.3 타격 · 5.15 빛기둥 → 5.8 클로즈업이 위로 날아 나감 → 6.4~7.2 몸이 내려와 제자리(스파인 몸짓 그대로 — 막지 않는다).
+        //   그림은 원작 고학년 전용 스파인(spine/ingame/effect/vividivineult · Highlight_1 4.133초 · 2026-10-14 기기에서 뽑음) — 들어옴 · 섬 · 나감이 모두 그 몸짓 안에 있어 우리는 틀기만 한다.
+        //   Start: 몸짓을 시작하는 스파인 초. 원작 영상 프레임에 뼈 실루엣을 겹쳐 맞춤(몸짓 0.8초 = 영상 2.54초, 3.85초 = 4.87초 → 사이 2.1초).
+        //   자리 · 크기: 영상(440×428, 높이 = 화면 높이, 왼끝 = 화면 왼끝)에서 스파인 원점이 (324, 252)px, 스파인 1 단위 = 0.12px.
+        //   스파인 이벤트(Event · SFX · Voice)는 정의만 있고 Highlight_1 에 찍힌 것이 없다 — 소리 · 타격 시각은 지금 계획(UltVideoFit) 그대로.
+        //   원작 레이저는 UI 전용 이펙트 프리팹(fx_ui_vividivine_ultimate_attack_*)이라 아직 없어 SD 고학년 레이저 장(laser_one)으로 대신 —
+        //   쏘는 자리는 이 스파인의 Point_Ult 뼈(원작 이펙트가 붙는 자리 · 몸 뒤 왼쪽 아래 — 영상의 빛줄기도 거기서 나온다). SD 쪽 레이저는 계획에서 뺀다(Drop)
+        class UltStanding { public string Spine, Drop, Fx; public float Start, Laser, Out; public float OX = 324f / 428f, OY = 252f / 428f, Unit = 0.12f / 428f; }
+        static readonly Dictionary<string, UltStanding> ULT_STANDING = new Dictionary<string, UltStanding>
+        {
+            ["비비_신성"] = new UltStanding { Spine = "vividivineult", Start = 2.1f, Laser = 3.95f, Out = 5.8f, Drop = "full_laser", Fx = "fx_vividivine_ultimate_full_laser_one_jolly_default" },
+        };
+        const int STANDING_ORDER = 345;   // 사도(330) · 고학년 이펙트(325) 위, 숫자(355) · 글(475) 아래
+
+        IEnumerator UltStandingCo(UltStanding c, float tStart, float speed, List<int> targets)
+        {
+            float S() => (Time.time - tStart) * speed;   // 스파인 초(1배속) — 몸짓 · 이펙트 · 타격이 같이 보는 시계
+            while (S() < c.Start) { if (!InUlt) yield break; yield return null; }
+            var data = Res.Spine(c.Spine);
+            float hw = Tone.HalfW, hh = Tone.HalfH;
+            var root = Make.Node("UltStanding", ScreenRoot);
+            Spine.Unity.SkeletonAnimation st = null;
+            Spine.Bone point = null;
+            float len = c.Out - c.Start + 0.6f;
+            if (data != null)
+            {
+                st = Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(data);
+                st.transform.SetParent(root, false);
+                var sd = data.GetSkeletonData(true);
+                var anim = sd.FindAnimation("Highlight_1") ?? (sd.Animations.Count > 0 ? sd.Animations.Items[0] : null);
+                if (anim != null)
+                {
+                    var tr = st.AnimationState.SetAnimation(0, anim, false);
+                    tr.TrackTime = S() - c.Start;   // 기다리다 늦은 몫만큼 앞으로(시계에 맞춤)
+                    len = anim.Duration;
+                }
+                st.timeScale = speed;
+                // 화면 높이(2hh) 기준 — 영상 px ÷ 428 = 화면 높이 비율. 스파인 1 단위(원본) = Unit × 2hh, 유니티 데이터는 data.scale 배로 읽혀 있다
+                float sc = c.Unit * hh * 2 / Mathf.Max(0.0001f, data.scale);
+                st.transform.localScale = new Vector3(sc, sc, 1);
+                st.transform.localPosition = new Vector3(-hw + c.OX * hh * 2, hh - c.OY * hh * 2, 0);
+                st.GetComponent<MeshRenderer>().sortingOrder = STANDING_ORDER;
+                point = st.Skeleton.FindBone("Point_Ult");
+            }
+            ScreenFx.I.Dim(0.88f, 300, 8f);   // 원작 — 클로즈업 동안 싸움터가 거의 검게
+            // 레이저 — Point_Ult 에서 맞는 적(무리 가운데 몸) 쪽으로
+            while (S() < c.Laser) { if (!InUlt) break; yield return null; }
+            if (InUlt && c.Fx != null && targets.Count > 0)
+            {
+                var aim = targets.Count > 1 ? MidBody(targets) : Enemies[targets[0]].Center;
+                Vector3 at = point != null ? Spine.Unity.SkeletonExtensions.GetWorldPosition(point, st.transform) : root.TransformPoint(new Vector3(-hw * 0.6f, -hh * 0.3f, 0));
+                Bolzena.Fx.BolzenaFx.Play(c.Fx, new Bolzena.Fx.FxPlayOptions { At = at, Aim = true, AimAt = aim, Until = Mathf.Max(0.6f, (c.Out - c.Laser) / speed - 0.2f), Order = STANDING_ORDER + 2 });
+            }
+            // 클로즈업이 위로 날아 나가기 시작하면 싸움터 어둠은 고학년 어둠으로
+            while (S() < c.Out) { if (!InUlt) break; yield return null; }
+            ScreenFx.I.Dim(0.7f, 300, 5f);
+            // 몸짓 끝까지(나가는 몸짓이 스파인 안에 있다). 고학년이 먼저 끝나면 0.15초에 걷는다
+            while (S() < c.Start + len) { if (!InUlt) break; yield return null; }
+            if (st != null && S() < c.Start + len)
+            {
+                float t0 = Time.time;
+                while (Time.time - t0 < 0.15f) { st.Skeleton.A = 1 - (Time.time - t0) / 0.15f; yield return null; }
+            }
+            Destroy(root.gameObject);
+        }
+
+        static readonly HashSet<string> KEEP_ON_SCREEN = new HashSet<string> { "버터", "셰이디_역전" };   // 원작 영상 비교: 몸짓 루트 이동이 화면 왼쪽 밖으로(우로스는 ULT_LOOP 가 같이 맡는다)
+        //   비비(신성)는 뺐다(2026-10-14) — 원작도 1.45~2.4초에 화면 위로 날아올라 나간 뒤 숨는다(퇴장). 내리면 화면 안 허공에 멈췄다 사라졌다
+        static readonly HashSet<string> ULT_KEEP_TOP = new HashSet<string> { "에르핀_왕도" };   // 2026-10-13 고학년 캡처: 뛰어오른 몸이 화면 위 가장자리에 잘림
+
+        // ── 적 무리 한 바퀴(2026-10-14 사용자 「우로스 — 적을 한 바퀴 돌고 불기둥 솟는 거」) ──
+        //   우로스 Ultimate1_1 은 몸짓 자체가 원을 그린다(스파인 루트, 키 H 단위): 1.5초 앞 +3.1H 로 사라짐(숨김 1.5~1.8) → 1.8초 +1.8H 에 나타나
+        //   왼쪽으로 베며 지나감(1.93 타격) → 2.1~2.9초 −3H(왼끝) → 3.0~3.1초 제자리 → 3.1초 불기둥. 원작은 적이 바로 앞(약 1H)이라 +1.8H 가 적 뒤였는데
+        //   우리 판은 적이 멀어(뒷줄) 적 앞 허공만 베고 지나갔다. → 숨은 동안(From) 몸을 「살아 있는 적 무리 오른끝 뒤」로 옮겨 두고(나타나는 자리 = 무리 뒤),
+        //   Hold 부터 Back 까지 그 몫을 0 으로 풀어 왼쪽으로 베는 몸이 무리를 가로질러 제자리 쪽으로 돌아오게 한다. 시각은 스파인 조각 시계(TrackTime, 1배속 ms)
+        //   Gap: 나타나는 몸 왼끝이 무리 오른끝에서 떨어지는 몫(H). 화면 양 끝 밖으로는 나가지 않게 같이 막는다(KeepOnScreen 과 같은 셈)
+        class UltLoop { public int From, Hold, Back; public float Gap; }
+        static readonly Dictionary<string, UltLoop> ULT_LOOP = new Dictionary<string, UltLoop>
+        {
+            ["우로스"] = new UltLoop { From = 1500, Hold = 1900, Back = 2100, Gap = 0.3f },
+        };
+        IEnumerator UltLoopCo(UnitView u, UltLoop lp, float dur)
+        {
+            var cam = Camera.main;
+            if (u == null || u.Art == null || cam == null || u.Sa == null) yield break;
+            var shadow = u.Sa.Skeleton.FindBone("Point_Shadow") ?? u.Sa.Skeleton.RootBone;
+            var topB = u.Sa.Skeleton.Data.FindBone("Point_Top");
+            float hw = (topB != null && Mathf.Abs(topB.Y) > 1f ? Mathf.Abs(topB.Y) : 600f) * Mathf.Abs(u.Sa.transform.lossyScale.y);   // 키 H(월드)
+            float push = 0, t = 0, shift = float.NaN;   // push — 화면 밖 막기(Art 단위) · shift — 무리 뒤로 옮긴 몫(월드)
+            while (t < dur && u)
+            {
+                float sx = Mathf.Max(0.001f, u.Art.parent.lossyScale.x);
+                var cur = u.Sa.AnimationState.GetCurrent(0);
+                float ms = cur != null ? cur.TrackTime * 1000f : 0;
+                float nudgeW = u.Nudge.x * sx;
+                float halfW = cam.orthographicSize * cam.aspect, camX = cam.transform.position.x;
+                if (float.IsNaN(shift) && ms >= lp.From)
+                {
+                    // 숨은 첫 프레임 — 그림자 본(옮김 뺀)이 무리 오른끝 + 몸 반폭(0.7H) + Gap 에 오게. 나타날 때 몸 오른끝(+0.9H)이 화면 밖으로 안 나가게
+                    float sxW = u.Sa.transform.TransformPoint(new Vector3(shadow.WorldX, shadow.WorldY, 0)).x - nudgeW;
+                    float right = float.MinValue;
+                    for (int i = 0; i < Enemies.Count; i++) if (Enemies[i] != null && !Dead(i)) right = Mathf.Max(right, Enemies[i].MeshBounds.max.x);
+                    shift = right > float.MinValue ? Mathf.Max(0, Mathf.Min(right + (0.7f + lp.Gap) * hw, camX + halfW - 0.25f - 0.9f * hw) - sxW) : 0;
+                }
+                float w = float.IsNaN(shift) || ms < lp.From ? 0 : ms <= lp.Hold ? 1 : ms >= lp.Back ? 0 : 1 - Mathf.SmoothStep(0, 1, (ms - lp.Hold) / Mathf.Max(1, lp.Back - lp.Hold));
+                float moveW = shift > 0 ? shift * w : 0;
+                // 화면 밖 막기 — 몸이 보일 때만(숨은 동안 경계는 0)
+                var b = u.MeshBounds;
+                float need = 0;
+                if (b.size.x > 0.01f)
+                {
+                    float min0 = b.min.x - nudgeW + moveW, max0 = b.max.x - nudgeW + moveW;   // 밀지 않았다면(옮김은 넣고)
+                    need = min0 < camX - halfW + 0.25f ? camX - halfW + 0.25f - min0 : max0 > camX + halfW - 0.25f ? camX + halfW - 0.25f - max0 : 0;
+                }
+                push = Mathf.MoveTowards(push, need / sx, Time.deltaTime * 40f);
+                u.Nudge = new Vector3(moveW / sx + push, 0, 0);
+                yield return null; t += Time.deltaTime;
+            }
+            if (!u) yield break;
+            float from = u.Nudge.x;
+            yield return Clock.Tween(0.25f, k => { if (u) u.Nudge = new Vector3(from * (1 - k), 0, 0); });
+            if (u) u.Nudge = Vector3.zero;
+        }
         IEnumerator KeepOnScreen(UnitView u, float dur)
         {
             var cam = Camera.main;
@@ -589,7 +739,7 @@ namespace Bolzena
                 float sx = Mathf.Max(0.001f, u.Art.parent.lossyScale.x);
                 float left = cam.transform.position.x - cam.orthographicSize * cam.aspect + 0.25f;
                 float out0 = left - (u.MeshBounds.min.x - push * sx);   // 밀지 않았다면 왼끝이 화면 밖으로 나간 몫(월드)
-                push = Mathf.MoveTowards(push, Mathf.Max(0, out0) / sx, Time.deltaTime * 12f);
+                push = Mathf.MoveTowards(push, Mathf.Max(0, out0) / sx, Time.deltaTime * 40f);   // 12 → 40(2026-10-13 우로스 2.0초 — 몸짓이 순간 뒤로 물러날 때 못 따라가 반쯤 걸렸다)
                 u.Nudge = new Vector3(push, 0, 0);
                 yield return null; t += Time.deltaTime;
             }
@@ -676,7 +826,7 @@ namespace Bolzena
         {
             int i = Mathf.Clamp(cue.Actor.Index, 0, Heroes.Count - 1);
             var u = Heroes[i];
-            var dmg = group.FindAll(x => x.Kind == EventKind.Damage);
+            var dmg = group.FindAll(x => x.Kind == EventKind.Damage && !IsShot(x));
             Debug.Log($"[FxCue] {cue.Text} {(u ? u.name : "-")} v={cue.Value} 피해 {dmg.Count}");
             Emit(cue.Text);
             if (u) u.Flash(c.Tint, 0.3f, 0.6f);
@@ -690,7 +840,7 @@ namespace Bolzena
             int n = 0;
             foreach (var e in group)
             {
-                if (e.Kind != EventKind.Damage) { yield return ApplyConsequence(e, u); continue; }
+                if (e.Kind != EventKind.Damage || IsShot(e)) { yield return ApplyConsequence(e, u); continue; }
                 float at = first + gap * n;
                 var tgt = e.Target.Index < Enemies.Count ? Enemies[e.Target.Index] : null;
                 if (c.At == "each" && c.Fx != null && tgt != null)
@@ -718,7 +868,9 @@ namespace Bolzena
             // 오로라 — 시전은 오로라를 부르는 몸짓 전부, 플라즈마 기둥(thunder)은 턴 시작마다 aurora_rain
             ["오로라"] = new UltSplit { CastEnd = 0, Drop = "ultimate_thunder" },
         };
-        public static bool UltDropPart(string hero, string part) => hero != null && part != null && ULT_SPLIT.TryGetValue(hero, out var s) && s.Drop != null && part.Contains(s.Drop);
+        public static bool UltDropPart(string hero, string part) => hero != null && part != null
+            && ((ULT_SPLIT.TryGetValue(hero, out var s) && s.Drop != null && part.Contains(s.Drop))
+                || (ULT_STANDING.TryGetValue(hero, out var st) && st.Drop != null && part.Contains(st.Drop)));   // 스탠딩이 대신 쏘는 장(비비(신성) 레이저)
 
         // 뒤따르는 피해를 묶는 cue(턴 시작 발동) — miro_beam · aurora_rain 은 V 대, kisha_finale · ide_wake 는 살아 있는 적 수만큼
         static readonly HashSet<string> CUE_STRIKE = new HashSet<string> { "miro_beam", "aurora_rain", "kisha_finale", "ide_wake" };
@@ -836,7 +988,7 @@ namespace Bolzena
         {
             int i = Mathf.Clamp(cue.Actor.Index, 0, Heroes.Count - 1);
             var u = Heroes[i];
-            var dmg = group.FindAll(x => x.Kind == EventKind.Damage);
+            var dmg = group.FindAll(x => x.Kind == EventKind.Damage && !IsShot(x));
             Debug.Log($"[FxCue] {cue.Text} {(u ? u.name : "-")} v={cue.Value} 피해 {dmg.Count}");
             Emit(cue.Text);
             string hid = Battle.Snapshot.Heroes[i].Id;
@@ -853,7 +1005,7 @@ namespace Bolzena
                 int n = 0;
                 foreach (var e in group)
                 {
-                    if (e.Kind != EventKind.Damage) { yield return ApplyConsequence(e, u); continue; }
+                    if (e.Kind != EventKind.Damage || IsShot(e)) { yield return ApplyConsequence(e, u); continue; }
                     float at = 0.35f + 0.28f * n;
                     var tgt = e.Target.Index < Enemies.Count ? Enemies[e.Target.Index] : null;
                     float fireAt = Mathf.Max(0, at - imp);
@@ -889,7 +1041,7 @@ namespace Bolzena
             bool fxDone = false;
             foreach (var e in group)
             {
-                if (e.Kind == EventKind.Damage) { Impact(e, u, true, k == dmg.Count - 1, hitSfx, dmg.Count > 3, !fxDone); fxDone = aoeAt.HasValue; total += e.Value; k++; }
+                if (e.Kind == EventKind.Damage && !IsShot(e)) { Impact(e, u, true, k == dmg.Count - 1, hitSfx, dmg.Count > 3, !fxDone); fxDone = aoeAt.HasValue; total += e.Value; k++; }
                 else yield return ApplyConsequence(e, u);
             }
             if (aoeAt.HasValue && total > 0) Vfx.Word(aoeAt.Value + new Vector3(0, 1.3f, 0), "합 " + total.ToString("N0"), 0.5f, new Color(1f, 0.92f, 0.7f), new Color(0.3f, 0.1f, 0), 1.0f, 1f, null, 480, 0.5f);
@@ -909,7 +1061,7 @@ namespace Bolzena
         {
             int i = Mathf.Clamp(cue.Actor.Index, 0, Heroes.Count - 1);
             var u = Heroes[i];
-            var dmg = group.FindAll(x => x.Kind == EventKind.Damage);
+            var dmg = group.FindAll(x => x.Kind == EventKind.Damage && !IsShot(x));
             Debug.Log($"[FxCue] miro_beam {(u ? u.name : "-")} v={cue.Value} 피해 {dmg.Count}");
             Emit("miro_beam");
             int n = Mathf.Max(1, dmg.Count);
@@ -919,7 +1071,7 @@ namespace Bolzena
             float t = 0; int k = 0, di = 0;
             foreach (var e in group)
             {
-                if (e.Kind != EventKind.Damage) { yield return ApplyConsequence(e, u); continue; }
+                if (e.Kind != EventKind.Damage || IsShot(e)) { yield return ApplyConsequence(e, u); continue; }
                 float at = start + (n > 1 ? span * di / (n - 1) : 0);
                 while (t < at - 0.33f) { yield return null; t += Time.deltaTime; }
                 var tgt = e.Target.Index < Enemies.Count ? Enemies[e.Target.Index] : null;
@@ -1191,7 +1343,7 @@ namespace Bolzena
             if (dashTo.HasValue)   // 달려가 때리는 사도 — 이펙트는 닿는 자리에서(몸짓 시작 0.16초 안에 거기 간다)
             {
                 var d = dashTo.Value; var b = caster;
-                caster = new Bolzena.Fx.FxActor { FeetAt = () => d, Height = b.Height, Party = true, Key = b.Key, Point = b.Point, Muzzle = b.Muzzle };
+                caster = new Bolzena.Fx.FxActor { FeetAt = () => d, Height = b.Height, Party = true, Key = b.Key, Point = b.Point, Muzzle = b.Muzzle, Weapon = b.Weapon };
             }
             var tfx = new List<Bolzena.Fx.FxActor>();
             foreach (var ti in targets) if (ti < Enemies.Count && Enemies[ti] != null) { var f = Enemies[ti].Fx; f.Alive = !Dead(ti); tfx.Add(f); }
@@ -1265,10 +1417,10 @@ namespace Bolzena
         {
             var res = new SortedDictionary<int, List<BattleEvent>>();
             int cur = -1, n = 0;
-            foreach (var e in group) if (e.Kind == EventKind.Damage) n++;
+            foreach (var e in group) if (e.Kind == EventKind.Damage && !IsShot(e)) n++;
             foreach (var e in group)
             {
-                if (e.Kind == EventKind.Damage) { cur++; res[cur] = new List<BattleEvent>(); e.Hit = cur; e.Hits = n; }
+                if (e.Kind == EventKind.Damage && !IsShot(e)) { cur++; res[cur] = new List<BattleEvent>(); e.Hit = cur; e.Hits = n; }
                 if (cur >= 0) res[cur].Add(e);
             }
             return res;
@@ -1288,7 +1440,7 @@ namespace Bolzena
                 for (int j = 0; j < m; j++) res[slot + j] = new List<BattleEvent>();
                 foreach (var e in groups[g])
                 {
-                    if (e.Kind != EventKind.Damage || e.Value < m) { res[slot + m - 1].Add(e); continue; }
+                    if (e.Kind != EventKind.Damage || e.Value < m || IsShot(e)) { res[slot + m - 1].Add(e); continue; }   // 쏘는 한 대는 나누지 않는다
                     int done = 0;
                     for (int j = 0; j < m; j++)
                     {
@@ -1331,8 +1483,16 @@ namespace Bolzena
             UltSyncLog = string.Join(",", parts);
         }
 
-        // 맞음 이펙트 — 원작 공용 타격(구운 낱장, 웹판 sparkFx). 갈래: 둔기 · 마법 · 그 밖은 베기
-        static string FxHitKind(HitKind k) => k == HitKind.Blunt ? "blunt" : k == HitKind.Magic ? "magic" : "slash";
+        // 맞음 이펙트 — 원작 공용 타격(구운 낱장, 웹판 sparkFx). 갈래: 둔기 · 마법 · 쏘기 · 그 밖은 베기
+        static string FxHitKind(HitKind k) => k == HitKind.Blunt ? "blunt" : k == HitKind.Magic ? "magic" : k == HitKind.Shot ? "shot" : "slash";
+        // 작은 공용 타격 한 장(전체 공격의 나머지 적) — 갈래마다 가벼운 것
+        static string SmallHitSheet(HitKind k) => k == HitKind.Blunt ? "fx_common_hit_2_m" : k == HitKind.Magic ? "fx_common_hit_4_m" : k == HitKind.Shot ? "fx_common_hit_1_m" : "fx_common_hit_3_m";
+        static bool CalmFx => Bolzena.RunUI.Settings.ReduceMotion || LowSpecFx.On;   // 움직임 줄이기 · 저사양 — 덧붙인 몸 반응(찌그러짐)을 끈다
+
+        // 전체 공격 물결 — 적마다 늦추는 몫(적이 많으면 좁게)과 한 박자에서 늦출 합의 상한
+        const float AOE_LAG_MAX = 0.24f;
+        static float AoeLag(int n) => Mathf.Lerp(0.06f, 0.04f, Mathf.Clamp01((n - 2) / 3f));
+        float crowdStopAt = -1f;     // 무리를 칠 때 멈칫은 한 번만(Clock.Now)
         static bool HitSheets => Bolzena.Fx.FxLibrary.Has("fx_common_hit_3_m");
 
         // 무리의 발 자리 — 살아 있는 대상들의 경계 상자 가운데(한 마리면 그 적). 전체 공격의 목표 지점
@@ -1362,6 +1522,8 @@ namespace Bolzena
         }
 
         Vector3? aoeAt;          // 전체 공격 중이면 무리 가운데 — 타격 이펙트를 거기 한 번에
+        // 지금 몸짓의 사도 고유 맞음 장이 적에게 터지나(OrigFx 계획의 target 장) — null 이면 몸짓 밖(고학년 발동 cue 는 제 장을 트니 있는 셈 · 그 밖은 없는 셈)
+        bool? ownHitFx;
 
         IEnumerator Ghosts(UnitView u, float dur, Color c)
         {
@@ -1416,10 +1578,8 @@ namespace Bolzena
             FieldRig.Punch(at, 0.1f);
             // 세기는 크기 · 흔들림 · 고리 · 집중선으로 내고, 빛(블룸 · 흰 덮개)은 눌러 둔다 — 대상(320)의 실루엣과 숫자가 읽혀야 한다.
             // 흰 폭발 구름은 대상 뒤(315)에 깐다: 몸 둘레로 터져 나오고 몸을 덮지 않는다
-            PostFx.Kick(chroma: 1f, lens: -0.4f, bloom: 0.2f);
-            Vfx.Flash(new Color(tint.r, tint.g, tint.b, 0.08f), 0.2f, 1f, 305);
-            ScreenFx.I.Lines(0.75f, Color.white, FieldRoot.TransformPoint(at), 302, 0.26f);
-            Clock.Run(LinesOff(0.5f));
+            // (2026-10-14 원작 비교) 마지막 타격 뒤 흰 집중선(속도선)과 사도 성격 색(녹 · 보라 · 빨강) 화면 덮개는 원작 고학년에 없어 뺐다 — 흔들림 · 멈칫 · 소리는 둔다
+            PostFx.Kick(chroma: 0.5f, lens: -0.2f, bloom: 0.1f);
             Sfx.Play("ult_impact", 1f);
             Emit("ult_impact");
             Emit("ult_impact_" + caster.name.Replace("hero_", ""));
@@ -1448,8 +1608,9 @@ namespace Bolzena
         }
 
         // ── 맞는 순간 ──
-        // fxHere — 전체 공격이면 첫 대상만 무리 가운데에 큰 이펙트를 내고, 나머지는 몸 반응 · 숫자만
-        void Impact(BattleEvent e, UnitView by, bool ult, bool last, string hitSfx, bool crowd, bool fxHere = true)
+        // fxHere — 전체 공격이면 첫 대상만 무리 가운데에 큰 이펙트를 내고, 나머지는 몸 반응 · 작은 타격 한 장 · 숫자만
+        // shot — 쏘는 한 대(추가 공격 · 탄환 · 반격 · 소환물, ShotHit): 가볍게, shotFx 가 있으면 공용 타격 대신 그 사도의 원작 맞음 장
+        void Impact(BattleEvent e, UnitView by, bool ult, bool last, string hitSfx, bool crowd, bool fxHere = true, bool shot = false, string shotFx = null, float shotScale = 0.85f)
         {
             int ti = e.Target.Index;
             if (ti >= Enemies.Count) return;
@@ -1460,38 +1621,51 @@ namespace Bolzena
             var at = t.Center + new Vector3(Random.Range(-0.15f, 0.15f), Random.Range(-0.2f, 0.25f), 0);
             bool crit = e.Crit;
             bool multi = e.Hits > 1;
+            bool finale = multi && last && !ult && !shot;   // 다단의 마지막 대 — 앞 대들은 가볍게, 이 대는 세게(2026-10-13)
+            bool light = (multi && !finale) || shot;
             float flip = Random.value < 0.5f ? 1 : -1;
 
-            // 멈칫 · 흔들림 · 줌 펀치
-            float stop = crit ? 0.14f : ult ? 0.075f : multi ? 0.05f : 0.085f;
-            if (!crowd || e.Target.Index == 0) Clock.HitStop(stop);
-            FieldRig.Shake(crit ? 0.5f : ult ? 0.38f : multi ? 0.2f : 0.3f, crit ? 2.5f : 0.6f);
-            FieldRig.Punch(aoeAt ?? at, crit ? 0.075f : ult ? 0.04f : 0.035f);
+            // 멈칫 · 흔들림 · 줌 펀치 — 무리를 치면 멈칫은 한 번만(전에는 0번 적일 때만 걸려 0번이 없는 무리는 멈칫이 없었다)
+            float stop = crit ? 0.14f : ult ? 0.075f : shot ? 0.04f : finale ? 0.12f : multi ? 0.05f : 0.085f;
+            if (!crowd || Clock.Now - crowdStopAt > 0.15f) { Clock.HitStop(stop); if (crowd) crowdStopAt = Clock.Now; }
+            FieldRig.Shake(crit ? 0.5f : ult ? 0.38f : finale ? 0.45f : shot ? 0.16f : multi ? 0.2f : 0.3f, crit ? 2.5f : finale ? 1.4f : 0.6f);
+            FieldRig.Punch(aoeAt ?? at, crit ? 0.075f : finale ? 0.06f : ult ? 0.04f : shot ? 0.02f : 0.035f);
 
-            // 몸 — 흰 번쩍임(반쯤만 — 온통 하얗게 채우면 실루엣이 날아간다) · 밀려남 · 붉게
+            // 몸 — 흰 번쩍임(반쯤만 — 온통 하얗게 채우면 실루엣이 날아간다) · 밀려남 · 붉게 · 찌그러짐(스파인 피격 애니가 없어 몸 크기로)
             // 고학년은 여러 대가 겹치니 한 대의 빛을 더 줄인다(fade)
             float fade = ult ? 0.6f : 1f;
             bool bigFoe = ti < Battle.Snapshot.Enemies.Count && Battle.Snapshot.Enemies[ti].Boss;   // 큰 몸은 흰 채우기가 더 넓게 번진다
-            t.Flash(new Color(1f, 0.97f, 0.9f), crit ? 0.18f : 0.11f, (crit ? 0.42f : 0.32f) * (ult ? 0.7f : 1f) * (bigFoe ? 0.6f : 1f));
-            t.Knock(1f, crit ? 0.5f : multi ? 0.18f : 0.3f, crit ? 0.36f : 0.26f);
+            t.Flash(new Color(1f, 0.97f, 0.9f), crit ? 0.2f : finale ? 0.17f : 0.13f, (crit ? 0.46f : finale ? 0.42f : light ? 0.3f : 0.36f) * (ult ? 0.7f : 1f) * (bigFoe ? 0.6f : 1f));
+            t.Knock(1f, crit ? 0.55f : finale ? 0.46f : light ? 0.2f : 0.36f, crit || finale ? 0.38f : 0.28f);
+            if (!CalmFx) t.Squash((crit ? 0.13f : finale ? 0.11f : light ? 0.045f : 0.075f) * (bigFoe ? 0.6f : 1f), crit || finale ? 0.3f : 0.22f);
             if (!e.Crit) StartCoroutine(RedTint(t));
 
-            // 전체 공격 — 이펙트는 무리 가운데에 한 번(조금 크게), 대상마다는 몸 반응 · 숫자만
+            // 전체 공격 — 이펙트는 무리 가운데에 한 번(조금 크게), 대상마다는 몸 반응 · 작은 타격 한 장 · 숫자
             var fxAt = aoeAt ?? at;
-            if ((fxHere || !aoeAt.HasValue) && HitSheets)
+            // (2026-10-14 원작 비교) 원작에 없는 공용 타격을 뺀다 — 노란 고리(fx_common_hit_22 「세게」 · 고학년 첫 타격 덧불) · 노란 불꽃줄(hit_slash_3 · hit_3_m) ·
+            //   치명 덧불(hit_shockwave_1)은 모든 평타 · 강공 · 스킬 · 고학년 타격에 같은 노란 연출로 겹쳤다. 사도 고유 맞음 장이 적에게 터지면(own) 그것만,
+            //   없으면 아주 약한 공용 한 장(SmallHitSheet — 작게 · 짧게)만
+            bool own = shot ? false : ownHitFx ?? ult;
+            void Weak(Vector3 p) { if (!Bolzena.Fx.BolzenaFx.Calm) Bolzena.Fx.BolzenaFx.Play(SmallHitSheet(kind), new Bolzena.Fx.FxPlayOptions { At = p, Scale = 0.5f, Until = 0.3f, Order = 182 + fxBoost, Parent = FieldRoot }); }
+            if (shot && shotFx != null && Bolzena.Fx.BolzenaFx.Play(shotFx, new Bolzena.Fx.FxPlayOptions { At = at, Scale = shotScale, Until = 0.6f, Order = 182 + fxBoost, Parent = FieldRoot }) != null)
             {
-                // 원작 공용 타격(웹판 sparkFx) — 자리는 원작 본 Point_Middle(전체 공격이면 무리 가운데)
-                var tf = t.Fx;
-                if (aoeAt.HasValue) { var p0 = fxAt; tf = new Bolzena.Fx.FxActor { FeetAt = () => t.Feet, Height = t.Height(), Party = false, Point = n => n == "Middle" ? p0 : (Vector3?)null }; }
-                Bolzena.Fx.BolzenaFx.HitOrder = 182 + fxBoost;
-                Bolzena.Fx.BolzenaFx.Hit(tf, FxHitKind(kind), !ult && !multi && last && by != null, crit, ult, e.Hit == 0);
+                // 쏜 사도의 원작 맞음 장(_hit)만(공용 낱장을 겹치던 것은 뺐다)
+                if (e.Blocked > 0) Bolzena.Fx.BolzenaFx.Common("shieldHit", t.Fx);
+            }
+            else if (!fxHere && aoeAt.HasValue)
+            {
+                // 전체 공격의 나머지 적 — 고유 장이 무리를 덮으면 몸 반응 · 숫자만, 없으면 약한 공용 한 장
+                if (!own) Weak(at);
+            }
+            else if (HitSheets)
+            {
+                if (!own) Weak(fxAt);
                 if (e.Blocked > 0) Bolzena.Fx.BolzenaFx.Common("shieldHit", t.Fx);
                 if (crit)
                 {
                     Vfx.Flash(new Color(1f, 0.9f, 0.7f, 0.06f), 0.12f);
                     PostFx.Kick(chroma: 0.6f, lens: -0.15f, bloom: 0.12f);
-                    ScreenFx.I.Lines(0.45f, new Color(1f, 0.97f, 0.9f), FieldRoot.TransformPoint(fxAt), 302, 0.3f);
-                    Clock.Run(LinesOff(0.28f));
+                    if (!ult) { ScreenFx.I.Lines(0.45f, new Color(1f, 0.97f, 0.9f), FieldRoot.TransformPoint(fxAt), 302, 0.3f); Clock.Run(LinesOff(0.28f)); }   // 고학년 타격 뒤 집중선은 원작에 없다
                 }
                 else if (ult) PostFx.Kick(chroma: 0.35f, bloom: 0.08f);
             }
@@ -1522,7 +1696,7 @@ namespace Bolzena
                 Vfx.Ring(fxAt, 0.3f, crit ? 3.0f : 2.0f, crit ? 0.3f : 0.22f, new Color(1f, 0.95f, 0.85f, 0.6f * fade), 1.5f, "FX_IN_RIng_Hit_wave_01", 184 + fxBoost);
                 Vfx.Burst(fxAt, new Vfx.BurstOpt
                 {
-                    Tex = "FX_IN_Spark", Count = crit ? 22 : multi ? 8 : 12, Speed = new Vector2(7f, crit ? 20f : 15f), Life = new Vector2(0.12f, 0.3f),
+                    Tex = "FX_IN_Spark", Count = crit ? 22 : finale ? 18 : multi ? 8 : 12, Speed = new Vector2(7f, crit ? 20f : 15f), Life = new Vector2(0.12f, 0.3f),
                     Size = new Vector2(0.05f, 0.13f), C0 = new Color(1f, 0.97f, 0.85f), C1 = sparkC, Stretch = true, StretchK = 0.045f, Drag = 4f, Angle = 10, Spread = 150, Order = 186 + fxBoost, Boost = 2.2f,
                 });
                 Vfx.Burst(fxAt, new Vfx.BurstOpt
@@ -1540,12 +1714,13 @@ namespace Bolzena
                     ScreenFx.I.Lines(0.45f, new Color(1f, 0.97f, 0.9f), FieldRoot.TransformPoint(fxAt), 302, 0.3f);
                     Clock.Run(LinesOff(0.28f));
                 }
+                else if (finale) Vfx.Sheet("fx_common_hit_22", fxAt, 1.1f, 187 + fxBoost, Random.Range(-10f, 10f), false, 1f, true, 1.05f, new Color(1f, 0.9f, 0.65f, 0.8f));   // 다단 마지막 대 — 세게 덧불
                 else if (ult) PostFx.Kick(chroma: 0.35f, bloom: 0.08f);
             }
 
             // 소리
-            Sfx.Play(crit ? "hit_crit" : kind == HitKind.Blunt ? "hit_blunt" : kind == HitKind.Magic ? "hit_magic" : "hit_slash", crit ? 0.95f : 0.8f, 1f, true);
-            if (hitSfx != null) Sfx.Play(hitSfx, 0.6f, 1f, true);
+            Sfx.Play(crit ? "hit_crit" : kind == HitKind.Blunt ? "hit_blunt" : kind == HitKind.Magic ? "hit_magic" : "hit_slash", crit ? 0.95f : shot ? 0.55f : finale ? 0.9f : 0.8f, 1f, true);
+            if (hitSfx != null) Sfx.Play(hitSfx, shot ? 0.45f : 0.6f, 1f, true);
             if (e.Blocked > 0) Sfx.Play("block_hit", 0.6f);
 
             // 숫자 · 막대
@@ -1572,9 +1747,150 @@ namespace Bolzena
         IEnumerator RedTint(UnitView u)
         {
             yield return Clock.Wait(0.06f);
-            u.Tint(new Color(1f, 0.55f, 0.55f), 40f);
-            yield return Clock.Wait(0.12f);
+            u.Tint(new Color(1f, 0.5f, 0.5f), 40f);
+            yield return Clock.Wait(0.14f);
             u.Tint(Color.white, 8f);
+        }
+
+        // ── 쏘는 한 대(2026-10-13) — 추가 공격 · 탄환 · 반격 · 협공 · 소환물 · 패시브 피해를 누가 쏘는지 보이게 ──
+        //   쏘는 사도 몸이 짧게 움찔(탄환은 반동으로 뒤로, 그 밖은 앞으로 반 발) · 빛 → 사도 원작 평타의 투사체(없으면 몸 앞 빛 한 번) →
+        //   맞는 쪽(바로 뒤 Damage "shot" → ShotHit — 사도 원작 맞음 장, 없으면 공용 타격). 여러 발이 몰리면 간격을 좁혀 하나씩 줄 세운다
+        // 날아가는 시간 — 0.1초면 캡처 칸(0.15초 간격)에 투사체가 거의 안 잡혔다(2026-10-13 캡처 검토) → 0.22초, 몰리면 0.1초까지
+        const float SHOT_FLY = 0.22f, SHOT_FLY_MIN = 0.1f, SHOT_RUN_RESET = 0.5f;
+        const int SHOT_RUN_FREE = 4, SHOT_RUN_CAP = 14;   // 4발까지는 0.22초씩, 그 뒤는 0.1초까지 줄이고 14발을 넘으면 기다리지 않는다
+        const float SHOT_SCALE = 1.1f, SHOT_TRAIL_GAP = 0.03f;   // 투사체 크기(전 0.8 — 작아 안 보였다) · 꼬리 빛 간격(초)
+        float shotLast = -10f;
+        int shotRun;
+        static readonly Dictionary<string, (string proj, string hit)> shotLooks = new Dictionary<string, (string proj, string hit)>();
+
+        static bool IsShot(BattleEvent e) => e != null && e.Kind == EventKind.Damage && e.Text == "shot";
+
+        // 쏘는 한 대의 맞는 장을 손으로 정한 사도(2026-10-13) — 평타에 「_hit」 장이 없거나 맞지 않는 것: (장, 크기)
+        //   이드: attackhit 는 연기가 위로 크게 솟는 판(화면 위까지) → 작게 · 우이(기억): 맞음 장이 없어 공용 타격 → 물방울 폭발(attack1_explosion)
+        static readonly Dictionary<string, (string fx, float scale)> SHOT_HIT = new Dictionary<string, (string fx, float scale)>
+        {
+            ["이드"] = ("fx_ed_attackhit_1", 0.5f),
+            ["우이_기억"] = ("fx_uimemory_attack1_explosion_1_default", 0.6f),
+            ["우이"] = ("fx_uieru_waterhit_1", 0.75f),
+        };
+        // 위에서 내리치는 사도(2026-10-13) — 지팡이 끝이 머리 위라 탄이 적 머리 위에서 세로로 꽂혀 바닥 아래까지 갔다(네르(빡침) 벼락).
+        //   적 몸 위(dy)에서 몸 가운데 조금 위로 짧게 떨어뜨리고, 판을 돌리지 않고 작게 — 판 아래 끝이 발밑을 넘지 않게
+        static readonly Dictionary<string, (float dy, float scale)> SHOT_DROP = new Dictionary<string, (float dy, float scale)>
+        {
+            ["네르_빡침"] = (2.2f, 0.55f),
+        };
+
+        // 쏘는 한 대의 색 — 사도 원작 평타 장의 가장 진한 색(채도 × 크기). 성격 색(hs.Tint)은 그림과 달라(란 = 순수 초록인데 보라 칼빛) 꼬리 · 빛이 엉뚱한 색이었다
+        static readonly Dictionary<string, Color> shotTints = new Dictionary<string, Color>();
+        static Color ShotTint(string hid, Color fallback)
+        {
+            if (hid == null) return fallback;
+            if (shotTints.TryGetValue(hid, out var got)) return got;
+            Color best = fallback; float bw = 0;
+            foreach (var n in Bolzena.Fx.FxLibrary.Get(hid, "attack"))
+            {
+                var fx = Bolzena.Fx.FxLibrary.Effect(n);
+                if (fx == null) continue;
+                foreach (var e in fx.Em)
+                {
+                    if (e.M3d || e.Col == null || e.Col.Length == 0) continue;
+                    var c = new Color(e.Col[0].r * e.Tint.r, e.Col[0].g * e.Tint.g, e.Col[0].b * e.Tint.b);
+                    float mx = Mathf.Max(c.r, Mathf.Max(c.g, c.b)), mn = Mathf.Min(c.r, Mathf.Min(c.g, c.b));
+                    if (mx < 0.3f) continue;
+                    float w = (mx - mn) / mx * Mathf.Min(10f, Mathf.Max(0.1f, e.Size.y));
+                    if (w > bw) { bw = w; best = new Color(c.r / mx, c.g / mx, c.b / mx, 1f); }
+                }
+            }
+            return shotTints[hid] = best;
+        }
+        static float ShotHitScale(string hid) => hid != null && SHOT_HIT.TryGetValue(hid, out var s) ? s.scale : 0.85f;
+
+        // 사도 원작 평타 이펙트에서 — 날아갈 작은 것(proj · bullet, 꼬리 빼고) · 맞는 장(hit). SHOT_HIT 가 있으면 그 장
+        static (string proj, string hit) ShotLook(string hid)
+        {
+            if (hid == null) return (null, null);
+            if (shotLooks.TryGetValue(hid, out var got)) return got;
+            string proj = null, hit = SHOT_HIT.TryGetValue(hid, out var sh) && Bolzena.Fx.FxLibrary.Has(sh.fx) ? sh.fx : null;
+            foreach (var n in Bolzena.Fx.FxLibrary.Get(hid, "attack"))
+            {
+                if (proj == null && (n.Contains("proj") || n.Contains("bullet")) && !n.Contains("trail")) proj = n;
+                if (hit == null && n.Contains("hit") && !n.Contains("shockwave")) hit = n;
+            }
+            return shotLooks[hid] = (proj, hit);
+        }
+
+        IEnumerator ShotFx(BattleEvent e)
+        {
+            int hi = e.Actor.Index, ti = e.Target.Index;
+            if (e.Actor.Side != Side.Party || hi < 0 || hi >= Heroes.Count || Heroes[hi] == null || ti < 0 || ti >= Enemies.Count || Enemies[ti] == null) yield break;
+            var u = Heroes[hi];
+            var t = Enemies[ti];
+            var hs = hi < Battle.Snapshot.Heroes.Count ? Battle.Snapshot.Heroes[hi] : null;
+            var look = ShotLook(hs?.Id);
+            // 몰림 — 앞 발에서 얼마 안 지나 또 오면 줄 세운 차례가 이어진다
+            if (Clock.Now - shotLast > SHOT_RUN_RESET) shotRun = 0;
+            shotRun++;
+            float fly = shotRun <= SHOT_RUN_FREE ? SHOT_FLY : shotRun > SHOT_RUN_CAP ? 0f
+                : Mathf.Lerp(SHOT_FLY, SHOT_FLY_MIN, (shotRun - SHOT_RUN_FREE) / (float)(SHOT_RUN_CAP - SHOT_RUN_FREE));
+            Trace?.Invoke("shot", $"{e.Text} {u.name.Replace("hero_", "")} → {t.name.Replace("enemy_", "")}");
+            // 몸짓 — 자리 몫(Knock)만 더해 몸짓 중인 사도에게도 겹쳐 걸린다. 사도 색(원작 평타 장의 색)으로 살짝 빛난다
+            var tint = ShotTint(hs?.Id, hs != null ? hs.Tint : Color.white);
+            bool recoil = e.Text == "bullet";
+            u.Knock(recoil ? -1f : 1f, recoil ? 0.14f : 0.22f, 0.22f);
+            u.Flash(Color.Lerp(tint, Color.white, 0.5f), 0.16f, 0.4f);
+            // 쏘는 자리 — 지금 무기 끝(MotionTables.WEAPON — 총열 · 칼끝 · 손, 2026-10-13) → 총구 → 평타 시전 본(Point_Attack1, 없으면 짐작한 몸 앞).
+            //   시온은 Point_Attack1 이 발밑, 클로에 · 이드 · 비비는 몸 뒤라 엉뚱한 데서 나가던 것
+            var from = u.Fx.Weapon?.Invoke() ?? u.Fx.Muzzle?.Invoke() ?? u.Fx.At(Bolzena.Fx.FxAnchor.Cast, "Attack1");
+            var to = t.Center;
+            float pScale = SHOT_SCALE;
+            (float dy, float scale) dr = default;
+            bool drop = hs != null && hs.Id != null && SHOT_DROP.TryGetValue(hs.Id, out dr);
+            if (drop) { from = t.Center + new Vector3(-0.35f, dr.dy, 0); to = t.Center + new Vector3(0, 0.35f, 0); pScale = dr.scale; }
+            bool flew = fly > 0 && look.proj != null && Bolzena.Fx.BolzenaFx.Play(look.proj, new Bolzena.Fx.FxPlayOptions
+            {
+                At = from, MoveTo = to, MoveDur = fly, Until = fly + 0.12f, Scale = pScale, Order = 190 + fxBoost, Parent = FieldRoot,
+                Aim = !drop,   // 맞는 적 몸 쪽을 보게 돌린다(내리치는 탄은 짜인 세로 그대로)
+            }) != null;
+            if (!flew) Vfx.Glow(from, 1.1f, new Color(tint.r, tint.g, tint.b, 0.75f), 0.16f, 2f, null, 190 + fxBoost, null, 1.4f);   // 투사체가 없는 사도 — 몸 앞 빛 한 번(입자 없음)
+            var cast = HeroSfx(u.name.Replace("hero_", ""), Motion.Attack1, false);
+            if (cast != null) Sfx.Play(cast, 0.35f, 1.08f, true);
+            shotLast = Clock.Now;
+            if (fly > 0)
+            {
+                // 꼬리 — 나는 길을 따라 사도 색 빛을 떨군다(투사체가 없는 사도는 이 빛 줄이 곧 탄). 전투 시계 그대로
+                float el = 0, next = 0;
+                while (el < fly)
+                {
+                    if (el >= next)
+                    {
+                        float f = Mathf.Clamp01(el / fly), e2 = f * f * (3 - 2 * f);
+                        Vfx.Glow(Vector3.LerpUnclamped(from, to, e2), flew ? 0.55f : 0.8f, new Color(tint.r, tint.g, tint.b, flew ? 0.45f : 0.7f), 0.2f, 2f, null, 189 + fxBoost, null, 1.1f);
+                        next += SHOT_TRAIL_GAP;
+                    }
+                    yield return null;
+                    el += Clock.UDt;
+                }
+            }
+            shotLast = Clock.Now;
+        }
+
+        // 쏘는 한 대가 닿는다 — 쏜 사도의 원작 맞음 장 · 맞는 소리로 가볍게(전체 공격 박자 안이어도 이 한 대는 그 적에게)
+        void ShotHit(BattleEvent e)
+        {
+            int ti = e.Target.Index;
+            if (ti < 0 || ti >= Enemies.Count || Enemies[ti] == null) return;
+            int hi = e.Actor.Side == Side.Party ? e.Actor.Index : -1;
+            string fx = null, snd = null;
+            float fxScale = 0.85f;
+            if (hi >= 0 && hi < Heroes.Count && Heroes[hi] != null)
+            {
+                if (hi < Battle.Snapshot.Heroes.Count) { fx = ShotLook(Battle.Snapshot.Heroes[hi].Id).hit; fxScale = ShotHitScale(Battle.Snapshot.Heroes[hi].Id); }
+                snd = HeroSfx(Heroes[hi].name.Replace("hero_", ""), Motion.Attack1, true);
+            }
+            var keep = aoeAt;
+            aoeAt = null;
+            Impact(e, null, false, true, snd, false, true, true, fx, fxScale);
+            aoeAt = keep;
         }
 
         // 맞는 순간에 함께 걸리는 것 — 상태 · 강인도 · 격파 · 쓰러짐 · 게이지 …
@@ -1592,7 +1908,11 @@ namespace Bolzena
                 case EventKind.Heal:
                     HealFx(e);
                     break;
+                case EventKind.Shot:
+                    yield return ShotFx(e);
+                    break;
                 case EventKind.Damage:
+                    if (IsShot(e)) { ShotHit(e); break; }   // 쏘는 한 대 — 그 사도의 맞음 장으로
                     // 몸짓 밖의 피해(지속 피해 · 반격 · 패시브) — 작게
                     if (e.Target.Index < Enemies.Count && Enemies[e.Target.Index] != null) Impact(e, null, false, false, null, true);
                     break;

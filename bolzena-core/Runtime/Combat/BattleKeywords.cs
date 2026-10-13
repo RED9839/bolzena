@@ -201,7 +201,7 @@ namespace Bolzena.Core
             if (hero == null || t == null || t.Dead || Over != null) return;
             int v = HitAmount(hero, ratio + Morale(), bas: bas);
             Say($"{hero.Name}: {label} → {t.Name} ({v})"); StatusCue(hero, label, true);
-            Hurt(t, v, new HurtOpts { From = hero, Card = true });
+            Hurt(t, v, new HurtOpts { From = hero, Card = true, Shot = label == "탄환!" ? "bullet" : label == "협공!" ? "assist" : label == "공명!" ? "resonance" : "extra" });
             if (!t.Dead && Over == null) ToughHit(t, R.ToughExtra(IsWeakHit(hero, t, null)));   // 추가 공격류 강인도(카제나 표 — 약점 0.5칸)
             AfterExtra(hero);
         }

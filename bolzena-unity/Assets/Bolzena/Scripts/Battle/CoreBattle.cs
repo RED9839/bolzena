@@ -647,11 +647,23 @@ namespace Bolzena.Battle
                     case "hurt":
                     {
                         string hk = c.Side + ":" + c.Idx;
-                        int n = hitN.TryGetValue(hk, out var x) ? x : 0;
-                        hitN[hk] = n + 1;
+                        // 쏘는 한 대(엔진 HurtOpts.Shot — 추가 공격 · 탄환 · 반격 · 협공 · 소환물 · 패시브 피해, 2026-10-13) — 카드 박자에 세지 않고
+                        //   그 사도가 쏘는 것으로: Shot(누가 · 누구에게 · 종류) 다음에 Damage(Text "shot")
+                        int si = c.Side == CSide.Enemy && c.Label != null && c.Hero != null ? b.Party.FindIndex(p => p.Key == c.Hero) : -1;
+                        int n = si >= 0 ? 0 : hitN.TryGetValue(hk, out var x) ? x : 0;
+                        if (si < 0) hitN[hk] = n + 1;
                         int g = Math.Max(0, Guard(c.Side, c.Idx) - c.Guard);
                         SetGuard(c.Side, c.Idx, g);
-                        if (c.Side == CSide.Enemy)
+                        if (c.Side == CSide.Enemy && si >= 0)
+                        {
+                            evs.Add(new BattleEvent { Kind = EventKind.Shot, Actor = UnitRef.Party(si), Target = UnitRef.Enemy(c.Idx), Text = c.Label });
+                            evs.Add(new BattleEvent
+                            {
+                                Kind = EventKind.Damage, Actor = UnitRef.Party(si), Target = UnitRef.Enemy(c.Idx), Value = c.V, Blocked = c.Guard, Crit = c.Crit,
+                                HpAfter = (int)c.To, BlockAfter = g, Hit = 0, Hits = 1, HitKind = Look.Hero(b.Party[si].Key).Hit, Text = "shot",
+                            });
+                        }
+                        else if (c.Side == CSide.Enemy)
                             evs.Add(new BattleEvent
                             {
                                 Kind = EventKind.Damage, Actor = actor, Target = UnitRef.Enemy(c.Idx), Value = c.V, Blocked = c.Guard, Crit = c.Crit,
@@ -774,9 +786,9 @@ namespace Bolzena.Battle
             if (start < 0) return;
             int most = 1;
             for (int i = start; i < evs.Count; i++)
-                if (evs[i].Kind == EventKind.Damage || evs[i].Kind == EventKind.PartyHurt) most = Math.Max(most, evs[i].Hit + 1);
+                if ((evs[i].Kind == EventKind.Damage && evs[i].Text != "shot") || evs[i].Kind == EventKind.PartyHurt) most = Math.Max(most, evs[i].Hit + 1);
             for (int i = start; i < evs.Count; i++)
-                if (evs[i].Kind == EventKind.Damage || evs[i].Kind == EventKind.PartyHurt) evs[i].Hits = most;
+                if ((evs[i].Kind == EventKind.Damage && evs[i].Text != "shot") || evs[i].Kind == EventKind.PartyHurt) evs[i].Hits = most;   // 쏘는 한 대는 1 그대로
         }
 
         static UnitRef Ref(Cue c) => c.Side == CSide.Enemy ? UnitRef.Enemy(c.Idx) : UnitRef.Party(Math.Max(0, c.Idx));

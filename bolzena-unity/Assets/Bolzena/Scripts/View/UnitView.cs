@@ -487,16 +487,28 @@ namespace Bolzena.View
             get
             {
                 if (fx != null) return fx;
-                System.Func<Vector3?> muzzle = null;
+                System.Func<Vector3?> muzzle = null, weapon = null;
+                float hh = Height();
                 if (SpineArt && Facing)
                 {
                     var m = Bolzena.Fx.SpineMotion.Muzzle(Sa, FxKey);
                     if (m != null) muzzle = () => { var w = m(); return w.HasValue && this ? transform.parent.InverseTransformPoint(w.Value) : (Vector3?)null; };
+                    // 무기 끝(MotionTables.WEAPON, 2026-10-13) — 카드 투사체 · 총구 불꽃 · 쏘는 한 대가 나가는 자리.
+                    //   땅 밑으로 내려간 칼끝(티그(영웅) 평타 · 디아나(왕년) 스킬)은 발에서 키의 0.15 위로 올린다
+                    var wp = Bolzena.Fx.SpineMotion.Weapon(Sa, FxKey);
+                    if (wp != null) weapon = () =>
+                    {
+                        var w = wp();
+                        if (!w.HasValue || !this) return null;
+                        var p = transform.parent.InverseTransformPoint(w.Value);
+                        p.y = Mathf.Max(p.y, Feet.y + hh * 0.15f);
+                        return p;
+                    };
                 }
                 fx = new Bolzena.Fx.FxActor
                 {
-                    FeetAt = () => this ? Feet : Vector3.zero, Height = Height(), Party = Facing, Key = FxKey ?? name,
-                    Point = PointAt, Muzzle = muzzle,
+                    FeetAt = () => this ? Feet : Vector3.zero, Height = hh, Party = Facing, Key = FxKey ?? name,
+                    Point = PointAt, Muzzle = muzzle, Weapon = weapon,
                 };
                 return fx;
             }
@@ -621,6 +633,17 @@ namespace Bolzena.View
             knock = Vector3.zero;
         }
 
+        // 찌그러짐(2026-10-13) — 스파인 피격 애니가 없어 몸(Art) 크기로: 맞는 순간 가로로 퍼지고 세로로 눌렸다가 한 번 늘어나며 튕겨 돌아온다(발은 제자리).
+        //   amt 0.05~0.13 · 게임 시간이라 멈칫 동안은 눌린 채로 선다
+        public void Squash(float amt, float dur = 0.22f)
+        {
+            if (amt <= 0 || dur <= 0) return;
+            squashAmt = Mathf.Max(amt, squashT < 1f ? squashAmt : 0);
+            squashT = 0;
+            squashDur = dur;
+        }
+        float squashAmt, squashT = 1f, squashDur = 0.22f;
+
         // 몸을 to(싸움터 좌표 — 발 자리)로 dur 동안 옮긴다
         public IEnumerator MoveTo(Vector3 to, float dur, System.Func<float, float> ease = null)
         {
@@ -673,6 +696,14 @@ namespace Bolzena.View
         {
             float dt = Time.deltaTime;
             Art.localPosition = offset + knock + Nudge;
+            if (squashT < 1f)
+            {
+                // 줄어드는 떨림 — 처음 눌림(+) → 1/3 쯤 늘어남(−) → 잦아듦
+                squashT = Mathf.Min(1f, squashT + dt / squashDur);
+                float r = 1f - squashT;
+                float s = squashT >= 1f ? 0 : squashAmt * r * r * Mathf.Cos(squashT * Mathf.PI * 3f);
+                Art.localScale = new Vector3(scaleMul * (1f + s), scaleMul * (1f - s), 1f);
+            }
             if (fillPhase > 0) fillPhase = Mathf.Max(0, fillPhase - dt * fillDecay);
             mpb.SetColor("_FillColor", fillColor);
             mpb.SetFloat("_FillPhase", fillPhase);

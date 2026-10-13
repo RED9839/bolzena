@@ -124,6 +124,23 @@ namespace Bolzena.Fx
             return topCache[name] = hi;
         }
 
+        // 총구 불꽃 판인가 — 이미터 텍스처에 Muzzle(_shared/FX_Muzzle_01)이 든 장. 이름 낱말(fire)로는 대상에 가던 것을 총구에 붙이려고(2026-10-13)
+        static readonly Dictionary<string, bool> muzzleCache = new Dictionary<string, bool>();
+        public static bool MuzzleTex(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return false;
+            if (muzzleCache.TryGetValue(name, out var got)) return got;
+            bool m = false;
+            var fx = Effect(name);
+            if (fx != null)
+                foreach (var e in fx.Em)
+                {
+                    var tn = e.TexPath ?? (e.Tex != null ? e.Tex.name : null);
+                    if (tn != null && tn.IndexOf("muzzle", System.StringComparison.OrdinalIgnoreCase) >= 0) { m = true; break; }
+                }
+            return muzzleCache[name] = m;
+        }
+
         public static float Duration(string name)
         {
             var e = Info(name);

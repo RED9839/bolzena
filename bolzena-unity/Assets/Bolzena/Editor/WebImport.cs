@@ -34,6 +34,12 @@ namespace Bolzena.EditorTools
         const int Quality = 50;
         // 미리 구운 사도 정지 그림(RunArt/Snap — runui SnapPrebake: 목록 카드 · 얼굴 칸 · 카드 그림)은 얼굴이 크게 보여 크런치 품질을 조금 높인다(폰 ASTC 6×6 은 그대로)
         const int SnapQuality = 70;
+        // 타격류 이펙트 원본(2026-10-13) — 이름에 hit · slash · proj · bullet · laser · muzzle 가 든 그림(white 의 hit 는 빼고 — fx · fx2 276장)은
+        //   날카로운 칼빛 · 탄이 크런치 블록으로 무르지 않게 데스크톱 크런치 품질 75 · 폰 ASTC 6×6. 나머지 원본은 그대로(50 · 8×8).
+        //   GetVersion 은 그대로 — 이미 가져온 것은 ProjectSetup.SwitchWebTextures 가 품질(DXT) · 형식(ASTC)이 다른 것을 골라 다시 가져온다
+        public const int HitQuality = 75;
+        static readonly System.Text.RegularExpressions.Regex HitName = new System.Text.RegularExpressions.Regex("(?<!w)hit|slash|proj|bullet|laser|muzzle", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        internal static bool HitFx(string p) => KindOf(p) == Kind.Fx && HitName.IsMatch(System.IO.Path.GetFileNameWithoutExtension(p));
         public override int GetPostprocessOrder() => 1000;
         // 규칙이 바뀌면 올린다 — 단, 올리면 PC(Standalone) 그림까지 전부 다시 가져온다(20분 넘게). v3 의 ASTC 갈래는 DXT · PC 결과를 바꾸지 않아
         // 2 그대로 두고, ASTC 로 아직 안 가져온 그림은 ProjectSetup.SwitchWebTextures 가 골라 다시 가져온다
@@ -108,6 +114,7 @@ namespace Bolzena.EditorTools
                 case Kind.Fx:
                     w.format = TextureImporterFormat.DXT5Crunched;
                     w.crunchedCompression = true;
+                    if (HitFx(p)) w.compressionQuality = HitQuality;
                     w.maxTextureSize = 1024;   // FxImport 와 같게
                     break;
             }
@@ -131,7 +138,7 @@ namespace Bolzena.EditorTools
                     w.maxTextureSize = 4096;
                     break;
                 case Kind.Fx:
-                    w.format = TextureImporterFormat.ASTC_8x8;
+                    w.format = HitFx(p) ? TextureImporterFormat.ASTC_6x6 : TextureImporterFormat.ASTC_8x8;
                     w.maxTextureSize = 1024;
                     break;
                 default:
@@ -150,7 +157,7 @@ namespace Bolzena.EditorTools
         internal static bool BgAstc(string p) => p.Contains("/Resources/Bg/") || p.Contains("/RunArt/Bg/");
 
         /// <summary>폰(ASTC) 판에서 이 그림이 가져야 할 형식 이름의 앞머리(점검용 — 다르면 다시 가져온다). 모르면 null.</summary>
-        internal static string AstcFormatOf(string p, Kind k) => k == Kind.Res && BgAstc(p) ? "ASTC_8x8" : k == Kind.Res ? "ASTC_6x6" : null;
+        internal static string AstcFormatOf(string p, Kind k) => k == Kind.Res && BgAstc(p) ? "ASTC_8x8" : k == Kind.Res ? "ASTC_6x6" : k == Kind.Fx && HitFx(p) ? "ASTC_6x6" : null;
 
         static void WebMips(TextureImporter ti, Kind k)
         {

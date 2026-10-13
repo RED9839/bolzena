@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Bolzena.Battle;
 using Bolzena.UI;
@@ -66,7 +67,7 @@ namespace Bolzena
             // 저학년(대조 1~4조)
             MKey("다야_퓨어샤인", Motion.Skill1), MKey("라이카", Motion.Skill1), MKey("리코타", Motion.Skill1), MKey("빅우드", Motion.Skill1),
             MKey("셰럼", Motion.Skill1), MKey("아네트", Motion.Skill1), MKey("아일라", Motion.Skill1), MKey("오팔", Motion.Skill1),
-            MKey("우이_기억", Motion.Skill1), MKey("코미_수영복", Motion.Skill1), MKey("스피키", Motion.Skill1), MKey("벨벳", Motion.Skill1),
+            MKey("코미_수영복", Motion.Skill1), MKey("스피키", Motion.Skill1), MKey("벨벳", Motion.Skill1),
             MKey("바리에", Motion.Skill1), MKey("스노키", Motion.Skill1), MKey("아라그니아", Motion.Skill1), MKey("레테", Motion.Skill1),
             MKey("큐이", Motion.Skill1), MKey("쵸피", Motion.Skill1),
             MKey("로네", Motion.Skill1), MKey("오로라", Motion.Skill1), MKey("이드", Motion.Skill1), MKey("우로스", Motion.Skill1),
@@ -74,7 +75,7 @@ namespace Bolzena
             MKey("네르", Motion.Skill1), MKey("바나", Motion.Skill1), MKey("베니", Motion.Skill1), MKey("아멜리아_R41", Motion.Skill1),
             MKey("코미", Motion.Skill1), MKey("폴랑", Motion.Skill1), MKey("마고", Motion.Skill1),
             // 강공
-            MKey("아일라", Motion.Attack2), MKey("우이_기억", Motion.Attack2), MKey("시저", Motion.Attack2), MKey("뮤트", Motion.Attack2),
+            MKey("아일라", Motion.Attack2), MKey("시저", Motion.Attack2), MKey("뮤트", Motion.Attack2),
             MKey("헤일리", Motion.Attack2), MKey("힐데", Motion.Attack2), MKey("캬롯", Motion.Attack2), MKey("제이드", Motion.Attack2),
             MKey("아멜리아_R41", Motion.Attack2), MKey("에르핀", Motion.Attack2), MKey("슈팡", Motion.Attack2),
             MKey("키샤", Motion.Attack2),   // 폴라로이드 액자 연출은 키샤 앞(적 쪽에 찍혀 화면 오른쪽을 덮던 것)
@@ -87,6 +88,9 @@ namespace Bolzena
             MKey("리코타", Motion.Attack1), MKey("리코타", Motion.Attack2), MKey("라이카", Motion.Attack2), MKey("레이지", Motion.Skill1),
             MKey("리온", Motion.Skill1), MKey("벨라", Motion.Skill1), MKey("리츠", Motion.Attack1), MKey("리츠", Motion.Attack2), MKey("리츠", Motion.Skill1),
             MKey("슈로", Motion.Skill1), MKey("레비_졸업", Motion.Attack2),
+            // 우이(기억) 강공 · 스킬 — 전엔 자기형(CARD_SELF)이라 연못 · 터지는 고리 · 세로선이 시전자 발밑에 섰다(2026-10-13 캡처 검토: 적 쪽이어야).
+            //   몸은 제자리, 맞는 장은 적에게(노래 · 강화는 FxRules.CARD_AT 로 시전자에)
+            MKey("우이_기억", Motion.Attack2), MKey("우이_기억", Motion.Skill1),
         };
 
         // 원작이 적 앞까지 가는 몸짓(근접 그림이 아니어도) — 몸짓이 스스로 멀리 옮기면(순간이동) 따로 가지 않는다
@@ -109,6 +113,26 @@ namespace Bolzena
             [MKey("요미", Motion.Skill1)] = new[] { 1700 },                 // 300 은 달 소환 표시 — 원작 61% 지점
             [MKey("사리", Motion.Skill1)] = new[] { 1967 },                 // 원작 1타(80%) — 연기 뒤 Skill1_2 의 찌르기(1567 + 400)
             [MKey("델리아", Motion.Skill1)] = new[] { 667, 1800 },          // 원작 2타
+            // 2026-10-13 엘다인 20명 카드 손보기
+            //   티그(영웅) 저학년 — 첫 SFX2(467)는 몸이 안 보이는 돌진 중(0.35~0.92초 숨음)이라 그때 맞으면 「타수만큼만 휘두르기」가 몸짓을 0.9초에 끊어
+            //   적 뒤 등장 · 큰 베기(1933 · 2000 이벤트)가 통째로 잘렸다. 맞는 때는 큰 베기
+            [MKey("티그_영웅", Motion.Skill1)] = new[] { 1950 },
+            //   실비아 강공 — 767 은 시전자 쪽 반짝(시전 표시), 적 위 분홍 폭발은 그 뒤(원작 기본공격 영상 2.5초 시전 반짝 → 2.6초 폭발) — 900 · 1633
+            [MKey("실비아", Motion.Attack2)] = new[] { 900, 1633 },
+            //   디아나(왕년) 강공 — 원작 4타(뛰어올라 내려찍으며 연타). 스파인 타격 표시는 1700 하나뿐이라 1타로 보였다 — 내려찍는 1700 부터 0.13초 간격 4번
+            [MKey("디아나_왕년", Motion.Attack2)] = new[] { 1700, 1833, 1967, 2100 },
+            //   비비 강공 — 333 이벤트(1006132)는 단검 넷(Weapon_Dagger1~4)이 떠오르는 표시라 첫 타격이 창 착지 전이었다(2026-10-14).
+            //   꽂히는 때는 667 · 733 · 800 · 867(이벤트 1006122~1006125 + 맞음 1006131)
+            [MKey("비비", Motion.Attack2)] = new[] { 667, 733, 800, 867 },
+        };
+        // 한 번 휘두르는 몸짓 안의 연타 — 엔진이 1타여도 「타수만큼만 휘두르기」로 끊지 않고 원작 타수대로 보이기만 나눈다(엔진 피해 합 그대로)
+        static readonly HashSet<string> CARD_SPLIT = new HashSet<string> { MKey("디아나_왕년", Motion.Attack2) };
+
+        // 적 뒤로 순간이동하는 몸짓 — (사라지는 때, 돌아오는 때) ms(1배속 · 몸짓 시작에서). 몸이 안 보이는 사이에 맞는 적 뒤로 옮기고 돌려 세운 뒤, 돌아오는 때 제자리로.
+        //   티그(영웅) 저학년: 스파인에서 몸 슬롯이 0.35~0.92초 다 숨는다(돌진) → 0.93초 칼을 든 채 다시 보이고 1.9~2.0초 큰 베기 → 2.03초 제자리로 뛴다
+        static readonly Dictionary<string, Vector2> CARD_BEHIND = new Dictionary<string, Vector2>
+        {
+            [MKey("티그_영웅", Motion.Skill1)] = new Vector2(600, 2017),
         };
         static List<float> CardHitsFix(string hid, Motion m, List<float> marks)
         {
@@ -120,7 +144,16 @@ namespace Bolzena
         static readonly HashSet<string> CARD_LAG_KEEP = new HashSet<string> { "시온더다크불릿", "칸나", "에피카" };
         public static bool CardLagKeep(string hid) => CARD_LAG_KEEP.Contains(hid);
 
-        static string CardFxAnim(string hid, Motion m, string first) => CARD_FX_ANIM.TryGetValue(MKey(hid, m), out var a) ? a : first;
+        // 표에 없으면 트는 조각 이름 그대로 — 단 SD 에 강공 · 스킬 동작이 없어 평타 조각(Attack1_1)을 빌려 트는 사도는 이펙트 갈래만 몸짓대로(Attack2_1 · Skill1_1).
+        //   전에는 갈래도 평타로 골라 평타 = 강공 = 스킬 이펙트가 같았다(2026-10-13 에피카 · 에르핀(왕도) · 비비(신성) 캡처). 표(FxRules.CARD_NAMES)의 「사도|Attack2 · Skill1」 장이 이 이름으로 걸린다
+        static string CardFxAnim(string hid, Motion m, string first)
+        {
+            if (CARD_FX_ANIM.TryGetValue(MKey(hid, m), out var a)) return a;
+            if (first == null) return null;
+            if (m == Motion.Attack2 && !first.StartsWith("Attack2")) return "Attack2_1";
+            if (m == Motion.Skill1 && !first.StartsWith("Skill1")) return "Skill1_1";
+            return first;
+        }
 
         public static bool CardSelf(string hid, Motion m) => CARD_SELF.Contains(MKey(hid, m));
 
@@ -277,7 +310,54 @@ namespace Bolzena
             return melee;
         }
 
-        // 저학년 시작 섬광 — 원작은 저학년마다 0.0~0.3초에 시전자 몸에서 흰 · 푸른 구슬이 터지고(별빛 번쩍) 고리가 퍼진다(힐데 · 가비아 영상).
+        // 적 뒤로 순간이동(CARD_BEHIND) — 숨는 때에 맞는 적 뒤(오른쪽)로 옮겨 돌려 세우고, 돌아오는 때에 제자리 · 방향을 되돌린다. 시각은 줄인 몸짓의 시계(Rm) ÷ 배속
+        IEnumerator CardBehindCo(UnitView u, int seq, List<int> targets, Vector2 ms, float speed)
+        {
+            float t0 = Time.time;
+            float hide = Rm(ms.x / 1000f) / speed, back = Rm(ms.y / 1000f) / speed;
+            while (Time.time - t0 < hide) { if (Stale(u, seq)) yield break; yield return null; }
+            var live = targets.FindAll(i => i < Enemies.Count && Enemies[i] != null);
+            if (live.Count == 0 || !u) yield break;
+            var tp = live.Count == 1 ? Enemies[live[0]].Feet : Mid(live);
+            float reach = live.Count == 1 ? Enemies[live[0]].Width() * 0.35f + 1.25f : 2.4f;
+            var to = new Vector3(Mathf.Min(tp.x + reach, 7.2f), tp.y - 0.02f, 0);
+            BlinkPuff(u.Center);
+            yield return u.MoveTo(to, 0.01f);
+            bool flipped = u.SpineArt && u.Sa != null;
+            if (flipped) u.Sa.Skeleton.ScaleX = -u.Sa.Skeleton.ScaleX;   // 적 뒤에서 적 쪽(왼쪽)을 본다
+            BlinkPuff(u.Center);
+            while (Time.time - t0 < back && !Stale(u, seq)) yield return null;
+            if (!u) yield break;
+            BlinkPuff(u.Center);
+            if (flipped) u.Sa.Skeleton.ScaleX = -u.Sa.Skeleton.ScaleX;
+            yield return u.MoveTo(u.Home, 0.01f);
+            BlinkPuff(u.Center);
+        }
+
+        void BlinkPuff(Vector3 at) => Vfx.Glow(at, 1.8f, new Color(0.8f, 0.9f, 1f, 0.7f), 0.25f, 2f, null, 150, null, 1.2f);
+
+        // 카드 몸짓이 화면 위로 나가면(뛰어오르기 — 디아나(왕년) 강공 · 비비 강공 · 요미 저학년 …) 몸을 그만큼 내린다(많아야 1.0). 몸짓이 끝나기 전에 되돌린다
+        IEnumerator CardKeepY(UnitView u, int seq, float dur)
+        {
+            var cam = Camera.main;
+            if (u == null || u.Art == null || cam == null || !u.SpineArt) yield break;
+            float push = 0, t = 0;
+            while (t < dur * 0.9f && u && !Stale(u, seq))
+            {
+                float sy = Mathf.Max(0.001f, u.Art.parent.lossyScale.y);
+                float top = cam.transform.position.y + cam.orthographicSize - 0.12f;
+                float out0 = (u.MeshBounds.max.y + push * sy) - top;   // 내리지 않았다면 위끝이 화면 밖으로 나간 몫(월드)
+                push = Mathf.MoveTowards(push, Mathf.Clamp(out0 / sy, 0, 1.0f), Time.deltaTime * 10f);
+                u.Nudge = new Vector3(0, -push, 0);
+                yield return null; t += Time.deltaTime;
+            }
+            if (!u) yield break;
+            float from = push;
+            if (from > 0) yield return Clock.Tween(0.15f, k => { if (u) u.Nudge = new Vector3(0, -from * (1 - k), 0); });
+            if (u) u.Nudge = Vector3.zero;
+        }
+
+        // 저학년 시작 섬광 —원작은 저학년마다 0.0~0.3초에 시전자 몸에서 흰 · 푸른 구슬이 터지고(별빛 번쩍) 고리가 퍼진다(힐데 · 가비아 영상).
         //   원작 공용 장을 _fxraw · MuMu 추출본에서 못 찾아(이름 skill_start · cast · common 다 봤다) 볼제나 공용 낱장으로 짓는다
         void CardOrb(UnitView u)
         {
@@ -297,7 +377,8 @@ namespace Bolzena
                 var t = Enemies[ti];
                 t.Flash(new Color(1f, 0.97f, 0.9f), 0.08f, 0.22f);
                 t.Knock(1f, 0.12f, 0.2f);
-                if (HitSheets) Bolzena.Fx.BolzenaFx.Hit(t.Fx, FxHitKind(kind));
+                // 공용 노란 타격(hit_3_m · hit_slash_3)은 원작에 없다(2026-10-14) — 사도 고유 맞음 장이 있으면 몸 반응만, 없으면 약한 공용 한 장
+                if (HitSheets && ownHitFx != true) Bolzena.Fx.BolzenaFx.Play(SmallHitSheet(kind), new Bolzena.Fx.FxPlayOptions { At = t.Center, Scale = 0.5f, Until = 0.3f, Order = 182, Parent = FieldRoot });
             }
             FieldRig.Shake(0.15f, 0.5f);
         }

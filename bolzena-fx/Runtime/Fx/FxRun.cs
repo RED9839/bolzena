@@ -11,12 +11,16 @@ namespace Bolzena.Fx
         public float Scale = 1f;
         public bool Flip;                  // 왼쪽을 본다(대상이 왼쪽)
         public float Until = float.PositiveInfinity;   // 이 초까지 하고 FADE 동안 걷힌다
+        public float Cut = float.PositiveInfinity;     // 이 초에 바로 걷는다(흐리지 않고 — 구운 낱장의 뒷칸을 안 보일 때)
         public bool Center;                // 뿌리에서 멀리 짜인 이펙트를 At 에 가운데 맞춘다
         public float? Top;                 // 이펙트가 넘지 않을 위끝(월드 y)
+        public bool FitTop;                // 그린 입자 · 낱장이 Top 위로 나가면 그 판을 자리(At) 둘레로 줄이고(많아야 FIT_MIN 배), 그래도 넘으면 내린다(많아야 FIT_DOWN) — 카드 장(2026-10-13 아야 · 이드 · 요미 · 벨라 화면 위 잘림)
         public Func<Vector3?> Track;       // 매 프레임 그 자리에 붙는다(총구 본)
         public bool Bare;                  // 구운 판의 TUNE dx · dy 를 안 쓴다(본에 붙일 때)
         public Vector3? MoveTo;            // 투사체 — At 에서 MoveTo 로 MoveDur 동안 날아간다
         public float MoveDur = 0.35f;
+        public bool Aim;                   // 투사체 — 판을 At → MoveTo 쪽으로 돌린다(원작 판은 가로로 날아가게 짜였다. 많아야 AIM_MAX)
+        public Vector3? AimAt;             // 날지 않는 판을 이 자리 쪽으로 돌린다(Aim 과 같이 — 카드 총구 레이저가 무기 끝에서 허공으로 뻗던 것, 2026-10-13 리뉴아)
         public int Order = 300;            // 그리는 차례(sortingOrder)
         public string SortingLayer;
         public Transform Parent;
@@ -38,6 +42,33 @@ namespace Bolzena.Fx
         const float MAX_DT = 1f / 20f;
         const float EDGE_OFF = 0.5f;
         public static float EDGE = 0.05f, SHEET_EDGE = 0.22f;
+        // 그림마다 가장자리 폭(2026-10-13) — Tools/fx_edge.py 가 원본 그림의 칸 바깥 세기를 재 Resources/<Root>/fx_edge.txt 에 적는다.
+        //   열쇠 = 그림 · 시트 칸 수 · 더하기. 폭이 음수면 타원으로 걷는다(둥근 불빛이 네모로 잘린 그림). lum = 알파 없는 그림을 알파 섞기로 — 밝기를 알파로.
+        //   표에 없으면 EDGE 그대로
+        static Dictionary<string, Vector2> edgeTab;
+        static void EdgeOf(FxEmitter e, out float w, out bool lum)
+        {
+            if (edgeTab == null)
+            {
+                edgeTab = new Dictionary<string, Vector2>();
+                var ta = Resources.Load<TextAsset>(FxLibrary.Root + "/fx_edge");
+                if (ta != null)
+                    foreach (var line in ta.text.Split('\n'))
+                    {
+                        if (line.Length == 0 || line[0] == '#') continue;
+                        var c = line.TrimEnd('\r').Split('\t');
+                        if (c.Length < 6) continue;
+                        float.TryParse(c[4], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float ew);
+                        edgeTab[c[0] + "|" + c[1] + "|" + c[2] + "|" + c[3]] = new Vector2(ew, c[5] == "1" ? 1 : 0);
+                    }
+            }
+            w = EDGE; lum = false;
+            if (string.IsNullOrEmpty(e.TexPath)) return;
+            int tx = e.HasSheet ? Mathf.Max(1, e.Sheet.Tx) : 1, ty = e.HasSheet ? Mathf.Max(1, e.Sheet.Ty) : 1;
+            if (!edgeTab.TryGetValue(e.TexPath + "|" + tx + "|" + ty + "|" + (e.Add ? 1 : 0), out var v)) return;
+            if (v.x != 0) w = v.x;
+            lum = v.y != 0;
+        }
 
         public string Name;
         public bool IsDone { get; private set; }
@@ -52,6 +83,10 @@ namespace Bolzena.Fx
         FxSheet sheet;
         FxPlayOptions o;
         float t, k, flip, dx, dy, ys = 1, sx = 1, fade = 1, spread = 1;
+        float fitK = 1, fitDown;            // FitTop — 지금까지 줄인 배율 · 내린 몫(줄이기만 한다 — 한 번 줄면 그 판이 끝날 때까지)
+        const float FIT_MIN = 0.6f, FIT_DOWN = 1.2f;
+        float rc = 1, rs = 0;              // 투사체 돌림(cos · sin) — FxPlayOptions.Aim
+        const float AIM_MAX = 60f * Mathf.Deg2Rad;
         Vector3 origin, from, to;
         bool moving;
         Em[] ems;
@@ -78,6 +113,10 @@ namespace Bolzena.Fx
         {
             public FxEmitter E;
             public float T0, Acc;
+            public float Edge = EDGE;   // 가장자리 폭(EdgeOf — 음수 = 타원)
+            public bool Lum;            // 밝기를 알파로(알파 없는 그림 · 알파 섞기)
+            public bool FlipV;          // 판의 세로 축을 뒤집는다(FLIP_V_BY_ART)
+            public bool RotLocal;       // 늘인 판을 늘인 뒤에 돌린다(ROT_LOCAL_BY_ART)
             public Burst[] Bursts;
             public readonly List<P> Parts = new List<P>();
         }
@@ -137,6 +176,19 @@ namespace Bolzena.Fx
             r.flip = o.Flip ? -1 : 1;
             r.origin = o.At;
             if (o.MoveTo.HasValue) { r.moving = true; r.from = o.At; r.to = o.MoveTo.Value; }
+            r.rc = 1; r.rs = 0;
+            var aimTo = o.MoveTo ?? o.AimAt;
+            if (aimTo.HasValue && o.Aim)
+            {
+                // 판은 앞(뒤집으면 -x)으로 날게 짜였다 — 그 앞이 날아가는 쪽을 보게(뒤집힌 판은 부호째 돌린다)
+                var d = aimTo.Value - o.At;
+                if (d.sqrMagnitude > 1e-6f)
+                {
+                    float ang = Mathf.Clamp(Mathf.Atan2(d.y * r.flip, d.x * r.flip), -AIM_MAX, AIM_MAX);
+                    if (AIM_BASE.TryGetValue(name, out var ab)) ang -= r.flip * ab * Mathf.Deg2Rad;   // 비스듬히 짜인 판 — 짜인 각만큼 덜 돌린다
+                    r.rc = Mathf.Cos(ang); r.rs = Mathf.Sin(ang);
+                }
+            }
             if (sheet != null) r.InitSheet(); else r.InitFx();
             r.UpdateOrigin();
             r.Build();
@@ -153,6 +205,92 @@ namespace Bolzena.Fx
             foreach (var s in SHADER_ONLY_TEX) if (e.TexPath.IndexOf(s, StringComparison.OrdinalIgnoreCase) >= 0) return true;
             return false;
         }
+        // 사도별 — 셰이더 그래프([SG]) 이미터만 빼는 텍스처(2026-10-13 깨진 판). 극좌표로 휘어 호(弧)가 되는 쐐기 그림이라 그대로 그리면 세모 판이 된다:
+        //   네르(빡침) 평타 파란 세모 = FX_NerRage_Slssh_1(쐐기) · FX_UI_particle_02(마름모 잡음), 실비아 평타 주황 세모 = FX_Silvia_slash1~3(쐐기).
+        //   같은 텍스처를 쓰는 다른 사도(로니 등)는 손대지 않는다 — 그 사도 판정 뒤에
+        static readonly Dictionary<string, string[]> SG_ONLY_BY_ART = new Dictionary<string, string[]>
+        {
+            //   (2026-10-14) 네르(빡침) 평타 맞음 Custom_hit(FX_NerRage_Slssh_line_1 — 원작은 셰이더가 일부만 흘려 보이는 긴 선) — 통째로 그리면 바닥 아래까지 닿는 긴 흰 가시(평타 · 추가탄환 b)
+            ["nerrage"] = new[] { "FX_NerRage_Slssh_1.png", "FX_UI_particle_02", "FX_NerRage_Slssh_line_1.png" },
+            //   (2026-10-14) 클로에 스킬 오라 뒤판(FX_TEX_Tint_Aura_01 — 색이 거의 검정, 원작은 셰이더 틴트) — 시전자 몸 위 검은 연기(스킬 a)
+            ["chloe"] = new[] { "FX_TEX_Tint_Aura_01_lum" },
+            ["silvia"] = new[] { "FX_Silvia_slash", "FX_UI_particle_02" },
+            // 티그(영웅) 고학년 slash_1 의 [SG]_Slash_1~3(FX_TigHero_Slash_4) — 원작은 휜 푸른 초승달, 우리 판은 오른쪽 끝 곧은 모서리 판(2026-10-13 고학년 캡처 15~16칸 · 이 그림은 이 장만 쓴다)
+            ["tighero"] = new[] { "FX_TigHero_Slash_4" },
+        };
+        static bool SgOnly(FxEffect f, FxEmitter e) => e.N != null && e.N.IndexOf("[SG]", StringComparison.Ordinal) >= 0 && ByArt(SG_ONLY_BY_ART, f, e);
+        static bool ByArt(Dictionary<string, string[]> tab, FxEffect f, FxEmitter e)
+        {
+            if (f == null || e.TexPath == null || f.Hero == null || !tab.TryGetValue(f.Hero, out var l)) return false;
+            foreach (var s in l) if (e.TexPath.IndexOf(s, StringComparison.OrdinalIgnoreCase) >= 0) return true;
+            return false;
+        }
+        // 굴절(일그러뜨림) 재질 이미터(2026-10-13) — 원작은 화면을 grab 해 휘게만 하는 판(재질 FX_RimChaos_Distort)인데, 우리 판은 주 그림(디졸브 원)을 그대로 그려
+        //   티그(영웅) 스킬 · 고학년의 매끈한 검은 · 흰 타원이 됐다. 같은 그림을 쓰는 다른 사도(63장)는 굴절 재질이 아니라 사도별로. 고학년 장에도 건다
+        static readonly Dictionary<string, string[]> DISTORT_BY_ART = new Dictionary<string, string[]>
+        {
+            ["tighero"] = new[] { "FX_TEX_Dissolve_Circle_01_lum" },
+        };
+        static bool Distort(FxEffect f, FxEmitter e) => e.N != null && e.N.IndexOf("[SG]", StringComparison.Ordinal) >= 0 && ByArt(DISTORT_BY_ART, f, e);
+        // 카드 장에서 빼는 이미터(이름표와 상관없이 · 2026-10-13 엘다인 캡처 검토) — 사도별 그림:
+        //   란 평타 FX_Ran_Slash_5~7 — 원작은 휜 메시(그리는 법 4)에 얹는 세로 칼빛인데 판 한 장(55)으로 그려 바닥 아래까지 닿는 보라 세로판 · 아래 끝 네모
+        //   비비 강공 FX_Vivi_Stab_01 — 원작은 내리꽂는 셰이더 판, 우리 판은 머리 위 9.5 에 멈춘 단검 4개(화면 위 허공)
+        //   우로스 강공 FX_Uros_Mountain_1 — 금빛 용 끝(+34)의 산 그림, 셋째 적 옆 허공 흰 기둥 · FX_Renewa_Glow_1 — 마스크 셰이더(Custom/FX_TEX_Tint_Mask) 판이라 통째 빛기둥
+        static readonly Dictionary<string, string[]> CARD_DROP_BY_ART = new Dictionary<string, string[]>
+        {
+            ["ran"] = new[] { "FX_Ran_Slash_5", "FX_Ran_Slash_6", "FX_Ran_Slash_7" },
+            ["vivi"] = new[] { "FX_Vivi_Stab_01" },
+            ["uros"] = new[] { "FX_Uros_Mountain_1", "FX_Renewa_Glow_1" },
+            // 2026-10-14 캡처 검토
+            //   클로에 가시(Slash_seq_mesh — 휜 메시에 얹는 끝이 평평한 쐐기 그림 · FX_IN_Piller 기둥) — 뒤집어도 판 한 장으론 앞 잎사귀까지 내려오는 분홍 판(평타 · 강공 · 스킬 b)
+            ["chloe"] = new[] { "FX_Chloe_Slash_", "FX_Chloe_Attackslash_", "FX_IN_Piller.png" },
+            //   네르(빡침) 강공 box_glow · 스킬 back_glow(FX_IN_Gradient_Edge — 가로로 고른 세로 띠, asp 4 · 위로 pivot) — 화면 위끝까지 닿는 직사각 빛기둥(타원 걷기를 해도 몸통이 곧다)
+            ["nerrage"] = new[] { "FX_IN_Gradient_Edge" },
+            //   비비 강공 · 평타 LightSlash · Slash_Highlight(FX_Slash_Seq_07 — 세로 18 단위 칼빛) — 적 발밑 한참 아래 흰 조각
+            ["vivi"] = new[] { "FX_Vivi_Stab_01", "FX_Slash_Seq_07" },
+            //   에르핀(왕도) 스킬 시전 — 반쪽 빛(Half_Glow_Depth, 아래가 곧게 잘린 그림)이 시전자 밑 분홍 네모 · 램프 빛(Lamp_Light)이 수직 금빛 기둥
+            ["erpinroyale"] = new[] { "FX_ErpinRoyale_Half_Glow_Depth_1", "FX_IN_Lamp_Light" },
+        };
+        // 카드 장에서 빼는 이미터(이미터 이름 앞머리) — 같은 그림을 다른 칸 수로 나눠 쓰는 사도라 그림으로는 못 가른다(2026-10-14):
+        //   아야 강공 [Seq]_Wind_Up(FX_Aya_Tex_1 10×4 둘째 줄 — 오른변이 곧은 칼날 그림, 원작은 휜 메시) — 베기 오른쪽 변 수직 잘림. 눈 · 얼음 칸은 남긴다
+        static readonly Dictionary<string, string> CARD_DROP_BY_NAME = new Dictionary<string, string> { ["aya"] = "[Seq]_Wind_Up" };
+        // 카드 · 고학년 장 모두에서 빼는 이미터(2026-10-14 「란 임팩트 직각으로 잘림」) — 원작은 휜 메시(그리는 법 4)에 얹는 세로 띠 그림인데
+        //   우리는 판 한 장으로 그려 끝이 곧은 보라 네모 · 사다리꼴 판이 된다. 원작 번들에서 이 그림을 쓰는 이미터는 모두 메시(판으로 쓰는 곳 없음):
+        //   란 FX_Ran_Slash_8 · 9(5×2 세로 띠 — 고학년 cast_5 · slash_1 · slash_2, 스킬 slash_4) · FX_Ran_Slash_3(1×5 — 강공이 빌린 스킬 slash_3 · 스킬 hit_2).
+        //   고학년의 초승달(FX_Ran_Uslash_6~8 — 원작도 판)은 남는다
+        static readonly Dictionary<string, string[]> MESH_DROP_BY_ART = new Dictionary<string, string[]>
+        {
+            ["ran"] = new[] { "FX_Ran_Slash_3", "FX_Ran_Slash_8", "FX_Ran_Slash_9" },
+        };
+        // 어둡게 까는 판(2026-10-13) — 알파 섞기 · 색이 어두운(최대 채널 < 0.5) 둥근 빛 그림. 원작은 밝은 판 뒤를 살짝 눌러 주는 「Glow_bg · Back_Glow · _Black · Core_b」인데
+        //   우리 판은 밝은 몫이 빠지거나(입체 메시 · 셰이더 그래프) 블룸이 없어 검은 타원 · 원판만 남았다(티그(영웅) 스킬 · 이드 강공 구체 · 에르핀 · 클로에 · 디아나 · 우로스 …).
+        //   그림이 빛 · 고리 꼴일 때만(비비의 검은 물 · 칼빛처럼 일부러 어두운 그림은 둔다). 고학년 장에도 건다
+        static readonly System.Text.RegularExpressions.Regex DARK_TEX = new System.Text.RegularExpressions.Regex("(glow|grow|flash|ring|circle|flare)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        static bool DarkBack(FxEmitter e)
+        {
+            // 셰이더 그래프 판([SG] — 색 · 세기를 셰이더가 따로 민다)은 두고, 아틀라스 · 일반 판만
+            if (e.Add || e.TexPath == null || (e.N != null && e.N.IndexOf("[SG]", StringComparison.Ordinal) >= 0) || !DARK_TEX.IsMatch(System.IO.Path.GetFileName(e.TexPath))) return false;
+            float c = 0;
+            if (e.Col == null || e.Col.Length == 0) c = 1;
+            else foreach (var k in e.Col) c = Mathf.Max(c, Mathf.Max(k.r * e.Tint.r, Mathf.Max(k.g * e.Tint.g, k.b * e.Tint.b)));
+            float ol = 0;
+            if (e.ColOL == null || e.ColOL.Length == 0) ol = 1;
+            else foreach (var k in e.ColOL) ol = Mathf.Max(ol, Mathf.Max(k.y, Mathf.Max(k.z, k.w)));
+            return c * ol < 0.5f;
+        }
+        // 위아래가 뒤집혀 짜인 휜 메시 칼빛(판의 세로 축이 아래로). 사도별 · 이미터 이름 앞머리
+        //   (2026-10-14) 클로에 가시는 뒤집어도 끝이 평평한 판이 앞 잎사귀까지 내려와 카드 장에서 뺐다(CARD_DROP_BY_ART) — 지금은 비어 있다
+        static readonly Dictionary<string, string> FLIP_V_BY_ART = new Dictionary<string, string>();
+        // 날아가는 쪽이 비스듬히 짜인 판(도, 앞 = 0 · 위 = +) — Aim 으로 적 쪽으로 돌릴 때 이만큼 덜 돌린다(2026-10-14):
+        //   리뉴아 강공 레이저(lazer_1 — 끝 고리가 (12, 13.8), 47.5°)가 적이 아니라 오른쪽 위 하늘로 · 이드 강공 레이저(attack_2 — 공 앞 원판에서 바닥 빛(4, −1.7)으로, −22°)
+        static readonly Dictionary<string, float> AIM_BASE = new Dictionary<string, float> { ["fx_renewa_attack_lazer_1"] = 47.5f, ["fx_ed_attack_2"] = -22f };
+        // 입자 제 크기를 가로 · 세로 따로 준 판(원작 size3D — 우리 quad 에 구워짐)을 무작위로 돌리는 이미터(2026-10-14 「티그 영웅 타격 임팩트 이상함」) —
+        //   원작은 늘인 판을 입자마다 돌려 맞는 자리에 비스듬한 긴 별빛이 엇갈리는데, 우리는 돌린 뒤에 세로로 늘여 모두 곧은 세로 빛기둥(몸 위에서 발밑 아래까지)이 됐다.
+        //   티그(영웅) 강공 hit_3 · 스킬 hit_1 · 고학년 hit_1 의 [Atlas_add]_Star(FX_IN_Particle_Star_01, 1×3 · 1×3.33). 사도별 · 그림 이름
+        static readonly Dictionary<string, string[]> ROT_LOCAL_BY_ART = new Dictionary<string, string[]>
+        {
+            ["tighero"] = new[] { "FX_IN_Particle_Star_01" },
+        };
 
         void InitFx()
         {
@@ -183,9 +321,18 @@ namespace Bolzena.Fx
             {
                 var e = fx.Em[i];
                 if ((e.M3d && !only3d) || e.Tex == null) continue;
-                if (ShaderOnly(e) && fx.name.IndexOf("ultimate", StringComparison.Ordinal) < 0) continue;   // 카드 장만(고학년 장은 이펙트 담당 판단에 둔다)
+                bool ult = fx.name.IndexOf("ultimate", StringComparison.Ordinal) >= 0;
+                // 셰이더 그래프로만 뜻이 있는 그림 · 굴절 판 · 어둡게 까는 판은 고학년 장에서도 뺀다(2026-10-13 고학년 캡처: 네르(빡침) 파란 그라디언트 판 · 이드 공 안 회색 원판 · 티그 굴절 타원)
+                //   사도별 셰이더 그래프 쐐기(SG_ONLY_BY_ART — 네르(빡침) 고학년 파란 세모 · 네모 판도 같은 그림)도 고학년까지
+                if (ShaderOnly(e) || SgOnly(fx, e) || Distort(fx, e) || DarkBack(e)) continue;
+                if (!ult && ByArt(CARD_DROP_BY_ART, fx, e)) continue;   // 사도별 메시 · 셰이더 판(란 · 비비 · 우로스)은 카드 장만
+                if (!ult && fx.Hero != null && e.N != null && CARD_DROP_BY_NAME.TryGetValue(fx.Hero, out var dn) && e.N.StartsWith(dn, StringComparison.Ordinal)) continue;
+                if (ByArt(MESH_DROP_BY_ART, fx, e)) continue;   // 사도별 휜 메시 칼빛(란) — 카드 · 고학년 모두
                 if (o.Only != null && Array.IndexOf(o.Only, i) < 0) continue;
                 var em = new Em { E = e, T0 = Rand(e.Delay) };
+                em.FlipV = e.HasQuad && e.Quad.w < 0 && fx.Hero != null && e.N != null && FLIP_V_BY_ART.TryGetValue(fx.Hero, out var fv) && e.N.StartsWith(fv, StringComparison.Ordinal);
+                em.RotLocal = e.HasQuad && ByArt(ROT_LOCAL_BY_ART, fx, e);
+                EdgeOf(e, out em.Edge, out em.Lum);
                 int nb = e.Bursts == null ? 0 : e.Bursts.Length;
                 em.Bursts = new Burst[nb];
                 for (int b = 0; b < nb; b++)
@@ -266,7 +413,7 @@ namespace Bolzena.Fx
             float dt = Mathf.Min(MAX_DT, Mathf.Max(0, BolzenaFx.DeltaTime())) * BolzenaFx.Rate;
             fade = Mathf.Clamp01((o.Until - t) / FADE);
             bool busy = Step(dt);
-            if (!(busy && t < Duration + 1.5f && t < o.Until))
+            if (!(busy && t < Duration + 1.5f && t < o.Until && t < o.Cut))
             {
                 Finish();
                 return;
@@ -291,6 +438,7 @@ namespace Bolzena.Fx
         {
             IsDone = false;
             t = 0; k = 0; dx = dy = 0; ys = sx = fade = spread = 1;
+            fitK = 1; fitDown = 0;
             moving = false; ems = null; matCount = -1;
             mesh.Clear();
         }
@@ -467,6 +615,19 @@ namespace Bolzena.Fx
             return busy;
         }
 
+        // 솟고 멈추는 수명 속도(2026-10-14 사용자 「실비아는 은분수 계속 올라가는 거」) — 원작 수명 속도는 곡선(처음에만 솟음)인데 추출이 평균 하나(상수)만 남겨
+        //   수명 내내 올라갔다. 실비아 고학년 석상(FX_Silvia_Statue_1 — Pos y −6.43 · 속도 y 27.8 · 수명 2.88초)은 0.23초에 바닥(0)까지 솟고 그 자리에 선다
+        //   (원작 영상 0.6~0.7초 솟음 → 1.4초 물줄기 → 2.5초까지 제자리에서 사라짐). 그림 경로 낱말 → 속도를 끄는 나이(초)
+        static readonly (string tex, float sec)[] VEL_STOP = { ("FX_Silvia_Statue", 0.23f) };
+        static readonly Dictionary<FxEmitter, float> velStop = new Dictionary<FxEmitter, float>();
+        static float VelStop(FxEmitter e)
+        {
+            if (velStop.TryGetValue(e, out var s)) return s;
+            s = float.MaxValue;
+            if (e.TexPath != null) foreach (var v in VEL_STOP) if (e.TexPath.IndexOf(v.tex, StringComparison.OrdinalIgnoreCase) >= 0) { s = v.sec; break; }
+            return velStop[e] = s;
+        }
+
         static void Move(FxEmitter e, P p, float dt)
         {
             if (e.Grav != 0) p.Vy -= e.Grav * dt;
@@ -477,7 +638,7 @@ namespace Bolzena.Fx
             }
             if (e.Drag != 0) { float d = Mathf.Exp(-e.Drag * dt); p.Vx *= d; p.Vy *= d; }
             // 수명 속도는 매 프레임 더해지는 몫이라 쌓지 않는다. 속도 제한은 둘을 합친 것에 건다
-            var V = e.HasVel ? (e.VelW ? new Vector2(e.Vel.x, e.Vel.y) : Proj(e.HasMt ? e.Mt : e.M, e.Vel)) : Vector2.zero;
+            var V = e.HasVel && !(p.Age > VelStop(e)) ? (e.VelW ? new Vector2(e.Vel.x, e.Vel.y) : Proj(e.HasMt ? e.Mt : e.M, e.Vel)) : Vector2.zero;
             float vx = p.Vx + V.x, vy = p.Vy + V.y;
             if (e.HasLimit)
             {
@@ -505,6 +666,11 @@ namespace Bolzena.Fx
 
         int curSub = -1;
         Texture curTex;
+        float curEdge = EDGE;   // 지금 쌓는 이미터의 가장자리 폭(BuildFx 가 Em.Edge 로 바꿔 끼운다)
+        bool curFlipV;          // 지금 쌓는 이미터의 세로 뒤집기(Em.FlipV)
+        bool curRotLocal;       // 지금 쌓는 이미터 — 늘인 뒤에 돌리기(Em.RotLocal)
+        // 길쭉한 판(그린 가로 · 세로 비가 이만큼 넘는 것)은 타원으로 걷는다 — 칸 끝까지 찬 빛기둥 · 세로판의 끝이 직선으로 잘려 보이던 것(2026-10-13 네르(빡침) 흰 빛기둥 · 반달 얼룩)
+        const float LONG_QUAD = 3f, LONG_EDGE = 0.15f;
 
         void BeginBuild()
         {
@@ -525,7 +691,12 @@ namespace Bolzena.Fx
         }
 
         // 화면식(y 아래) 꼭짓점 → 월드
-        Vector3 W(float sxv, float syv) => origin + new Vector3(sxv * k, -syv * k, 0);
+        Vector3 W(float sxv, float syv)
+        {
+            float x = sxv * k, y = -syv * k;
+            if (rs == 0) return origin + new Vector3(x, y, 0);
+            return origin + new Vector3(x * rc - y * rs, x * rs + y * rc, 0);   // 투사체 돌림(Aim)
+        }
 
         void AddQuad(Vector3 a, Vector3 b, Vector3 c, Vector3 d, float u0, float v0, float u1, float v1, Color col, float add, bool edge, float lx0 = -1, float lx1 = -1)
         {
@@ -533,8 +704,8 @@ namespace Bolzena.Fx
             verts.Add(a); verts.Add(b); verts.Add(c); verts.Add(d);
             // 웹 그림은 윗줄이 v0 — 유니티 텍스처는 아래가 0 이라 뒤집는다
             uvs.Add(new Vector2(u0, 1 - v0)); uvs.Add(new Vector2(u1, 1 - v0)); uvs.Add(new Vector2(u1, 1 - v1)); uvs.Add(new Vector2(u0, 1 - v1));
-            // uv1 = (칸 안의 자리 x, y, 더하기, 걷어 낼 가장자리 폭)
-            if (edge) { uv1.Add(new Vector4(0, 0, add, EDGE)); uv1.Add(new Vector4(1, 0, add, EDGE)); uv1.Add(new Vector4(1, 1, add, EDGE)); uv1.Add(new Vector4(0, 1, add, EDGE)); }
+            // uv1 = (칸 안의 자리 x, y, 더하기(1) · 밝기를 알파로(-1), 걷어 낼 가장자리 폭(음수 = 타원))
+            if (edge) { uv1.Add(new Vector4(0, 0, add, curEdge)); uv1.Add(new Vector4(1, 0, add, curEdge)); uv1.Add(new Vector4(1, 1, add, curEdge)); uv1.Add(new Vector4(0, 1, add, curEdge)); }
             else if (lx0 >= 0)
             {
                 // 구운 칸 — 위아래(와 늘인 끝)를 넉넉히 걷는다. 칸 끝까지 찬 레이저 · 불빛이 네모로 잘려 보이지 않게
@@ -553,6 +724,7 @@ namespace Bolzena.Fx
             mesh.Clear();
             if (verts.Count == 0) { mr.enabled = false; return; }
             mr.enabled = true;
+            if (o.FitTop && o.Top.HasValue) FitVerts(o.Top.Value);
             mesh.SetVertices(verts);
             mesh.SetUVs(0, uvs);
             mesh.SetUVs(1, uv1);
@@ -567,6 +739,24 @@ namespace Bolzena.Fx
             if (changed || matCount != n) { mr.sharedMaterials = matArr; matCount = n; }
         }
 
+        // 화면 위끝 맞추기(FitTop) — 이번 프레임 꼭짓점의 위끝이 top 을 넘으면 자리(origin) 둘레로 줄이고(FIT_MIN 까지), 그래도 넘는 몫은 내린다(FIT_DOWN 까지).
+        //   배율 · 내림은 줄어들기만 해서(그 판이 끝날 때까지) 커졌다 작아졌다 하지 않는다
+        void FitVerts(float top)
+        {
+            float hi = float.MinValue;
+            for (int i = 0; i < verts.Count; i++) if (verts[i].y > hi) hi = verts[i].y;
+            float span = hi - origin.y, room = top - origin.y;
+            if (hi > top) fitK = Mathf.Min(fitK, span > 1e-3f && room > 0 ? Mathf.Max(FIT_MIN, room / span) : FIT_MIN);
+            float over = origin.y + span * fitK - top;
+            if (over > 0) fitDown = Mathf.Min(FIT_DOWN, Mathf.Max(fitDown, over));
+            if (fitK >= 0.999f && fitDown <= 0) return;
+            for (int i = 0; i < verts.Count; i++)
+            {
+                var v = verts[i];
+                verts[i] = new Vector3(origin.x + (v.x - origin.x) * fitK, origin.y + (v.y - origin.y) * fitK - fitDown, v.z);
+            }
+        }
+
         void BuildFx()
         {
             // 화면식 원점 이동(dx) — 웹판 runOrigin 의 sx
@@ -576,7 +766,10 @@ namespace Bolzena.Fx
                 if (em.Parts.Count == 0) continue;
                 var e = em.E;
                 UseTex(e.Tex);
-                float add = e.Add ? 1 : 0;
+                float add = e.Add ? 1 : em.Lum ? -1 : 0;
+                curEdge = em.Edge;
+                curFlipV = em.FlipV;
+                curRotLocal = em.RotLocal;
                 bool edge = true;
                 float f0 = fade;
                 if (e.M3d) fade *= 0.6f;
@@ -597,6 +790,7 @@ namespace Bolzena.Fx
                 var q = e.Quad;
                 float cr = Mathf.Cos(p.Rot), sr = Mathf.Sin(p.Rot);
                 float ax = q.x * cr + q.z * sr, ay = q.y * cr + q.w * sr, bx = -q.x * sr + q.z * cr, by = -q.y * sr + q.w * cr;
+                if (curRotLocal) { ax = cr * q.x - sr * q.y; ay = sr * q.x + cr * q.y; bx = cr * q.z - sr * q.w; by = sr * q.z + cr * q.w; }   // 늘인 판을 돌린다(ROT_LOCAL_BY_ART)
                 float sz = s / 2, sv = sz * e.Asp;
                 ux = fl * ax * sz; uy = -ay * sz; vx = -fl * bx * sv; vy = by * sv;
             }
@@ -622,6 +816,7 @@ namespace Bolzena.Fx
                 ux = c * w / 2; uy = sn * w / 2; vx = -sn * h / 2; vy = c * h / 2;
                 if (e.HasSc && e.Sc.x * fl < 0) { ux = -ux; uy = -uy; }
             }
+            if (curFlipV) { vx = -vx; vy = -vy; }
             // 시트 칸
             float u0 = 0, v0 = 0, u1 = 1, v1 = 1;
             if (e.HasSheet)
@@ -650,8 +845,11 @@ namespace Bolzena.Fx
             }
             float boost = e.Add ? BolzenaFx.AddBoost : BolzenaFx.AlphaBoost;
             var col4 = Lin(p.C.r * C.x * boost, p.C.g * C.y * boost, p.C.b * C.z * boost, alpha);
+            float lu = ux * ux + uy * uy, lv = vx * vx + vy * vy, ce = curEdge;
+            if (curEdge >= 0 && Mathf.Min(lu, lv) > 0 && Mathf.Max(lu, lv) > LONG_QUAD * LONG_QUAD * Mathf.Min(lu, lv)) curEdge = -Mathf.Max(curEdge, LONG_EDGE);
             AddQuad(W(cx - ux - vx, cy - uy - vy), W(cx + ux - vx, cy + uy - vy), W(cx + ux + vx, cy + uy + vy), W(cx - ux + vx, cy - uy + vy),
                     u0, v0, u1, v1, col4, add, edge);
+            curEdge = ce;
         }
 
         void BuildSheet()

@@ -212,6 +212,34 @@ namespace Bolzena.Fx
         };
         public static readonly Regex MUZZLE_RE = new Regex("(muzzle|barrel)", RegexOptions.IgnoreCase);
 
+        // 무기 끝 — 카드 몸짓의 투사체 · 총구 불꽃 · 쏘는 한 대(추가 공격 · 탄환 · 반격 …)가 나가는 자리(2026-10-13 엘다인 20명).
+        //   [사도 → 슬롯 이름 정규식] 그 슬롯들에 지금 보이는 그림의 꼭짓점 가운데 가장 앞(적 쪽) — 칼이 뒤집혀도 · 손이 바뀌어도 그 순간 앞에 있는 끝.
+        //   고른 근거: 스켈레톤 슬롯 이름(gun · weapon · sword · hand …) + 평타 · 센 공격 · 스킬의 때리는 순간(SpineMotion.StrikeOf 규칙)에 그 끝이 몸 앞에 오는지.
+        //   표에 없거나 보이는 그림이 없으면 null — 예전 사슬(총구 → 시전 본 → …) 그대로. 고학년은 이 표를 쓰지 않는다(영상 맞춤 그대로)
+        public static readonly Dictionary<string, string> WEAPON = new Dictionary<string, string>
+        {
+            { "시온더다크불릿", "^Gun_barrel" },                          // 총열 끝 — Point_Attack1 은 발밑 고정 점이었다
+            { "네르_빡침", "^Weapon$" },                                  // 지팡이(양 끝 중 앞)
+            { "디아나_왕년", "^(Weapon_Blade|Weapon_Top|Hand_[LR]$)" },   // 날 끝 · 센 공격(무기 없음)은 주먹
+            { "벨라", "^Hand_[LR]$" },                                    // 무기 없음 — 앞 손
+            { "비비", "^(Weapon|Weapon_Dagger\\d*)$" },                    // 단검들
+            { "비비_신성", "\\]Hand_" },                                  // 손가락 끝([SKY]Hand_L_5_Finger …)
+            { "이드", "^Hand_[LR]$" },                                    // 손 — Point_Attack1 은 몸 뒤로 움직이는 점이었다
+            { "에르핀_왕도", "^Hand_[LR]$" },                             // 주먹(FX_Punch 는 몸 앞 고정 점)
+            { "란", "^(Weapon_Blade|Weapon_Grip.*)$" },                   // 칼 · 칼자루
+            { "아야", "^(Sword|Weapon_)" },                               // 꽃 지팡이 · 센 공격의 칼
+            { "실비아", "(Fan_|^Hand_R$)" },                              // 부채
+            { "클로에", "teddy_arm" },                                    // 곰 인형 팔 — Point_Attack1 은 몸 뒤 바닥이었다
+            { "티그_영웅", "^Sword(_Ult_Blade)?$" },                      // 검
+            { "우로스", "^Sword_1$" },                                    // 칼
+            { "리뉴아", "^Hand_[LR]2?$" },                                // 손(레이저 · 투사체)
+            { "에피카", "^Weapon" },                                      // 악기
+            { "우이", "^Weapon_Leaf" },                                   // 지팡이 잎
+            { "우이_기억", "\\]Hand_[LR]" },                              // 손
+            { "요미", "^Weapon_(Body|Ring)" },                            // 무기 몸통
+            { "죠안", "^Hand_[LR]$" },                                    // 손가락 튕기는 손
+        };
+
         // 고학년 타격 시각 — SD 이벤트를 모르면 동작 시작에서 이만큼(ms)
         public const int ULT_HIT = 500;
 

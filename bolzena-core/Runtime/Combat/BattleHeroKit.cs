@@ -108,7 +108,7 @@ namespace Bolzena.Core
                 {
                     if (t.Dead || Over != null) continue;
                     int v = HitAmount(who, f.Ratio + Morale(), bas: f.Base);
-                    Hurt(t, v, new HurtOpts { From = who, Card = true });
+                    Hurt(t, v, new HurtOpts { From = who, Card = true, Shot = "summon" });
                     if (!t.Dead && Over == null) ToughHit(t, R.ToughExtra(IsWeakHit(who, t, null), (f.Target ?? "randomEnemy") == "allEnemies"));   // 소환물 공격 강인도(카제나 표 — 약점 0.5칸)
                 }
             Say($"「{kw.Id}」 {hits}대 — 따라 친다"); StatusCue(who, $"{kw.Id} ×{hits}", true);
