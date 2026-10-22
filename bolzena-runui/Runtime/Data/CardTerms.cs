@@ -364,6 +364,9 @@ namespace Bolzena.RunUI
         // ── 카드 아이콘(글 속) ── ic_deck 한 장짜리 TMP 스프라이트 애셋을 런타임에 만든다. 셰이더가 없으면 글리프 「▣」로 대신
         static TMP_SpriteAsset icons;
         static bool iconsTried;
+        static readonly System.Collections.Generic.List<string> iconNames = new System.Collections.Generic.List<string>();
+        /// <summary>글 속 아이콘 이름이 있나(재화 cur_<열쇠> — 그림이 없거나 셰이더가 없으면 false, 글은 이름만).</summary>
+        public static bool HasIcon(string name) { var _ = Icons; return iconNames.Contains(name); }
         public static TMP_SpriteAsset Icons
         {
             get
@@ -389,6 +392,27 @@ namespace Bolzena.RunUI
                     var ch = new TMP_SpriteCharacter(0xE000, sa, glyph) { name = "card", scale = 0.92f };
                     sa.spriteCharacterTable.Add(ch);
                     sa.UpdateLookupTables();
+                    // 재화 그림(2026-10-21 — RunArt/Currency/<열쇠>, ProgStore.ICON_KEYS) — 그림마다 한 장짜리 애셋을 만들어 대체 애셋으로 단다(<sprite name="cur_열쇠">)
+                    foreach (var key in ProgStore.ICON_KEYS)
+                    {
+                        var ct = Resources.Load<Texture2D>("RunArt/Currency/" + key);
+                        if (ct == null) continue;
+                        var ca = ScriptableObject.CreateInstance<TMP_SpriteAsset>();
+                        ca.name = "RunUI currency " + key;
+                        typeof(TMP_SpriteAsset).GetField("m_Version", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(ca, "1.1.0");
+                        ca.spriteSheet = ct;
+                        var cm = new Material(sh) { name = "RunUI currency " + key };
+                        cm.SetTexture(ShaderUtilities.ID_MainTex, ct);
+                        ca.material = cm;
+                        float cw = ct.width, chh = ct.height;
+                        var cg = new TMP_SpriteGlyph(0, new GlyphMetrics(cw, chh, 0, chh * 0.82f, cw * 1.04f), new GlyphRect(0, 0, (int)cw, (int)chh), 1f, 0);
+                        ca.spriteGlyphTable.Add(cg);
+                        ca.spriteCharacterTable.Add(new TMP_SpriteCharacter(0xE100u + (uint)iconNames.Count, ca, cg) { name = "cur_" + key, scale = 1.25f });
+                        ca.UpdateLookupTables();
+                        sa.fallbackSpriteAssets ??= new System.Collections.Generic.List<TMP_SpriteAsset>();
+                        sa.fallbackSpriteAssets.Add(ca);
+                        iconNames.Add("cur_" + key);
+                    }
                     icons = sa;
                 }
                 catch (Exception e) { Debug.LogWarning("[RunUI] 카드 아이콘 스프라이트 실패 — 글리프로 대신: " + e.Message); icons = null; }

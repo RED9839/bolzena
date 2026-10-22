@@ -80,7 +80,7 @@ namespace Bolzena.UI
             var t = Make.Text("t", root, "패배…", new Vector3(0, 0.12f, 0), 0.95f, O + 3, Color.white);
             t.colorGradient = new VertexGradient(new Color(0.95f, 0.92f, 0.95f), new Color(0.95f, 0.92f, 0.95f), new Color(1f, 0.45f, 0.45f), new Color(1f, 0.45f, 0.45f));
             Make.Outline(t, 0.15f, new Color(0.12f, 0, 0.02f));
-            var sub = Make.Text("sub", root, "파티가 쓰러졌습니다", new Vector3(0, -0.5f, 0), 0.22f, O + 3, new Color(0.8f, 0.82f, 0.92f));
+            var sub = Make.Text("sub", root, "파티가 쓰러졌다", new Vector3(0, -0.5f, 0), 0.22f, O + 3, new Color(0.8f, 0.82f, 0.92f));
             sub.characterSpacing = 12;
             t.alpha = 0; sub.alpha = 0;
             yield return Clock.Tween(0.5f, k =>
@@ -92,6 +92,30 @@ namespace Bolzena.UI
             }, true);
             OnStage?.Invoke("defeat");
             yield return Clock.WaitU(0.6f);
+        }
+
+        // 프론티어 시간 종료 — 금 실선의 남색 띠 · 「시간 종료」 · 점수(보스가 잃은 HP). 남아 있는다(결과 화면으로 넘어갈 때까지)
+        public static IEnumerator TimeUp(Transform parent, int score)
+        {
+            var root = Make.Node("TimeUp", parent, new Vector3(0, 1.0f, 0));
+            var dim = Make.Box("dim", root, Res.UI("white"), new Vector3(0, -1.0f, 0), new Vector2(44, 16), O - 1, new Color(0.02f, 0.02f, 0.05f, 0));
+            var bandRoot = Make.Node("b", root);
+            var b = Band(bandRoot, 1.5f, new Color(0.95f, 0.81f, 0.48f), O);
+            var t = Make.Text("t", root, "시간 종료", new Vector3(0, 0.16f, 0), 0.9f, O + 3, Color.white);
+            t.colorGradient = new VertexGradient(Color.white, Color.white, new Color(0.95f, 0.81f, 0.48f), new Color(0.95f, 0.81f, 0.48f));
+            Make.Outline(t, 0.15f, new Color(0.12f, 0.06f, 0f));
+            var sub = Make.Text("sub", root, $"보스가 잃은 HP  {score:N0}", new Vector3(0, -0.48f, 0), 0.26f, O + 3, new Color(0.95f, 0.9f, 0.75f));
+            sub.characterSpacing = 8;
+            t.alpha = 0; sub.alpha = 0;
+            yield return Clock.Tween(0.5f, k =>
+            {
+                Make.Alpha(dim, 0.45f * k);
+                BandAlpha(b, k, Ease.OutCubic(k));
+                t.alpha = k; sub.alpha = k;
+                t.characterSpacing = Mathf.Lerp(60, 14, Ease.OutCubic(k));
+            }, true);
+            OnStage?.Invoke("timeup");
+            yield return Clock.WaitU(0.8f);
         }
 
         // 보스 등장 — 위아래 경고 띠가 흐르고, 비스듬한 띠 안으로 보스가 크게(검은 실루엣 → 드러남), 이름이 찍힌다
@@ -219,7 +243,7 @@ namespace Bolzena.UI
             Make.Own(rays.gameObject, raysMat);
             var bandRoot = Make.Node("b", root, new Vector3(0, 1.4f, 0));
             var band = Band(bandRoot, 1.7f, new Color(0.95f, 0.83f, 0.55f), O + 1);
-            var sub = Make.Text("sub", root, "적을 모두 물리쳤습니다", new Vector3(0, 0.82f, 0), 0.24f, O + 3, new Color(0.95f, 0.88f, 0.7f));
+            var sub = Make.Text("sub", root, "적을 모두 물리쳤다", new Vector3(0, 0.82f, 0), 0.24f, O + 3, new Color(0.95f, 0.88f, 0.7f));
             sub.characterSpacing = 30;
             sub.alpha = 0;
             var t = Make.Text("t", root, "승리!", new Vector3(0, 1.58f, 0), 1.05f, O + 3, Color.white);

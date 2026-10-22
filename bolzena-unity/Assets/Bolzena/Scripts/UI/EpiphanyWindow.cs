@@ -44,10 +44,10 @@ namespace Bolzena.UI
             var rays = Make.Quad("rays", root, new Vector3(0, 0.2f, 0), new Vector2(18, 18), raysMat, O + 1);
             Make.Own(rays.gameObject, raysMat);
             rays.gameObject.SetActive(false);   // 단순한 창(2026-10-08 시안) — 빛살 없음
-            var title = Make.Text("title", root, "<color=#ffd76a>신탁 효과</color>를 결정하세요.", new Vector3(0, 3.45f, 0), 0.5f, O + 40, Color.white);
+            var title = Make.Text("title", root, "<color=#ffd76a>신탁 효과</color> 고르기", new Vector3(0, 3.45f, 0), 0.5f, O + 40, Color.white);
             Make.Outline(title, 0.22f, Color.black);
             // 아래 안내(회색 작은 글) — 길게 누르면 카드 상세. 폰엔 오른쪽 단추가 없어 「(우클릭)」을 뺀다
-            var sub = Make.Text("sub", root, "카드를 누르면 자세히 보고, 한 번 더 누르면 결정합니다.", new Vector3(0, -4.05f, 0), 0.2f, O + 40, new Color(0.82f, 0.84f, 0.9f));
+            var sub = Make.Text("sub", root, "한 번 누르면 자세히 · 한 번 더 누르면 결정", new Vector3(0, -4.05f, 0), 0.2f, O + 40, new Color(0.82f, 0.84f, 0.9f));
             Make.Outline(sub, 0.3f, Color.black);
             // 제목 아래 가는 금빛 줄 + 가운데 별 하나
             var subBg = Make.Box("titleline", root, Res.UI("band_line"), new Vector3(0, 3.0f, 0), new Vector2(5.2f, 0.03f), O + 40, new Color(1f, 0.84f, 0.45f, 0));

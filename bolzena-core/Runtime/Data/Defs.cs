@@ -138,6 +138,9 @@ namespace Bolzena.Core
         public int KnownHits;
         /// <summary>(아야) ifFoe known · knownHits — foeTurn 이면 같은 적에게 그 적 차례마다(내 턴마다) 한 번만 덤.</summary>
         public string Once;
+        /// <summary>(2026-10-19 타수 합치기) dmg — plusIf(조건 조각 하나)가 서면 친 대마다 피해 비율 +plus(대 수는 그대로 — 「피해 100%(「본성」이면 140%)」).</summary>
+        public double Plus;
+        public Fx PlusIf;
 
         [Newtonsoft.Json.JsonIgnore] public int NOr1 => N <= 0 ? 1 : N;
 
@@ -540,6 +543,8 @@ namespace Bolzena.Core
         public bool Guard;
         /// <summary>적에게 거는 표식 — 걸린 적을 치는 아군 카드는 약점 공격이 된다(친 카드 한 장에 1 준다).</summary>
         public bool Weakens;
+        /// <summary>(아야 리워크 10-20) 적에게 거는 표식 — 걸린 적을 **키워드 주인**이 칠 때만 약점 공격(동료는 아님). 겹을 저절로 쓰지 않는다(spend 로 쓴다).</summary>
+        public bool WeakOwner;
         /// <summary>guard(소환물)가 한 대를 다 막지 않고 이만큼만 깎는다(0.2 = -20%).</summary>
         public double Cut;
         /// <summary>(시범 16) guard(소환물) 하나가 사라지기 전에 받는 대 수(기본 1) — 모모 분신은 셋을 맞아야 깨진다.</summary>
@@ -757,6 +762,8 @@ namespace Bolzena.Core
         public List<string> Weak;
         /// <summary>강인도 칸 — 0 이면 보통 · 엘리트 · 보스 기본(R.TOUGH).</summary>
         public double Tough;
+        /// <summary>강인도 고정 규칙(R.TOUGH_FIXED — 보스 7 · 엘리트 5 · 일반 3)을 따르지 않고 데이터 tough 를 그대로 쓴다 — 프론티어 시즌 보스(2026-10-19 사용자 「M.E.O.W 강인도 10」).</summary>
+        public bool ToughOwn;
         public bool Boss;
         /// <summary>cycle(적힌 순서) · shuffle(무작위, 같은 종류 세 번 잇지 않는다 — w 무게).</summary>
         public string Pick = "cycle";
@@ -925,6 +932,8 @@ namespace Bolzena.Core
         public string Race;
         public string Line;
         public List<FloorDef> Floors = new();
+        /// <summary>마을 고르기 창의 대표 장비 2개(2026-10-21). 없으면 그 마을 묶음 전설 가운데 id 차례 앞 2개(GameData.VillageShowcase).</summary>
+        public List<string> ShowEquips;
     }
 
     public sealed class FloorDef
@@ -1072,5 +1081,7 @@ namespace Bolzena.Core
         public Stats AffinityStats;
         public List<PassiveRule> AffinityEffect = new();
         public string Blurb;
+        /// <summary>나오는 마을(2026-10-21 카제나식 마을 장비 — bolzena-unity/Docs/마을_장비_설계.md) — 마을 id 면 그 마을 판에서만, null · 「공용」 이면 모든 마을. 콘텐츠에 없으면 지금처럼 모든 판.</summary>
+        public string Pool;
     }
 }

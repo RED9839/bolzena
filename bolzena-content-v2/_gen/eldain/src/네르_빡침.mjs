@@ -21,12 +21,12 @@ export default hero({
   },
   passives: [   // 고유 능력 둘 — 신앙 모으기 · 가득 차면 성전
     { name: '여왕님을 위해서라면', when: { on: 'play', who: 'other', type: '공격' }, fx: [stack(Q, 1)] },   // 동료 공격 카드마다 신앙 1
-    { name: '성전 선포!', when: { on: 'stackReach', id: Q, n: 5 }, fx: [spend(Q, 5), ...enterF] },   // 10-13 저녁 사용자: 신앙 5 가득이면 저절로 성전(「성전 선포」 카드는 4로 일찍)
+    { name: '성전 선포!', when: { on: 'stackReach', id: Q, n: 5 }, fx: [spend(Q, 5), ...enterF] },   // 10-19: 저절로는 신앙 5 그대로(4 로 내리면 모험 완주율이 +7%p — 카드 「성전 선포」 만 4 → 3)   // 10-13 저녁 사용자: 신앙 5 가득이면 저절로 성전(「성전 선포」 카드는 4로 일찍)
   ],
   forms: [{
     id: F, name: '성전', desc: '본인은 성전, 남들은 빡침이라 부르는 폭주', stance: true, anim: 'Idle_Change', turns: 3,
     passives: [
-      { name: '심판의 벼락', when: { on: 'play', who: 'other', type: '공격' }, fx: [dmg(0.5, 'randomEnemy', { hitFx: [status('취약', 1)] })] },   // 추격 — 동료 공격 카드마다 무작위 적 50% · 맞은 적 취약 1(10-13 저녁 사용자)
+      { name: '심판의 벼락', when: { on: 'play', who: 'other', type: '공격' }, fx: [dmg(1, 'randomEnemy', { hitFx: [status('취약', 1)] })] },   // 10-19 밸런스: 50 → 100%   // 추격 — 동료 공격 카드마다 무작위 적 50% · 맞은 적 취약 1(10-13 저녁 사용자)
       { name: '새로이 쌓아갈 추억', when: { on: 'break', who: 'any' }, fx: [extend] },   // 격파마다 +1턴(최대 5)
     ],
     offExpire: [{ k: 'spend', id: Q, all: true }],
@@ -43,7 +43,7 @@ export default hero({
         { fx: [dmg(1.4), stack(Q, 3), ...SF(dmg(1))] },
         { fx: [dmg(1.4, 'allEnemies'), stack(Q, 2), ...SF(dmg(0.6, 'allEnemies'))] },
         { fx: [dmg(1.8), status('약화', 1), stack(Q, 2)] },
-        { fx: [dmg(1.8), stack(Q, 2), { k: 'ifBreak' }, { k: 'ap', v: 1 }] },
+        { fx: [dmg(2.1), stack(Q, 2), { k: 'ifBreak' }, { k: 'ap', v: 1 }] },   // 10-19 밸런스: 180 → 210%
       ],
       blesses: ['power', 'cost', [stack(Q, 1)]],
     },
@@ -73,13 +73,13 @@ export default hero({
     },
     { // 마무리 — 신앙 4로 성전
       name: '성전 선포', cost: 1, type: '공격',
-      fx: [dmg(1.6, 'allEnemies'), ...declare(4)],   // 10-13 저녁: 신앙은 동료 공격으로 차서 이 카드의 신앙 +1 은 뺌(글 45자 — 성전 취약이 붙음)
+      fx: [dmg(1.6, 'allEnemies'), ...declare(3)],   // 10-19 밸런스: 신앙 4 → 3   // 10-13 저녁: 신앙은 동료 공격으로 차서 이 카드의 신앙 +1 은 뺌(글 45자 — 성전 취약이 붙음)
       oracles: [
-        { type: '스킬', fx: [...declare(4), empower(0.6, { who: 'any' })] },
-        { fx: [dmg(2.2, 'allEnemies'), ...declare(4)] },
-        { fx: [dmg(1.4, 'allEnemies'), vuln(2), ...declare(4)] },
-        { fx: [dmg(1.4, 'allEnemies'), ...declare(3)] },
-        { fx: [dmg(3), ...declare(4)] },
+        { type: '스킬', fx: [...declare(3), empower(0.6, { who: 'any' })] },
+        { fx: [dmg(2.2, 'allEnemies'), ...declare(3)] },
+        { fx: [dmg(1.4, 'allEnemies'), vuln(2), ...declare(3)] },
+        { fx: [dmg(1.4, 'allEnemies'), ...declare(2)] },
+        { fx: [dmg(3), ...declare(3)] },
       ],
       blesses: ['power', 'draw', [stack(Q, 1)]],
     },

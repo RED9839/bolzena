@@ -235,7 +235,8 @@ namespace Bolzena.Core
             var hero = owner != null && HeroUnit(owner) is Unit h && !h.Dead ? h : AliveParty().OrderByDescending(AtkNow).FirstOrDefault();
             var foes = AliveEnemies().ToList();
             double ratio = CardOf(id)?.Def?.BulletRatio is double br && br > 0 ? br : R.SV("탄환");   // 카드마다 배율(2026-10-13 시온)
-            ExtraHit(hero, foes.Count > 0 ? foes[Rng.Int(foes.Count)] : null, ratio, null, "탄환!");
+            if (HpSrc != null) HpCtx = "@탄환:" + CardOf(id)?.Name;   // 측정 전용
+            ExtraHit(hero, foes.Count > 0 ? foes[Rng.Int(foes.Count)] : null, ratio, null, "탄환!"); HpCtx = null;
             if (Over == null) TallyAdd("bullet", new EmitInfo { Id = id, By = hero?.Key });   // 키워드 tally bullet — 탄환으로 쏠 때마다(시온 「탄창」)
         }
 

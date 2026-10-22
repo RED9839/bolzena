@@ -118,7 +118,7 @@ namespace Bolzena.UI
             var rows = new List<(StatusChip c, string who)>();
             foreach (var c in s.PartyChips) rows.Add((c, null));
             foreach (var h in s.Heroes) foreach (var c in h.Chips) if (c.Kind != "key") rows.Add((c, h.Key));
-            Column(R, l + 0.2f, mid - 0.3f, y0, k, "적용 중인 효과", "적용 중인 효과가 없습니다.", rows.Count, (i, x, w, y) => EffectRow(R, rows[i].c, rows[i].who, x, w, y, k));
+            Column(R, l + 0.2f, mid - 0.3f, y0, k, "적용 중인 효과", "적용 중인 효과가 없다", rows.Count, (i, x, w, y) => EffectRow(R, rows[i].c, rows[i].who, x, w, y, k));
             // 오른쪽 — 적용 중인 패시브(고유 효과 · 패시브 · 장비)
             var pas = new List<(string head, string text, string who, bool gold)>();
             foreach (var h in s.Heroes)
@@ -127,7 +127,7 @@ namespace Bolzena.UI
                 foreach (var p in h.Passives) pas.Add((null, p, h.Key, false));
                 foreach (var g in h.Gear) if (g.Id != null && !string.IsNullOrEmpty(g.Text)) pas.Add((g.Name, g.Text, h.Key, false));
             }
-            Column(R, mid + 0.3f, r - 0.1f, y0, k, "적용 중인 패시브", "적용 중인 패시브가 없습니다.", pas.Count, (i, x, w, y) => PassiveRow(R, pas[i].head, pas[i].text, pas[i].who, x, w, y, k));
+            Column(R, mid + 0.3f, r - 0.1f, y0, k, "적용 중인 패시브", "적용 중인 패시브가 없다", pas.Count, (i, x, w, y) => PassiveRow(R, pas[i].head, pas[i].text, pas[i].who, x, w, y, k));
         }
 
         delegate float RowFn(int i, float x, float w, float y);

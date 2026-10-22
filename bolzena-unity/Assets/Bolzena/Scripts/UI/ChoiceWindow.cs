@@ -17,10 +17,11 @@ namespace Bolzena.UI
         const int O = 1400;
 
         public static IEnumerator Run(Transform parent, CardInfo info, Action<int> picked, int demoPick = -1) =>
-            Run(parent, info, info.Choices, "갈래를 고르세요", picked, demoPick);
+            Run(parent, info, info.Choices, "갈래 고르기", picked, demoPick);
 
-        /// <summary>labels 의 칸 가운데 하나를 고른다 — picked(1 ~ labels.Count), 무르면 0. info 가 null 이면 카드 없이 칸만.</summary>
-        public static IEnumerator Run(Transform parent, CardInfo info, IReadOnlyList<string> labels, string title, Action<int> picked, int demoPick = -1)
+        /// <summary>labels 의 칸 가운데 하나를 고른다 — picked(1 ~ labels.Count), 무르면 0. info 가 null 이면 카드 없이 칸만.
+        /// icons 를 주면 칸 왼쪽에 그 그림(단계 고르기 — 요미 달 단계마다, 2026-10-14 사용자). null 인 칸은 글만.</summary>
+        public static IEnumerator Run(Transform parent, CardInfo info, IReadOnlyList<string> labels, string title, Action<int> picked, int demoPick = -1, IReadOnlyList<Sprite> icons = null)
         {
             var root = Make.Node("ChoiceWindow", parent);
             var dim = Make.Box("dim", root, Res.UI("white"), Vector3.zero, new Vector2(60, 30), O, new Color(0.01f, 0.015f, 0.04f, 0.95f));
@@ -32,7 +33,7 @@ namespace Bolzena.UI
             if (info != null)
             {
                 var cv = CardView.Create(root, info);
-                cv.ShowDesc = true; cv.ShowPin = true;
+                cv.ShowDesc = true; cv.ShowPin = false;   // 오른쪽 위 주인 얼굴 없이 — 다른 창(확대 · 신탁 · 버리기)과 같게(2026-10-14 사용자)
                 cv.TargetPos = new Vector3(0, 1.0f, 0); cv.TargetScale = s; cv.Snap();
                 cv.SetOrder(O + 10);
                 top = 1.0f + CardView.H * s / 2 + 0.3f * k;
@@ -49,7 +50,15 @@ namespace Bolzena.UI
                 var at = new Vector3((i - (n - 1) / 2f) * (bw + gap), by, 0);
                 var bg = Make.Sliced("b" + i, root, Res.UI("cell_9s"), at, new Vector2(bw, bh), O + 20);
                 var hl = Make.Sliced("bh" + i, root, Res.UI("cell_on_9s"), at, new Vector2(bw, bh), O + 20, new Color(1, 1, 1, 0));
-                Tone.Text("n", root, $"<color={Tone.SubTag}><size=70%>{i + 1}</size></color>  {labels[i]}", at + new Vector3(0, -0.01f, 0), Tone.Lg * k, O + 22, Tone.Ink);
+                var ic = icons != null && i < icons.Count ? icons[i] : null;
+                float shift = 0;
+                if (ic != null)
+                {   // 아이콘은 칸 왼쪽, 글은 그만큼 오른쪽으로
+                    float isz = bh * 0.72f;
+                    Make.Box("ic" + i, root, ic, at + new Vector3(-bw / 2 + bh * 0.55f, 0, 0), new Vector2(isz, isz), O + 22);
+                    shift = bh * 0.4f;
+                }
+                Tone.Text("n", root, $"<color={Tone.SubTag}><size=70%>{i + 1}</size></color>  {labels[i]}", at + new Vector3(shift, -0.01f, 0), Tone.Lg * k, O + 22, Tone.Ink);
                 var b = bg.gameObject.AddComponent<Button>();
                 b.Size = new Vector2(bw, bh);
                 b.Highlight = hl;

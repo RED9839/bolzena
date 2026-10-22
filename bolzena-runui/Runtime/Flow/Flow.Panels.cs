@@ -21,7 +21,7 @@ namespace Bolzena.RunUI
             float w = Mathf.Min(Theme.C(1180, 1240), size.x - 48);
             float h = Mathf.Min(Theme.C(820, 700), size.y - 24);
             float footH = Theme.C(84, 80);
-            var (body, close, bar) = Stage.ModalBox("settings", w, h, "설정", "바꾼 값은 바로 저장됩니다", true, null, footH);
+            var (body, close, bar) = Stage.ModalBox("settings", w, h, "설정", "바꾼 값은 바로 저장된다", true, null, footH);
 
             // 탭 줄 · 아래 스크롤 칸
             var tabs = Ui.Rect("tabs", body).Band(1, 56, 0, 0, 0);
@@ -49,7 +49,7 @@ namespace Bolzena.RunUI
 
             // 아래 띠 — 왼쪽 안내 · 오른쪽 단추(로비로 · 닫기)
             Ui.Row(bar, Theme.Gap, TextAnchor.MiddleRight, new RectOffset(10, 10, 14, 14), false, true);
-            var hint = Ui.Text(bar, (Theme.Compact ? "바깥을 누르면 닫힙니다" : "Esc 키나 바깥을 누르면 닫힙니다") + " · 버전 " + PatchNotes.Version, Theme.FsSm, Theme.Dim, TextAlignmentOptions.MidlineLeft);
+            var hint = Ui.Text(bar, (Theme.Compact ? "바깥을 누르면 닫힌다" : "Esc 키나 바깥을 누르면 닫힌다") + " · 버전 " + PatchNotes.Version, Theme.FsSm, Theme.Dim, TextAlignmentOptions.MidlineLeft);
             hint.textWrappingMode = TextWrappingModes.NoWrap; hint.overflowMode = TextOverflowModes.Ellipsis;
             hint.Pref(0, -1, 1);
             if (inRun)
@@ -59,7 +59,7 @@ namespace Bolzena.RunUI
                 Stage.Hot["settings.lobby"] = lobby;
             }
             if (!inRun)
-            {   // 크레파스 · 교주 보드 진행 코드 — 창 하나에서 보이기 · 복사 · 붙여 넣어 불러오기(Flow.Crayon.cs ProgressCodePanel — 웹은 브라우저 클립보드)
+            {   // 진행 코드(편성 프리셋 · 완주 기록) — 창 하나에서 보이기 · 복사 · 붙여 넣어 불러오기(Flow.ProgressCode.cs — 웹은 브라우저 클립보드)
                 var pc = Btn.Make(bar, "진행 코드", BtnStyle.PillDark, ProgressCodePanel, Theme.FsMd);
                 pc.Pref(Theme.C(200, 190)); Stage.Hot["settings.code"] = pc;
             }
@@ -89,26 +89,26 @@ namespace Bolzena.RunUI
         // ── 탭 속 ──
         void SoundTab(RectTransform c)
         {
-            SetSlider(c, "전체 소리", TestMute.On ? "시험 실행이라 지금은 소리가 꺼져 있습니다" : "모든 소리의 크기입니다", Settings.Master, v => Settings.Master = v, "set.master");
-            SetSlider(c, "효과음", "카드 · 타격 · 단추 소리의 크기입니다", Settings.SfxVol, v => Settings.SfxVol = v, "set.sfx");
-            SetSlider(c, "목소리", "사도 목소리의 크기입니다", Settings.Voice, v => Settings.Voice = v, "set.voice");
+            SetSlider(c, "전체 소리", TestMute.On ? "시험 실행이라 소리가 꺼져 있다" : "모든 소리의 크기", Settings.Master, v => Settings.Master = v, "set.master");
+            SetSlider(c, "효과음", "카드 · 타격 · 단추 소리의 크기", Settings.SfxVol, v => Settings.SfxVol = v, "set.sfx");
+            SetSlider(c, "목소리", "사도 목소리의 크기", Settings.Voice, v => Settings.Voice = v, "set.voice");
         }
 
         void BattleTab(RectTransform c)
         {
-            SetToggle(c, "움직임 줄이기", "화면 전환과 등장 연출을 짧게 합니다", Settings.ReduceMotion, v => Settings.ReduceMotion = v, "set.calm");
-            SetToggle(c, "화면 흔들림 끄기", "타격과 고학년 때 화면이 흔들리지 않습니다", Settings.NoShake, v => Settings.NoShake = v, "set.shake");
-            SetToggle(c, "컷인 건너뛰기", "고학년 컷인 없이 바로 씁니다", Settings.SkipCutin, v => Settings.SkipCutin = v, "set.cutin");
-            SetToggle(c, "고학년 짧게 보기", "끄면 모험에서 처음 쓸 때만 길게 봅니다", Settings.UltShort, v => Settings.UltShort = v, "set.ultshort");
-            SetToggle(c, "사도 말풍선", "전투 중 내 차례에 한참 가만히 있으면 사도가 한마디씩 합니다", Settings.HeroTalk, v => Settings.HeroTalk = v, "set.herotalk");
+            SetToggle(c, "움직임 줄이기", "화면 전환과 등장 연출을 짧게 한다", Settings.ReduceMotion, v => Settings.ReduceMotion = v, "set.calm");
+            SetToggle(c, "화면 흔들림 끄기", "타격과 고학년 때 화면이 흔들리지 않는다", Settings.NoShake, v => Settings.NoShake = v, "set.shake");
+            SetToggle(c, "컷인 건너뛰기", "고학년 컷인 없이 바로 쓴다", Settings.SkipCutin, v => Settings.SkipCutin = v, "set.cutin");
+            SetToggle(c, "고학년 짧게 보기", "끄면 모험에서 처음 쓸 때만 길게 본다", Settings.UltShort, v => Settings.UltShort = v, "set.ultshort");
+            SetToggle(c, "사도 말풍선", "전투 중 내 차례에 한참 가만히 있으면 사도가 한마디씩 한다", Settings.HeroTalk, v => Settings.HeroTalk = v, "set.herotalk");
         }
 
         // 화면 모드 한 줄 풀이 — 설명 칸에 한 줄로 들어가게 줄였다(DisplayOptions.ModeHint 는 전투 창이 쓴다)
         static string ModeLine(int i) => i switch
         {
-            0 => "고른 해상도 크기의 창으로 띄웁니다",
-            1 => "모니터를 채우고 그리는 크기만 바꿉니다 · 알트탭이 빠릅니다",
-            _ => "모니터 해상도를 바꿔 차지합니다 · 알트탭이 느립니다",
+            0 => "고른 해상도 크기의 창으로 띄운다",
+            1 => "모니터를 채우고 그리는 크기만 바꾼다 · 알트탭이 빠르다",
+            _ => "모니터 해상도를 바꿔 차지한다 · 알트탭이 느리다",
         };
 
         // 창 모드 · 해상도는 바꾸면 바로 시험 적용(Try)하고 「10초 안에 확인」 창을 띄운다 — 확인이 없으면 앞 화면으로.
@@ -121,13 +121,13 @@ namespace Bolzena.RunUI
             TextMeshProUGUI modeDesc = null, resDesc = null, fullDesc = null, fpsDesc = null;
             int curMode = DisplayOptions.ModeIndex, curPreset = DisplayOptions.PresetIndex;
             string ResLine() => "지금 " + DisplayOptions.Describe();
-            string FullLine() => $"지금 {Screen.width}×{Screen.height} · 전체 화면은 Esc 로 나옵니다";
+            string FullLine() => $"지금 {Screen.width}×{Screen.height} · 전체 화면은 Esc 로 나온다";
             bool low = DisplayOptions.LowSpec;
-            const string LowWhy = "저사양 모드를 끄면 고를 수 있습니다";
-            string FpsLine() => low ? $"저사양 모드라 {DisplayOptions.LowSpecFps} 으로 그립니다"
-                              : DisplayOptions.VSync ? "수직동기가 켜져 있어 쉽니다 · 끄면 고를 수 있습니다" : "초당 그리는 횟수입니다 · 낮추면 전기와 열이 줄어듭니다";
-            string QualLine() => low ? $"저사양 모드라 {Mathf.RoundToInt(DisplayOptions.QualityScale * 100)}% 로 그립니다"
-                               : "전투 화면을 그리는 크기입니다 · 낮추면 가볍고 조금 흐려집니다";
+            const string LowWhy = "저사양 모드를 끄면 고를 수 있다";
+            string FpsLine() => low ? $"저사양 모드라 {DisplayOptions.LowSpecFps} 으로 그린다"
+                              : DisplayOptions.VSync ? "수직동기가 켜져 있어 쉰다 · 끄면 고를 수 있다" : "초당 그리는 횟수 · 낮추면 전기와 열이 줄어든다";
+            string QualLine() => low ? $"저사양 모드라 {Mathf.RoundToInt(DisplayOptions.QualityScale * 100)}% 로 그린다"
+                               : "전투 화면을 그리는 크기 · 낮추면 가볍고 조금 흐려진다";
             var quals = new Btn[0];
             TextMeshProUGUI qualDesc = null;
 
@@ -138,7 +138,7 @@ namespace Bolzena.RunUI
                 var mc = SetRow(c, "화면 모드", ModeLine(curMode), Theme.C(520, 520), 50, out modeDesc, out _);
                 modes = SetSegments(mc, DisplayOptions.Modes.Select(m => m.Name).ToArray(), k => Pick(k, -1), "disp.mode");
                 for (int i = 0; i < modes.Length; i++)
-                    if (!DisplayOptions.ModeAvailable(i)) { modes[i].Interactable = false; modes[i].Why = "이 기기에서는 쓸 수 없습니다"; }
+                    if (!DisplayOptions.ModeAvailable(i)) { modes[i].Interactable = false; modes[i].Why = "이 기기에서는 쓸 수 없다"; }
 
                 var mon = DisplayOptions.Monitor;
                 var rc = SetRow(c, "해상도", ResLine(), Theme.C(520, 520), 50, out resDesc, out _);
@@ -148,12 +148,12 @@ namespace Bolzena.RunUI
                     var s = DisplayOptions.SizeOf(i);
                     if (DisplayOptions.Fits(i)) continue;
                     presets[i].Interactable = false;
-                    presets[i].Why = $"{s.x}×{s.y} — 이 모니터({mon.x}×{mon.y})보다 큽니다";
+                    presets[i].Why = $"{s.x}×{s.y} — 이 모니터({mon.x}×{mon.y})보다 크다";
                     var lk = Ui.Img(presets[i].transform, Theme.S("ic_lock"), Theme.Sub, "lock"); lk.rectTransform.At(1, 1, -6, -5, 14, 14); lk.preserveAspect = true;
                 }
             }
             // 저사양 모드 — 켜면 아래 세부 항목(화질 · 프레임 · 수직동기 · 화면 효과)을 한 번에 정하고 잠근다(저장된 값은 그대로 — 끄면 돌아온다)
-            SetToggle(c, "저사양 모드", "화면 효과 끔 · 화질 75% · 프레임 30 · 이펙트 줄임을 한 번에 겁니다 · 폰 · 약한 PC 용", low,
+            SetToggle(c, "저사양 모드", "화면 효과 끔 · 화질 75% · 프레임 30 · 이펙트 줄임을 한 번에 건다 · 폰 · 약한 PC 용", low,
                 v => { DisplayOptions.SetLowSpec(v); StartCoroutine(Rebuild()); }, "disp.low");
             if (!desk)
             {
@@ -165,11 +165,11 @@ namespace Bolzena.RunUI
             var fc = SetRow(c, "프레임 제한", FpsLine(), Theme.C(500, 500), 50, out fpsDesc, out _);
             fps = SetSegments(fc, Enumerable.Range(0, DisplayOptions.FrameCaps.Count).Select(DisplayOptions.FrameCapName).ToArray(),
                 k => { DisplayOptions.SetFrameCap(k); Paint(); }, "disp.fps");
-            SetToggle(c, "수직동기", low ? "저사양 모드라 쉽니다" : "모니터 주사율에 맞춰 찢김 없이 그립니다", DisplayOptions.VSync && !low, v => { DisplayOptions.SetVSync(v); Paint(); }, "disp.vsync");
-            SetToggle(c, "화면 효과", low ? "저사양 모드라 꺼 둡니다" : "전투의 빛 번짐 · 타격 색 효과를 그립니다 · 끄면 폰 · 저사양 PC 에서 가벼워집니다", DisplayOptions.PostFxOn, v => DisplayOptions.SetPostFx(v), "disp.post");
+            SetToggle(c, "수직동기", low ? "저사양 모드라 쉰다" : "모니터 주사율에 맞춰 찢김 없이 그린다", DisplayOptions.VSync && !low, v => { DisplayOptions.SetVSync(v); Paint(); }, "disp.vsync");
+            SetToggle(c, "화면 효과", low ? "저사양 모드라 꺼 둔다" : "전투의 빛 번짐 · 타격 색 효과를 그린다 · 끄면 폰 · 저사양 PC 에서 가벼워진다", DisplayOptions.PostFxOn, v => DisplayOptions.SetPostFx(v), "disp.post");
             if (low) foreach (var hk in new[] { "disp.vsync", "disp.post" }) Lock(hk);
-            SetToggle(c, "글자 크게", "판 화면 글자를 키웁니다 · 다음 화면부터 바뀝니다", Settings.BigText, v => Settings.BigText = v, "set.big");
-            SetToggle(c, "플레이 기록 보내기(익명)", "판이 끝나면 편성 · 카드 · 전투 결과를 익명으로 보내 밸런스에 씁니다 · 개인 정보는 없습니다", PlayRecord.On, v => PlayRecord.On = v, "set.rec");
+            SetToggle(c, "글자 크게", "모험 화면 글자를 키운다 · 다음 화면부터 바뀐다", Settings.BigText, v => Settings.BigText = v, "set.big");
+            SetToggle(c, "플레이 기록 보내기(익명)", "모험이 끝나면 편성 · 카드 · 전투 결과를 익명으로 보내 밸런스에 쓴다 · 개인 정보는 없다", PlayRecord.On, v => PlayRecord.On = v, "set.rec");
 
             void Paint()
             {
@@ -180,7 +180,7 @@ namespace Bolzena.RunUI
                 {
                     SegOn(fps[i], !vs && i == DisplayOptions.FpsIndexOn);
                     fps[i].Interactable = !vs && !low;
-                    fps[i].Why = low ? LowWhy : vs ? "수직동기를 끄면 고를 수 있습니다" : null;
+                    fps[i].Why = low ? LowWhy : vs ? "수직동기를 끄면 고를 수 있다" : null;
                 }
                 for (int i = 0; i < quals.Length; i++)
                 {
@@ -201,7 +201,7 @@ namespace Bolzena.RunUI
                 int p = preset >= 0 ? preset : curPreset >= 0 ? curPreset : (m == 0 ? (DisplayOptions.Fits(2) ? 2 : 1) : 0);
                 if (m == curMode && p == curPreset) return;
                 int pm = curMode, pp = curPreset;
-                if (!DisplayOptions.Try(m, p)) { Toast.Show("이 화면으로는 바꿀 수 없습니다"); return; }
+                if (!DisplayOptions.Try(m, p)) { Toast.Show("이 화면으로는 바꿀 수 없다"); return; }
                 curMode = m; curPreset = p;
                 Paint();
                 KeepScreen(kept =>
@@ -362,7 +362,7 @@ namespace Bolzena.RunUI
         void KeepScreen(Action<bool> done)
         {
             var (panel, close) = Stage.Modal("keepscreen", 640, 300, false);
-            var t = Ui.Title(panel, "이 화면으로 두겠습니까?", Theme.FsXl, Theme.Gold, TextAlignmentOptions.Center);
+            var t = Ui.Title(panel, "이 화면으로 둘까?", Theme.FsXl, Theme.Gold, TextAlignmentOptions.Center);
             t.rectTransform.Band(1, 46, 30, 30, -30);
             var b = Ui.Text(panel, "", Theme.FsBody, Theme.Sub, TextAlignmentOptions.Center);
             b.rectTransform.Band(1, 76, 40, 40, -82);
@@ -376,7 +376,7 @@ namespace Bolzena.RunUI
                 if (keep) DisplayOptions.Keep(); else DisplayOptions.Revert();
                 close();
                 done?.Invoke(keep);
-                if (!keep) Toast.Show("앞 화면으로 돌아갔습니다");
+                if (!keep) Toast.Show("앞 화면으로 돌아갔다");
             }
             var no = Btn.Make(row, "되돌리기", BtnStyle.PillDark, () => End(false), Theme.FsMd);
             var ok = Btn.Make(row, "이대로", BtnStyle.PillGold, () => End(true), Theme.FsMd);
@@ -388,7 +388,7 @@ namespace Bolzena.RunUI
                 float left = 10f;
                 while (!over && left > 0)
                 {
-                    if (b) b.text = $"{DisplayOptions.Describe()}\n<color={Theme.GoldTag}><size=130%>{Mathf.CeilToInt(left)}</size></color>초 안에 누르지 않으면 앞 화면으로 돌아갑니다";
+                    if (b) b.text = $"{DisplayOptions.Describe()}\n<color={Theme.GoldTag}><size=130%>{Mathf.CeilToInt(left)}</size></color>초 안에 누르지 않으면 앞 화면으로 돌아간다";
                     left -= Time.unscaledDeltaTime;
                     yield return null;
                 }

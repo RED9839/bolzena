@@ -65,6 +65,7 @@ namespace Bolzena.Demo
             PointerInput.SimPos = new Vector2(0, -6);
             d.DemoEpiphanyPick = 0;
             d.DemoSpendPick = 0;   // 소모량 · 버리기 고르기 창 — 사람 손을 기다리다 데모가 멈췄다(2026-10-09 「Card 0 → -1」 160초)
+            if (d.DemoBranchPick < 0) d.DemoBranchPick = 1;   // 갈래 · 단계 고르기 창도 같다 — 요미 「달님께 비는 기도」 에서 「Card 2 → -1」 361초 멈춤(2026-10-14)
             d.Moment += OnMoment;
             UltCutin.OnStage += s => { lastMoment = s; Shot(s, 0); };
             EpiphanyWindow.OnStage += s =>
@@ -124,10 +125,21 @@ namespace Bolzena.Demo
                 case "battle_end": Shot("battle_end", 10); break;
                 case "boss_banner_start": cap.BeginSeq("boss_entry"); break;
                 case "boss_in": cap.EndSeq(); break;
+                case "clone_fx_atk": case "clone_fx_ult":   // 클론이 빌린 사도 이펙트 — 처음 한 번씩 몸짓을 프레임으로(2026-10-14)
+                    if (cloneSeq.Add(m)) StartCoroutine(SeqFor(m == "clone_fx_ult" ? "clone_ult" : "clone_atk", m == "clone_fx_ult" ? 5f : 2.5f));
+                    break;
                 default:
                     if (m.StartsWith("ult_impact_")) { Shot(m, 2); Shot(m + "_after", 9); }
                     break;
             }
+        }
+
+        readonly HashSet<string> cloneSeq = new HashSet<string>();
+        IEnumerator SeqFor(string name, float sec)
+        {
+            cap.BeginSeq(name, 3);
+            yield return new WaitForSecondsRealtime(sec);
+            cap.EndSeq();
         }
 
         // 같은 이름은 처음 한 번만. frames 프레임 뒤에 찍는다(파편이 퍼진 뒤를 보게)
@@ -455,6 +467,24 @@ namespace Bolzena.Demo
                 while (got < 0) yield return null;
                 Debug.Log("[Demo] 두 갈래 고름 " + got);
                 if (real != null) { Debug.Log("[Demo] -choicecard 끝"); Application.Quit(0); yield break; }
+            }
+            // -stagetest: 단계 고르기 창(요미 「달님께 비는 기도」 — 단계 칸 아이콘 · 얼굴 핀 없음 확인, 2026-10-14)
+            if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-stagetest") >= 0 && d.Battle is CoreBattle scb)
+            {
+                var si = scb.InfoOf(Arg("-stagecard") ?? "요미_u2");
+                var names = new List<string> { "초승", "반달", "보름", "그믐" };
+                var icons = new List<Sprite>(); for (int k = 1; k <= 4; k++) icons.Add(Bolzena.View.ChipRow.StageIcon("달바라기 꽃", k));
+                int got = -1;
+                StartCoroutine(UI.ChoiceWindow.Run(d.UiRoot, si, names, "단계 고르기", v => got = v, 2, icons));
+                yield return Wait(0.6f);
+                Shot("stage_window", 0);
+                while (got < 0) yield return null;
+                got = -1;
+                StartCoroutine(UI.ChoiceWindow.Run(d.UiRoot, null, names, "「지극정성의 마중」 — 단계 고르기", v => got = v, 3, icons));
+                yield return Wait(0.6f);
+                Shot("stage_window_ult", 0);
+                while (got < 0) yield return null;
+                Debug.Log("[Demo] -stagetest 끝"); Application.Quit(0); yield break;
             }
             // 고학년 원 툴팁 · 적 이름 줄(올림)
             if (d.Hud.Ults.Count > 0)

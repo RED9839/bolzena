@@ -16,10 +16,6 @@ namespace Bolzena.RunUI
     {
         /// <summary>전투 장면 위에 보상을 띄울 때(배경 없이) 사도 머리의 화면 좌표 — 전투 쪽(BattleDirector)이 꽂는다. 사도 키 → 화면 픽셀(없으면 null).</summary>
         public static Func<string, Vector2?> BattleHeadOnScreen;
-        /// <summary>전투 화면 학년 공책 툴팁을 고정(true) · 풀기(false) — 전투 쪽 PartyHud 가 꽂는다(시범 캡처 -demo-grade).</summary>
-        public static Action<bool> BattleGradeTip;
-        /// <summary>전투 끝 학년 스티커 「착」 연출을 시작한 시각(Time.unscaledTime, 없으면 -1) — 전투 쪽 PartyHud 가 적는다(시범 캡처).</summary>
-        public static float BattleGradeSlapAt = -1;
 
         /// <summary>파티에서 한 명 — 무작위(빼고 싶은 사도 avoid).</summary>
         HeroInfo SayPick(string avoid = null)

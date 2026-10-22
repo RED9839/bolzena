@@ -13,7 +13,7 @@ namespace Bolzena.RunUI
         {
             float w = Theme.C(290, 250), h = Theme.C(46, 40);
             var b = Btn.Make(root, null, BtnStyle.PillDark, PatchNotesPanel, 0, "version");
-            b.GetComponent<RectTransform>().At(1, 1, -Theme.Gutter - 8, -Theme.C(22, 14), w, h);
+            b.GetComponent<RectTransform>().At(1, 1, -Theme.Gutter - 8 - LobbyCogW, -Theme.C(22, 14), w, h);   // 맨 오른쪽은 설정 톱니(Flow.Lobby.cs)
             var t = Ui.Title(b.transform, $"업데이트 내용  <size=78%><color={Theme.DimTag}>{PatchNotes.Version}</color></size>", Theme.C(Theme.FsMd, Theme.FsSm), Theme.Ink, TextAlignmentOptions.Center);
             t.rectTransform.Fill(16, 2, 16, 2);
             t.textWrappingMode = TextWrappingModes.NoWrap; t.overflowMode = TextOverflowModes.Overflow;
@@ -39,13 +39,13 @@ namespace Bolzena.RunUI
             float w = Mathf.Min(Theme.C(1040, 1100), size.x - 48);
             float h = Mathf.Min(Theme.C(800, 700), size.y - 24);
             float footH = Theme.C(84, 72);
-            var (body, close, bar) = Stage.ModalBox("patchnotes", w, h, "업데이트 내용", $"지금 버전 {PatchNotes.Version} · 지난 소식은 아래로", true, null, footH);
+            var (body, close, bar) = Stage.ModalBox("patchnotes", w, h, "업데이트 내용", $"지금 버전 {PatchNotes.Version} · 지난 소식은 아래", true, null, footH);
 
             var content = Ui.Scroll(body, out _);
             Ui.Col(content, 4, TextAnchor.UpperLeft, new RectOffset(12, 18, 4, 16), true, false);
             var notes = PatchNotes.All;
             if (notes.Count == 0)
-                Ui.Text(content, "아직 적힌 소식이 없습니다", Theme.FsBody, Theme.Dim);
+                Ui.Text(content, "적힌 소식이 없다", Theme.FsBody, Theme.Dim);
             for (int i = 0; i < notes.Count; i++)
             {
                 var e = notes[i];
@@ -90,7 +90,7 @@ namespace Bolzena.RunUI
             }
 
             Ui.Row(bar, Theme.Gap, TextAnchor.MiddleRight, new RectOffset(10, 10, 14, 14), false, true);
-            var hint = Ui.Text(bar, "로비 오른쪽 위 단추로 다시 볼 수 있습니다", Theme.FsSm, Theme.Dim, TextAlignmentOptions.MidlineLeft);
+            var hint = Ui.Text(bar, "로비 오른쪽 위 단추로 다시 볼 수 있다", Theme.FsSm, Theme.Dim, TextAlignmentOptions.MidlineLeft);
             hint.textWrappingMode = TextWrappingModes.NoWrap; hint.overflowMode = TextOverflowModes.Ellipsis;
             hint.Pref(0, -1, 1);
             var ok = Btn.Make(bar, "확인", BtnStyle.PillGold, close, Theme.FsMd);

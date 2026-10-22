@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 namespace Bolzena.RunUI
 {
     // 팀 편성 편의 캡처(-demo-partykit, 늘 -save partykit 처럼 따로 둔 저장으로) — 끌어서 자리 바꾸기 전 · 중 · 후 / 프리셋 창 / 시작 덱 목록 · 카드 상세 /
-    //   보드 요약 줄(누르면 보드) · 완주 기록(칸 · 사도 목록) · 편성 목소리 호출 로그. 실제 OS 마우스는 쓰지 않는다(EventSystem 끌기 이벤트를 직접 보낸다).
+    //   완주 기록(칸 · 사도 목록) · 편성 목소리 호출 로그. 실제 OS 마우스는 쓰지 않는다(EventSystem 끌기 이벤트를 직접 보낸다).
     public partial class Demo
     {
         static Vector2 ScreenCenter(RectTransform r) { var c = new Vector3[4]; r.GetWorldCorners(c); return (c[0] + c[2]) * 0.5f; }
@@ -38,14 +38,7 @@ namespace Bolzena.RunUI
         {
             var voice = new List<string>();
             HeroVoice.OnPlayed = s => voice.Add(s);
-            PartyStore.ResetAll(); CrayonStore.Reset();
-            // 보드 — 몇 칸 칠해 둔다(능력치 · 시작 골드 · 학점)
-            CrayonStore.Give(60, 12, 4, 2);
-            foreach (var (kind, n) in new[] { ("atk", 3), ("hp", 2), ("def", 1), ("crit", 2), ("gold", 1), ("credits", 1) })
-            {
-                var cell = CrayonStore.Table.Cells.FirstOrDefault(c => c.Kind == kind);
-                for (int k = 0; cell != null && k < n; k++) CrayonStore.Paint(cell.Id);
-            }
+            PartyStore.ResetAll();
             var playable = Roster.All.Where(h => h.Playable).Select(h => h.key).ToList();
             var three = playable.Take(3).ToList();
             PartyStore.SetCleared(three[0], 3); PartyStore.SetCleared(three[1], 12); PartyStore.SetCleared(three[2], 5); PartyStore.SetCleared(playable[3], 1);
@@ -106,7 +99,7 @@ namespace Bolzena.RunUI
             yield return Press("deck.card0", 1.0f);
             yield return Shot("pk_deck_card");
             CloseModals(); yield return Wait(0.5f); CloseModals(); yield return Wait(0.5f);
-            yield return Shot("pk_board_row");
+            yield return Shot("pk_tools_row");
             // 모험 시작 → 최근 편성 기억
             yield return Press("party.go", 0.5f);
             yield return Screen_("map", 1.0f);
@@ -119,12 +112,11 @@ namespace Bolzena.RunUI
             f.End("clear");
             yield return Wait(0.5f);
             Expect(PartyStore.Cleared(after[0]) == c0 + 1, "같은 판은 두 번 세지 않음");
-            // 보드 요약 줄 → 보드 화면
+            // 편성 화면에 교주 보드 띠가 없다(2026-10-21 없앰)
             f.Party(f.P.S.Village);
             yield return Screen_("party", 1.2f);
-            yield return Press("party.board", 1.0f);
-            Expect(f.Stage.Current == "crayon", "보드 요약 줄을 누르면 보드 화면 (지금 " + f.Stage.Current + ")");
-            PartyStore.ResetAll(); CrayonStore.Reset();
+            Expect(Hot("party.board") == null, "편성 화면 — 교주 보드 띠 없음");
+            PartyStore.ResetAll();
             Debug.Log($"[Demo] 편성 편의 캡처 끝 · 실패 {fails}");
             yield return Wait(0.4f);
             Application.Quit(fails == 0 ? 0 : 6);

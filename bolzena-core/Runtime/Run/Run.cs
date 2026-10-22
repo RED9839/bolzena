@@ -47,8 +47,8 @@ namespace Bolzena.Core
         public string AssignNeutral(string heroKey)
         {
             var id = PendingNeutral;
-            if (id == null) return "주인을 고를 교주 카드가 없습니다";
-            if (heroKey == null || !S.Party.Contains(heroKey)) return "파티에 없는 사도입니다";
+            if (id == null) return "주인을 고를 교주 카드가 없다";
+            if (heroKey == null || !S.Party.Contains(heroKey)) return "파티에 없는 사도다";
             S.NeutralWait.RemoveAt(0);
             S.Deck.Add(GameData.WithOwner(id, heroKey));
             return null;
@@ -281,10 +281,26 @@ namespace Bolzena.Core
 
         string FightKind => S.EventFight != null ? "event" : IsBoss ? "boss" : S.Elite ? "elite" : "fight";
 
+        /// <summary>지금 싸움의 적 체력 · 피해 배율 — 층 배율(R.FoeScale) × 난이도 단계(Tiers.Scale, 단계 0 이면 곱하지 않는다).</summary>
         public (double hp, double dmg) FoeScaleOf()
         {
-            if (BossAsElite) return R.FoeScale(S.Floor, elite: true);
-            return R.FoeScale(S.Floor, boss: IsBoss && S.EventFight == null, elite: S.EventFight != null ? S.EventFight.Elite : S.Elite);
+            var sc = BossAsElite ? R.FoeScale(S.Floor, elite: true)
+                : R.FoeScale(S.Floor, boss: IsBoss && S.EventFight == null, elite: S.EventFight != null ? S.EventFight.Elite : S.Elite);
+            if (S.Tier <= 0) return sc;   // 단계 없음 — 지금 판과 같은 값 그대로
+            var tx = Tiers.Scale(S.Tier);
+            return (sc.hp * tx.hp, sc.dmg * tx.dmg);
+        }
+
+        /// <summary>
+        /// 난이도 단계를 정한다(1 ~ Tiers.MAX, 0 = 단계 없음) — 판을 열 때, 첫 싸움 전에만. 여는 조건(앞 단계 완주 — Tiers.Open)은 계정 기록이라 서버 · 화면이 본다.
+        /// 못 바꾸면 까닭, 바꿨으면 null.
+        /// </summary>
+        public string SetTier(int tier)
+        {
+            if (tier < 0 || tier > Tiers.MAX) return $"난이도 단계는 0 ~ {Tiers.MAX}";
+            if (S.Hist.Count > 0) return "싸움을 시작한 판은 단계를 바꿀 수 없다";
+            S.Tier = tier;
+            return null;
         }
 
         // ── 싸움 ───────────────────────────────────────────────────────
@@ -295,20 +311,20 @@ namespace Bolzena.Core
         public (Battle battle, RewardState loot) OpenFight(double hpx = 1, double dmgx = 1, List<Cue> cues = null, Action<Cue> onCue = null)
         {
             var next = S.NextFight; S.NextFight = null;
-            next = GradeNext(next);   // 진급 보상 — 예습 노트 · 전술 교본(RunGrade.cs)
             var glow = S.ForceGlow ?? RollEpiphany();
             var sc = FoeScaleOf();
             var setup = new BattleSetup
             {
                 Party = S.Party.ToList(), Deck = S.Deck.ToList(), Enemies = CurrentEnemies().ToList(),
                 PartyHp = S.PartyHp, PartyMaxHp = S.PartyMaxHp, Gear = GearStats(), GearRules = GearRules(), Flash = S.Flash,
-                EnemyHp = sc.hp * hpx, EnemyDmg = sc.dmg * dmgx, Next = next, Mind = S.MindBreak > 0, Shin = S.Shin, Gauge = GradeGauge(),
+                EnemyHp = sc.hp * hpx, EnemyDmg = sc.dmg * dmgx, Next = next, Mind = S.MindBreak > 0, Shin = S.Shin, Gauge = Math.Min(R.GAUGE_MAX, S.Gauge),
                 Elite = S.EventFight != null ? S.EventFight.Elite : S.Elite || BossAsElite, EnemyNature = S.EnemyNature, Floor = S.Floor + 1,
-                Glow = glow, Growth = GradeGrowth(), CardVals = S.CardVals, CritDmg = Perk("critDmg"),
+                Glow = glow, Growth = S.Growth, CardVals = S.CardVals, Prog = S.Prog,
                 Seed = (uint)(S.Seed + S.Floor * 101 + S.Node * 7 + S.Step * 13 + (S.EventFight != null ? 555 : 0)),
             };
             var b = Battle.Start(Data, setup, cues, onCue);
             b.Tape = new BattleTape(setup.Deck);   // 플레이 기록 — 턴별 녹화
+            b.Record(setup);   // 입력 테이프 — 이 셋업 + 입력으로 다시 돌린다(BattleInput.cs)
             var loot = S.EventFight != null ? null : RollReward();
             return (b, loot);
         }
@@ -316,6 +332,7 @@ namespace Bolzena.Core
         /// <summary>전투가 끝난 뒤 — 얻은 카드 · 신탁, 파티 HP, 남은 게이지, 싸움 기록.</summary>
         public void AfterFight(Battle b)
         {
+            b.Input?.Close(b);   // 입력 테이프 — 끝 지문 · 결과(BattleInput.cs)
             foreach (var id in b.GainedCards) if (!S.Deck.Contains(id) && PowerWhy(id) == null) GainCard(id);
             foreach (var (cid, n, shin) in b.GainedFlash) { if (GameData.IsCopy(cid)) continue; var cardId = OwnInst(cid); S.Flash[cardId] = n; if (shin != null) S.Shin[cardId] = shin; }
             // 제거 태그 — 덱에서 완전히 뺀다(전투가 갈라 낸 한 장 「#n」이면 덱의 맨 id 한 장)
@@ -362,7 +379,6 @@ namespace Bolzena.Core
             RecordFightPicks(b, false);   // 플레이 기록 — 전투 중 고른 빛 · 끝난 뒤 제시된 빛 · 전리품(RunRecord.cs)
             S.PartyHp = Math.Max(0, b.Pool.Hp); S.PartyMaxHp = b.Pool.MaxHp;
             S.Gauge = Num.Clamp(b.Gauge, 0, R.GAUGE_MAX);
-            GainCredits(b);   // 학점 · 진급(RunGrade.cs)
         }
 
         public bool PartyWiped => S.PartyHp <= 0;
@@ -404,7 +420,7 @@ namespace Bolzena.Core
             var graced = new HashSet<string>(glow.Values.Select(x => x.Hero));
             var free = owners.Where(x => !graced.Contains(x.owner)).ToList();
             var lit = new List<string>();
-            foreach (var (_, ids) in free) if (Rnd() < (R.EPI_CARD.TryGetValue(kind, out var q) ? q + Perk("oracleChance") : 0)) lit.Add(Pick(ids));   // 크레파스 보드 — 신탁 확률
+            foreach (var (_, ids) in free) if (Rnd() < (R.EPI_CARD.TryGetValue(kind, out var q) ? q : 0)) lit.Add(Pick(ids));
             if (able.Count > 0 && lit.Count == 0 && (S.RewardFlash || R.EPI_SURE_CARD.Contains(kind)))
             {
                 var freeIds = free.SelectMany(x => x.ids).ToList();
@@ -436,11 +452,12 @@ namespace Bolzena.Core
             if (c == null) return new List<GlowPick>();
             var pool = Enumerable.Range(1, c.Oracles.Count).Where(n => n != not && FlashOk(cardId, n)).ToList();
             var picks = new List<int>();
-            int np = OraclePicks + PerkChance("oraclePick");   // 교주 보드 「네 잎 클로버」 — 덜 칠했으면 그 확률로 후보 +1
-            while (picks.Count < np && pool.Count > 0) { int i = RndInt(pool.Count); picks.Add(pool[i]); pool.RemoveAt(i); }
+            while (picks.Count < R.ORACLE_PICKS && pool.Count > 0) { int i = RndInt(pool.Count); picks.Add(pool[i]); pool.RemoveAt(i); }
             picks.Sort();
             var opts = picks.Select(n => new GlowPick { N = n }).ToList();
-            if (opts.Count > 0 && Rnd() < R.ORACLE_BLESS)
+            double bless = R.ORACLE_BLESS;
+            if (S.Prog != null && c.Hero != null && S.Prog.TryGetValue(c.Hero, out var pm) && pm.Shin > 0) bless *= 1 + pm.Shin;   // 잠재력 05-2(신 번뜩임 적응) — 난수 뽑는 수는 그대로
+            if (opts.Count > 0 && Rnd() < bless)
             {
                 var o = opts[RndInt(opts.Count)];
                 var kinds = DivineKindsFor(Data.View(cardId, o.N));
@@ -459,7 +476,7 @@ namespace Bolzena.Core
 
         public string ClaimGlow(string cardId, Glow g, int choice)
         {
-            if (g == null || choice < 0 || choice >= g.Count) return "고를 수 없습니다";
+            if (g == null || choice < 0 || choice >= g.Count) return "고를 수 없다";
             if (g.Kind == "hero")
             {
                 var o = g.Options[choice];
@@ -469,7 +486,7 @@ namespace Bolzena.Core
                 return null;
             }
             var p = g.Picks[choice];
-            if (!FlashOk(cardId, p.N)) return "강화 카드가 되는 신탁은 덱에 한 장일 때만 붙습니다";
+            if (!FlashOk(cardId, p.N)) return "강화 카드가 되는 신탁은 덱에 한 장일 때만 붙는다";
             cardId = OwnInst(cardId);
             Fill("oracle", GameData.NoInst(cardId), p.N.ToString(), g.Picks.Select(x => x.N.ToString()));
             S.Flash[cardId] = p.N;
@@ -501,14 +518,26 @@ namespace Bolzena.Core
 
         public CardView ViewOf(string id) => GameData.WithBless(Data.View(id, S.Flash.TryGetValue(id, out var n) ? n : 0), S.Shin.TryGetValue(id, out var sh) ? Battle.BlessOf(Data.Card(id), sh) : null);   // 피해를 더하는 축복을 받은 스킬은 공격 카드
         public bool OnlyCard(string id) => Data.Card(id) != null && ViewOf(id).IsOnly;
-        public string PowerWhy(string cardId) => OnlyCard(cardId) && HasCard(cardId) ? "유일 — 덱에 한 장만 넣을 수 있습니다" : null;
+        public string PowerWhy(string cardId) => OnlyHeld(cardId) ? "유일 — 덱에 한 장만 넣을 수 있다" : null;
+        /// <summary>
+        /// 그 카드가 유일인데 덱(+ 주인 기다리는 줄)에 이미 있나. 덱에 든 같은 카드가 신탁으로 유일이 된 것도 본다 — 신탁은 덱의 id(「n_x@사도」)에 붙어 있어
+        /// 새로 얻는 맨 id(「n_x」)로만 보면 유일이 아니라 두 번째 장이 들어왔다(2026-10-18 프론티어 슬롯 검사가 찾음 — n_soda · n_apprentice).
+        /// </summary>
+        bool OnlyHeld(string cardId)
+        {
+            if (!HasCard(cardId)) return false;
+            if (OnlyCard(cardId)) return true;
+            var k = GameData.NoOwner(cardId);
+            return S.Deck.Any(x => GameData.NoOwner(x) == k && OnlyCard(x));
+        }
 
-        /// <summary>신탁 n 을 붙여도 되나 — 「강화 카드.」 신탁은 덱에 그 카드가 한 장일 때만.</summary>
+        /// <summary>신탁 n 을 붙여도 되나 — 카드를 유일로 만드는 신탁(「강화 카드.」 · 교주 카드의 power 신탁 → 「유일」)은 덱에 그 카드가 한 장일 때만.</summary>
         public bool FlashOk(string cardId, int n)
         {
             var c = Data.Card(cardId);
             if (c == null || n < 1 || n > c.Oracles.Count || GameData.IsCopy(cardId)) return false;   // 복제본은 복제할 때 모습에 묶인다
-            if (!Data.View(cardId, n).IsPower || Data.View(cardId).IsPower) return true;
+            // IsOnly(IsPower 이거나 「유일」 태그)로 — 옛 IsPower 만 보던 것은 사도 강화 카드만 잡아, 같은 교주 카드 두 장에 power 신탁이 붙어 유일 카드가 두 장이 됐다(2026-10-18 n_apprentice)
+            if (!Data.View(cardId, n).IsOnly || Data.View(cardId).IsOnly) return true;
             var k = GameData.NoInst(cardId);
             return S.Deck.Count(x => GameData.NoInst(x) == k) <= 1;
         }
@@ -578,7 +607,7 @@ namespace Bolzena.Core
         {
             if (cardId == null || n <= 0 || !FlashOk(cardId, n)) return false;
             S.Flash[cardId] = n;
-            Fill("oracle", GameData.NoInst(cardId), n.ToString(), null, addIfNone: false);   // 진급 보상 신탁처럼 앞서 제시된 것이 있으면 채운다
+            Fill("oracle", GameData.NoInst(cardId), n.ToString(), null, addIfNone: false);   // 앞서 제시된 것(Pick "oracle")이 있으면 채운다
             return true;
         }
 
@@ -602,7 +631,6 @@ namespace Bolzena.Core
             var table = IsBoss ? R.BOSS_EQUIP : S.Elite ? R.ELITE_EQUIP : R.FIGHT_EQUIP;
             double chance = IsBoss || S.Elite ? 1 : R.DROP_FIGHT;
             var w = table[Math.Min(S.Floor, table.Length - 1)];
-            if (S.Elite && !IsBoss && Perk("eliteUp") > 0 && Rnd() < Perk("eliteUp")) w = GradeUp(w);   // 크레파스 보드 — 엘리트 장비 한 등급 위
             var eq = !lastBoss && (S.DevDrop || Rnd() < chance) ? OfferEquip(w, 1) : new List<string>();
             S.Reward = new RewardState { Equip = eq.Count > 0 ? eq : null, Gold = gold };
             return S.Reward;
@@ -616,7 +644,7 @@ namespace Bolzena.Core
         public string TakeEquip(string equipId)
         {
             var rw = S.Reward;
-            if (rw?.Equip == null || !rw.Equip.Contains(equipId) || rw.EquipTaken != null) return "고를 수 없습니다";
+            if (rw?.Equip == null || !rw.Equip.Contains(equipId) || rw.EquipTaken != null) return "고를 수 없다";
             GainEquip(equipId);
             rw.EquipTaken = equipId;
             Fill("equip", null, equipId, rw.Equip);
@@ -635,7 +663,7 @@ namespace Bolzena.Core
         public int CampHealOf() => Math.Min(S.PartyMaxHp - S.PartyHp, Num.Round(S.PartyMaxHp * R.CAMP_HEAL));
         public string CampRest()
         {
-            if (CampUsed) return "이번 캠프에서는 이미 골랐습니다";
+            if (CampUsed) return "이번 캠프에서는 이미 골랐다";
             S.PartyHp = Math.Min(S.PartyMaxHp, S.PartyHp + Math.Max(0, CampHealOf()));
             S.Stops[S.Camp.Key] = "rest";
             Pick("rest", null, null, "rest");
@@ -653,9 +681,9 @@ namespace Bolzena.Core
         }
         public string CampTrain(int n)
         {
-            if (CampUsed) return "이번 캠프에서는 이미 골랐습니다";
+            if (CampUsed) return "이번 캠프에서는 이미 골랐다";
             var t = S.Camp.Train;
-            if (t == null || !TakeOffer(t, n)) return "수련할 카드가 없습니다";
+            if (t == null || !TakeOffer(t, n)) return "수련할 카드가 없다";
             S.Stops[S.Camp.Key] = "train";
             Pick("train", GameData.NoInst(t.CardId), t.Picks.Select(x => x.ToString()), n.ToString());
             return null;
@@ -691,21 +719,14 @@ namespace Bolzena.Core
             return S.Shop;
         }
 
-        /// <summary>상점 물건 — 교주 보드 「골디 할인권」(shopDiscount)이 있으면 깎은 값, Base 는 원래 값(할인 없으면 0).</summary>
-        ShopItem Ware(string id, string kind, int price) { int p = ShopPrice(price); return new ShopItem { Id = id, Kind = kind, Price = p, Base = p != price ? price : 0 }; }
+        ShopItem Ware(string id, string kind, int price) => new ShopItem { Id = id, Kind = kind, Price = price };
 
-        /// <summary>상점 할인율(0~1) — 교주 보드 「골디 할인권」.</summary>
-        public double ShopOff => Math.Min(0.9, Perk("shopDiscount"));
-        /// <summary>상점 값 하나에 할인을 건다 — 깎은 값은 반올림(0.5 는 올림). 물건 · 카드 빼기 · 다시 진열 전부 이것을 거친다.</summary>
-        public int ShopPrice(int price) => ShopOff <= 0 || price <= 0 ? price : Math.Max(0, (int)Math.Floor(price * (1 - ShopOff) + 0.5));
-
-        public int RerollBase => R.SHOP_REROLL + R.SHOP_REROLL_STEP * (S.Shop?.Rerolls ?? 0);
-        public int RerollPrice => ShopPrice(RerollBase);
+        public int RerollPrice => R.SHOP_REROLL + R.SHOP_REROLL_STEP * (S.Shop?.Rerolls ?? 0);
         public string RerollShop()
         {
-            if (S.Shop == null) return "상점이 열려 있지 않습니다";
+            if (S.Shop == null) return "상점이 열려 있지 않다";
             int price = RerollPrice;
-            if (S.Gold < price) return "골드가 모자랍니다";
+            if (S.Gold < price) return "골드가 모자라다";
             S.Gold -= price;
             var keep = S.Shop.Items.Where(it => it.Delivery && !it.Sold).ToList();
             S.Shop.Items = Shelf().Concat(keep).ToList();
@@ -718,8 +739,8 @@ namespace Bolzena.Core
         public string Buy(int idx, string heroKey = null)
         {
             var it = S.Shop != null && idx >= 0 && idx < S.Shop.Items.Count ? S.Shop.Items[idx] : null;
-            if (it == null || it.Sold) return "이미 팔린 물건입니다";
-            if (S.Gold < it.Price) return "골드가 모자랍니다";
+            if (it == null || it.Sold) return "이미 팔린 물건이다";
+            if (S.Gold < it.Price) return "골드가 모자라다";
             if (it.Kind == "neutral" && PowerWhy(it.Id) != null) return PowerWhy(it.Id);
             S.Gold -= it.Price;
             it.Sold = true;
@@ -728,17 +749,15 @@ namespace Bolzena.Core
             return null;
         }
 
-        /// <summary>카드 빼기 원래 값(할인 전) — 옛 표의 removeCost(빼기 −골드)도 여기서 뺀다.</summary>
-        public int RemoveBase => Math.Max(0, R.PRICE_REMOVE + R.PRICE_REMOVE_STEP * S.Removals - (int)Perk("removeCost"));
-        public int RemovePrice => ShopPrice(RemoveBase);   // 크레파스 보드 — 상점 할인
+        public int RemovePrice => R.PRICE_REMOVE + R.PRICE_REMOVE_STEP * S.Removals;
         public string RemoveCard(string cardId)
         {
-            if (S.Shop == null || S.Shop.RemoveUsed) return "이번에는 더 뺄 수 없습니다";
+            if (S.Shop == null || S.Shop.RemoveUsed) return "이번에는 더 뺄 수 없다";
             int price = RemovePrice;
-            if (S.Gold < price) return "골드가 모자랍니다";
+            if (S.Gold < price) return "골드가 모자라다";
             int i = S.Deck.IndexOf(cardId);
-            if (i < 0) return "덱에 없는 카드입니다";
-            if (ViewOf(cardId).IsTaboo) return "금기 카드는 뺄 수 없습니다";
+            if (i < 0) return "덱에 없는 카드다";
+            if (ViewOf(cardId).IsTaboo) return "금기 카드는 뺄 수 없다";
             S.Gold -= price;
             S.Deck.RemoveAt(i);
             S.Removals++;
@@ -749,13 +768,29 @@ namespace Bolzena.Core
         }
 
         // ── 장비 ───────────────────────────────────────────────────────
-        public Stats StatsOf(string equipId, string heroKey)
+        public Stats StatsOf(string equipId, string heroKey) => StatsOf(Data, equipId, heroKey);
+
+        /// <summary>장비 하나의 능력치(+ 애착 사도가 꼈으면 애착 능력치) — 판 없이도(프론티어 사도 슬롯이 같은 셈을 쓴다).</summary>
+        public static Stats StatsOf(GameData d, string equipId, string heroKey)
         {
-            var e = Data.Equip(equipId);
+            var e = d.Equip(equipId);
             if (e == null) return new Stats();
             var s = e.Stats ?? new Stats();
             if (e.Affinity != null && e.Affinity == heroKey && e.AffinityStats != null) s = s + e.AffinityStats;
             return s;
+        }
+
+        /// <summary>낀 장비들의 효과(+ 애착 효과) — 판 없이도(GearRules · 프론티어가 같은 셈을 쓴다).</summary>
+        public static List<PassiveRule> GearRulesOf(GameData d, string heroKey, IEnumerable<string> equipIds)
+        {
+            var rules = new List<PassiveRule>();
+            foreach (var id in equipIds)
+            {
+                var e = d.Equip(id); if (e == null) continue;
+                rules.AddRange(e.Effect);
+                if (e.Affinity == heroKey) rules.AddRange(e.AffinityEffect);
+            }
+            return rules;
         }
         public Dictionary<string, string> GearOf(string heroKey) => S.Gear.TryGetValue(heroKey, out var g) ? g : new Dictionary<string, string>();
 
@@ -767,13 +802,7 @@ namespace Bolzena.Core
             var o = new Dictionary<string, List<PassiveRule>>();
             foreach (var k in S.Party)
             {
-                var rules = new List<PassiveRule>();
-                foreach (var id in GearOf(k).Values)
-                {
-                    var e = Data.Equip(id); if (e == null) continue;
-                    rules.AddRange(e.Effect);
-                    if (e.Affinity == k) rules.AddRange(e.AffinityEffect);
-                }
+                var rules = GearRulesOf(Data, k, GearOf(k).Values);
                 if (rules.Count > 0) o[k] = rules;
             }
             return o;
@@ -790,7 +819,7 @@ namespace Bolzena.Core
         /// <summary>장비를 얻는다 — 「정할 차례」 줄(Bag)에 선다. 화면은 곧장 끼기 or 팔기를 묻는다.</summary>
         public string GainEquip(string equipId, bool bought = false)
         {
-            if (Data.Equip(equipId) == null) return "그런 아티팩트가 없습니다";
+            if (Data.Equip(equipId) == null) return "그런 아티팩트가 없다";
             S.Bag.Add(equipId);
             if (bought) S.BagBought.Add(equipId);
             return null;
@@ -801,13 +830,13 @@ namespace Bolzena.Core
         public string Equip(string heroKey, string equipId, bool replace = false)
         {
             var e = Data.Equip(equipId);
-            if (e == null) return "그런 아티팩트가 없습니다";
-            if (!S.Party.Contains(heroKey)) return "파티에 없는 사도입니다";
+            if (e == null) return "그런 아티팩트가 없다";
+            if (!S.Party.Contains(heroKey)) return "파티에 없는 사도다";
             int i = S.Bag.IndexOf(equipId);
-            if (i < 0) return "받은 아티팩트가 아닙니다";
+            if (i < 0) return "받은 아티팩트가 아니다";
             if (!S.Gear.TryGetValue(heroKey, out var g)) S.Gear[heroKey] = g = new Dictionary<string, string>();
             g.TryGetValue(e.Slot, out var old);
-            if (old != null && !replace) return $"{e.Slot} 칸이 차 있습니다 — 바꿔 끼면 낀 것은 팔립니다";
+            if (old != null && !replace) return $"{e.Slot} 칸이 차 있다 — 바꿔 끼면 낀 것은 팔린다";
             S.Bag.RemoveAt(i);
             if (old != null) { ShiftHp(-StatsOf(old, heroKey).Hp); S.Gold += SellPrice(old); }
             g[e.Slot] = equipId;
@@ -820,8 +849,8 @@ namespace Bolzena.Core
         public string SellEquip(string equipId)
         {
             int i = S.Bag.IndexOf(equipId);
-            if (i < 0) return "받은 아티팩트가 아닙니다 — 낀 아티팩트는 바꿔 낄 때 팔립니다";
-            if (IsBought(equipId)) return "상점에서 산 아티팩트는 팔 수 없습니다 — 사도에게 낍니다";
+            if (i < 0) return "받은 아티팩트가 아니다 — 낀 아티팩트는 바꿔 낄 때 팔린다";
+            if (IsBought(equipId)) return "상점에서 산 아티팩트는 팔 수 없다 — 사도에게 낀다";
             S.Bag.RemoveAt(i);
             S.Gold += SellPrice(equipId);
             return null;
@@ -833,7 +862,10 @@ namespace Bolzena.Core
         public List<string> OfferEquip(Dictionary<string, int> weights, int n, bool dupes = true)
         {
             var have = dupes ? new HashSet<string>() : Owned();
-            var pool = Data.Equips.Keys.OrderBy(x => x, StringComparer.Ordinal).Where(id => !have.Contains(id) && Data.Equip(id).Grade != null && weights.TryGetValue(Data.Equip(id).Grade, out var gw) && gw > 0 && R.EQUIP_PRICE.ContainsKey(Data.Equip(id).Grade)).ToList();
+            var all = Data.Equips.Keys.OrderBy(x => x, StringComparer.Ordinal).Where(id => !have.Contains(id) && Data.Equip(id).Grade != null && weights.TryGetValue(Data.Equip(id).Grade, out var gw) && gw > 0 && R.EQUIP_PRICE.ContainsKey(Data.Equip(id).Grade)).ToList();
+            // 그 판 마을의 장비(공용 + 마을 묶음, 2026-10-21) — 그 등급이 마을에 하나도 없으면 모든 장비에서(이벤트가 칸 · 등급을 정해 줄 때 빈손이 되지 않게)
+            var pool = all.Where(id => GameData.EquipIn(Data.Equip(id), S.Village)).ToList();
+            if (pool.Count == 0) pool = all;
             var outs = new List<string>();
             while (outs.Count < n && pool.Count > 0)
             {
@@ -853,7 +885,9 @@ namespace Bolzena.Core
         public List<string> OfferEquipSlot(string grade, string slot)
         {
             var have = Owned();
-            var pool = Data.Equips.Values.Where(e => !have.Contains(e.Id) && e.Grade == grade && e.Slot == slot).Select(e => e.Id).OrderBy(x => x, StringComparer.Ordinal).ToList();
+            var all = Data.Equips.Values.Where(e => !have.Contains(e.Id) && e.Grade == grade && e.Slot == slot).OrderBy(e => e.Id, StringComparer.Ordinal).ToList();
+            var pool = all.Where(e => GameData.EquipIn(e, S.Village)).Select(e => e.Id).ToList();   // 그 마을 장비 — 그 칸 · 등급이 마을에 없으면 모든 장비에서
+            if (pool.Count == 0) pool = all.Select(e => e.Id).ToList();
             return pool.Count > 0 ? new List<string> { pool[RndInt(pool.Count)] } : new List<string>();
         }
 

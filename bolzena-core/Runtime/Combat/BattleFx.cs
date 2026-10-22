@@ -28,6 +28,8 @@ namespace Bolzena.Core
         /// <summary>때 붙은 마디(draw · discard · handEnd) — 그 마디만 돈다.</summary>
         public string When;
         public bool Rhythmed;
+        /// <summary>(2026-10-19) dmg plusIf 를 미리 볼 때 — 조건이 섰는가.</summary>
+        public bool PlusHit;
         /// <summary>계산형 — 이 카드에서 셈 조건(ifSpent · ifBalanced)이 섰다. 카드가 다 끝난 뒤 「셈이 맞으면」(tally) 계기를 낸다.</summary>
         public bool Tallied;
         public string PerStack;
@@ -257,7 +259,7 @@ namespace Bolzena.Core
         /// <summary>피해 한 대 — 스탯 × 배율(치명 · 축복 포함). 화면의 카드 면 숫자도 이것을 쓴다.</summary>
         public int HitAmount(Unit u, double ratio, bool shin = false, bool crit = false, string bas = null) =>
             R.FinalDamage(bas == "def" ? R.DefDmgStat(AtkOf(u), DefOf(u)) : AtkOf(u), ratio, shin: shin, crit: crit, critX: CritXOf(u));   // 파티 — 판 덤 × 치명 피해 상태(▶E83)
-        /// <summary>실드 · 회복의 바탕 방어력(2026-10-10 카제나식) — 기본 방어력(사도 데이터) + 추가 방어력(아티팩트 · 판 성장 · 교주 보드, Unit.GearAdd) × R.GUARD_EXTRA_K, 그다음 전투 중 「방어 +%」 를 곱한다.</summary>
+        /// <summary>실드 · 회복의 바탕 방어력(2026-10-10 카제나식) — 기본 방어력(사도 데이터) + 추가 방어력(아티팩트 · 판 성장, Unit.GearAdd) × R.GUARD_EXTRA_K, 그다음 전투 중 「방어 +%」 를 곱한다.</summary>
         int GuardDef(Unit u)
         {
             int extra = u.Side == Side.Party ? (u.GearAdd?.Def ?? 0) : 0;
@@ -275,6 +277,17 @@ namespace Bolzena.Core
         public int HealAmount(Unit u, double ratio, string shin) => Math.Max(1, Num.Round(GuardDef(u) * ratio * RoleGuardOf(u) * (shin == "heal" ? R.SHIN : 1) * Math.Max(0, 1 + StatMod(u, "heal"))));
 
         /// <summary>효과 조각 목록을 돌린다(카드 · 신탁 · 축복 · 패시브 · 키워드 · 고학년 공용).</summary>
+        /// <summary>(2026-10-19) dmg plusIf 를 미리 볼 때 조건 뒤에 붙는 표시 조각 — 여기까지 문이 열려 있으면 PlusHit.</summary>
+        static readonly Fx PLUS_PROBE = new Fx { K = FxK.When };
+        /// <summary>(2026-10-19 타수 합치기) dmg 의 plusIf 조건이 지금 서는가 — 카드의 일(ctx)을 베껴 조건 조각 하나만 돌려 본다(효과는 없다).</summary>
+        bool PlusOk(Fx cond, FxCtx ctx)
+        {
+            if (cond == null) return false;
+            var c = ctx.Copy(); c.When = null; c.PerStack = null; c.PerEach = false; c.PlusHit = false;
+            RunFx(new List<Fx> { cond, PLUS_PROBE }, c);
+            return c.PlusHit;
+        }
+
         void RunFx(List<Fx> list, FxCtx ctx)
         {
             if (list == null) return;
@@ -283,6 +296,7 @@ namespace Bolzena.Core
             string part = null;
             foreach (var f in list)
             {
+                if (ReferenceEquals(f, PLUS_PROBE)) { ctx.PlusHit = gate; continue; }
                 if (f.K == FxK.When) { part = f.On; gate = true; continue; }
                 if (ctx.When != part) continue;
                 // 조건 조각은 새 문장을 연다 — 앞 조건이 서지 않았어도 다음 조건은 다시 본다(「파괴: … 조율: …」 은 따로따로)
@@ -361,8 +375,10 @@ namespace Bolzena.Core
                     // ── 키워드 사전(2026-10-05) ──
                     case FxK.IfKill:                                                                     // 처치: 이 카드(이 일)가 적을 쓰러뜨렸으면
                         gate = KillSeq == ActSeq && ActSeq != 0;
+                        // (2026-10-19) orBoss — 처치했거나, 고른 적이 살아 있는 보스면(보스전에서도 도는 처치 효과)
+                        if (f.Id == "orBoss") { if (!gate) { var bt = Resolve(ctx, "oneEnemy").FirstOrDefault(); gate = bt != null && bt.Boss && !bt.Dead; } }
                         // id(시범 16 쵸피) — elite: 엘리트 싸움의 적 · 보스 · boss: 보스만
-                        if (gate && f.Id != null) gate = (Counts.TryGetValue("killTier", out var ktv) ? ktv : 0) >= (f.Id == "boss" ? 2 : 1);
+                        else if (gate && f.Id != null) gate = (Counts.TryGetValue("killTier", out var ktv) ? ktv : 0) >= (f.Id == "boss" ? 2 : 1);
                         if (f.Not) gate = !gate;
                         break;
                     case FxK.IfBreak: gate = BreakSeq == ActSeq && ActSeq != 0; if (f.Not) gate = !gate; break;   // 붕괴: 이 카드가 적을 격파했으면(not — 못 했으면, 시범 16 샤샤)
@@ -448,15 +464,28 @@ namespace Bolzena.Core
                                 break;
                             }
                             string dTarget = f.Target ?? "oneEnemy";
+                            // (2026-10-19 타수 합치기) 조건 몫은 대를 늘리지 않고 친 대마다 비율에 더한다
+                            // (2026-10-19) plusIf ifFoe boss 는 맞는 적마다 본다 — 적 전체를 쳐도 보스 하나에게만 더한다
+                            bool plusFoe = f.PlusIf != null && f.Plus != 0 && f.PlusIf.K == FxK.IfFoe && f.PlusIf.Id == "boss";
+                            double ratio = f.Ratio + (!plusFoe && f.PlusIf != null && f.Plus != 0 && PlusOk(f.PlusIf, ctx) ? f.Plus : 0);
+                            double RatioOf(Unit t) => plusFoe && t.Boss != f.PlusIf.Not ? ratio + f.Plus : ratio;
                             if (dTarget == "oneEnemy" && ctx.Card && ctx.Type == "공격" && Kw.Values.Any(k => k.Def.Spread && k.Owner == owner.Key && StackOf(owner.Key, k.Id) <= 0)) dTarget = "allEnemies";
                             // hitsPer — 고유 효과 겹 + hitsAdd 회(엘다인 ▶E24)
                             int hits = f.XHits ? ctx.X + (f.XStack != null ? StackOf(owner.Key, f.XStack) : 0) : f.HitsPer != null ? Math.Max(0, PerCountRaw(ctx, f.HitsPer) + f.HitsAdd) : f.HitsOr1;
-                            if (ctx.PerStack != null) { hits *= PerCount(ctx, ctx.PerStack); ctx.PerStack = null; }
+                            // (2026-10-19 R.PER_HIT_MERGE) 파티의 X 타수 · 「1개당」 피해는 한 대에 합친다 — 수는 배율(merge)로
+                            bool mergeOk = R.PER_HIT_MERGE && owner.Side == Side.Party && ctx.LoopId == null && !f.KillMore;
+                            double merge = 1;
+                            if (mergeOk && (f.XHits || f.HitsPer != null)) { merge = hits; hits = hits > 0 ? 1 : 0; }   // X 타수 · 겹 수 타수(hitsPer)
+                            if (ctx.PerStack != null)
+                            {
+                                int pc = PerCount(ctx, ctx.PerStack); ctx.PerStack = null;
+                                if (mergeOk) { merge *= pc; if (pc <= 0) hits = 0; } else hits *= pc;
+                            }
                             // (엘다인 ▶E19) spend pick loop — 고른 만큼 친 뒤, 치는 동안 새로 얻은 겹(남겨 둔 몫 위)을 1씩 더 써서 이어 친다(합해 LoopMax 대까지)
                             string loopId = ctx.LoopId; int loopMax = ctx.LoopMax, loopKeep = ctx.LoopKeep; ctx.LoopId = null;
                             if (loopId != null) hits = Math.Min(hits, loopMax);
                             // 카드의 덤 배율 — 탐구심(이 카드) · 칼날 벼리기(공격 카드의 방어 기반) · 형상 강화(만든 카드)
-                            double ck = 1;
+                            double ck = merge;
                             if (ctx.Card && ctx.CardId != null) { int g = CardStOf(ctx.CardId, "탐구심"); if (g > 0) ck *= 1 + R.SV("탐구심") * g; }
                             if (f.Base == "def" && ctx.Type == "공격") ck *= 1 + R.StackEff("칼날 벼리기", St(owner, "칼날 벼리기"));
                             if (ctx.Made) ck *= 1 + R.StackEff("형상 강화", St(owner, "형상 강화"));
@@ -473,13 +502,14 @@ namespace Bolzena.Core
                                     bool first = ctx.Card && t.Side == Side.Enemy && !(ctx.Toughed != null && ctx.Toughed.Contains(t));
                                     if (first) { CardHit(owner, t, ctx); if (t.Dead) continue; }
                                     if (first && ctx.Type == "공격") GlowUse();
+                                    double rt = RatioOf(t);
                                     double k2 = ctx.Scale * ck * (brandId != null && St(t, "죽음의 낙인") > 0 && t.Brand.Contains(brandId) ? 1 + R.SV("죽음의 낙인") : 1);
                                     if (f.Dot)
                                     {   // 고정 지속 피해 — 증감 · 상태 · 방어 · 실드를 모두 안 탄다
-                                        Hurt(t, Math.Max(1, Num.Round(AtkOf(owner) * f.Ratio * k2)), new HurtOpts { From = owner, Pure = true, Dot = true });
+                                        Hurt(t, Math.Max(1, Num.Round(AtkOf(owner) * rt * k2)), new HurtOpts { From = owner, Pure = true, Dot = true });
                                         continue;
                                     }
-                                    int v = f.Fixed ? Math.Max(1, Num.Round(AtkOf(owner) * f.Ratio * k2)) : HitAmount(owner, f.Ratio * k2 + (ctx.Card ? Morale() : 0), boost, crit, f.Base);
+                                    int v = f.Fixed ? Math.Max(1, Num.Round(AtkOf(owner) * rt * k2)) : HitAmount(owner, rt * k2 + (ctx.Card ? Morale() : 0), boost, crit, f.Base);
                                     // 처치 일격도 강인도를 깎는다 — 쓰러지기 직전에 이 카드의 강인도 피해(LethalKill)
                                     var (lf0, lt0) = (lethalFor, lethalTough);
                                     if (ctx.Card && t.Side == Side.Enemy) { var ht = t; lethalFor = t; lethalTough = () => CardTough(owner, ht, ctx, dTarget, true); }
@@ -521,7 +551,7 @@ namespace Bolzena.Core
                                     for (int j = hits; j < hits * f.KnownHits && !t.Dead && Over == null; j++)
                                     {
                                         bool kc = !Preview && Rng.Next() * 100 < owner.Crit + StatMod(owner, "crit") * 100;
-                                        Hurt(t, HitAmount(owner, f.Ratio * ctx.Scale * ck + (ctx.Card ? Morale() : 0), false, kc, f.Base), new HurtOpts { From = owner, Crit = kc, Tags = ctx.HitTags, Card = ctx.Card, Attack = ctx.Type == "공격" });
+                                        Hurt(t, HitAmount(owner, RatioOf(t) * ctx.Scale * ck + (ctx.Card ? Morale() : 0), false, kc, f.Base), new HurtOpts { From = owner, Crit = kc, Tags = ctx.HitTags, Card = ctx.Card, Attack = ctx.Type == "공격" });
                                     }
                                 }
                             break;

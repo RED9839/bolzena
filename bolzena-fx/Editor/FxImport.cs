@@ -26,6 +26,7 @@ namespace Bolzena.Fx.EditorTools
         public static void ImportAll()
         {
             Converted = Failed = Approx = Skipped3d = Baked = 0;
+            FxPsBuild.Reset();
             Problems.Clear();
             AssetDatabase.Refresh();
             TextureSettings();
@@ -79,6 +80,7 @@ namespace Bolzena.Fx.EditorTools
             if (File.Exists(uh)) { File.Copy(uh, Out + "/ult_hits.json", true); AssetDatabase.ImportAsset(Out + "/ult_hits.json"); Debug.Log("[FxImport] 고학년 타수 표 ult_hits.json"); }
             EditorUtility.SetDirty(lib);
             AssetDatabase.SaveAssets();
+            Debug.Log($"[FxImport] 원작 파티클 프리팹 {FxPsBuild.Built}개 · 실패 {FxPsBuild.Failed}");
             Debug.Log($"[FxImport] 사도 {lib.Heroes.Count}명 · 이펙트 {Converted}개 변환 · 실패 {Failed} · 근사(이미터) {Approx} · 입체 메시로 뺀 이미터 {Skipped3d} · 구운 낱장 {Baked}");
             foreach (var p in Problems.Take(40)) Debug.Log("[FxImport] ! " + p);
         }
@@ -148,6 +150,11 @@ namespace Bolzena.Fx.EditorTools
 
         static void BaseMaterial()
         {
+            // 셰이더 그래프 재현 셰이더도 빌드에 실리게(재질은 이펙트마다 SgMaterial 이 Resources 에 만든다)
+            if (Shader.Find("Bolzena/FxMaster") == null) Debug.LogError("[FxImport] 셰이더 없음 Bolzena/FxMaster");
+            if (Shader.Find("Bolzena/FxTint") == null) Debug.LogError("[FxImport] 셰이더 없음 Bolzena/FxTint");
+            if (Shader.Find("Bolzena/FxMisc") == null) Debug.LogError("[FxImport] 셰이더 없음 Bolzena/FxMisc");
+            if (Shader.Find("Bolzena/FxShock") == null) Debug.LogError("[FxImport] 셰이더 없음 Bolzena/FxShock");
             var path = Out + "/FxParticle.mat";
             var sh = Shader.Find(BolzenaFx.ShaderName);
             if (sh == null) { Debug.LogError("[FxImport] 셰이더 없음 " + BolzenaFx.ShaderName); return; }
@@ -157,10 +164,55 @@ namespace Bolzena.Fx.EditorTools
             EditorUtility.SetDirty(m);
         }
 
+        // ── 원작 텍스처 감김(Repeat/Clamp) ── 원작 번들의 Texture2D m_TextureSettings 그대로(Tools/orig_wrap.tsv: 이름 · wrapU · wrapV 탭 구분, 0 = Repeat · 1 = Clamp).
+        //   전엔 「셰이더 그래프가 쓰는 그림은 다 Repeat」로 짐작했다 — 원작과 다른 것이 952장, UV 를 민 판(네르 초승달 쐐기)이 바깥에 되풀이돼 흰 덩어리가 됐다(10-17 사용자)
+        static Dictionary<string, TextureWrapMode> origWrap;
+        static TextureWrapMode? OrigWrap(string path)
+        {
+            if (origWrap == null)
+            {
+                origWrap = new Dictionary<string, TextureWrapMode>(System.StringComparer.OrdinalIgnoreCase);
+                var tsv = Path.GetFullPath("Packages/com.bolzena.fx/Tools/orig_wrap.tsv");
+                if (!File.Exists(tsv)) tsv = "C:/projects/bolzena-fx/Tools/orig_wrap.tsv";
+                if (File.Exists(tsv))
+                    foreach (var l in File.ReadAllLines(tsv)) { var c = l.Split('\t'); if (c.Length >= 2) origWrap[c[0]] = c[1] == "0" ? TextureWrapMode.Repeat : TextureWrapMode.Clamp; }
+            }
+            var nm = Path.GetFileNameWithoutExtension(path);
+            if (nm.EndsWith("_alum")) nm = nm.Substring(0, nm.Length - 5);   // 알파를 밝기로 옮긴 우리 사본 — 원작 이름으로
+            return origWrap.TryGetValue(nm, out var w) ? w : (TextureWrapMode?)null;
+        }
+        // 감김만 원작대로 고친다(가벼움) — Unity.exe -batchmode -quit -executeMethod Bolzena.Fx.EditorTools.FxImport.WrapFromOriginal
+        public static void WrapFromOriginal()
+        {
+            int n = 0, all = 0;
+            AssetDatabase.StartAssetEditing();
+            try
+            {
+                foreach (var g in AssetDatabase.FindAssets("t:Texture2D", new[] { Src }))
+                {
+                    var path = AssetDatabase.GUIDToAssetPath(g);
+                    if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) continue;
+                    var w = OrigWrap(path); if (!w.HasValue) continue;
+                    all++;
+                    if (ti.wrapMode == w.Value) continue;
+                    ti.wrapMode = w.Value; ti.SaveAndReimport(); n++;
+                }
+            }
+            finally { AssetDatabase.StopAssetEditing(); }
+            Debug.Log($"[FxImport] 원작 감김 — 표에 있는 {all}장 중 {n}장 고침");
+        }
+
         // ── 가져오기 설정 ──
         static void TextureSettings()
         {
             var guids = AssetDatabase.FindAssets("t:Texture2D", new[] { Src });
+            // 셰이더 그래프 재현이 쓰는 그림은 반복(Repeat) — 원작 셰이더는 UV 를 밀고(Custom1 · 흐름) 겹쳐 쓴다. 가장자리 고정이면 끝 색이 판처럼 번졌다(10-15 에르핀(왕도) 고학년 분홍 판)
+            var repeat = new HashSet<string>();
+            var rx = new System.Text.RegularExpressions.Regex("\"(?:_Main_Tex|_Mask_Tex|_Dissolve_Tex|_Color_Tex|_Noise_Tex|_Alpha_Tex|_Distort_Tex|_Color|_Dissolve_Tex_Add|_Main_Mask)\":\"([^\"]+)\"");
+            foreach (var dir in new[] { "fx", "fx2" })
+                if (Directory.Exists(Src + "/" + dir))
+                    foreach (var f in Directory.GetFiles(Src + "/" + dir, "fx.json", SearchOption.AllDirectories))
+                        foreach (System.Text.RegularExpressions.Match m in rx.Matches(File.ReadAllText(f))) repeat.Add((Src + "/" + dir + "/" + m.Groups[1].Value).Replace('\\', '/'));
             AssetDatabase.StartAssetEditing();
             try
             {
@@ -170,12 +222,13 @@ namespace Bolzena.Fx.EditorTools
                     if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) continue;
                     bool baked = path.Contains("/baked/");
                     int max = baked ? 8192 : 1024;
-                    if (ti.textureType == TextureImporterType.Default && ti.sRGBTexture && ti.alphaIsTransparency && ti.wrapMode == TextureWrapMode.Clamp
+                    var wrap = OrigWrap(path) ?? (repeat.Contains(path) ? TextureWrapMode.Repeat : TextureWrapMode.Clamp);   // 원작 텍스처 설정이 있으면 그것(10-17)
+                    if (ti.textureType == TextureImporterType.Default && ti.sRGBTexture && ti.alphaIsTransparency && ti.wrapMode == wrap
                         && ti.maxTextureSize == max && ti.npotScale == TextureImporterNPOTScale.None && ti.mipmapEnabled) continue;
                     ti.textureType = TextureImporterType.Default;
                     ti.sRGBTexture = true;
                     ti.alphaIsTransparency = true;
-                    ti.wrapMode = TextureWrapMode.Clamp;
+                    ti.wrapMode = wrap;
                     ti.filterMode = FilterMode.Bilinear;
                     ti.mipmapEnabled = true;
                     ti.npotScale = TextureImporterNPOTScale.None;
@@ -322,6 +375,7 @@ namespace Bolzena.Fx.EditorTools
                 if (e.TexPath != null && (e.TexPath.Contains("_lum") || e.TexPath.Contains("_toon") || e.TexPath.Contains("_dslv"))) Approx++;
                 fx.Em.Add(e);
             }
+            fx.Ps = FxPsBuild.Build(Out, name, (List<object>)body["em"], fx.Em);   // (10-16) 원작 ParticleSystem 그대로 조립(원작 값이 있을 때)
             EditorUtility.SetDirty(fx);
         }
 
@@ -331,6 +385,8 @@ namespace Bolzena.Fx.EditorTools
             e.N = S(d, "n");
             e.TexPath = S(d, "tex");
             if (e.TexPath != null) e.Tex = AssetDatabase.LoadAssetAtPath<Texture2D>(Src + "/" + texDir + "/" + e.TexPath);
+            e.MaskPath = S(d, "mask");
+            e.Mask = e.MaskPath != null ? AssetDatabase.LoadAssetAtPath<Texture2D>(Src + "/" + texDir + "/" + e.MaskPath) : null;
             e.Add = F(d, "add", 0) != 0;
             e.Tint = C4(d, "tint", Color.white);
             e.Dur = F(d, "dur", 0);
@@ -362,13 +418,13 @@ namespace Bolzena.Fx.EditorTools
             e.Mt = Arr(d, "mt", 6); e.HasMt = e.Mt != null;
             if (d.ContainsKey("sc")) { e.HasSc = true; e.Sc = V2(d, "sc"); }
             e.SizeOL = Keys2(d, "sizeOL");
-            e.SizeK = Or1(F(d, "sizeK", 1));
+            e.SizeK = F(d, "sizeK", 1);
             if (d.TryGetValue("colOL", out var co) && co is List<object> col)
                 e.ColOL = col.Select(x => { var l = Nums(x); return new Vector4(At(l, 0), At(l, 1), At(l, 2), At(l, 3)); }).ToArray();
             e.AlphaOL = Keys2(d, "alphaOL");
             if (d.ContainsKey("vel")) { e.HasVel = true; e.Vel = V3(d, "vel"); e.VelW = F(d, "velW", 0) != 0; }
             e.Radial = F(d, "radial", 0);
-            e.SpdMul = Or1(F(d, "spdMul", 1));
+            e.SpdMul = F(d, "spdMul", 1);
             if (d.ContainsKey("force")) { e.HasForce = true; e.Force = V3(d, "force"); e.ForceW = F(d, "forceW", 0) != 0; }
             if (d.ContainsKey("limit") && d["limit"] != null) { e.HasLimit = true; e.Limit = F(d, "limit", 0); e.Damp = F(d, "damp", 0); }
             e.Drag = F(d, "drag", 0);
@@ -391,7 +447,93 @@ namespace Bolzena.Fx.EditorTools
             if (d.ContainsKey("ext")) { e.HasExt = true; e.Ext = V2(d, "ext"); }
             e.M3d = F(d, "m3d", 0) != 0;
             e.FlipU = F(d, "flipU", 0);
+            e.SimW = F(d, "simW", 0) > 0;
+            e.Rm = (int)F(d, "rm", -1); e.Ra = (int)F(d, "ra", -1);
+            e.Shn = S(d, "shn");
+            Vector2[] Comp(object o) => o is List<object> l ? l.Select(x => { var v = MeshNums(new Dictionary<string, object> { ["k"] = x }, "k"); return new Vector2(At(v, 0), At(v, 1)); }).ToArray()
+                                      : new[] { new Vector2(0, o is double dv ? (float)dv : o is long lv ? lv : 0f) };
+            if (d.TryGetValue("c1", out var c1o) && c1o is List<object> c1 && c1.Count >= 4)
+            {
+                e.C1x = Comp(c1[0]); e.C1y = Comp(c1[1]); e.C1z = Comp(c1[2]); e.C1w = Comp(c1[3]);
+            }
+            if (d.TryGetValue("c2", out var c2o) && c2o is List<object> c2 && c2.Count >= 4)
+            {
+                e.C2x = Comp(c2[0]); e.C2y = Comp(c2[1]); e.C2z = Comp(c2[2]); e.C2w = Comp(c2[3]);
+            }
+            if (d.TryGetValue("sg", out var sgo) && sgo is Dictionary<string, object> sgd) e.Sg = SgMaterial(sgd, texDir);
+            if (d.TryGetValue("mesh", out var mo) && mo is Dictionary<string, object> md)
+            {
+                var v = MeshNums(md, "v3"); var u = MeshNums(md, "u"); var t = MeshNums(md, "t"); var a = MeshNums(md, "a"); var A = MeshNums(md, "A");
+                int n = v.Count / 3;
+                if (n > 0 && u.Count == n * 2 && t.Count >= 3)
+                {
+                    e.MeshV = new Vector3[n]; e.MeshUV = new Vector2[n];
+                    for (int i = 0; i < n; i++) { e.MeshV[i] = new Vector3(v[3 * i], v[3 * i + 1], v[3 * i + 2]); e.MeshUV[i] = new Vector2(u[2 * i], u[2 * i + 1]); }
+                    if (A.Count == 6) { e.MeshAx = new Vector3(A[0], A[1], A[2]); e.MeshAy = new Vector3(A[3], A[4], A[5]); }
+                    e.MeshT = t.Select(x => Mathf.Clamp((int)x, 0, n - 1)).ToArray();
+                    e.MeshA = a.Count == n ? a.ToArray() : null;
+                }
+            }
             return e;
+        }
+
+        // 셰이더 그래프 재현 재질(10-15) — 값이 같으면 같은 재질 하나(이름 = 값의 해시). Resources/<Root>/Sg/ 에 둔다
+        static readonly Dictionary<string, Material> sgMade = new Dictionary<string, Material>();
+        public static int SgMade => sgMade.Count;
+        static Material SgMaterial(Dictionary<string, object> sg, string texDir)
+        {
+            var kind = S(sg, "k");
+            int misc = kind == "dstep" ? 1 : kind == "moveuv" ? 2 : kind == "dsmooth" ? 3 : kind == "uvoff" ? 4 : kind == "toon" ? 5 : kind == "toon_rb" ? 6 : kind == "pixel" ? 7 : kind == "dgrad" ? 8 : kind == "water" ? 9 : kind == "toon_ol" ? 10 : kind == "uvmd" ? 11 : kind == "trail" ? 12 : 0;
+            int shock = kind == "shock" ? 1 : kind == "slash" ? 2 : kind == "slash01" ? 3 : kind == "dedge" ? 4 : 0;
+            var shName = shock > 0 ? "Bolzena/FxShock" : kind == "master" ? "Bolzena/FxMaster" : kind == "tint" || kind == "tint_color" || kind == "tint_back" ? "Bolzena/FxTint" : misc > 0 ? "Bolzena/FxMisc" : null;
+            var sh = shName != null ? Shader.Find(shName) : null;
+            if (sh == null) return null;
+            var key = kind + "|" + SgKey(sg);
+            var hash = Hash128.Compute(key).ToString();
+            if (sgMade.TryGetValue(hash, out var made)) return made;
+            Directory.CreateDirectory(Out + "/Sg");
+            var path = Out + "/Sg/" + kind + "_" + hash + ".mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (m == null) { m = new Material(sh); AssetDatabase.CreateAsset(m, path); } else m.shader = sh;
+            if (sg.TryGetValue("tex", out var to) && to is Dictionary<string, object> tex)
+                foreach (var kv in tex)
+                {
+                    var t = AssetDatabase.LoadAssetAtPath<Texture2D>(Src + "/" + texDir + "/" + (kv.Value as string));
+                    if (t != null) m.SetTexture(kv.Key, t);
+                }
+            if (sg.TryGetValue("st", out var sto) && sto is Dictionary<string, object> st)
+                foreach (var kv in st) { var l = Nums(kv.Value); if (l.Count == 4) m.SetVector(kv.Key + "_ST2", new Vector4(l[0], l[1], l[2], l[3])); }
+            if (sg.TryGetValue("f", out var fo) && fo is Dictionary<string, object> f)
+                foreach (var kv in f) if (kv.Value is double dv) m.SetFloat(kv.Key, (float)dv); else if (kv.Value is long lv) m.SetFloat(kv.Key, lv);
+            if (sg.TryGetValue("v", out var vo) && vo is Dictionary<string, object> vv)
+                foreach (var kv in vv) { var l = Nums(kv.Value); m.SetVector(kv.Key, new Vector4(At(l, 0), At(l, 1), At(l, 2), At(l, 3))); }
+            if (shock > 0)
+            {
+                m.SetFloat("_Kind", shock);
+                float dst = m.HasProperty("_DstBlend") ? m.GetFloat("_DstBlend") : 10;
+                m.SetFloat("_Add", (shock == 1 || shock == 4) && dst == 1 ? 1 : 0);   // Shockwave · Dissolve_Edge 만 재질 섞기(Slash 둘은 원작 패스가 알파 섞기)
+            }
+            else if (misc > 0)
+            {
+                m.SetFloat("_Kind", misc);
+                float dst = m.HasProperty("_DstBlend") ? m.GetFloat("_DstBlend") : 10;
+                m.SetFloat("_Add", (misc == 3 || misc == 9 || misc == 11 || misc == 12) && dst == 1 ? 1 : 0);   // 재질 섞기 갈래(Smoothstep · Water · UV_Move_Dissolve_1 · Master_Trail)   // Smoothstep 만 재질 섞기(나머지는 원작 패스가 알파 섞기)
+            }
+            else if (kind == "master")
+            {
+                float dst = m.HasProperty("_DstBlend") ? m.GetFloat("_DstBlend") : 10;
+                m.SetFloat("_Add", dst == 1 ? 1 : 0);   // 원작 One/One · SrcAlpha/One 은 더하기
+            }
+            else { m.SetFloat("_UseColor", kind == "tint_color" ? 1 : 0); if (kind == "tint_back") m.SetFloat("_Main_Tex_Alpha", 1); }   // Tint_Back 은 늘 R = 알파   // Tint 는 원작 패스가 늘 알파 섞기
+            EditorUtility.SetDirty(m);
+            sgMade[hash] = m;
+            return m;
+        }
+        static string SgKey(object o)
+        {
+            if (o is Dictionary<string, object> d) return "{" + string.Join(",", d.OrderBy(kv => kv.Key).Select(kv => kv.Key + ":" + SgKey(kv.Value))) + "}";
+            if (o is List<object> l) return "[" + string.Join(",", l.Select(SgKey)) + "]";
+            return o == null ? "null" : System.Convert.ToString(o, System.Globalization.CultureInfo.InvariantCulture);
         }
 
         static FxShapeKind Kind(string k)
@@ -423,6 +565,9 @@ namespace Bolzena.Fx.EditorTools
             return def;
         }
         static List<float> Nums(object o) => o is List<object> l ? l.Select(x => x is double v ? (float)v : 0f).ToList() : new List<float>();
+        // 메시 수 — 정수(삼각형 번호 · 0)도 읽는다(Nums 는 double 만)
+        static List<float> MeshNums(Dictionary<string, object> d, string k)
+            => d.TryGetValue(k, out var o) && o is List<object> l ? l.Select(x => x is double dv ? (float)dv : x is long lv ? lv : x is int iv ? iv : 0f).ToList() : new List<float>();
         static Vector2 V2(Dictionary<string, object> d, string k)
         {
             if (!d.TryGetValue(k, out var o) || !(o is List<object>)) return Vector2.zero;

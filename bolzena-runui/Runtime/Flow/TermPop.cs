@@ -173,7 +173,7 @@ namespace Bolzena.RunUI
         {
             var lay = layer != null ? layer : tmp.canvas != null ? (RectTransform)tmp.canvas.transform : null;
             if (lay == null) return;
-            ShowAt(lay, screen, new[] { terms[n] }, cards, CamOf(lay.GetComponentInParent<Canvas>()), true);
+            ShowAt(lay, screen, new[] { terms[n] }, cards, CamOf(lay.GetComponentInParent<Canvas>()), !Touch);   // 누름으로 띄운 판 = 덮개(바깥을 누르면 닫힘)
             owner = this; openIdx = n;
         }
 
@@ -186,7 +186,10 @@ namespace Bolzena.RunUI
             Close();
             if (layer == null || list == null || list.Count == 0) return null;
             RectTransform root;
-            if (Touch || !hover)   // 올림으로 띄운 판(PC)만 덮개 없이 — 그 밖은 바깥을 누르면 닫힌다
+            // 올림으로 띄운 판(PC · CardSide)만 덮개 없이 — 그 밖은 바깥을 누르면 닫힌다.
+            //   예전엔 「Touch || !hover」 였는데 Touch 가 늘 참(2026-10-09)이라 올림 판에도 화면 덮개가 깔렸고, 덮개가 칸을 가려
+            //   CardSide 가 「나감」 → 0.2초 뒤 닫힘 → 다시 「들어옴」 → 0.35초 뒤 띄움을 되풀이했다(2026-10-19 사용자 — 프론티어 입구 패턴 칩 깜빡임).
+            if (!hover)
             {
                 var shade = Ui.Img(layer, Theme.White, new Color(0, 0, 0, 0.001f), "termpop shade", true);
                 shade.rectTransform.Fill();

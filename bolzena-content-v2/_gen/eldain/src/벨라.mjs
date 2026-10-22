@@ -16,36 +16,36 @@ export default hero({
   id: H, name: '벨라', nature: '활발', race: '유령', role: '탱커', star: 3,
   blurb: '경계선 위를 떠도는 앳된 유령. 존재감을 쌓아 두면 파티가 힘을 얻고, 나눠 주면 파티를 감싸고 상처를 아물게 합니다.',
   keyword: {
-    name: K, desc: '벨라가 쌓아 둔 존재감 — 쥐고 있으면 파티가 세지고, 쓰면 파티를 돌본다', carrier: 'self', cap: 7,
+    name: K, desc: '벨라가 쌓아 둔 존재감 — 쥐고 있으면 파티가 세지고, 쓰면 파티를 돌본다', carrier: 'self', cap: 5,   // 10-21 밸런스 조절: 최대 7 → 6 → 5(3차)
     per: [{ stat: 'dealt', v: 0.05, who: 'allies' }],
   },
   passives: [
-    { name: '앳된 존재감', when: { on: 'play', who: 'other', every: 2 }, fx: [lit(1)] },   // 동료 카드 2장마다 존재감 1
-    { name: '경계선상의 유령', when: { on: 'fightStart' }, fx: [shield(1), lit(2)] },
+    { name: '앳된 존재감', when: { on: 'play', who: 'other', every: 3 }, fx: [lit(1)] },   // 동료 카드 3장마다 존재감 1(10-21 밸런스 조절: 2 → 3장)
+    { name: '경계선상의 유령', when: { on: 'fightStart' }, fx: [shield(0.5), lit(1)] },   // 10-21 밸런스 조절: 존재감 2 → 1 · 4차 실드 120 → 60%
   ],
-  ult: { name: '앳된 존재의 증명', cost: 150, fx: [ddmg(1.5, 'allEnemies'), lit(3), shield(1.5), heal(1.5)] },
+  ult: { name: '앳된 존재의 증명', cost: 200,   /* 10-21 밸런스 조절: 150 → 200 */ fx: [ddmg(2, 'allEnemies'), lit(3), shield(1), heal(1)] },   // 10-21 7차: 실드 · 회복 180 → 120%
 }, {
   basicNames: ['유령 손짓', '촛농 떨구기', '반투명 가드'], deck: 'heavy',
   uniques: [
     // 신탁 = 방향 고르기(사용자 「완전히 리뉴얼」): 더 채우기 · 동료 강화 · 조금만 쓰기 · 쓰기를 실드 · 피해 · AP · 약화 · 사기로 · 쥔 만큼 세지기 · 강인도 · 실드 유지 · 끈기.
     { // 시동 · 보존
       name: '첫 번째 촛불', cost: 1, type: '스킬', tags: ['보존'], choices: CH,
-      fx: [shield(2), ...fill(lit(3)), ...use(heal(0.15))],
+      fx: [shield(1.67), ...fill(lit(2)), ...use(heal(0.15))],   // 10-21 밸런스 조절: 실드 240 → 200%(2차) · 채우기 3 → 2(5차)
       oracles: [
         { tags: ['보존'], fx: [shield(1), ...fill(lit(5)), ...use(heal(0.15))] },                                  // 더 채우기
         { fx: [...fill(lit(2), empower(0.3, { who: 'other' })), ...use(heal(0.15))] },    // 채우며 동료 다음 카드 +30%(글 45자 — 이것만 보존 뺌)
         { cost: 0, tags: ['보존'], fx: [shield(0.8), ...fill(lit(2)), ...useN(2, heal(0.3))] },                    // 0코 · 쓰기는 2개만 크게
         { tags: ['보존'], fx: [shield(1.5), ...fill(lit(3)), ...use(shield(0.4))] },                               // 쓰기 → 실드
-        { tags: ['개전', '보존'], fx: [...fill(lit(3)), ...use(ddmg(0.3, 'allEnemies'))] },              // 개전 · 쓰기 → 적 전체 피해
+        { tags: ['개전', '보존'], fx: [...fill(lit(3)), ...use(ddmg(0.5, 'allEnemies'))] },   // 10-19 밸런스: 1개당 전체 30 → 50%              // 개전 · 쓰기 → 적 전체 피해
       ],
       blesses: ['guard', 'draw', [lit(1)]],
     },
     {
       name: '존재감 나눠 주기', cost: 0, type: '스킬', choices: CH,
-      fx: [...fill(lit(2)), ...use(heal(0.15))],
+      fx: [...fill(lit(1)), ...use(heal(0.15))],   // 10-21 밸런스 조절 6차: 채우기 2 → 1
       oracles: [
         { fx: [draw(1), ...fill(lit(2)), ...use(heal(0.15))] },                                                     // 드로우
-        { fx: [...fill(lit(2)), ...use(ddmg(0.3, 'allEnemies'))] },                                               // 쓰기 → 1개당 적 전체 피해
+        { fx: [...fill(lit(2)), ...use(ddmg(0.5, 'allEnemies'))] },   // 10-19 밸런스: 30 → 50%                                               // 쓰기 → 1개당 적 전체 피해
         { tags: ['소멸'], fx: [...fill(lit(2)), { k: 'ifChoice', n: 2 }, spend(K, 3), { k: 'ifEvent', n: 3 }, { k: 'ap', v: 1 }] },  // 쓰기 → 3개 써서 AP 1(0코 AP 라 소멸)
         { fx: [...fill(lit(1)), ...use(heal(0.25))] },                                                              // 쓰기 쪽으로
         { fx: [...fill(lit(2)), ...use(heal(0.1)), status('사기', 1)] },                                            // 쓰기 → 회복 + 사기 1
@@ -54,7 +54,7 @@ export default hero({
     },
     {
       name: '랜턴 가드', cost: 2, type: '스킬', choices: CH,
-      fx: [shield(2.4), ...fill(lit(2)), ...use(shield(0.5))],
+      fx: [shield(2), ...fill(lit(2)), ...use(shield(0.5))],   // 10-21 밸런스 조절 2차: 실드 290 → 240%
       oracles: [
         { fx: [shield(3.6), ...fill(lit(1)), ...use(shield(0.3))] },                                                // 큰 실드
         { cost: 1, fx: [shield(1.2), ...fill(lit(2)), ...use(shield(0.5))] },                                      // 1코
@@ -66,10 +66,10 @@ export default hero({
     },
     {
       name: '너의 존재를 비춰 줘', cost: 2, type: '공격', choices: CH,
-      fx: [ddmg(2), ...fill(lit(2)), ...use(ddmg(0.6))],
+      fx: [ddmg(2), ...fill(lit(2)), ...use(ddmg(0.8))],   // 10-19 밸런스: 쓰기 1개당 60 → 80%
       oracles: [
         { fx: [ddmg(1, 'allEnemies'), ...fill(lit(2)), ...use(heal(0.1))] },                                       // 적 전체 · 쓰기 → 회복
-        { fx: [ddmg(2), ...fill(lit(1), { k: 'perStack', id: K }, ddmg(0.3))] },                   // 채우기 → 쥔 만큼 더 세게(쓰지 않음)
+        { fx: [ddmg(2), ...fill(lit(1), { k: 'perStack', id: K }, ddmg(0.5))] },   // 10-19: 채우기 1당 30 → 50%                   // 채우기 → 쥔 만큼 더 세게(쓰지 않음)
         { fx: [ddmg(2), ...fill(lit(2)), { k: 'ifChoice', n: 2 }, spend(K, 'all'), { k: 'ifEvent', n: 3 }, { k: 'tough', v: 2 }] },   // 쓰기 → 3개 넘게 쓰면 강인도 2
         { cost: 1, fx: [ddmg(1), ...fill(lit(1)), ...use(shield(0.3))] },                                         // 1코 · 쓰기 → 실드
         { fx: [ddmg(1.5), draw(1), ...fill(lit(2)), ...use(shield(0.3))] },                                       // 드로우 · 쓰기 → 실드

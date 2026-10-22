@@ -34,7 +34,7 @@ export default hero({
     { name: '소망을 머금은 꽃', when: { on: 'fightStart' }, fx: [fl(2)] },   // 원작 2성 — 전투 시작 꽃밭 2
     { name: '지극정성', when: { on: 'turnStart' }, fx: [half, heal(0.3), dark, heal(0.3)] },   // 10-13 사용자: 반달 · 그믐에서만 매 턴 회복(보름 · 초승 빼고) — 조건이 AND 뿐이라 두 갈래(gate 는 조건마다 새로 선다)
   ],
-  ult: { name: '지극정성의 마중', cost: 250, fx: [dmg(0.5, 'allEnemies', { hits: 4 }), pick, status('둔화', 1, { target: 'allEnemies' }), { k: 'ap', v: 2 }] },   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 다음 턴 AP 1 → 지금 AP 2
+  ult: { name: '지극정성의 마중', cost: 250, fx: [dmg(1, 'allEnemies', { hits: 2 }),   /* 10-19 타수: 4회 × 50% → 2회 × 100% */ pick, status('둔화', 1, { target: 'allEnemies' }), { k: 'ap', v: 2 }] },   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 다음 턴 AP 1 → 지금 AP 2
 }, {
   basicNames: ['달빛 탄', '석장 휘두르기', '사제의 베일'], deck: 'heavy',
   uniques: [
@@ -64,11 +64,11 @@ export default hero({
     },
     {
       name: '별빛 두 줄기', cost: 1, type: '공격', tags: KEEP,
-      fx: [dmg(1, 'randomEnemy', { hits: 2 }), slowed, dmg(0.6)],
+      fx: [dmg(1, 'randomEnemy', { hits: 2, plus: 0.3, plusIf: slowed })],   // 10-19 타수(사용자 「조건부 추가 타격도 합쳐 최대 2타」): 2회 × 100% + 둔화면 60% → 둔화면 대마다 +30%(합 그대로)
       oracles: [
-        { tags: KEEP, fx: [dmg(1.4, 'randomEnemy', { hits: 2 }), slowed, dmg(1.4)] },   // 메인딜
+        { tags: KEEP, fx: [dmg(1.4, 'randomEnemy', { hits: 2, plus: 0.7, plusIf: slowed })] },   // 10-19 타수: + 둔화면 140% → 대마다 +70%   // 메인딜
         { tags: KEEP, fx: [dmg(1, 'randomEnemy', { hits: 2, hitFx: [status('약화', 1)] })] },   // 서포터
-        { tags: KEEP, cost: 0, fx: [dmg(0.6, 'randomEnemy', { hits: 2 }), slowed, dmg(0.6)] },
+        { tags: KEEP, cost: 0, fx: [dmg(0.6, 'randomEnemy', { hits: 2, plus: 0.3, plusIf: slowed })] },   // 10-19 타수: + 둔화면 60% → 대마다 +30%
         { tags: KEEP, fx: [dmg(1.2, 'randomEnemy', { hits: 2 }), step(1)] },   // 10-13 신탁 점검
         { tags: KEEP, fx: [dmg(1, 'randomEnemy', { hits: 2 }), dark, status('둔화', 1, { target: 'allEnemies' })] },   // 서포터
       ],
@@ -76,11 +76,11 @@ export default hero({
     },
     { // 마무리 — 보름 메인딜 / 반달 · 그믐 서포터 갈래
       name: '달님께 비는 운석', cost: 2, type: '공격', tags: ['유일', ...KEEP],   // 10-13 저녁 사용자: 유일(덱에 한 장 · 복제 안 됨). 10-13 신탁 점검: 신탁 1 · 2 · 3 · 5 올림(운석은 다음 턴 · 보름 고정 340%)
-      fx: [dmg(2.2, 'allEnemies')],
+      fx: [dmg(1.8, 'allEnemies')],   // 10-21 밸런스 조절: 220 → 180%
       oracles: [
         { power: true, fx: [fl(2), power([rule({ on: 'play' }, [moon(3), dmg(1.2, 'randomEnemy')])])] },   // 메인딜
         { tags: KEEP, fx: [{ k: 'later', n: 1, then: [dmg(5, 'allEnemies')] }] },                         // 메인딜
-        { tags: KEEP, fx: [dmg(3.4, 'allEnemies'), stack(M, 1, { set: 3 }), lock] },                       // 메인딜(보름 고정)
+        { tags: KEEP, fx: [dmg(2.8, 'allEnemies'), stack(M, 1, { set: 3 }), lock] },   // 10-21: 340 → 280%                       // 메인딜(보름 고정)
         { type: '스킬', tags: KEEP, fx: [heal(2), dark, { k: 'nextAp', v: 1 }] },                         // 서포터(그믐)
         { type: '스킬', tags: KEEP, fx: [shield(1.8), half, status('약화', 1, { target: 'allEnemies' })] },   // 서포터(반달)
       ],

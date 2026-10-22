@@ -24,6 +24,8 @@ namespace Bolzena.Core
         public readonly Dictionary<string, VillageDef> Villages = new();
         public readonly List<EventDef> Events = new();
         public readonly Dictionary<string, EquipDef> Equips = new();
+        /// <summary>사도 영구 성장 표(묶음 키 「prog」 — content world/성장, Prog.cs). 콘텐츠에 하나만. 없으면 null(성장 측정 · 적용 불가).</summary>
+        public ProgTable Prog;
 
         /// <summary>전투 중 만든 카드(패시브 · 키워드의 「카드 생성」) — 신탁 · 축복이 안 붙는 맨 카드. id 뒤에 붙인다.</summary>
         public const string PLAIN = "~";
@@ -44,6 +46,9 @@ namespace Bolzena.Core
         /// <summary>id → 그 id 가 든 파일(폴더에서 읽었을 때). 키는 "hero:id" · "card:id" · "enemy:id" · "village:id" · "event:id" · "equip:id" · "cloneHero:id".</summary>
         public readonly Dictionary<string, string> Sources = new();
         public string SourceOf(string kind, string id) => id != null && Sources.TryGetValue(kind + ":" + id, out var f) ? f : null;
+        /// <summary>콘텐츠 지문(Fingerprint) — 폴더에서 읽은 파일들(경로 + 글, \r 뺌)을 읽은 차례로 해시한 16자. 폴더에서 읽지 않았거나 Add 로 덧씌웠으면 null. 입력 테이프(BattleInput.Content)가 적는다.</summary>
+        public string ContentHash;
+        Fnv contentH;
 
         // ── 읽기 ──────────────────────────────────────────────────────
         /// <summary>
@@ -60,8 +65,10 @@ namespace Bolzena.Core
         {
             var d = new GameData();
             var errs = new List<string>();
+            d.contentH = new Fnv();
             foreach (var p in paths) d.ReadPath(p, errs);
             if (errs.Count > 0) throw new FormatException("데이터를 읽지 못했다" + NL + string.Join(NL, errs));
+            d.ContentHash = d.contentH.Hex(); d.contentH = null;
             d.views.Clear();
             return d;
         }
@@ -81,7 +88,9 @@ namespace Bolzena.Core
             {
                 string rel = File.Exists(path) ? Slash(Path.GetFullPath(f)) : Slash(Path.GetRelativePath(path, f));
                 Newtonsoft.Json.Linq.JToken tok;
-                try { tok = Newtonsoft.Json.Linq.JToken.Parse(File.ReadAllText(f)); }
+                var text = File.ReadAllText(f);
+                if (contentH != null) { contentH.S(rel); contentH.S(text.Replace("\r", "")); }
+                try { tok = Newtonsoft.Json.Linq.JToken.Parse(text); }
                 catch (JsonException e) { errs.Add($"{rel}: JSON 꼴이 아니다 — {e.Message}"); continue; }
                 if (tok is Newtonsoft.Json.Linq.JArray arr)
                 {
@@ -94,6 +103,13 @@ namespace Bolzena.Core
                     foreach (var prop in obj.Properties())
                     {
                         if (prop.Name.StartsWith("$")) continue;   // $schema 따위
+                        if (prop.Name == "prog")
+                        {   // 사도 영구 성장 표 — 한 벌만
+                            if (d.Prog != null) { errs.Add($"{rel}: 성장 표(prog)가 둘 — {d.SourceOf("prog", "prog")} 에도 있다"); continue; }
+                            try { d.Prog = JsonConvert.DeserializeObject<ProgTable>(prop.Value.ToString(), Json); Sources["prog:prog"] = rel; }
+                            catch (JsonException e) { errs.Add($"{rel}: 성장 표(prog)를 읽지 못했다: {e.Message}"); }
+                            continue;
+                        }
                         if (Array.IndexOf(FILES, prop.Name) < 0) { errs.Add($"{rel}: 모르는 키 「{prop.Name}」 — {string.Join(" · ", FILES)} 가운데"); continue; }
                         d.AddFrom(prop.Name, prop.Value.ToString(), rel, errs);
                     }
@@ -150,6 +166,7 @@ namespace Bolzena.Core
             foreach (var e in Parse<EventDef>(events, "events")) { Events.RemoveAll(x => x.Id == e.Id); Events.Add(e); }
             foreach (var e in Parse<EquipDef>(equips, "equips")) Equips[e.Id] = e;
             views.Clear();
+            ContentHash = null;   // 덧씌운 콘텐츠 — 폴더 지문과 다르다
             return this;
         }
 
@@ -299,6 +316,33 @@ namespace Bolzena.Core
         public HeroDef HeroOfForm(string id) => id == null ? null : Heroes.Values.FirstOrDefault(h => h.Forms != null && h.Forms.Any(f => f.Id == id));
         public EquipDef Equip(string id) => id != null && Equips.TryGetValue(id, out var e) ? e : null;
         public EventDef Event(string id) => Events.FirstOrDefault(e => e.Id == id);
+
+        // ── 마을 장비(2026-10-21 카제나식 — 공용 + 마을 묶음) ──────────────
+        /// <summary>공용 장비인가 — pool 이 없거나 「공용」(모든 마을 판에 나온다).</summary>
+        public static bool IsCommonEquip(EquipDef e) => e != null && (string.IsNullOrEmpty(e.Pool) || e.Pool == "공용");
+        /// <summary>그 마을 판에 나오는 장비인가(공용 또는 그 마을 묶음). village 가 null 이면 모든 장비.</summary>
+        public static bool EquipIn(EquipDef e, string village) => e != null && (village == null || IsCommonEquip(e) || e.Pool == village);
+
+        /// <summary>마을 → 장비 묶음(id 차례). grade 를 주면 그 희귀도만. common = false 면 공용 장비는 빼고 그 마을 묶음만(마을 고르기 · 도감).</summary>
+        public List<string> VillageGear(string village, string grade = null, bool common = false) =>
+            Equips.Values.Where(e => (grade == null || e.Grade == grade) && (common ? EquipIn(e, village) : e.Pool == village))
+                .Select(e => e.Id).OrderBy(x => x, StringComparer.Ordinal).ToList();
+
+        /// <summary>마을 고르기 창의 대표 장비 2개 — 마을의 showEquips(있는 장비만), 없으면 그 마을 묶음 전설 앞 2개.</summary>
+        public List<string> VillageShowcase(string village, int n = 2)
+        {
+            if (village == null || !Villages.TryGetValue(village, out var v)) return new List<string>();
+            var show = (v.ShowEquips ?? new List<string>()).Where(id => Equip(id) != null).Take(n).ToList();
+            return show.Count > 0 ? show : VillageGear(village, "전설").Take(n).ToList();
+        }
+
+        /// <summary>장비가 나오는 마을(id 차례) — 공용이면 모든 마을(도감 「나오는 마을」).</summary>
+        public List<string> EquipVillages(string equipId)
+        {
+            var e = Equip(equipId);
+            if (e == null) return new List<string>();
+            return Villages.Keys.Where(v => EquipIn(e, v)).OrderBy(x => x, StringComparer.Ordinal).ToList();
+        }
 
         /// <summary>그 사도의 고유 카드(id 차례).</summary>
         public List<string> UniquesOf(string heroId) =>

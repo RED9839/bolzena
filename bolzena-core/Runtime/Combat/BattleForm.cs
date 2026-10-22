@@ -101,7 +101,7 @@ namespace Bolzena.Core
             return o;
         }
 
-        static Fx Scaled(Fx f, double r) { var c = f.Copy(); c.Ratio = Math.Round(f.Ratio * r, 4); return c; }
+        static Fx Scaled(Fx f, double r) { var c = f.Copy(); c.Ratio = Math.Round(f.Ratio * r, 4); c.Plus = Math.Round(f.Plus * r, 4); return c; }
         /// <summary>피해 조각의 친 횟수 × n — 고정 횟수 피해만(일의 값 · 지속 피해 · X · 겹 비례 횟수 · 1개당(per 뒤) 피해는 그대로).</summary>
         static Fx MoreHits(Fx f, int n)
         {

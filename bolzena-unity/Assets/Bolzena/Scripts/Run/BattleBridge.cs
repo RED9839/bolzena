@@ -11,7 +11,9 @@ namespace Bolzena
     // 판 화면(com.bolzena.runui) ↔ 전투 화면(Battle 장면)의 다리.
     //   Flow.FightStop → Open: 코어 판이 싸움을 열고(Run.OpenFight — 쪽지는 CoreBattle 이 받는다) 판 화면을 감춘 뒤 Battle 장면으로.
     //   BattleDirector 가 끝을 보여 주면 Return: 판에 결과를 넣고(RunPort.Finish → Run.AfterFight) Run 장면으로 돌아와 판 화면을 다시 켠다.
-    public class BattleBridge : IFightScreen
+    //   프론티어(OpenFrontier): 판 없이 저장 사도 슬롯 · 시즌 · 서버 씨앗으로 Core.Frontier.Start 한 전투를 같은 길로 연다(신탁 · 은총 없이 — 엔진이 끈다).
+    //   끝(보스 처치 · 쓰러짐 · 턴 제한 TimeUp)을 보여 주면 Return: 입력 테이프를 닫아 FrontierTape.Json() 글을 그대로 들고 Run 장면으로 돌아와 결과를 넘긴다.
+    public class BattleBridge : IFightScreen, IFrontierFight
     {
         public const string RunScene = "Run", BattleScene = "Battle";
 
@@ -21,6 +23,81 @@ namespace Bolzena
             public RunPort.FightTicket Ticket;
             public CoreBattle Battle;
             public Action<RunPort.FightOutcome> Done;
+            /// <summary>프론티어 전투면 시즌(판 전투는 null — Port · Ticket 이 null 이다).</summary>
+            public Bolzena.Core.FrontierSeason Frontier;
+            public List<Bolzena.Core.HeroSlot> FrontierSlots;
+            public Action<FrontierResult> FrontierDone;
+            /// <summary>시험 덱 전투(「덱 만들기」 — 규칙 검사 밖 슬롯 · 사도별 딜 측정).</summary>
+            public bool Lab;
+            /// <summary>배경(Ticket 이 없을 때 — 프론티어).</summary>
+            public string Bg;
+        }
+
+        /// <summary>프론티어 싸움터 배경.</summary>
+        public const string FrontierBg = "stage37_1";
+
+        public void OpenFrontier(Bolzena.Core.GameData data, List<Bolzena.Core.HeroSlot> slots, Bolzena.Core.FrontierSeason season, long seed, Action<FrontierResult> done, bool lab = false, Bolzena.Core.ProgState prog = null)
+        {
+            var cb = CoreBattle.ForRun(data);
+            var gear = new Dictionary<string, Dictionary<string, string>>();
+            foreach (var s in slots) gear[s.Hero] = new Dictionary<string, string>(s.Gear);
+            CoreBattle.GearOf = k => gear.TryGetValue(k, out var g) ? g : null;
+            // 시험 덱(lab)은 규칙 검사 밖 슬롯도 열고(strict false) · 사도별 딜을 잰다(Battle.HpMeter — 측정 전용, Battle.Start 때 켜져 있어야 그 전투를 잰다 · 점수 · 테이프 · 지문 무관)
+            Bolzena.Core.Battle b;
+            Bolzena.Core.Battle.HpMeterOn = lab;
+            try { b = Bolzena.Core.Frontier.Start(data, slots, season, seed, cb.CueSink, strict: !lab, prog: prog); }   // prog — 서버가 떠 둔 성장(성장 켬일 때만, 없으면 null = 지금과 같다)   // 셋업 · 입력 테이프(Record)까지 — 서버 검증기가 같은 슬롯 · 씨앗에서 똑같이 짓는다
+            finally { Bolzena.Core.Battle.HpMeterOn = false; }
+            cb.Attach(b);
+            cb.FrontierSeason = season;
+            cb.RunTally = null;
+            Fight = new Pending { Battle = cb, Frontier = season, FrontierSlots = slots, FrontierDone = done, Bg = FrontierBg, Lab = lab };
+            PlayRecord.FightSpeed = () => 0;   // 판 기록(전투 시간)에 섞지 않는다
+            EndHold = null;                    // 보상 오버레이 없음 — 끝을 보여 주면 곧장 결과로
+            Debug.Log($"[Bridge] 프론티어 열기{(lab ? "(시험 덱)" : "")} — {season.Id}/{season.Boss}/{season.Turns}턴 · 씨앗 {seed} · [{string.Join(", ", slots.ConvertAll(s => s.Hero))}] · 파티 HP {b.Pool.Hp}");
+            Hitch.Mark("프론티어 열기");
+            Flow.Me.StartCoroutine(Enter());
+        }
+
+        // 프론티어 끝 — 테이프를 닫아 글로(FrontierTape.Json() 그대로 — 다시 직렬화하지 않는다) Run 장면으로 돌아가 결과를 넘긴다
+        static void ReturnFrontier(Pending p, bool quit)
+        {
+            Clock.Reset();
+            var res = new FrontierResult();
+            var fb = p.Battle?.Fight;
+            try
+            {
+                if (fb == null) res.Error = "전투가 없다";
+                else
+                {
+                    res.Over = Bolzena.Core.Frontier.Over(fb, p.Frontier);
+                    res.Score = Bolzena.Core.Frontier.Score(fb);
+                    res.Played = Math.Min(fb.Turn, p.Frontier.Turns);
+                    if (p.Lab && fb.HpMeter != null)
+                    {
+                        res.Meter = new Dictionary<string, long[]>();
+                        foreach (var kv in fb.HpMeter) res.Meter[kv.Key] = (long[])kv.Value.Clone();
+                    }
+                    if (quit || res.Over == null) res.Error = "전투를 끝까지 하지 않아 낼 수 없다";
+                    else
+                    {
+                        var tape = Bolzena.Core.Frontier.Tape(fb, p.Frontier, p.FrontierSlots);
+                        res.Tape = tape.Json();
+                        res.Score = tape.Score; res.Over = tape.Over; res.Played = tape.Played;
+                    }
+                }
+            }
+            catch (Exception e) { Debug.LogException(e); res.Error = "기록을 닫지 못했습니다 — " + e.Message; res.Tape = null; }
+            Debug.Log($"[Bridge] 프론티어 끝 — {res.Over ?? "-"} · {res.Played}턴 · 점수 {res.Score} · 테이프 {(res.Tape != null ? $"{res.Tape.Length / 1024f:0.0}KB" : "없음")}");
+            void Loaded(Scene s, LoadSceneMode m)
+            {
+                SceneManager.sceneLoaded -= Loaded;
+                Fight = null; finished = false;
+                PlayRecord.FightSpeed = null;
+                Flow.Me.Stage.Canvas.enabled = true;
+                p.FrontierDone?.Invoke(res);
+            }
+            SceneManager.sceneLoaded += Loaded;
+            SceneManager.LoadScene(RunScene);
         }
 
         /// <summary>끝 자세(싸움터를 둔 채 HUD 를 걷은 모습) 위에서 붙들 손 — 판 화면의 「배경 없이 보상 열기」 가 생기면 여기에 그것을 꽂는다
@@ -114,6 +191,7 @@ namespace Bolzena
         public static void LeaveToLobby()
         {
             if (Fight == null || Flow.Me == null) { Debug.Log("[Bridge] 판이 없어(전투 시범) 메인 화면으로 못 나감"); return; }
+            if (Fight.Frontier != null) { var fp = Fight; ReturnFrontier(fp, true); return; }   // 프론티어 — 그만둠(시도는 쓴 것으로 센다 · 낼 수 없다)
             PlayRecord.Send(Fight.Port, "quit");   // 플레이 기록 — 메인으로(판은 이어할 수 있다)
             Clock.Reset();
             void Loaded(Scene s, LoadSceneMode m)
@@ -131,6 +209,7 @@ namespace Bolzena
         {
             var p = Fight;
             if (p == null || finished) return;
+            if (p.Frontier != null) { finished = true; ReturnFrontier(p, false); return; }
             Clock.Reset();
             var o = p.Port.Finish(p.Ticket);
             Debug.Log($"[Bridge] 싸움 끝 — {(o.Won ? "승리" : "패배")} · {o.Turns}턴 · 파티 HP {o.HpBefore} → {o.HpAfter}");

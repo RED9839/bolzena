@@ -42,7 +42,7 @@ function syncOracles(c) {
     }
     const t = TUNE[c.id]?.[String(i + 1)];
     if (t && t !== 1) {
-      const walk = (fx) => (fx || []).forEach(f => { if (POW.has(f.k) && typeof f.ratio === 'number' && !f.ofEvent && !f.ofShield && !f.ofForm) f.ratio = grid(f.ratio * t); if (f.then) walk(f.then); if (f.hitFx) walk(f.hitFx); });
+      const walk = (fx) => (fx || []).forEach(f => { if (POW.has(f.k) && typeof f.ratio === 'number' && !f.ofEvent && !f.ofShield && !f.ofForm) { f.ratio = grid(f.ratio * t); if (typeof f.plus === 'number') f.plus = grid(f.plus * t); } if (f.then) walk(f.then); if (f.hitFx) walk(f.hitFx); });
       walk(o.fx);
     }
   });

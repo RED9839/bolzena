@@ -224,7 +224,7 @@ namespace Bolzena.Fx
             { "벨라", "^Hand_[LR]$" },                                    // 무기 없음 — 앞 손
             { "비비", "^(Weapon|Weapon_Dagger\\d*)$" },                    // 단검들
             { "비비_신성", "\\]Hand_" },                                  // 손가락 끝([SKY]Hand_L_5_Finger …)
-            { "이드", "^Hand_[LR]$" },                                    // 손 — Point_Attack1 은 몸 뒤로 움직이는 점이었다
+            { "이드", "^Nattah_(Body|Head|Face)" },                     // 나타(앞에 뜬 로봇)가 대신 쏜다 — 2026-10-15 사용자. 손은 몸 뒤라 엉뚱했다
             { "에르핀_왕도", "^Hand_[LR]$" },                             // 주먹(FX_Punch 는 몸 앞 고정 점)
             { "란", "^(Weapon_Blade|Weapon_Grip.*)$" },                   // 칼 · 칼자루
             { "아야", "^(Sword|Weapon_)" },                               // 꽃 지팡이 · 센 공격의 칼
@@ -239,6 +239,8 @@ namespace Bolzena.Fx
             { "요미", "^Weapon_(Body|Ring)" },                            // 무기 몸통
             { "죠안", "^Hand_[LR]$" },                                    // 손가락 튕기는 손
         };
+        // (10-18 4차 사용자 「레이저는 나타 가운데에서」) 가장 앞 꼭짓점 대신 그 슬롯들 그림의 가운데(상자 가운데)를 쓰는 사도 — 꼭짓점이 슬롯 사이를 건너뛰며 점이 튀지도 않는다
+        public static readonly HashSet<string> WEAPON_CENTER = new HashSet<string> { "이드" };
 
         // 고학년 타격 시각 — SD 이벤트를 모르면 동작 시작에서 이만큼(ms)
         public const int ULT_HIT = 500;

@@ -353,25 +353,25 @@ namespace Bolzena.UI
                     var tb = ToughBar.Create(st.T, new Vector3(Pad + tw / 2, py, 0), tw, 0.11f, tmax, OC, false);
                     tb.Set(e.ToughV, false);
                     tb.SetBroken(e.Broken, false);
-                    Tone.Text("tt", st.T, e.Broken ? "<color=#ffd65a>격파됨</color>  <size=85%>— 이번 차례를 쉽니다</size>"
+                    Tone.Text("tt", st.T, e.Broken ? "<color=#ffd65a>격파됨</color>  <size=85%>— 이번 차례를 쉰다</size>"
                         : $"강인도 <color=#d9c9ff>{EnemyHud.Thirds(e.ToughV)}</color> <color={Tone.DimTag}>/ {EnemyHud.Thirds(tmax)}</color>",
                         new Vector3(Pad + tw + 0.14f, py, 0), Tone.Sm, OC, Tone.Sub, TextAlignmentOptions.Left, true);
                     py -= 0.24f;
-                    Tone.Text("tn", st.T, e.Broken ? "다음 차례가 오면 일어나 강인도가 다시 가득 찹니다" : "격파되면 1턴 동안 행동하지 못합니다 · 격파한 쪽 AP +1",
+                    Tone.Text("tn", st.T, e.Broken ? "다음 차례에 일어나 강인도가 다시 가득 찬다" : "격파되면 1턴 동안 행동하지 못한다 · 격파한 쪽 AP +1",
                         new Vector3(Pad, py, 0), Tone.Cap, OC, Tone.Sub, TextAlignmentOptions.Left, true, Wd - Pad * 2);
                 }
                 else
                 {
                     // 강인도가 없는 적(보스가 부르는 몹) — 막대 대신 한 줄
-                    Tone.Text("tt", st.T, "강인도 없음 — 격파되지 않습니다", new Vector3(Pad, py, 0), Tone.Sm, OC, Tone.Dim, TextAlignmentOptions.Left, true, Wd - Pad * 2);
+                    Tone.Text("tt", st.T, "강인도 없음 — 격파되지 않는다", new Vector3(Pad, py, 0), Tone.Sm, OC, Tone.Dim, TextAlignmentOptions.Left, true, Wd - Pad * 2);
                 }
                 st.Y = py - 0.2f;
 
                 // 다음 행동 칸
                 st.Head("다음 행동");
                 float it = st.Y;
-                if (e.Dead) st.Para("쓰러졌습니다", Pad, Wd - Pad * 2, Tone.Body, Tone.Dim);
-                else if (e.Broken || e.Intent == IntentKind.None) st.Para(e.Broken ? "격파 — 1턴 동안 행동하지 못합니다(격파한 쪽 AP +1)." : "할 일 없음", Pad, Wd - Pad * 2, Tone.Body, Tone.Sub);
+                if (e.Dead) st.Para("쓰러졌다", Pad, Wd - Pad * 2, Tone.Body, Tone.Dim);
+                else if (e.Broken || e.Intent == IntentKind.None) st.Para(e.Broken ? "격파 — 1턴 동안 행동하지 못한다(격파한 쪽 AP +1)" : "할 일 없음", Pad, Wd - Pad * 2, Tone.Body, Tone.Sub);
                 else
                 {
                     var k = e.Intent;
@@ -412,12 +412,12 @@ namespace Bolzena.UI
         public static string Rush(EnemyState e, bool longForm)
         {
             if (e.Sealed) return "<color=#a9a3b8>봉인됨</color>";
-            if (e.RushNeed <= 0) return longForm ? Tip.Dim("▶ 즉시 행동으로 당겨지지 않습니다") : "";
-            if (e.RushedTurn) return longForm ? "<color=#a9a3b8>▶ 이번 턴에는 이미 즉시 행동했습니다</color>" : "<color=#a9a3b8>▶끝</color>";
+            if (e.RushNeed <= 0) return longForm ? Tip.Dim("▶ 즉시 행동으로 당겨지지 않는다") : "";
+            if (e.RushedTurn) return longForm ? "<color=#a9a3b8>▶ 이번 턴에는 이미 즉시 행동했다</color>" : "<color=#a9a3b8>▶끝</color>";
             int left = e.RushNeed - e.RushCnt;
             string col = left <= 1 ? "#ff7a6a" : "#ffe28a";
             return longForm
-                ? $"<color={col}>▶{e.RushCnt}/{e.RushNeed}</color> — 카드를 {left}장 더 내면 이 수를 즉시 씁니다"
+                ? $"<color={col}>▶{e.RushCnt}/{e.RushNeed}</color> — 카드를 {left}장 더 내면 이 수를 즉시 쓴다"
                 : $"<color={col}>▶{e.RushCnt}/{e.RushNeed}</color>";
         }
     }

@@ -34,9 +34,6 @@ namespace Bolzena.Core
         /// <summary>도달한 층(1 · 2) · 싸움 세기(0..2, 3 = 보스) · 걸음 · 마지막 칸 종류.</summary>
         public int Floor, Node, Step;
         public string At;
-        public int Grade, Credits;
-        /// <summary>교주 보드(크레파스)에 칠한 단계 수(화면이 준다).</summary>
-        public int Board;
         /// <summary>전투 시간 가운데 2배속이던 몫(0~1). 전투가 없었으면 없음.</summary>
         public double? Fast;
         public int Gold, Hp, MaxHp, Removals;
@@ -48,6 +45,8 @@ namespace Bolzena.Core
         public DeathRec Death;
         /// <summary>크기 상한 때문에 줄인 단계(0 = 그대로) — 1 일반 전투 턴 기록 · 2 진열 · 3 제시된 것 · 4 선택 기록 · 5 모든 턴 기록 · 6 덱.</summary>
         public int Trim;
+        /// <summary>난이도 단계(RunState.Tier — 1~9, 0 = 단계 없음이라 JSON 에 안 적힌다). 받는 쪽 record.js 가 tier 를 알아야 보낼 수 있다(2026-10-20).</summary>
+        public int Tier;
     }
 
     public sealed class PartySlot { public string Id; public int Slot; }
@@ -55,13 +54,12 @@ namespace Bolzena.Core
     /// <summary>쓰러진 곳 — 층 · 싸움 세기 · 종류 · 그때 적 · 파티 HP(그 싸움 시작 · 최대) · 몇 턴째.</summary>
     public sealed class DeathRec { public int F, N, Turn; public string K; public List<string> Foes; public int Hp, MaxHp; }
 
-    /// <summary>화면이 아는 것 — 익명 id · 버전 · 플랫폼 · 끝난 시각 · 결과 · 교주 보드.</summary>
+    /// <summary>화면이 아는 것 — 익명 id · 버전 · 플랫폼 · 끝난 시각 · 결과.</summary>
     public sealed class RecordMeta
     {
         public string Anon, Ver, Build, Os = "pc", Result;
         public bool Phone, Low;
         public DateTime Ended = DateTime.UtcNow;
-        public int Board;
     }
 
     public static class RunRecord
@@ -108,7 +106,6 @@ namespace Bolzena.Core
                 Result = m.Result ?? (S.Done == "clear" ? "win" : S.PartyHp <= 0 ? "lose" : "quit"),
                 Party = S.Party.Select((k, i) => new PartySlot { Id = k, Slot = i + 1 }).ToList(),
                 Floor = S.Floor + 1, Node = S.Node, Step = S.Step, At = run.CurrentNode?.Type,
-                Grade = R.GRADE_ON ? run.Grade : 0, Credits = R.GRADE_ON ? S.Credits : 0, Board = m.Board,   // 학년 꺼짐이면 0
                 Fast = rec.FightSec > 0 ? Math.Round(Math.Min(1, rec.FastSec / rec.FightSec), 3) : (double?)null,
                 Gold = S.Gold, Hp = Math.Max(0, S.PartyHp), MaxHp = S.PartyMaxHp, Removals = S.Removals,
                 Fights = S.Hist.Select(CopyFight).ToList(),
@@ -118,6 +115,7 @@ namespace Bolzena.Core
                     Id = g.Key, N = g.Count(), O = S.Flash.TryGetValue(g.Key, out var f) ? f : 0, B = S.Shin.TryGetValue(g.Key, out var sh) ? sh : null,
                 }).ToList(),
                 Arts = S.Party.Where(k => run.GearOf(k).Count > 0).ToDictionary(k => k, k => new Dictionary<string, string>(run.GearOf(k))),
+                Tier = S.Tier,
             };
             if (r.Arts.Count == 0) r.Arts = null;
             if (rec.Began != null && DateTime.TryParse(rec.Began, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var b0))

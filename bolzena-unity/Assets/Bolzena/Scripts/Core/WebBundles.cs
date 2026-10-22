@@ -91,7 +91,7 @@ namespace Bolzena
                     }
                     if (r.responseCode == 404) { Debug.Log("[Bundles] 매니페스트 없음 — Resources 만 쓴다"); Ready(); yield break; }
                     Debug.LogWarning($"[Bundles] 매니페스트 실패({attempt}) {r.error}");
-                    Status(-1, $"그림 목록을 받지 못했습니다 — 다시 시도하는 중({attempt})…");
+                    Status(-1, $"그림 목록을 받지 못했다 — 다시 받는 중({attempt})…");
                 }
                 yield return new WaitForSecondsRealtime(Mathf.Min(10f, 1.5f * attempt));
             }
@@ -167,7 +167,7 @@ namespace Bolzena
                             if (b != null) { loaded[e.folder] = b; done += e.size; lastFail = 0; break; }
                             Debug.LogWarning($"[Bundles] {e.file} 실패({attempt}) {r.error}");
                             lastFail = attempt;
-                            if (loud || waiting) Status(-1, $"그림을 받지 못했습니다 — 다시 시도하는 중({attempt})… 연결을 확인해 주세요");
+                            if (loud || waiting) Status(-1, $"그림을 받지 못했다 — 다시 받는 중({attempt})… 연결을 확인할 수 있다");
                         }
                         yield return new WaitForSecondsRealtime(Mathf.Min(10f, 1.5f * attempt));
                     }

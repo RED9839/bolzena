@@ -54,17 +54,21 @@ static class Program
         string b = Opt("bot", "basic"), p = Opt("party", PartyPick.Random); bool u = Flag("uniqueonly");
         if (b != "basic" && b != "skilled") return (null, null, "--bot 은 basic(초보) · skilled(숙련)");
         if (!PartyPick.MODES.Contains(p)) return (null, null, "--party 는 random · role · synergy");
-        // --crayon all | 표.json — 교주 보드(크레파스) 전부 올린 상태(기본 표: bolzena-runui Resources/RunUI/crayon.json)
-        string cr = Opt("crayon");
-        Dictionary<string, double> perks = null;
-        if (cr != null)
-        {
-            string f = cr == "all" ? Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../../bolzena-runui/Runtime/Resources/RunUI/crayon.json")) : cr;
-            if (!File.Exists(f)) return (null, null, "크레파스 표가 없다: " + f);
-            perks = Crayon.Perks(Crayon.Parse(File.ReadAllText(f)), null, all: true);
-            Console.WriteLine("교주 보드 전부 — " + string.Join(" · ", perks.Select(kv => $"{kv.Key} {kv.Value}")));
-        }
-        return (new SimOpts { Skilled = b == "skilled", UniqueOnly = u, Perks = perks }, p, null);
+        // --prog none|q1|half|q3|max — 사도 잠재력 측정 묶음(콘텐츠 성장 표 presets — 잠재력 연 비율, Prog.cs)
+        string pg = Opt("prog");
+        if (pg != null && ProgErr(pg) is string pe) return (null, null, pe);
+        // --tier N — 난이도 단계(Tiers.Scale, 1 ~ Tiers.MAX). 없으면 0(단계 없음 = 지금 판)
+        int tier = int.Parse(Opt("tier", "0"));
+        if (tier < 0 || tier > Tiers.MAX) return (null, null, $"--tier 는 0 ~ {Tiers.MAX}");
+        return (new SimOpts { Skilled = b == "skilled", UniqueOnly = u, Prog = pg, Tier = tier }, p, null);
+    }
+
+    static GameData progData;
+    /// <summary>--prog 묶음 이름이 틀렸으면 까닭(콘텐츠에 성장 표가 없거나 묶음이 없음).</summary>
+    static string ProgErr(string name)
+    {
+        if (progData?.Prog == null) return "--prog: 콘텐츠에 성장 표(prog)가 없다 — --data C:\\projects\\bolzena-content-v2";
+        return progData.Prog.Presets.ContainsKey(name) ? null : $"--prog 는 {string.Join(" · ", progData.Prog.Presets.Keys)} 가운데";
     }
 
     /// <summary>원작 관계(시너지 편성) — --relations 파일, 없으면 데이터 폴더의 _ref/relations.json, 그다음 사도 데스크의 relations.json. 못 찾으면 빈 표(키워드 맞물림만).</summary>
@@ -144,6 +148,12 @@ static class Program
             long later = G(k + "|keepPaid") + G(k + "|keepUnpaid");
             sb.AppendLine($"  [{ko}] 턴 {t} · 낸 턴 {P(G(k + "|played"), t)} · 쥐고 넘긴 턴 {P(G(k + "|held"), t)} · 낼 AP 가 있는데 쥔 턴 {P(G(k + "|heldPlayable"), t)} · 보존 카드 쥔 턴 {P(G(k + "|keepHeld"), t)}{(G(k + "|keepHeld") > 0 ? $" — 까닭 {string.Join(" · ", why)}" : "")}{(later > 0 ? $" · 때 맞음 {P(G(k + "|keepPaid"), later)}" : "")}");
         }
+        if (G("xPlay") > 0)
+        {   // (10-22 에르핀) X 카드 — 쓴 AP 나눔 · 평균 X 겹
+            var dist = Battle.Trace.Where(kv => kv.Key.StartsWith("xAp:")).Select(kv => (a: int.Parse(kv.Key.Substring(4)), n: kv.Value)).OrderBy(x => x.a).Select(x => $"AP {x.a} {P(x.n, G("xPlay"))}");
+            sb.AppendLine($"  X 카드 {G("xPlay")}번 · 평균 AP {(double)G("xAp") / G("xPlay"):0.00} · 평균 X 겹 {(double)G("xStack") / G("xPlay"):0.00} — {string.Join(" · ", dist)}");
+        }
+        if (turns > 0) sb.AppendLine($"  AP 를 남기고 마친 턴 {P(G("apLeftTurns"), turns)} · 남긴 AP 평균(그 턴) {(G("apLeftTurns") > 0 ? (double)G("apLeft") / G("apLeftTurns") : 0):0.00}");
         if (G("pick") > 0) sb.AppendLine($"  고른 만큼 쓰기 {G("pick")}번 — 전부가 아닌 고름 {P(G("pickPartial"), G("pick"))}");
         if (G("formIn") > 0)
         {
@@ -161,6 +171,7 @@ static class Program
     static int Main(string[] args)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
+        if (args.Length > 0 && args[0] == "admin") return Admin.Run(args.Skip(1).ToArray());   // 운영 명령(Admin.cs) — 콘텐츠를 읽지 않는다
         rest = args.ToList();
         if (Opt("bossult") == "0") BossUlt.On = false;   // 보스 클론 고학년 끄기(전후 비교)
         string bux = Opt("bossultx"); if (bux != null) BossUlt.Scale = D(bux);   // 보스 고학년 피해 배율(계수 찾기)
@@ -174,11 +185,12 @@ static class Program
         string fdm = Opt("floordmg"); if (fdm != null) { var fv = fdm.Split(',').Select(D).ToArray(); for (int i = 0; i < fv.Length; i++) R.FLOOR_DMG[i + 1] = fv[i]; }   // 층별 적 피해 배율 시험(1층,2층 — Rules.cs 를 고치기 전 후보 재기)
         string nodes = Opt("nodes"); if (nodes != null) R.FLOOR_NODES = int.Parse(nodes);   // 층 길이 시험(옛 10 칸과 견주기 — Rules.cs FLOOR_NODES)
         var paths = Many("data");
-        if (paths.Count == 0) paths.Add(rest.FirstOrDefault() == "records" && Directory.Exists(@"C:\projects\bolzena-content-v2") ? @"C:\projects\bolzena-content-v2"   // 플레이 기록은 실제 콘텐츠로 읽는다
+        if (paths.Count == 0) paths.Add((rest.FirstOrDefault() == "records" || rest.FirstOrDefault() == "verify") && Directory.Exists(@"C:\projects\bolzena-content-v2") ? @"C:\projects\bolzena-content-v2"   // 플레이 기록 · 프론티어 검증은 실제 콘텐츠로 읽는다
             : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../Data/Sample")));
         GameData data;
         try { data = GameData.FromFolders(paths); }
         catch (Exception e) { Console.WriteLine("읽기 실패"); Console.WriteLine(e.Message); return 2; }
+        progData = data;
         string cmd = rest.Count > 0 ? rest[0] : "check";
         if (rest.Count > 0) rest.RemoveAt(0);
         var tx = new CardText(data);
@@ -314,13 +326,17 @@ static class Program
                     // solo [--err 2] [--min 300] [--max 3000] [--hero 키;키] [--out 파일.md] [--seed 0] — 사도마다 「혼자」 완주율(그 사도 + 무작위 둘), 병렬
                     double err = D(Opt("err", "2")); int min = int.Parse(Opt("min", "300")), max = int.Parse(Opt("max", "3000")), seed = int.Parse(Opt("seed", "0"));
                     var only = Many("hero"); string outp = Opt("out") ?? NewOut("solo.md"); string kwOut = Opt("kw");
+                    string sprog = Opt("prog"); double shp = D(Opt("hp", "1")), sdmg = D(Opt("dmg", "1")); int sth = int.Parse(Opt("threads", "0"));   // 사도 영구 성장 묶음 · 적 배율(난이도 단계 재기)
+                    int stier = int.Parse(Opt("tier", "0"));   // 난이도 단계(Tiers.Scale)
+                    if (stier < 0 || stier > Tiers.MAX) { Console.WriteLine($"--tier 는 0 ~ {Tiers.MAX}"); return 1; }
+                    if (sprog != null && ProgErr(sprog) is string spe) { Console.WriteLine(spe); return 1; }
                     if (kwOut != null) { KwMeter.Reset(); KwMeter.On = true; }
                     var t0 = DateTime.Now;
-                    var rows = MetaSim.Solo(data, err, min, max, seed, heroes: only.Count > 0 ? only : null, log: Console.WriteLine);
-                    File.WriteAllText(outp, MetaSim.SoloMarkdown(data, rows, Opt("title", "사도 혼자 완주율")));
+                    var rows = MetaSim.Solo(data, err, min, max, seed, threads: sth, heroes: only.Count > 0 ? only : null, log: Console.WriteLine, prog: sprog, hpx: shp, dmgx: sdmg, tier: stier);
+                    File.WriteAllText(outp, MetaSim.SoloMarkdown(data, rows, Opt("title", "사도 혼자 완주율" + (sprog != null ? $" · 성장 {sprog}" : "") + (stier > 0 ? $" · 단계 {stier}" : "") + (shp != 1 || sdmg != 1 ? $" · 적 HP×{shp} 피해×{sdmg}" : ""))));
                     if (kwOut != null) { KwMeter.On = false; File.WriteAllText(kwOut, KwTable(data)); Console.WriteLine($"→ 고유 효과 계측 {Path.GetFullPath(kwOut)}"); }
                     foreach (var r in rows) Console.WriteLine($"  {r.Name}({r.Role}) {r.Win:0.0}% ±{r.Err:0.0} ({r.N}판)");
-                    Console.WriteLine($"→ {Path.GetFullPath(outp)} · {rows.Sum(r => r.N)}판 · {(DateTime.Now - t0).TotalSeconds:0}초");
+                    Console.WriteLine($"→ {Path.GetFullPath(outp)} · {rows.Sum(r => r.N)}판 · 평균 {rows.Average(r => r.Win):0.0}% · {(DateTime.Now - t0).TotalSeconds:0}초");
                     return 0;
                 }
             case "records":
@@ -376,12 +392,27 @@ static class Program
                 }
             case "weaksim":
                 {
-                    // weaksim [바퀴] [--seed 0] [--bot skilled] [--weak role|0|1|2|3] [--crayon all|표] — 약점 사도 수별 완주율(WeakSim.cs)
+                    // weaksim [바퀴] [--seed 0] [--bot skilled] [--weak role|0|1|2|3] — 약점 사도 수별 완주율(WeakSim.cs)
                     int seed = int.Parse(Opt("seed", "0")); string weak = Opt("weak", "role");
                     var (bot, _, err) = BotOpts(); if (err != null) { Console.WriteLine(err); return 1; }
                     int n = rest.Count > 0 && int.TryParse(rest[0], out var x4) ? x4 : 400;
-                    return WeakSim.Run(data, n, seed, bot.Skilled, weak, bot.Perks);
+                    return WeakSim.Run(data, n, seed, bot.Skilled, weak);
                 }
+            case "replay":
+                // replay [판 54] [--seed 0] [--threads 8] [--bot basic|skilled] [--party random|role|synergy] [--preview] [--out 폴더] · replay 파일.json|폴더 — 입력 테이프 다시 돌리기(Replay.cs)
+                return Replay.Run(data, rest, (a, b) => Opt(a, b), Flag, BotOpts);
+            case "vilgear":
+                // vilgear [셋 판 300] [--solo 60] [--seed 0] [--threads 8] [--out 파일.md] — 마을을 정한 완주율 · 사도 × 마을 표(VillageGear.cs)
+                return VillageGear.Run(data, rest, (a, b) => Opt(a, b));
+            case "frontier":
+                // frontier [판 200] [--slotbot basic|skilled|both] [--fights 300] [--fightbot smart|simple|both] [--turns N] [--boss id] [--hp 1] [--dmg 1] [--save 폴더] [--out 파일.md] · --slots a,b,c · --verify 테이프 — 프론티어(FrontierSim.cs)
+                return FrontierSim.Run(data, rest, (a, b) => Opt(a, b), Flag);
+            case "herodps":
+                // herodps [--fights 400] [--oracle best|1..5|all] [--fixed a,b[;c,d]] [--fightbot smart|simple] [--seed 0] [--threads 8] [--verify 50] [--out 파일.md] [--tsv 파일] · --list — 사도별 개별 딜(측정 전용, HeroDps.cs)
+                return HeroDps.Run(data, rest, (a, b) => Opt(a, b), Flag);
+            case "verify":
+                // verify [--url 주소] [--token 관리자토큰] [--limit 20] [--log 파일] [--strict-version] [--dry] — 서버의 검증 대기 슬롯 · 점수를 다시 돌려 결과를 올린다(Verify.cs)
+                return Verify.Run(data, (a, b) => Opt(a, b), Flag);
             case "bench":
                 // bench [판 20] [--seed 0] [--rep 3] [--records 파일] · bench --sim 바퀴 [--threads 8] · bench --textdump 파일 — 엔진 성능(Bench.cs)
                 return Bench.Run(data, rest);
@@ -420,7 +451,30 @@ static class Program
                     foreach (var l in per) Console.WriteLine(l);
                     return 0;
                 }
-            case "natures":
+            case "prog":
+                {
+                    // prog [묶음 …] — 성장 표의 측정 묶음마다 역할 대표 사도의 최종 능력치 · 카드군 덤 · 증감 · 패시브 수(Prog.Build, 판 장비 빼고)
+                    if (data.Prog == null) { Console.WriteLine("콘텐츠에 성장 표(prog)가 없다"); return 1; }
+                    var names = rest.Count > 0 ? rest.ToList() : data.Prog.Presets.Keys.ToList();
+                    var reps = data.Heroes.Values.GroupBy(h => h.Role).Select(g => g.OrderBy(h => h.Id, StringComparer.Ordinal).First().Id).ToList();
+                    foreach (var nm in names)
+                    {
+                        var st = Prog.Preset(data, data.Prog, nm, reps);
+                        if (st == null) { Console.WriteLine($"묶음 없음: {nm}"); return 1; }
+                        var pb = Prog.Build(data, data.Prog, st, reps);
+                        Console.WriteLine($"## {nm} — {data.Prog.Presets[nm].Desc}");
+                        foreach (var k in reps)
+                        {
+                            var h = data.Hero(k); var s = pb.Sum.TryGetValue(k, out var s0) ? s0 : null; var m = pb.Mods.TryGetValue(k, out var m0) ? m0 : null;
+                            if (s == null) { Console.WriteLine($"  {h.Name}({h.Role}) — 성장 없음"); continue; }
+                            Console.WriteLine($"  {h.Name}({h.Role}) · HP {h.Hp}→{s.Hp}({100.0 * s.Hp / h.Hp:0}%) · 공격 {h.Atk}→{s.Atk}({100.0 * s.Atk / h.Atk:0}%) · 방어 {h.Def}→{s.Def}({100.0 * s.Def / h.Def:0}%) · 치명 {h.Crit}→{s.Crit}"
+                                + $" · 카드 기본 +{m.Basic * 100:0}% 교주 +{m.Neutral * 100:0}% 고유 +{m.Unique * 100:0}% · 증감 {(m.Stat == null ? "-" : string.Join(" ", m.Stat.Select(kv => $"{kv.Key} +{kv.Value * 100:0.#}%")))}"
+                                + $" · 패시브 {m.Rules?.Count ?? 0} · 카드 덤 {m.Cards?.Count ?? 0}{(m.Shin > 0 ? $" · 축복 ×{1 + m.Shin:0.##}" : "")} · 시작 고유 +{(pb.StartUniques.TryGetValue(k, out var su) ? su : 0)}");
+                        }
+                        foreach (var x in Prog.CheckState(data, data.Prog, Prog.Preset(data, data.Prog, nm, data.Heroes.Keys))) Console.WriteLine("  검사 " + x);
+                    }
+                    return 0;
+                }            case "natures":
                 {
                     // natures [씨앗] — 마을 × 적 속성: 고를 수 있나 · 그 속성의 보스 클론(빌린 몸이면 「몸」)
                     long seed = rest.Count > 0 ? long.Parse(rest[0]) : 1;

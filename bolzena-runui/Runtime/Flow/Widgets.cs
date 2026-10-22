@@ -363,7 +363,7 @@ namespace Bolzena.RunUI
         /// noFace — 오른쪽 위 주인 얼굴 핀을 숨긴다(신탁 고르기 창만 — 2026-10-06 사용자). 틀 색은 그대로 주인 성격.</summary>
         /// <summary>신탁 고르기 창 후보 카드에 축복 효과 줄을 얹을 때(그 한 장 만드는 동안만) 쓴다.</summary>
         public static string BlessOverride;
-        public static RectTransform Card(Transform parent, Flow f, string id, float w = 200, string name = "card", CardView view = null, string owner = null, bool noFace = false)
+        public static RectTransform Card(Transform parent, Flow f, string id, float w = 200, string name = "card", CardView view = null, string owner = null, bool noFace = false, CardMark markOf = null)
         {
             var P = f.P;
             var v = view ?? P.View(id);
@@ -453,7 +453,7 @@ namespace Bolzena.RunUI
 
             // ── 아래 글 자리 재기(효과 글 길이만큼 어둠을 올린다) ──
             string full = v != null ? P.Text.Card(v) : "";
-            var mark = view == null ? f.P.Mark(id) : CardMark.Of(P.Data, id, 0, null);
+            var mark = markOf ?? (view == null ? f.P.Mark(id) : CardMark.Of(P.Data, id, 0, null));   // markOf — 판 밖 카드(사도 저장 슬롯)의 신탁 · 축복 · 복제 표식
             if (BlessOverride != null) { mark.Bless = "축복"; mark.BlessText = BlessOverride; }
             bool blessOn = mark.Blessed && !BlessFx.Old && !string.IsNullOrEmpty(mark.BlessText);
             string baseFull = v != null && v.Oracle != null ? P.Text.Card(v.Def) : null;

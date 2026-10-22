@@ -154,6 +154,7 @@ namespace Bolzena.Core
                             "hp" => t.MaxHp > 0 && (double)t.Hp / t.MaxHp <= (f.Pct > 0 ? f.Pct : 0.3),
                             "hpMob" => !t.Boss && t.MaxHp > 0 && (double)t.Hp / t.MaxHp <= (f.Pct > 0 ? f.Pct : 0.3),
                             "alone" => AliveEnemies().Count == 1,   // 적이 하나뿐이면(엘다인 4차 요청 — 아야)
+                            "boss" => t.Boss,   // (2026-10-19) 대상이 보스면(클론 보스 포함 — 아야 빙설화도 plusIf)
                             "anyAttack" => AnyFoeAttack(),
                             "known" => KnownFoe(owner, t, f.Once),   // 아는 수면(아야 만년설의 앎)   // 공격하려는 적이 하나라도 있으면(엘다인 4차 — 실비아 은분수)
                             // 그 상태가 걸린 적(감전 → 충격 …)

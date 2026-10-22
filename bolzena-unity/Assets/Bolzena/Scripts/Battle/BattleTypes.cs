@@ -248,6 +248,7 @@ namespace Bolzena.Battle
         Revive,         // Target(적) 되살아남 — core revive(재 속 부활 · 가사에서 일어섬) · HpAfter 체력
         FoeCharge,      // 엘리트 · 일반 적 힘 모으기 — Actor(적) · Text warn(모으기 — core foeChargeWarn) · cut(끊김 — 격파로 모은 수를 놓침) · Say 쏟을 수 이름 · Anim 모으기 이름 · Value 다음 턴 피해(warn)
         Shot,           // 사도가 몸짓 밖에서 따로 치는 한 대(2026-10-13) — Actor(쏘는 사도) · Target(적) · Text 종류(extra · bullet · counter · assist · resonance · summon). 바로 뒤 Damage(Text "shot")가 그 한 대
+        TimeUp,         // 프론티어 턴 제한이 끝났다(core Frontier.Over == "time") — Value 점수(보스가 잃은 HP)
     }
 
     public class BattleEvent

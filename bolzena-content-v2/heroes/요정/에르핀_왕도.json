@@ -29,7 +29,7 @@
           "name": "왕마력",
           "desc": "마력탄을 줄줄이 부르는 왕마력",
           "carrier": "self",
-          "cap": 5
+          "cap": 6
         }
       ],
       "passives": [
@@ -58,6 +58,18 @@
               "ratio": 0.2
             }
           ]
+        },
+        {
+          "name": "여왕의 의지",
+          "when": {
+            "on": "foeShieldBreak"
+          },
+          "fx": [
+            {
+              "k": "empower",
+              "ratio": 0.2
+            }
+          ]
         }
       ],
       "ult": {
@@ -66,13 +78,13 @@
         "fx": [
           {
             "k": "dmg",
-            "ratio": 0.2,
+            "ratio": 0.6,
             "target": "allEnemies",
-            "hits": 8
+            "hits": 2
           },
           {
             "k": "dmg",
-            "ratio": 0.6,
+            "ratio": 1,
             "target": "allEnemies"
           },
           {
@@ -137,6 +149,11 @@
           "v": 1
         },
         {
+          "k": "stack",
+          "id": "왕마력",
+          "v": 1
+        },
+        {
           "k": "draw",
           "v": 2
         }
@@ -149,6 +166,11 @@
               "k": "status",
               "id": "근면",
               "v": 2
+            },
+            {
+              "k": "stack",
+              "id": "왕마력",
+              "v": 1
             },
             {
               "k": "draw",
@@ -192,14 +214,14 @@
           "name": "신탁 3",
           "fx": [
             {
-              "k": "status",
-              "id": "근면",
+              "k": "stack",
+              "id": "축복의 왕관",
               "v": 1
             },
             {
               "k": "stack",
-              "id": "축복의 왕관",
-              "v": 1
+              "id": "왕마력",
+              "v": 2
             },
             {
               "k": "draw",
@@ -213,6 +235,11 @@
             {
               "k": "status",
               "id": "저장",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "왕마력",
               "v": 1
             },
             {
@@ -230,6 +257,11 @@
             {
               "k": "status",
               "id": "근면",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "왕마력",
               "v": 1
             },
             {
@@ -371,11 +403,12 @@
               "target": "oneEnemy"
             },
             {
-              "k": "ifKill"
+              "k": "ifKill",
+              "id": "orBoss"
             },
             {
-              "k": "status",
-              "id": "근면",
+              "k": "stack",
+              "id": "왕마력",
               "v": 1
             }
           ]
@@ -529,12 +562,12 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.4,
+          "ratio": 1.8,
           "target": "randomEnemy"
         },
         {
           "k": "dmg",
-          "ratio": 1.4,
+          "ratio": 1.8,
           "target": "randomEnemy",
           "xHits": true,
           "xStack": "왕마력"
@@ -579,12 +612,12 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 2,
               "target": "oneEnemy"
             },
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 2,
               "target": "oneEnemy",
               "xHits": true,
               "xStack": "왕마력"
@@ -601,12 +634,12 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.5,
+              "ratio": 1.9,
               "target": "allEnemies"
             },
             {
               "k": "dmg",
-              "ratio": 1.5,
+              "ratio": 1.9,
               "target": "randomEnemy",
               "xHits": true,
               "xStack": "왕마력"
@@ -626,12 +659,12 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 2.1,
               "target": "randomEnemy"
             },
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 2.1,
               "target": "randomEnemy",
               "xHits": true,
               "xStack": "왕마력"
@@ -648,7 +681,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 2,
+              "ratio": 2.8,
               "target": "randomEnemy",
               "xHits": true,
               "xStack": "왕마력"
@@ -696,12 +729,13 @@
           "v": 1
         },
         {
-          "k": "draw",
+          "k": "stack",
+          "id": "왕마력",
           "v": 1
         },
         {
-          "k": "empower",
-          "ratio": 0.3
+          "k": "draw",
+          "v": 1
         }
       ],
       "oracles": [
@@ -714,12 +748,13 @@
               "v": 1
             },
             {
-              "k": "draw",
+              "k": "stack",
+              "id": "왕마력",
               "v": 1
             },
             {
-              "k": "empower",
-              "ratio": 0.4
+              "k": "draw",
+              "v": 1
             }
           ]
         },
@@ -732,12 +767,13 @@
               "v": 1
             },
             {
-              "k": "draw",
+              "k": "stack",
+              "id": "왕마력",
               "v": 1
             },
             {
-              "k": "empower",
-              "ratio": 0.3
+              "k": "draw",
+              "v": 1
             }
           ]
         },
@@ -746,12 +782,13 @@
           "cost": 0,
           "fx": [
             {
-              "k": "draw",
+              "k": "stack",
+              "id": "왕마력",
               "v": 1
             },
             {
-              "k": "empower",
-              "ratio": 0.2
+              "k": "draw",
+              "v": 1
             }
           ]
         },
@@ -769,12 +806,13 @@
               "v": 1
             },
             {
-              "k": "draw",
+              "k": "stack",
+              "id": "왕마력",
               "v": 1
             },
             {
-              "k": "empower",
-              "ratio": 0.3
+              "k": "draw",
+              "v": 1
             }
           ]
         },
@@ -783,7 +821,7 @@
           "fx": [
             {
               "k": "gauge",
-              "v": 20,
+              "v": 30,
               "target": "self"
             },
             {
@@ -792,8 +830,9 @@
               "v": 1
             },
             {
-              "k": "draw",
-              "v": 1
+              "k": "stack",
+              "id": "왕마력",
+              "v": 2
             }
           ]
         }

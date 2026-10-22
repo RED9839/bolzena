@@ -317,6 +317,17 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(6, b.StackOf("ay", "영역"), "HP 30% 이하");
         }
 
+        [Test] public void 타수_합치기_겹_수_타수는_한_대에_피해_합은_그대로()
+        {
+            // (2026-10-19 R.PER_HIT_MERGE) 파티의 겹 수 타수 · 「1개당」 피해 · X 타수는 여러 번 대신 한 대 × 수
+            var b = F(new[] { "ay" });
+            K.Hand(b, "moon3", "hitsper"); K.Play(b, "moon3");   // 영역 1
+            int h0 = b.HitsBy(K.E(b), "ay");
+            K.Play(b, "hitsper");
+            Assert.AreEqual(1000 - 20, K.Hp(b), "(영역 1 + 1) × 10% — 합은 그대로");
+            Assert.AreEqual(R.PER_HIT_MERGE ? 1 : 2, b.HitsBy(K.E(b), "ay") - h0, "친 횟수");
+        }
+
         // ── E23 · E11 · E25 생성 카드 ──
         [Test] public void E23_공격력이_가장_높은_아군이_주인()
         {
@@ -613,13 +624,12 @@ namespace Bolzena.Core.Tests
             Has(EldErrors(Eld("시온더다크불릿", "딜러", uniqueFx: "{k:'status', id:'불굴', v:1}")), "딜러는 실드");
         }
 
-        [Test] public void E29_전부_써서는_3명까지()
+        [Test] public void E29_전부_써서는_사도_수_한도_없음()
         {
-            // 2026-10-11 카제나 재정렬 — 4명 → 3명(E62)
+            // 2026-10-11 카제나 재정렬로 3명까지였다가 2026-10-18 사용자 결정으로 한도를 없앴다 — 넷이어도 오류 없음
             string all(string kw) => $"{{k:'spend', id:'{kw}', all:true}}, {{k:'perEvent'}}, {{k:'dmg', ratio:0.5, target:'oneEnemy'}}";
             var ids = new[] { "아야", "란", "요미", "티그_영웅" };
-            Has(EldErrors(ids.Select(id => Eld(id, uniqueFx: all(id + "의 마음"))).ToArray()), "3명까지");
-            Assert.IsFalse(EldErrors(ids.Take(3).Select(id => Eld(id, uniqueFx: all(id + "의 마음"))).ToArray()).Any(e => e.Contains("3명까지")));
+            Assert.IsFalse(EldErrors(ids.Select(id => Eld(id, uniqueFx: all(id + "의 마음"))).ToArray()).Any(e => e.Contains("전부 써서")));
         }
 
         [Test] public void E29_자동_추가타는_하나_같은_계기는_하나로()

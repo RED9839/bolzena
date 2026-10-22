@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Bolzena.Core;
 
@@ -17,9 +16,6 @@ using Bolzena.Core;
 /// </summary>
 static class OracleAB
 {
-    static readonly MethodInfo GaugeM = typeof(Run).GetMethod("GradeGauge", BindingFlags.NonPublic | BindingFlags.Instance);
-    static readonly MethodInfo GrowthM = typeof(Run).GetMethod("GradeGrowth", BindingFlags.NonPublic | BindingFlags.Instance);
-
     /// <summary>OpenFight 와 같은 싸움 설정(신탁 빛 · 다음 싸움 덤은 뺌).</summary>
     static BattleSetup Capture(Battle b, Run run)
     {
@@ -29,10 +25,10 @@ static class OracleAB
             Party = S.Party.ToList(), Deck = S.Deck.ToList(), Enemies = run.CurrentEnemies().ToList(),
             PartyHp = S.PartyHp, PartyMaxHp = S.PartyMaxHp, Gear = run.GearStats(), GearRules = run.GearRules(),
             Flash = new Dictionary<string, int>(S.Flash), Shin = new Dictionary<string, string>(S.Shin),
-            EnemyHp = sc.hp, EnemyDmg = sc.dmg, Mind = S.MindBreak > 0, Gauge = (int)GaugeM.Invoke(run, null),
+            EnemyHp = sc.hp, EnemyDmg = sc.dmg, Mind = S.MindBreak > 0, Gauge = Math.Min(R.GAUGE_MAX, S.Gauge),
             Elite = b.EliteFight, EnemyNature = S.EnemyNature, Floor = S.Floor + 1, Glow = null,
-            Growth = (Dictionary<string, Stats>)GrowthM.Invoke(run, null),
-            CardVals = S.CardVals?.ToDictionary(kv => kv.Key, kv => new Dictionary<string, int>(kv.Value)), CritDmg = run.Perk("critDmg"),
+            Growth = S.Growth,
+            CardVals = S.CardVals?.ToDictionary(kv => kv.Key, kv => new Dictionary<string, int>(kv.Value)),
             Seed = (uint)(S.Seed + S.Floor * 101 + S.Node * 7 + S.Step * 13 + (S.EventFight != null ? 555 : 0)),
         };
     }

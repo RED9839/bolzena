@@ -14,43 +14,45 @@ const dil = (v = 1) => status('근면', v);
 // 10-13 사용자 「마력 난타 처치하면 1회 더 없애고 리뉴얼」: X(남은 AP) + 쌓인 왕마력 수만큼 쏘고 왕마력을 모두 쓴다 — 왕마력탄으로 모아 난타로 쏟는다
 const barrage = (ratio, target = 'randomEnemy', x) => dmg(ratio, target, { xHits: true, xStack: '왕마력', ...x });
 const dumpMana = spend('왕마력', 'all');
+const mana = (v = 1) => stack('왕마력', v);
 
 export default hero({
   id: H, name: '에르핀(왕도)', nature: '순수', race: '요정', role: '딜러', star: 3,
   blurb: '요정 왕국의 여왕이 된 에르핀. 왕마력탄으로 모은 왕마력을 마력 난타로 한꺼번에 쏟아붓습니다. 부지런한 여왕은 쓰러뜨린 만큼 숨을 돌립니다.',
   keyword: { name: '축복의 왕관', desc: '여왕이 쓴 축복의 왕관', carrier: 'self', cap: 3, per: [{ stat: 'atk', v: 0.1 }] },   // 10-12 밤: 동료에게 씌우던 표시(최대 1) → 자신(최대 3)
   // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
-  keywords: [{ name: '왕마력', desc: '마력탄을 줄줄이 부르는 왕마력', carrier: 'self', cap: 5 }],
+  keywords: [{ name: '왕마력', desc: '마력탄을 줄줄이 부르는 왕마력', carrier: 'self', cap: 6 }],
   // 사용자 10-11: 20명 모두 고유 능력 2개
   passives: [
     { name: '모두를 위한 배려', when: { on: 'fightStart' }, fx: [dil(1)] },   // 원작 2성 — 전투 시작 근면 1
     { name: '여왕의 의지', when: { on: 'kill', who: 'any' }, fx: [empower(0.2)] },   // 처치마다 자신의 다음 카드 +20%(처치 — 에르핀 소유)
+    { name: '여왕의 의지', when: { on: 'foeShieldBreak' }, fx: [empower(0.2)] },   // 10-19 사용자 「보스전에서도 의미 있게」: 누가든 적의 실드(방어)를 깨도 다음 카드 +20%(보스는 실드를 거듭 두른다 · 「격파」 는 네르 소유라 실드로)
   ],
-  ult: { name: '에르피엔 펀치', cost: 250, fx: [dmg(0.2, 'allEnemies', { hits: 8 }), dmg(0.6, 'allEnemies'), dil(1), crown(1)] },   // 10-12 밤: 아군 피해 +20% → 왕관 1(자신 강화)   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로 · 같은 날 밤 사용자 「원작에서 전체 공격」 — 적 1명 8회 × 40% → 적 전체 8회 × 20% + 마지막 한 방 60%(원작: 8회 범위 · 마지막 타격 더 강함)
+  ult: { name: '에르피엔 펀치', cost: 250, fx: [dmg(0.6, 'allEnemies', { hits: 2 }), dmg(1, 'allEnemies'), dil(1), crown(1)] },   // 10-19 타수(사용자 「고학년 최대 3타」): 8회 × 20% + 60% → 2회 × 60% + 마지막 100%(합 220% 그대로 · 마지막이 가장 셈)   // 10-12 밤: 아군 피해 +20% → 왕관 1(자신 강화)   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로 · 같은 날 밤 사용자 「원작에서 전체 공격」 — 적 1명 8회 × 40% → 적 전체 8회 × 20% + 마지막 한 방 60%(원작: 8회 범위 · 마지막 타격 더 강함)
 }, {
   basicNames: ['마력탄', '연속 마력탄', '왕관 방패'], deck: 'light',
   uniques: [
     { // 시동
       name: '축복의 왕관', cost: 0, type: '스킬',
-      fx: [dil(1), draw(2)],
+      fx: [dil(1), mana(1), draw(2)],
       oracles: [
-        { fx: [dil(2), draw(2)] },
+        { fx: [dil(2), mana(1), draw(2)] },
         { power: true, fx: [dil(1), draw(2), power([rule({ on: 'turnStart' }, [dil(1)])])] },   // 10-13 신탁 점검: 드로우 2 되살림
-        { fx: [dil(1), crown(1), draw(2)] },   // 10-12 밤: 다른 아군 다음 카드 +30% → 왕관 · 10-13 신탁 점검: 드로우 1
-        { fx: [status('저장', 1), draw(2)] },   // 10-13 신탁 점검: 드로우 1→2   // 딸기 케이크(AP 를 남김)
-        { tags: ['개전'], fx: [dil(1), draw(2)] },   // 10-13 신탁 점검: 드로우 2 되살림
+        { fx: [crown(1), mana(2), draw(2)] },   // 10-12 밤: 다른 아군 다음 카드 +30% → 왕관 · 10-13 신탁 점검: 드로우 1
+        { fx: [status('저장', 1), mana(1), draw(2)] },   // 10-13 신탁 점검: 드로우 1→2   // 딸기 케이크(AP 를 남김)
+        { tags: ['개전'], fx: [dil(1), mana(1), draw(2)] },   // 10-13 신탁 점검: 드로우 2 되살림
       ],
       blesses: ['draw', 'cost', [dil(1)]],
     },
     {
       name: '에르피엔 왕마력탄', cost: 1, type: '공격', tags: WK,
-      fx: [dmg(4), dmg(0.3, 'randomEnemy', { hitsPer: '왕마력' }), stack('왕마력', 1)],
+      fx: [dmg(4), dmg(0.3, 'randomEnemy', { hitsPer: '왕마력' }), stack('왕마력', 1)],   // 10-19 타수: 엔진 R.PER_HIT_MERGE 가 왕마력 수만큼을 무작위 적 한 대 × 왕마력 으로 합친다(합 그대로 · 2타)
       oracles: [
         { tags: WK, fx: [dmg(4), dmg(0.3, 'randomEnemy', { hitsPer: '왕마력' }), stack('왕마력', 2)] },   // 10-13 신탁 점검: 왕마력을 버리던 신탁 — 왕마력 2
         { tags: [...WK, '회수 3'], fx: [dmg(3.2)] },
         { tags: WK, fx: [dmg(1.3, 'allEnemies'), stack('왕마력', 1)] },   // 10-13 신탁 점검: 왕마력 되살림
         { cost: 0, tags: WK, fx: [dmg(1.8)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 · 10-13 신탁 점검: 같은 비용에 약하기만 해 비용 0
-        { tags: WK, fx: [dmg(3.2), { k: 'ifKill' }, dil(1)] },
+        { tags: WK, fx: [dmg(3.2), { k: 'ifKill', id: 'orBoss' }, stack('왕마력', 1)] },   // 10-19: 처치하면 근면 1 → 처치하거나 보스면 왕마력 1(보스전에서 난타로 이어지게)
       ],
       blesses: ['power', 'cost', [dil(1)]],
     },
@@ -68,25 +70,25 @@ export default hero({
     },
     { // 마무리 — X: 남은 AP + 왕마력 수만큼 무작위 적에게, 왕마력을 모두 쓴다(10-13 리뉴얼 — 옛 「처치하면 한 대 더」 뺌)
       name: '마력 난타', cost: 0, x: true, type: '공격',
-      fx: [dmg(1.4, 'randomEnemy'), barrage(1.4), dumpMana],   // X = 0 · 왕마력 0 이어도 한 대
+      fx: [dmg(1.8, 'randomEnemy'), barrage(1.8), dumpMana],   // X = 0 · 왕마력 0 이어도 한 대
       oracles: [
         { power: true, fx: [stack('왕마력', 2), power([rule({ on: 'turnStart' }, [stack('왕마력', 1)])])] },   // 강화 — 턴 시작마다 왕마력 1(옛 「처치마다 120%」 대신)
-        { fx: [dmg(1.1), barrage(1.1, 'oneEnemy'), dumpMana] },   // 적 1명에게 모두
-        { fx: [dmg(1, 'allEnemies'), barrage(1), dumpMana] },   // 적 전체 한 번 + 난타
-        { tags: ['보존'], fx: [dmg(1, 'randomEnemy'), barrage(1)] },   // 보존 · 왕마력을 쓰지 않는다(쌓은 채로 다음 난타)
-        { fx: [status('면역', 1), barrage(1.2), dumpMana] },   // 원작 여왕의 의지
+        { fx: [dmg(1.4), barrage(1.4, 'oneEnemy'), dumpMana] },   // 적 1명에게 모두
+        { fx: [dmg(1.3, 'allEnemies'), barrage(1.3), dumpMana] },   // 적 전체 한 번 + 난타
+        { tags: ['보존'], fx: [dmg(1.3, 'randomEnemy'), barrage(1.3)] },   // 보존 · 왕마력을 쓰지 않는다(쌓은 채로 다음 난타)
+        { fx: [status('면역', 1), barrage(1.7), dumpMana] },   // 원작 여왕의 의지
       ],
       blesses: ['power', 'draw', [stack('왕마력', 1)]],
     },
     { // 4차 8장 — 열기(원작 2성 「모두를 위한 배려」 — 여왕의 의지)
       name: '모두를 위한 배려', cost: 1, type: '스킬',
-      fx: [crown(1), draw(1), empower(0.3)],   // 10-12 밤: 동료에게 왕관 · 동료 드로우 · 다른 아군 강화 → 자신
+      fx: [crown(1), mana(1), draw(1)],   // 10-12 밤: 동료에게 왕관 · 동료 드로우 · 다른 아군 강화 → 자신
       oracles: [
-        { fx: [status('면역', 1), draw(1), empower(0.4)] },   // 10-13 신탁 점검
-        { fx: [dil(1), draw(1), empower(0.3)] },   // 10-13 신탁 점검
-        { cost: 0, fx: [draw(1), empower(0.2)] },
-        { fx: [status('면역', 1), crown(1), draw(1), empower(0.3)] },
-        { fx: [gaugeMe(20), crown(1), draw(1)] },
+        { fx: [status('면역', 1), mana(1), draw(1)] },   // 10-13 신탁 점검
+        { fx: [dil(1), mana(1), draw(1)] },   // 10-13 신탁 점검
+        { cost: 0, fx: [mana(1), draw(1)] },
+        { fx: [status('면역', 1), crown(1), mana(1), draw(1)] },
+        { fx: [gaugeMe(30), crown(1), mana(2)] },
       ],
       blesses: ['draw', 'cost', [dil(1)]],
     },

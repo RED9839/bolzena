@@ -5,9 +5,9 @@ using UnityEngine;
 namespace Bolzena.RunUI
 {
     // 판 화면 한 바퀴(-demo-uitour) — UI 통일 · 지도 여백 전후를 같은 자리에서 찍는다.
-    //   로비 · 교주 보드 · 도감 · 설정 → 마을 공개 → 편성 → 지도(처음 · 맨 위 줄 칸 · 맨 아래 줄 칸) → 덱 · 장비 · 학년 표 · 판 설정 · 사도 상세
+    //   로비 · 도감 · 설정 → 마을 공개 → 편성 → 지도(처음 · 맨 위 줄 칸 · 맨 아래 줄 칸) → 덱 · 장비 · 판 설정 · 사도 상세
     //   → 휴식 · 상점 → 이벤트 → 싸움(전투 HUD · 보상은 GoFight 가 찍는다)
-    //   지도 「맨 위 줄 칸」 은 파티 미니미가 머리 띠(파티 알약 · 학년 카드) 바로 밑에 서는 자리 — 2026-10-09 사용자 캡처의 잘림을 다시 본다.
+    //   지도 「맨 위 줄 칸」 은 파티 미니미가 머리 띠(파티 알약 · 적 속성 알약) 바로 밑에 서는 자리 — 2026-10-09 사용자 캡처의 잘림을 다시 본다.
     public partial class Demo
     {
         IEnumerator UiTour_()
@@ -16,14 +16,6 @@ namespace Bolzena.RunUI
             f.Lobby();
             yield return Screen_("lobby", 1.2f);
             yield return Shot("ui_lobby");
-            if (Hot("crayon") != null)
-            {
-                yield return Press("crayon", 0.2f);
-                yield return Wait(1.4f);
-                yield return Shot("ui_crayon");
-                f.Lobby();
-                yield return Screen_("lobby", 0.8f);
-            }
             yield return Press("dex", 0.2f);
             yield return Wait(1.6f);
             yield return Shot("ui_dex");
@@ -68,7 +60,6 @@ namespace Bolzena.RunUI
             yield return Shot("ui_gear");
             CloseModals();
             yield return Wait(0.3f);
-            if (Hot("grade") != null) { yield return Press("grade", 0.9f); yield return Shot("ui_grade_table"); CloseModals(); yield return Wait(0.3f); }
             yield return Press("settings", 0.9f);
             yield return Shot("ui_settings_run");
             CloseModals();
@@ -106,6 +97,29 @@ namespace Bolzena.RunUI
             Debug.Log("[Demo] UI 한 바퀴 끝");
             yield return Wait(0.4f);
             Application.Quit(0);
+        }
+
+        /// <summary>지도에서 가까운 싸움 하나까지 가서 이기고 돌아온다(이벤트 · 캠프는 지나간다 — 옛 Demo.Grade 에서 옮김).</summary>
+        IEnumerator FightOnce()
+        {
+            for (int step = 0; step < 8; step++)
+            {
+                float t = 0;
+                while (t < 25 && (f.Stage.Busy || f.Stage.Current != "map")) { t += Time.unscaledDeltaTime; yield return null; }
+                if (f.Stage.Current != "map") yield break;
+                var reach = f.P.Reachable();
+                var map = f.P.Map();
+                var pick = reach.FirstOrDefault(id => Core.Run.NodeById(map, id)?.Type == "fight") ?? reach.FirstOrDefault(id => Core.Run.NodeById(map, id)?.Type == "elite") ?? reach.First();
+                var type = Core.Run.NodeById(map, pick).Type;
+                yield return Press("node:" + pick, 0.2f);
+                yield return Wait(1f);
+                switch (type)
+                {
+                    case "fight": case "elite": case "boss": yield return GoFight("win", type); yield break;
+                    case "event": yield return GoEvent(); break;
+                    case "camp": case "campshop": yield return GoCamp(type); break;
+                }
+            }
         }
     }
 }

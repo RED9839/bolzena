@@ -28,7 +28,7 @@ export default hero({
     // 2026-10-13 원작 1:1(사용자 「패시브도 원작 패시브로」): 옛 「소녀가 보호하겠사와요」(턴 끝 실드 · 반격 1)는 시동 카드와 이름 · 효과가 같아 뺐다.
     //   원작 전투 패시브 = 반격(맞으면 방어 기반 100%, 실드로 다 막으면 200%, 최대 10) — 엔진 공통 반격 규칙(150/300% · 최대 10)이 이미 그대로 맡는다.
     //   그래서 패시브 칸에는 원작 수집 문서의 전투 패시브 강화(돌파 6) 「턴 시작 시 반격 강화 1」 — 반격 강화 1 은 그 턴 반격 피해 +50% 로(「창 네 자루」 신탁 3 과 같은 값).
-    { name: '되갚을 준비', when: { on: 'turnStart' }, fx: [{ k: 'counterMod', v: 1, turns: 1 }] },   // 세기 맞춤(10-13 사용자): 원작 반격 강화 1(+50% 로 옮김) → 세기 맞춤 +100%
+    { name: '되갚을 준비', when: { on: 'turnStart' }, fx: [{ k: 'counterMod', v: 0.5, turns: 1 }] },   // 10-21 밸런스 조절: +100 → +50%(원작값)   // 세기 맞춤(10-13 사용자): 원작 반격 강화 1(+50% 로 옮김) → 세기 맞춤 +100%
   ],
   ult: { name: '퀵실버 랜스', cost: 200, fx: [ddmg(3), perStack('반격'), ddmg(0.3)] },   // 원작 「절대 영도」 — 방어 기반 300% + 반격 1당 +30%(돌파 3 값 · 10-13 엔진이 파티 상태 「반격」 겹을 센다)
 }, {
@@ -40,7 +40,7 @@ export default hero({
     //   남은 근사: 피해 기반 실드 50% → 실드 150%(엔진에 없음) · 완성형(창 네 자루)은 원작 번뜩임이 없어 에고 발현으로 채움. 이전 판: C:\projects\_backup\bibi_magna2_20261013
     { // 시동 ← 얼음 파편 — 열기: 결정화 2 + 턴 시작 반격 1
       name: '소녀가 보호하겠사와요', cost: 1, type: '강화', tags: ['주도'],
-      fx: [status('결정화', 4), power([rule({ on: 'turnStart' }, [ctr(1)])])],   // 원작 결정화 2 → 세기 맞춤 4
+      fx: [status('결정화', 3), power([rule({ on: 'turnStart' }, [ctr(1)])])],   // 원작 결정화 2 → 세기 맞춤 4 → 3(10-21 밸런스 조절 7차)
       oracles: [
         { power: true, tags: ['주도'], fx: [status('결정화', 7), power([rule({ on: 'turnStart' }, [ctr(1)])])] },   // I 결정화 5 · 원작 5 → 세기 맞춤 7
         { power: true, tags: ['주도'], fx: [status('결정화', 5), power([rule({ on: 'turnStart' }, [ctr(2)])])] },   // II 결정화 3 · 반격 2 · 원작 3 → 세기 맞춤 5
@@ -52,7 +52,7 @@ export default hero({
     },
     { // 고유 3 ← 빙벽 — 굴리기: 실드 + 반격 + 1턴간 반격이 적 전체로
       name: '오시려구요?', cost: 2, type: '스킬',
-      fx: [shield(2.4), ctr(2), { k: 'counterAll', turns: 1 }],   // 원작 실드 180% → 세기 맞춤 240%(×1.2 전)
+      fx: [shield(2.17), ctr(2), { k: 'counterAll', turns: 1 }],   // 10-21 밸런스 조절 3차: 290 → 260%   // 원작 실드 180% → 세기 맞춤 240%(×1.2 전)
       oracles: [
         { fx: [shield(3), ctr(3), { k: 'counterAll', turns: 2 }] },                                    // I 수치 · 2턴
         { fx: [shield(3), ctr(2), perStack('반격'), shield(0.3)] },                                     // II 반격 1당 실드 +30%
@@ -81,14 +81,14 @@ export default hero({
         { fx: [shield(2.1), status('취약', 3, { target: 'allEnemies' }), { k: 'perFoe' }, shield(0.6)] },   // I 적 1명당 실드 +60%
         { fx: [shield(2.1), status('취약', 4, { target: 'allEnemies' })] },                          // II
         { power: true, fx: [status('결정화', 6), power([rule({ on: 'counter' }, [status('취약', 3, { target: 'oneEnemy' })])])] },   // III 결정화 4 · 반격한 적에 취약 3(원작 BEST) · 원작 결정화 4 → 세기 맞춤 6
-        { type: '공격', fx: [ddmg(1, 'randomEnemy', { hits: 3, hitFx: [status('취약', 1)] })] },   // IV 무작위 3연타 · 맞은 적 취약 1
+        { type: '공격', fx: [ddmg(1.5, 'randomEnemy', { hits: 2, hitFx: [status('취약', 1)] })] },   // IV 무작위 3연타 · 맞은 적 취약 1 · 10-19 타수: 3회 × 100% → 2회 × 150%(취약 3 → 2)
         { fx: [status('취약', 3, { target: 'allEnemies' }), ctr(3)] },                                 // V
       ],
       blesses: ['guard', 'draw', [S(1)]],
     },
     { // 고유 2 ← 빙하의 철권 — 터뜨리기: 방어 기반 큰 한 방 + 실드
       name: '세계수 뿌리에 수은을', cost: 2, type: '공격',
-      fx: [ddmg(3), shield(2)],   // 원작 피해 기반 실드 50%(근사 150%) → 세기 맞춤 200%(×1.2 전)
+      fx: [ddmg(3.3), shield(2)],   // 10-21 밸런스 조절: 300 → 330%   // 원작 피해 기반 실드 50%(근사 150%) → 세기 맞춤 200%(×1.2 전)
       oracles: [
         { fx: [ddmg(4.5), shield(1.5)] },                                                              // I 수치
         { fx: [ddmg(3), status('취약', 3, { target: 'oneEnemy' })] },                                 // II 취약 3

@@ -179,8 +179,8 @@ namespace Bolzena.Core
             }
         }
 
-        /// <summary>턴을 넘긴다 — 턴 끝 효과 · 적의 차례 · 다음 턴 시작까지.</summary>
-        public Battle EndTurn()
+        /// <summary>턴을 넘긴다 — 턴 끝 효과 · 적의 차례 · 다음 턴 시작까지. 바깥 입구는 EndTurn(BattleInput.cs — 입력 테이프에 적고 턴 지문을 남긴다).</summary>
+        Battle EndTurnRun()
         {
             FreeTurn.Clear();
             if (Over != null) return this;

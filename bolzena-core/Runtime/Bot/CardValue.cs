@@ -44,6 +44,12 @@ namespace Bolzena.Core
         public const double GONE_PER = 3, SUMMON_HITS = 2.5, RIPEN_VAL = 0.9;
         /// <summary>(엘다인) 실드 비례의 보통 수(실드 100당 · 대충) · 변신 조건이 설 확률(변신 사도의 카드).</summary>
         public const double SHIELD_PER = 1.5, FORM_ON = 0.45;
+        /// <summary>(2026-10-19) ifKill orBoss — 처치했거나 고른 적이 보스면(보스전이면 늘 · 아니면 처치 확률).</summary>
+        public const double KILL_OR_BOSS = 0.6;
+        /// <summary>(2026-10-19) ifFoe boss — 대상이 보스면(판의 보스전 몫 · 대충).</summary>
+        public const double FOE_BOSS = 0.3;
+        /// <summary>(2026-10-19 타수 합치기) dmg plusIf 조건이 설 확률(대충) — 조건 조각 하나.</summary>
+        static double PlusCondVal(Fx c) => c.K == FxK.IfForm ? (c.Not ? 0.5 : FORM_ON) : c.K == FxK.IfFoe && c.Id == "boss" ? FOE_BOSS : c.K == FxK.IfKill && c.Id == "orBoss" ? KILL_OR_BOSS : c.K == FxK.IfStack && c.Not ? COND_VAL["ifNoStack"] : COND_VAL.TryGetValue(c.K, out var v) ? v : 0.5;
         /// <summary>「… 1개당」 의 보통 수 — 버린 장수 · 치른 HP(단위) · 적의 디버프 가짓수.</summary>
         public const double DISC_PER = 1.5, PAID_PER = 1.5, DEBUFF_PER = 2;
         public const int RHYTHM_PER = 2;
@@ -87,7 +93,7 @@ namespace Bolzena.Core
                     case FxK.IfKill: case FxK.IfBreak: case FxK.IfWounded: case FxK.IfChoice: case FxK.IfRandom: case FxK.IfHand: case FxK.IfPile: case FxK.IfNth: case FxK.IfStreak: case FxK.IfAllHeroes: case FxK.IfFoe: case FxK.IfCardSt:
                     case FxK.IfPricier: case FxK.IfGained:
                         if (f.K == FxK.IfPricier && live && !f.Not) { cond = 1; break; }   // 지금 바로 앞 카드보다 비싸다(봇 LiveVal)
-                        cond = f.K == FxK.IfRandom ? (f.Pct > 0 ? f.Pct : 0.5) : f.K == FxK.IfKill && f.Id != null ? COND_VAL[f.Id == "boss" ? "killBoss" : "killElite"] : f.K == FxK.IfFoe && f.Id == "alone" ? COND_VAL["alone"] : f.K == FxK.IfFoe && f.Id == "known" ? COND_VAL["known"] : f.K == FxK.IfNth && f.After ? 0.5 : COND_VAL[f.K];
+                        cond = f.K == FxK.IfRandom ? (f.Pct > 0 ? f.Pct : 0.5) : f.K == FxK.IfKill && f.Id == "orBoss" ? KILL_OR_BOSS : f.K == FxK.IfKill && f.Id != null ? COND_VAL[f.Id == "boss" ? "killBoss" : "killElite"] : f.K == FxK.IfFoe && f.Id == "boss" ? FOE_BOSS : f.K == FxK.IfFoe && f.Id == "alone" ? COND_VAL["alone"] : f.K == FxK.IfFoe && f.Id == "known" ? COND_VAL["known"] : f.K == FxK.IfNth && f.After ? 0.5 : COND_VAL[f.K];
                         if (f.Not && (f.K == FxK.IfKill || f.K == FxK.IfBreak || f.K == FxK.IfPricier || f.K == FxK.IfGained)) cond = 1 - cond;
                         break;
                     case FxK.PerGone: per = f.Turn ? (f.Id != null ? 1.5 : 2) : f.Who == "self" ? GONE_PER * 0.7 : GONE_PER; break;
@@ -166,7 +172,7 @@ namespace Bolzena.Core
                             // 일의 값 고정 피해 — 쓴 실드(보통 한 장 반의 실드) · 지금 실드(보통 두 장) × ofEvent
                             if (f.OfForm > 0) { double d1 = f.OfForm * 12 * Area(f.Target ?? "oneEnemy"); v += d1; dmgV += d1 * cond; per = 1; break; }   // 이번 변신 중 준 피해(보통 카드 열두 장 몫) × 비율(▶E76)
                             if (f.OfEvent > 0 && (shieldSpent || f.OfShield)) { double d0 = f.OfEvent * (f.OfShield ? 0.9 : 0.6) * Area(f.Target ?? "oneEnemy"); v += d0; dmgV += d0 * cond; per = 1; break; }
-                            double d = f.Ratio * n * 0.83 * Area(f.Target ?? "oneEnemy") * (f.XHits ? 3 : 1) * per * (f.Fixed ? 0.9 : 1) * (f.KillMore ? 1.2 : 1) * (f.KnownHits > 1 ? 1 + 0.5 * (f.KnownHits - 1) : 1);   // 처치하면 한 대 더(▶E79)
+                            double d = (f.Ratio + (f.PlusIf != null ? f.Plus * PlusCondVal(f.PlusIf) : 0)) * n * 0.83 * Area(f.Target ?? "oneEnemy") * (f.XHits ? 3 : 1) * per * (f.Fixed ? 0.9 : 1) * (f.KillMore ? 1.2 : 1) * (f.KnownHits > 1 ? 1 + 0.5 * (f.KnownHits - 1) : 1);   // 처치하면 한 대 더(▶E79)
                             if (dmgV == 0) dmgArea = Area(f.Target ?? "oneEnemy");
                             v += d; dmgV += d * cond; per = 1;
                             if (f.HitFx != null) v += 0.5 * n * ValueOf(f.HitFx);   // 맞은 적마다(대충 절반이 산다)

@@ -8,7 +8,7 @@ namespace Bolzena.RunUI
 {
     /// <summary>
     /// 편성 기억(판 밖 영구 저장 — PlayerPrefs): 최근 편성 · 프리셋 셋 · 사도별 완주 횟수. 사도는 로스터 key 로 적는다(코어 id 가 바뀌어도 이름표는 그대로).
-    /// -save 로 따로 둔 시험 실행은 그 이름을 붙인 키를 써서 사용자의 기록을 건드리지 않는다(CrayonStore 와 같은 규칙).
+    /// -save 로 따로 둔 시험 실행은 그 이름을 붙인 키를 써서 사용자의 기록을 건드리지 않는다.
     /// </summary>
     public static class PartyStore
     {
@@ -84,14 +84,50 @@ namespace Bolzena.RunUI
                 Clears[h.key] = Cleared(h.key) + 1;
             }
             Flush();
+            CountVillage(s);
+        }
+
+        // ── 마을별 완주 기록(마을 고르기 노드의 띠, 2026-10-21) — 「마을=횟수;…」 · 「마을=단계;…」. CountClear 가 같은 판에 한 번만 부른다 ──
+        static Dictionary<string, int> Map(string n)
+        {
+            var o = new Dictionary<string, int>();
+            foreach (var kv in PlayerPrefs.GetString(K(n), "").Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                var p = kv.Split('=');
+                if (p.Length == 2 && int.TryParse(p[1], out var v) && v > 0) o[p[0]] = v;
+            }
+            return o;
+        }
+        static void SetMap(string n, Dictionary<string, int> m) { PlayerPrefs.SetString(K(n), string.Join(";", m.Select(kv => kv.Key + "=" + kv.Value))); PlayerPrefs.Save(); }
+        /// <summary>그 마을 완주 횟수(이 기기).</summary>
+        public static int VillageClears(string village) => village != null && Map("vilclears").TryGetValue(village, out var n) ? n : 0;
+        /// <summary>그 마을에서 완주한 가장 높은 단계(성장 켬 · 이 기기). 0 = 없음.</summary>
+        public static int VillageBest(string village) => village != null && Map("vilbest").TryGetValue(village, out var n) ? n : 0;
+        static void CountVillage(RunState s)
+        {
+            if (string.IsNullOrEmpty(s.Village)) return;
+            var c = Map("vilclears"); c[s.Village] = (c.TryGetValue(s.Village, out var n) ? n : 0) + 1; SetMap("vilclears", c);
+            if (s.Tier <= 0) return;
+            var b = Map("vilbest");
+            if (!b.TryGetValue(s.Village, out var t) || s.Tier > t) { b[s.Village] = s.Tier; SetMap("vilbest", b); }
         }
         static void Flush() { PlayerPrefs.SetString(K("clears"), string.Join(";", Clears.Select(kv => kv.Key + "=" + kv.Value))); PlayerPrefs.Save(); }
 
         /// <summary>시험 도구 — 완주 횟수를 직접 정한다.</summary>
         public static void SetCleared(string heroKey, int n) { if (n > 0) Clears[heroKey] = n; else Clears.Remove(heroKey); Flush(); }
-        // ── 진행 코드(CrayonStore.Export · Import — 코어 Crayon 진행 코드의 덧붙임) ──
+        // ── 진행 코드(코어 ProgressCode 의 덧붙임 — 설정 → 「진행 코드」, Flow.ProgressCode.cs) ──
+        /// <summary>진행 코드 — 편성 기억(프리셋 · 최근 · 완주 기록). 설정(소리 · 화면)은 기기마다라 넣지 않는다.</summary>
+        public static string ExportCode() => ProgressCode.Export(Dump());
+        /// <summary>진행 코드를 받아 들인다 — 틀리면 까닭(지금 기억은 그대로).</summary>
+        public static string ImportCode(string code)
+        {
+            var (extra, why) = ProgressCode.Import(code);
+            if (why != null) return why;
+            Load(extra);
+            return null;
+        }
         /// <summary>진행 코드에 담는 편성 기억 — 최근 편성 · 프리셋 5칸(사도 셋 · 성격 표) · 사도별 완주 기록. 저장된 글 그대로(빈 칸은 뺀다).</summary>
-        static readonly string[] CodeKeys = { "recent", "preset1", "preset2", "preset3", "preset4", "preset5", "tag1", "tag2", "tag3", "tag4", "tag5", "clears" };
+        static readonly string[] CodeKeys = { "recent", "preset1", "preset2", "preset3", "preset4", "preset5", "tag1", "tag2", "tag3", "tag4", "tag5", "clears", "vilclears", "vilbest" };
         public static Dictionary<string, string> Dump()
         {
             var o = new Dictionary<string, string>();
@@ -115,7 +151,7 @@ namespace Bolzena.RunUI
         public static void ResetAll()
         {
             clears = null;
-            foreach (var n in new[] { "recent", "clears", "lastclear", "preset1", "preset2", "preset3", "preset4", "preset5", "tag1", "tag2", "tag3", "tag4", "tag5" }) PlayerPrefs.DeleteKey(K(n));
+            foreach (var n in new[] { "recent", "clears", "lastclear", "preset1", "preset2", "preset3", "preset4", "preset5", "tag1", "tag2", "tag3", "tag4", "tag5", "vilclears", "vilbest" }) PlayerPrefs.DeleteKey(K(n));
             PlayerPrefs.Save();
         }
     }

@@ -392,7 +392,7 @@ namespace Bolzena.UI
         void Miss(Vector3 at)
         {
             Sfx.Play("card_cant", 0.5f);
-            Vfx.Word(at + new Vector3(0, 0.6f, 0), "적에게 놓으세요", 0.26f, new Color(1f, 0.85f, 0.6f), new Color(0.2f, 0.05f, 0), 1.0f, 1f, transform.parent, 700, 0.3f);
+            Vfx.Word(at + new Vector3(0, 0.6f, 0), "적에게 놓기", 0.26f, new Color(1f, 0.85f, 0.6f), new Color(0.2f, 0.05f, 0), 1.0f, 1f, transform.parent, 700, 0.3f);
         }
 
         // 겨눈 적 — 상자 안이면 그 적, 싸움터 위(손 위)에서 상자 밖이면 가장 가까운 적

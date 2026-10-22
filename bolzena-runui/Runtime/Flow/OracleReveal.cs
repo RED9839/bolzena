@@ -108,7 +108,7 @@ namespace Bolzena.RunUI
                 var bl = Ui.Title(root, "겨우살이 축복", compact ? 24 : 32, Color.white, TextAlignmentOptions.Center);
                 bl.rectTransform.At(0.5f, 0, 0, compact ? 76 : 102, 700, 50); bl.Outline(0.3f, Color.black);
             }
-            var title = Ui.Title(root, simple ? "<color=#FFD76A>신탁 효과</color>를 결정하세요." : o.Title, simple ? (compact ? 34 : 46) : compact ? 64 : 84, new Color(1f, 0.95f, 0.75f), TextAlignmentOptions.Center);
+            var title = Ui.Title(root, simple ? "<color=#FFD76A>신탁 효과</color>결정" : o.Title, simple ? (compact ? 34 : 46) : compact ? 64 : 84, new Color(1f, 0.95f, 0.75f), TextAlignmentOptions.Center);
             title.rectTransform.At(0.5f, 1, 0, compact ? -42 : -60, 1100, compact ? 80 : 100);
             if (!simple) title.colorGradient = new VertexGradient(Color.white, Color.white, new Color(1f, 0.78f, 0.3f), new Color(1f, 0.78f, 0.3f));
             title.Outline(0.22f, simple ? Color.black : new Color(0.35f, 0.15f, 0));

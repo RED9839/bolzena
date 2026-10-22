@@ -24,7 +24,7 @@ export default hero({
     name: C, desc: '허물과 본성이 한 바퀴 돈 자취', carrier: 'self', cap: 3,
     per: [{ stat: 'atk', v: 0.05, who: 'allies' }],
   },
-  keywords: [{ name: U, desc: '우로스가 영역 위에 세운 동료', carrier: 'hero', cap: 1, hunt: true, per: [{ stat: 'dealt', v: 0.1, who: 'holder' }] }],
+  keywords: [{ name: U, desc: '우로스가 영역 위에 세운 동료', carrier: 'hero', cap: 1, hunt: true, per: [{ stat: 'dealt', v: 0.05, who: 'holder' }] }],   // 10-21 밸런스 조절 3차: +10 → +5%
   // 자동 규칙 둘: 한 바퀴마다 순환 · AP(한 턴 1번 — 태세 한 바퀴 formLap 예외) · 순환이 다 차면 파티 사기
   passives: [
     { name: '순환', when: { on: 'formLap' }, fx: [lap(1), { k: 'ap', v: 1 }] },   // 10-11 사용자: 턴당 조건 없앰 — 「우로스는 사기인 걸로」(한 바퀴에 우로스 카드 2장이 들어 무한은 아님)
@@ -35,13 +35,13 @@ export default hero({
     { id: GOOD, name: '허물', desc: '벗어 놓은 내면(슈로) — 돕는 얼굴(우로스 카드를 내면 본성으로)', stance: true, toggle: EVIL },
     { id: EVIL, name: '본성', desc: '타락한 뱀 — 압도하는 얼굴(우로스 카드를 내면 허물로)', stance: true, toggle: GOOD },
   ],
-  ult: { name: '압도', cost: 250, fx: [dmg(0.8, 'allEnemies', { hits: 2 }), lap(3), up(), status('사기', 2)] },   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 사기 2 더함   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로
+  ult: { name: '압도', cost: 250, fx: [dmg(0.8, 'allEnemies', { hits: 2 }), lap(1), up(), status('사기', 1)] },   // 10-21 7 · 8차: 사기 2 → 1 · 순환 3 → 1   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 사기 2 더함   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로
 }, {
   basicNames: ['검기 날리기', '백사 일섬', '슈로의 인사'], deck: 'heavy',
   uniques: [
     { // 시동 — 영역 위 동료를 세우고 한 바퀴를 연다
       name: '지배의 영역', cost: 1, type: '스킬',
-      fx: [up(), G, shield(0.8), E, empower(0.3, { who: 'other' })],
+      fx: [up(), G, shield(0.5), E, empower(0.2, { who: 'other' })],   // 10-21 밸런스 조절 6차: 실드 100 → 60% · 동료 다음 카드 +30 → +20%
       oracles: [
         { fx: [up(), G, shield(1.2), E, empower(0.4, { who: 'other' })] },
         { fx: [up(), draw(1), keep, E, empower(0.3, { who: 'other' })] },   // 10-13 신탁 점검
@@ -65,11 +65,11 @@ export default hero({
     },
     { // 쌓인 순환으로 치기(쓰지 않음)
       name: '백사당의 죽도', cost: 1, type: '공격',
-      fx: [dmg(1), per, dmg(0.3), E, dmg(0.6)],
+      fx: [dmg(0.8, 'oneEnemy', { plus: 0.6, plusIf: E }), per, dmg(0.2)],   // 10-21 밸런스 조절 2차: 100 → 80% · 1당 30 → 20%   // 10-19 타수: 100% + 1당 30% + 본성 60% → 100%(본성 160%) + 1당 30%
       oracles: [
-        { fx: [dmg(1.2), per, dmg(0.4), E, dmg(0.6)] },
+        { fx: [dmg(1.2, 'oneEnemy', { plus: 0.6, plusIf: E }), per, dmg(0.4)] },
         { fx: [dmg(1), per, dmg(0.3), G, empower(0.5, { who: 'other' })] },   // 10-13 신탁 점검
-        { cost: 0, fx: [dmg(0.6), per, dmg(0.2), E, dmg(0.4)] },
+        { cost: 0, fx: [dmg(0.6, 'oneEnemy', { plus: 0.4, plusIf: E }), per, dmg(0.2)] },
         { fx: [dmg(0.6, 'allEnemies'), per, dmg(0.2, 'allEnemies'), E, status('약화', 1, { target: 'allEnemies' })] },
         { fx: [dmg(1.2), per, dmg(0.4), keep] },   // 10-13 신탁 점검
       ],
@@ -77,25 +77,25 @@ export default hero({
     },
     { // 마무리 — 다 찬 순환 3을 써서 쏟는다(다시 돌려야 공격력이 돌아온다)
       name: '거대한 뱀', cost: 2, type: '공격',
-      fx: [dmg(1, 'allEnemies'), E, dmg(0.4, 'allEnemies'), ...full, dmg(1.6, 'allEnemies')],
+      fx: [dmg(1, 'allEnemies', { plus: 0.4, plusIf: E }), ...full, dmg(1.2, 'allEnemies')],   // 10-21 밸런스 조절: 순환 3 덤 160 → 120%   // 10-19 타수: 100% + 본성 40% + 순환 3 160% → 100%(본성 140%) + 순환 3 160%
       oracles: [
-        { fx: [dmg(1.2, 'allEnemies'), E, dmg(0.4, 'allEnemies'), ...full, dmg(1.8, 'allEnemies')] },
-        { fx: [dmg(2.4), E, dmg(1), ...full, dmg(3.8)] },   // 10-13 신탁 점검
+        { fx: [dmg(1.2, 'allEnemies', { plus: 0.4, plusIf: E }), ...full, dmg(1.4, 'allEnemies')] },   // 10-21: 180 → 140%
+        { fx: [dmg(2.4, 'oneEnemy', { plus: 1, plusIf: E }), ...full, dmg(2.9)] },   // 10-21 밸런스 조절: 380 → 290%   // 10-13 신탁 점검
         { type: '스킬', fx: [shield(2), ...full, shield(2.4), status('사기', 1)] },   // 10-13 신탁 점검
-        { cost: 1, fx: [dmg(1, 'allEnemies'), ...full, dmg(2, 'allEnemies')] },   // 10-13 신탁 점검
-        { fx: [dmg(1, 'allEnemies'), ...full, dmg(1.6, 'allEnemies'), { k: 'nextAp', v: 1 }] },   // 10-13 신탁 점검
+        { cost: 1, fx: [dmg(1, 'allEnemies'), ...full, dmg(1.5, 'allEnemies')] },   // 10-21: 200 → 150%   // 10-13 신탁 점검
+        { fx: [dmg(1, 'allEnemies'), ...full, dmg(1.2, 'allEnemies'), { k: 'nextAp', v: 1 }] },   // 10-21: 160 → 120%   // 10-13 신탁 점검
       ],
       blesses: ['power', 'cost', [lap(1)]],
     },
     { // 순서 맞추기 — 태세를 바꾸지 않는다(원작 2성 「내 마음의 등대」 비수)
       name: '백사의 비수', cost: 0, type: '공격',
-      fx: [dmg(0.4, 'randomEnemy', { hits: 2 }), keep],
+      fx: [dmg(0.3, 'randomEnemy', { hits: 2 }), keep],   // 10-21 밸런스 조절 2차: 2 × 40 → 30%
       oracles: [
-        { fx: [dmg(0.5, 'randomEnemy', { hits: 2 }), keep, E, dmg(0.3, 'randomEnemy')] },
+        { fx: [dmg(0.5, 'randomEnemy', { hits: 2, plus: 0.15, plusIf: E }), keep] },   // 10-19 타수: 2회 × 50% + 본성 30% → 본성이면 대마다 +15%
         { fx: [dmg(0.4, 'randomEnemy', { hits: 2 }), keep, E, { k: 'takenMod', v: 0.1, turns: 2, target: 'oneEnemy' }] },
         { fx: [dmg(0.5, 'randomEnemy', { hits: 2 }), keep, G, up()] },
-        { fx: [dmg(0.3, 'randomEnemy', { hits: 2 }), per, dmg(0.1, 'randomEnemy'), keep] },
-        { fx: [dmg(0.4, 'randomEnemy', { hits: 3 }), keep] },
+        { fx: [dmg(0.6, 'randomEnemy'), per, dmg(0.1, 'randomEnemy'), keep] },   // 10-19 타수: 2회 × 30% → 60% 한 대(+ 1당)
+        { fx: [dmg(0.6, 'randomEnemy', { hits: 2 }), keep] },   // 10-19 타수: 무작위 3회 × 40% → 2회 × 60%
       ],
       blesses: ['power', 'draw', [lap(1)]],
     },

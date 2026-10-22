@@ -281,7 +281,7 @@ namespace Bolzena.RunUI
                 }
                 if (on)
                 {
-                    var hint = Ui.Text(rt, "한 번 더 누르면 결정합니다", Theme.FsCap, Theme.Gold, TextAlignmentOptions.Center, false, "hint"); hint.rectTransform.At(0.5f, 1, 0, 26, cw, 22); hint.Outline(0.3f);
+                    var hint = Ui.Text(rt, "한 번 더 누르면 결정한다", Theme.FsCap, Theme.Gold, TextAlignmentOptions.Center, false, "hint"); hint.rectTransform.At(0.5f, 1, 0, 26, cw, 22); hint.Outline(0.3f);
                     hint.overflowMode = TextOverflowModes.Overflow;
                     Tw.Breathe(rt, 0.02f, 1.2f);
                     Stage.Hot["event.ok"] = b;
@@ -421,7 +421,7 @@ namespace Bolzena.RunUI
         // 「지도 공개」 — 두 이야기 가운데 하나
         void EventFork(RectTransform root, EventState E)
         {
-            W.StatusBar(root, this, true, true, true, "갈림길", "두 이야기 가운데 하나를 고릅니다");
+            W.StatusBar(root, this, true, true, true, "갈림길", "두 이야기 가운데 하나를 고를 수 있다");
             var row = Ui.Rect("pick", root).At(0.5f, 0.5f, 0, -20, Mathf.Min(1100, Stage.Size.x - 60), Theme.C(340, 300));
             Ui.Row(row, 24, TextAnchor.MiddleCenter, null, true, true);
             int i = 0;
@@ -461,7 +461,7 @@ namespace Bolzena.RunUI
                 Put(t.rectTransform, t.GetPreferredValues(text).x + 2);
             }
             void Chips(IEnumerable<Outcome> outs) { foreach (var x2 in (outs ?? Enumerable.Empty<Outcome>()).Where(x => x.K != "flag")) { var (rt, w) = OutChip(box, x2); Put(rt, w); } }   // 깃발(연속 이벤트)은 안 보인다
-            if (o.Leave) { Lead(P.OutOf(o).Count == 0 ? "아무 대가 없이 떠납니다" : "", Theme.Sub); Chips(P.OutOf(o)); }
+            if (o.Leave) { Lead(P.OutOf(o).Count == 0 ? "아무 대가 없이 떠난다" : "", Theme.Sub); Chips(P.OutOf(o)); }
             else if (o.Fight != null) { Lead($"전투 — {o.Fight.Name ?? "적"} · 이기면", Theme.Bad); Chips(o.Fight.Win); }
             else if (o.Judge != null)
             {
@@ -471,7 +471,7 @@ namespace Bolzena.RunUI
             }
             else if (o.Gamble != null)
             {
-                if (o.Hidden) Lead("결과는 알 수 없습니다", Theme.Sub);
+                if (o.Hidden) Lead("결과는 알 수 없다", Theme.Sub);
                 else foreach (var g in o.Gamble) { Lead($"{Mathf.RoundToInt((float)g.P * 100)}%", Theme.Sky); Chips(g.Out); }
             }
             else
@@ -638,7 +638,7 @@ namespace Bolzena.RunUI
             }
             // 기록 — 위 줄에 없는 것(신탁 · 축복 · 다음 전투 …)까지
             var logs = E.Log.ToList();
-            if (logs.Count == 0 && n == 0) logs.Add("아무 일도 일어나지 않았습니다");
+            if (logs.Count == 0 && n == 0) logs.Add("아무 일도 일어나지 않았다");
             if (logs.Count > 0)
             {
                 var t = Ui.Text(content, string.Join("   ", logs.Select(l => "· " + l)), Theme.FsSm, Theme.Sub, TextAlignmentOptions.TopLeft, false, "log");
@@ -715,12 +715,12 @@ namespace Bolzena.RunUI
             int total = Mathf.Max(rest, removeTotal);
             removeTotal = total;
             string what = p.Basic ? "시작 카드" : "카드";
-            return total > 1 ? $"덱에서 뺄 {what}를 고릅니다 ({total - rest + 1}/{total})" : $"덱에서 뺄 {what}를 고릅니다";
+            return total > 1 ? $"덱에서 뺄 {what}를 고를 수 있다 ({total - rest + 1}/{total})" : $"덱에서 뺄 {what}를 고를 수 있다";
         }
         int removeTotal;
 
         /// <summary>신탁 · 축복 고르는 창의 안내 — 두 번 누르기(TwoTap · 전투 EpiphanyWindow 와 같은 글).</summary>
-        const string PickTwiceSub = "카드를 누르면 자세히 보고, 한 번 더 누르면 결정합니다.";
+        const string PickTwiceSub = "카드를 누르면 자세히 보고, 한 번 더 누르면 결정한다.";
 
         void PendingPick(RectTransform root, Pending p)
         {
@@ -745,16 +745,16 @@ namespace Bolzena.RunUI
             string title = p.K switch
             {
                 "remove" => RemoveTitle(p),
-                "dupe" => "복제할 고유 카드를 고릅니다",
-                "card" => (p.Label ?? "카드") + " — 하나를 고릅니다",
-                "flash" => $"「{P.Data.Card(p.Offer?.CardId)?.Name}」 — 신탁 하나를 고릅니다",
-                "shinPick" => p.Random ? "축복을 얹을 카드를 고릅니다 — 축복 · 신탁은 무작위로 붙습니다" : "축복을 얹을 카드를 고릅니다 — 이어서 축복 · 신탁을 고릅니다",   // 무작위는 이벤트에 「무작위」 라고 적힌 것만(2026-10-13)
-                "gambleChoice" => "하나를 고릅니다",
-                _ => "고릅니다",
+                "dupe" => "복제할 고유 카드 고르기",
+                "card" => (p.Label ?? "카드") + " — 하나 고르기",
+                "flash" => $"「{P.Data.Card(p.Offer?.CardId)?.Name}」 — 신탁 하나 고르기",
+                "shinPick" => p.Random ? "축복을 얹을 카드 고르기 — 축복 · 신탁은 무작위로 붙는다" : "축복을 얹을 카드 고르기 — 이어서 축복 · 신탁을 고른다",   // 무작위는 이벤트에 「무작위」 라고 적힌 것만(2026-10-13)
+                "gambleChoice" => "하나 고르기",
+                _ => "고르기",
             };
             float mw = Mathf.Min(Theme.Compact ? 1240 : Mathf.Max(1240, 8 * (170 + 12) + 80), Stage.Size.x - 40);   // 넓은 화면은 카드 고르기 한 줄 6~8칸
             bool twice = p.K == "flash" || p.K == "shinPick";   // 신탁 · 축복 고르기는 두 번 누르기(TwoTap) — 제거 · 복제 · 카드 고르기는 그대로 한 번
-            var (right, closeM, _) = Stage.ModalBox("pending", mw, Mathf.Min(680, Stage.Size.y - 24), title, twice ? PickTwiceSub : "이벤트에서 얻은 것 — 하나를 고릅니다", false, null, 0, false);
+            var (right, closeM, _) = Stage.ModalBox("pending", mw, Mathf.Min(680, Stage.Size.y - 24), title, twice ? PickTwiceSub : "이벤트에서 얻은 것 — 하나 고르기", false, null, 0, false);
             Ui.Col(right, Theme.Gap, TextAnchor.UpperLeft, new RectOffset(4, 4, 0, 4));
             var area = Ui.Rect("pick", right); area.Pref(-1, 200, -1, 1);
             var content = Ui.Scroll(area, out _);

@@ -17,7 +17,7 @@ namespace Bolzena.UI
         static readonly string[] Titles = { "뽑을 더미", "버린 더미", "소멸" };
         static readonly string[] Icons = { "ic_pile_up", "ic_pile_down", "ic_skull" };
         static readonly string[] Bands = { null, "버린 더미", "사라진 카드" };
-        static readonly string[] Why = { "차례는 감춥니다 — 사도별 기본 → 고유 차례", "최근에 버린 카드가 맨 앞 — 덱이 바닥나면 섞여서 뽑을 더미로 돌아갑니다", "최근 것이 맨 앞 — 소멸했거나 손이 넘쳐 빠진 카드 — 이 전투에서 다시 나오지 않습니다" };
+        static readonly string[] Why = { "차례는 감춤 — 사도별 기본 → 고유 차례", "최근에 버린 카드가 맨 앞 — 덱이 바닥나면 섞여 뽑을 더미로 돌아간다", "최근 것이 맨 앞 — 소멸했거나 손이 넘쳐 빠진 카드 · 이 전투에서 다시 나오지 않는다" };
 
         public static Modal Show(Transform parent, BattleSnapshot s, int tab)
         {
@@ -226,7 +226,7 @@ namespace Bolzena.UI
             }
             if (list.Count == 0)
             {
-                Tone.Text("none", cards, "비어 있습니다", new Vector3((areaL + areaR) / 2, y - 1.4f, 0), Tone.Lg * k, OC, Tone.Dim);
+                Tone.Text("none", cards, "비어 있음", new Vector3((areaL + areaR) / 2, y - 1.4f, 0), Tone.Lg * k, OC, Tone.Dim);
                 scrollMax = 0;
                 return;
             }

@@ -36,8 +36,17 @@ namespace Bolzena.Core
         public Dictionary<string, Stats> Growth;
         /// <summary>카드 값(판에 남는 카드 인스턴스 카운터).</summary>
         public Dictionary<string, Dictionary<string, int>> CardVals;
-        /// <summary>치명 피해 배율에 더하는 몫(크레파스 보드 — R.CRIT_MULT + 이것).</summary>
+        /// <summary>
+        /// 치명 피해 배율에 더하는 몫(R.CRIT_MULT + 이것). 교주 보드(크레파스)가 채우던 칸 — 2026-10-21 보드를 없애 판은 늘 0 을 적는다.
+        /// 칸은 남긴다: 셋업 JSON(입력 테이프 · 프론티어 검증의 셋업 비교 · 기본값까지 다 적음)의 꼴이 바뀌면 옛 판 테이프가 검증에서 어긋난다.
+        /// </summary>
         public double CritDmg;
+        /// <summary>
+        /// 사도 영구 성장(Prog.Build — 잠재력). 사도 → 몫. null 이면 성장 없음(지금 판과 같다).
+        /// null 이면 셋업 JSON 에 칸 자체를 적지 않는다 — 성장 전에 남긴 입력 테이프 · 프론티어 셋업 비교가 그대로 맞는다.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty(NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public Dictionary<string, ProgMods> Prog;
     }
 
     /// <summary>
@@ -207,8 +216,10 @@ namespace Bolzena.Core
         bool capMeter = true;
         /// <summary>이 전투에서 생긴 판 단위 성장(판이 AfterFight 에서 RunState.Growth 에 더한다).</summary>
         public Dictionary<string, Stats> GrowthGain = new();
-        /// <summary>치명 피해 배율에 더하는 몫(BattleSetup.CritDmg — 크레파스 보드).</summary>
+        /// <summary>치명 피해 배율에 더하는 몫(BattleSetup.CritDmg — 지금은 늘 0).</summary>
         public double CritDmgX;
+        /// <summary>사도 영구 성장 몫(BattleSetup.Prog — 읽기만, 복사본과 나눠 쓴다). null = 없음.</summary>
+        public Dictionary<string, ProgMods> ProgOf;
 
         // ── 기록 · 연출 ──
         public List<string> Log = new();
@@ -232,16 +243,19 @@ namespace Bolzena.Core
         void Setup(BattleSetup st)
         {
             var gear = st.Gear ?? new Dictionary<string, Stats>();
+            ProgOf = st.Prog != null && st.Prog.Count > 0 ? st.Prog : null;
             for (int i = 0; i < st.Party.Count; i++)
             {
                 var key = st.Party[i];
                 var h = Data.Hero(key) ?? throw new ArgumentException($"없는 사도: {key}");
                 var g = gear.TryGetValue(key, out var gg) ? gg : new Stats();
                 if (st.Growth != null && st.Growth.TryGetValue(key, out var gr)) g = g + new Stats { Atk = gr.Atk, Def = gr.Def, Crit = gr.Crit };
+                // 영구 성장(Prog) — 기본치로 친다(GearAdd 밖 — 실드 · 회복 바탕 방어에 그대로)
+                var pb = ProgOf != null && ProgOf.TryGetValue(key, out var pm) ? pm.Base ?? new Stats() : new Stats();
                 Party.Add(new Unit
                 {
                     Side = Side.Party, Idx = i, Key = key, Name = h.Name, Role = h.Role, Nature = h.Nature,
-                    Share = h.Hp + g.Hp, Atk = h.Atk + g.Atk, Def = h.Def + g.Def, Crit = h.Crit + g.Crit,
+                    Share = h.Hp + pb.Hp + g.Hp, Atk = h.Atk + pb.Atk + g.Atk, Def = h.Def + pb.Def + g.Def, Crit = h.Crit + pb.Crit + g.Crit,
                     GearAdd = new Stats { Atk = g.Atk, Def = g.Def, Crit = g.Crit },
                 });
             }
@@ -276,8 +290,21 @@ namespace Bolzena.Core
             Shin = st.Shin != null ? new Dictionary<string, string>(st.Shin) : new();
 
             gearRules = st.GearRules;
-            SetupPassives(st.GearRules);
+            if (ProgOf != null && ProgOf.Values.Any(m => m.Rules != null && m.Rules.Count > 0))
+            {   // 영구 성장 패시브(잠재력 사도 칸) — 장비 효과 뒤에 붙인다(판이 준 표는 건드리지 않게 새 표로)
+                var mr = new Dictionary<string, List<PassiveRule>>();
+                if (st.GearRules != null) foreach (var kv in st.GearRules) mr[kv.Key] = kv.Value.ToList();
+                foreach (var key in st.Party)
+                    if (ProgOf.TryGetValue(key, out var pm) && pm.Rules != null && pm.Rules.Count > 0)
+                    {
+                        if (!mr.TryGetValue(key, out var l)) mr[key] = l = new List<PassiveRule>();
+                        l.AddRange(pm.Rules);
+                    }
+                gearRules = mr;
+            }
+            SetupPassives(gearRules);
             MeterInit();
+            if (HpMeterOn) { HpMeter = new Dictionary<string, long[]>(); HpSrc = new Dictionary<string, long[]>(); }
 
             // 개전 — 첫 손패에 든다(뽑을 더미는 끝에서부터 뽑으니 끝으로)
             var opening = Draw.Where(id => HasTagB(id, Tag.Opening)).ToList();
@@ -327,7 +354,7 @@ namespace Bolzena.Core
             bool big = !summon && (e.Boss || e.Clone != null || e.Id != null && e.Id.EndsWith("_elite", StringComparison.Ordinal));
             double min = big ? R.MIN_TOUGH_BIG : R.MIN_TOUGH_FIGHT;   // 2026-10-10 사용자 — 보스도 5(옛 TOUGH.MinBoss 7 은 쓰지 않는다)
             // 2026-10-12 사용자 「일반이면 3 고정(탱커 컨셉이라고 5 주지 말고) · 엘리트 · 보스만 5」 — 데이터 tough 는 더 쓰지 않는다
-            if (summon || !R.TOUGH_FIXED) return Math.Max(min, t);
+            if (summon || !R.TOUGH_FIXED || (e.ToughOwn && e.Tough > 0)) return Math.Max(min, t);   // toughOwn — 고정 규칙 대신 데이터 tough(프론티어 보스)
             return e.Boss || e.Clone != null ? R.BOSS_TOUGH : big ? R.ELITE_TOUGH : R.MIN_TOUGH_FIGHT;
         }
 
@@ -372,7 +399,7 @@ namespace Bolzena.Core
         internal Battle Clone(Rng rng, bool bot)
         {
             var s = (Battle)MemberwiseClone();
-            s.OnCue = null; s.OnLog = null; s.Cues = null; s.Meter = null; s.Tape = null;
+            s.OnCue = null; s.OnLog = null; s.Cues = null; s.Meter = null; s.HpMeter = null; s.HpSrc = null; s.Tape = null; s.Input = null;
             s.Log = new List<string>();
             s.Rng = rng ?? Rng.Clone();
             s.Pool = Pool.Clone(!bot);
@@ -417,7 +444,7 @@ namespace Bolzena.Core
             s.Forms = new Dictionary<string, FormRt>(Forms.Count);
             foreach (var kv in Forms) s.Forms.Add(kv.Key, kv.Value.Copy());
             s.Powers = new List<PowerRt>(Powers.Count);
-            foreach (var p in Powers) s.Powers.Add(p.Copy());   // 규칙 캐시(powerRules)는 나눠 쓴다 — 같은 강화면 규칙이 같다   // 모습 캐시(formViews · formRules)는 나눠 쓴다 — 바뀌지 않는다
+            foreach (var p in Powers) s.Powers.Add(p.Copy());   // 규칙 캐시(PowerRt.Rt)는 그 강화를 따라 나눠 쓴다 — 같은 강화면 규칙이 같다   // 모습 캐시(formViews · formRules)는 나눠 쓴다 — 바뀌지 않는다
             return s;
         }
 

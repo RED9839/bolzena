@@ -7,7 +7,7 @@ using Bolzena.Core;
 /// <summary>
 /// 약점 속성 의존도 시험(2026-10-09, 도구만) — role 편성 판(PartyPick.Jobs)을 그대로 쓰되, 판의 적 속성(씨앗으로 정해짐)에 대해
 /// 약점 사도 수를 강제한다(같은 역할 안에서 바꿔 끼움). 「약점」 = 그 적 속성을 이기는 성격(R.WeakTo) 또는 공명(늘 약점으로 친다).
-///   weaksim [바퀴 400] [--seed 0] [--bot skilled] [--weak role|0|1|2|3] [--crayon all|표] [--floordmg a,b]
+///   weaksim [바퀴 400] [--seed 0] [--bot skilled] [--weak role|0|1|2|3] [--floordmg a,b]
 ///   --weak role 이면 편성을 바꾸지 않고, 약점 사도 수별로 나눠 보인다.
 /// </summary>
 static class WeakSim
@@ -18,7 +18,7 @@ static class WeakSim
         return n == "공명" || (n != null && R.WeakTo(nat).Contains(n));
     }
 
-    public static int Run(GameData d, int rounds, int seed, bool skilled, string weak, Dictionary<string, double> perks)
+    public static int Run(GameData d, int rounds, int seed, bool skilled, string weak)
     {
         var t0 = DateTime.Now;
         var jobs = PartyPick.Jobs(d, rounds, seed, PartyPick.Role);
@@ -101,7 +101,7 @@ static class WeakSim
         Parallel.For(0, list.Count, new ParallelOptions { MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount - 1) }, j =>
         {
             var fights = new List<Battle>(); var kinds = new List<string>();
-            res[j] = new RunBot(d).RunFull(list[j].party, list[j].seed, new SimOpts { Skilled = skilled, Perks = perks, OnFight = (b, r) => { fights.Add(b); kinds.Add($"{r.S.Floor + 1}|{(r.S.EventFight != null ? "event" : r.IsBoss ? "boss" : r.S.Elite ? "elite" : "fight")}"); } });
+            res[j] = new RunBot(d).RunFull(list[j].party, list[j].seed, new SimOpts { Skilled = skilled, OnFight = (b, r) => { fights.Add(b); kinds.Add($"{r.S.Floor + 1}|{(r.S.EventFight != null ? "event" : r.IsBoss ? "boss" : r.S.Elite ? "elite" : "fight")}"); } });
             lock (turns) for (int q = 0; q < fights.Count; q++) { turns.TryGetValue(kinds[q], out var tv); turns[kinds[q]] = (tv.n + 1, tv.t + fights[q].Turn); }   // 층 · 종류별 평균 턴(엘다인 4차 난이도 — 편성별 싸움 길이)
             System.Threading.Interlocked.Add(ref inc, fights.Sum(b => (long)b.SumIncoming));
             System.Threading.Interlocked.Add(ref grd, fights.Sum(b => (long)b.SumGuarded));
@@ -117,7 +117,7 @@ static class WeakSim
             double half = 1.96 * Math.Sqrt(P(win) / 100 * (1 - P(win) / 100) / n) * 100;
             return $"| {label} | {n} | **{P(win):0.0}%** ±{half:0.0} | {P(f1):0.0} ({W(0, "fight")} · {W(0, "elite")} · {W(0, "boss")}) | {P(f2):0.0} ({W(1, "fight")} · {W(1, "elite")} · {W(1, "boss")}) |";
         }
-        Console.WriteLine($"weaksim — 편성 {(weak == "role" ? "role 그대로" : weak == "D" ? "딜러 1명만 약점(" : weak == "S" ? "서포터 1명만 약점(" : weak == "T" ? "탱커 1명만 약점(" : $"약점 {weak}명 강제(")}{(weak == "role" ? "" : $"바꿔 끼운 자리 {moved} · 못 맞춘 자리 {short_})")} · {(skilled ? "숙련" : "초보")} 봇{(perks != null ? " · 보드 전부" : "")} · FLOOR_DMG {R.FLOOR_DMG[1]} · {R.FLOOR_DMG[2]} · {list.Count}판 · {(DateTime.Now - t0).TotalSeconds:0}초");
+        Console.WriteLine($"weaksim — 편성 {(weak == "role" ? "role 그대로" : weak == "D" ? "딜러 1명만 약점(" : weak == "S" ? "서포터 1명만 약점(" : weak == "T" ? "탱커 1명만 약점(" : $"약점 {weak}명 강제(")}{(weak == "role" ? "" : $"바꿔 끼운 자리 {moved} · 못 맞춘 자리 {short_})")} · {(skilled ? "숙련" : "초보")} 봇 · FLOOR_DMG {R.FLOOR_DMG[1]} · {R.FLOOR_DMG[2]} · {list.Count}판 · {(DateTime.Now - t0).TotalSeconds:0}초");
         Console.WriteLine($"생존 몫 — 적 공격이 든 양 가운데 방어 · 실드가 막은 {(inc > 0 ? 100.0 * grd / inc : 0):0.0}% · 회복이 채운 {(inc > 0 ? 100.0 * hl / inc : 0):0.0}%(판당 든 피해 {(double)inc / Math.Max(1, list.Count):0})");
         string T(string k) => turns.TryGetValue(k, out var tv) && tv.n > 0 ? $"{(double)tv.t / tv.n:0.00}" : "-";
         Console.WriteLine($"평균 턴 — 1층 일반 {T("1|fight")} · 엘리트 {T("1|elite")} · 보스 {T("1|boss")} | 2층 일반 {T("2|fight")} · 엘리트 {T("2|elite")} · 보스 {T("2|boss")}");

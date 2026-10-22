@@ -81,10 +81,10 @@ namespace Bolzena.RunUI
         public VillageDef Village(string id) => id != null && Data.Villages.TryGetValue(id, out var v) ? v : Data.Villages.Values.FirstOrDefault();
         public List<VillageDef> Villages => Data.Villages.Values.ToList();
 
-        public void NewRun(List<string> party, string village, long seed, string foeNature = null)
+        public void NewRun(List<string> party, string village, long seed, string foeNature = null, int tier = 0)
         {
             Run = Run.New(Data, party, seed, village, foeNature);
-            Run.ApplyPerks(CrayonStore.Perks);   // 교주 보드(크레파스) — 올린 단계의 영구 능력치
+            ProgStore.ApplyTo(Run, tier);        // 난이도 단계 · 사도 성장(성장 표가 있을 때만 — 없으면 아무것도 안 한다, Data/ProgStore.cs)
             PlayRecord.Began(this);   // 플레이 기록 — 판 시작 시각
         }
 
@@ -163,6 +163,9 @@ namespace Bolzena.RunUI
         }
 
         public FightOutcome Finish(FightTicket t) => Finish(t.B, t.Loot, t.Event, t.Foes, t.Before);
+
+        /// <summary>바깥에서 끝까지 돈 판(자동 데모 — 엔진 봇이 완주한 판)을 이 문의 판으로 받는다.</summary>
+        public void Adopt(Run run) { Run = run; }
 
         public FightOutcome Finish(Battle b, RewardState loot, bool ev, List<string> foes, int before)
         {

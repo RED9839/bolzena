@@ -6,12 +6,20 @@ using UnityEngine;
 
 namespace Bolzena.RunUI
 {
-    // 마을 공개 — 웹판 ui.js villageScreen(docs/20-마을.md §0). 모험을 시작하면 마을 하나가 무작위로 정해져 보인다.
-    // 웹판보다: 마을 이름이 슬롯처럼 돌다가 멈추고, 두 층이 차례로 펼쳐진다.
+    // 마을 공개 — 웹판 ui.js villageScreen(docs/20-마을.md §0). 마을 고르기(Flow.VillagePick.cs) 다음 화면 — 고른 마을 · 이번 모험의 적 속성 · 두 보스를 보여 준다.
+    // 「무작위」로 떠났으면 마을 이름이 슬롯처럼 돌다가 멈추고(고른 마을은 이름이 곧장 선다), 두 층이 차례로 펼쳐진다.
     public partial class Flow
     {
-        public void VillageReveal(string villageId, Action onGo)
+        // 마지막 마을 공개의 굴리기 · 뒤로(편성에서 뒤로 와 다시 세울 때 그대로 — 그때는 이름을 다시 굴리지 않는다)
+        string revealVillage; Action revealBack;
+
+        /// <summary>마을 공개. rolled = 「무작위」로 정해진 마을(이름 굴리기) · null 이면 앞 공개를 다시 세움(굴리기 없음). back = 「다시 고르기」(없으면 「로비로」).</summary>
+        public void VillageReveal(string villageId, Action onGo, bool? rolled = null, Action back = null)
         {
+            bool again = rolled == null && villageId == revealVillage;
+            if (again) back = revealBack;
+            else { revealVillage = villageId; revealBack = back; }
+            bool roll = rolled ?? !again;
             var v = P.Village(villageId);
             var f0 = v.Floors[0];
             Stage.SetBg(f0.Bg != null && f0.Bg.TryGetValue("fight", out var bg) ? bg : "stage3_2", 0.55f);
@@ -54,19 +62,25 @@ namespace Bolzena.RunUI
                     Tw.Pop(row.rectTransform, 1.1f + i * 0.18f, 0.8f, 0.4f);
                 }
                 if (hasNat) FoeSide(panel, v, FoeNature, 1.4f);
-                var note = Ui.Text(main, $"1-1 부터 {v.Floors.Count}-{Core.R.FLOOR_NODES} 까지 이 마을의 적만 나옵니다. {v.Floors.Count}층 보스를 이기면 모험 완주입니다.", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center);
+                var note = Ui.Text(main, $"1-1 부터 {v.Floors.Count}-{Core.R.FLOOR_NODES} 까지 이 마을의 적만 나온다. {v.Floors.Count}층 보스를 이기면 모험 완주다", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center);
                 note.rectTransform.Band(0, 30, 30, 30, 112);
                 var row2 = Ui.Rect("buttons", main).Band(0, 66, 40, 40, 34);
                 Ui.Row(row2, 16, TextAnchor.MiddleCenter, null, false, true);
-                var back = Btn.Make(row2, "로비로", BtnStyle.PillDark, Lobby, Theme.FsMd);
-                back.Pref(200, Theme.BtnMainH);
+                var bk = Btn.Make(row2, back != null ? "다시 고르기" : "로비로", BtnStyle.PillDark, back ?? Lobby, Theme.FsMd);
+                bk.Pref(200, Theme.BtnMainH);
+                Stage.Hot["back"] = bk;
+                Stage.OnBack = back ?? Lobby;
                 var go = Btn.Make(row2, "파티 편성", BtnStyle.PillGold, onGo, Theme.FsLg);
                 go.Pref(380, Theme.BtnMainH);
                 Stage.Hot["go"] = go;
 
-                // 이름 굴리기 — 다른 마을 이름(없으면 층 이름)을 돌리다가 멈춘다
-                var pool = P.Villages.Select(x => x.Name).Concat(v.Floors.Select(x => x.Name)).Distinct().ToList();
-                StartCoroutine(Roll(name, pool, v.Name));
+                // 이름 굴리기(무작위로 정해졌을 때만) — 다른 마을 이름(없으면 층 이름)을 돌리다가 멈춘다. 고른 마을은 이름이 곧장 선다
+                if (roll)
+                {
+                    var pool = P.Villages.Select(x => x.Name).Concat(v.Floors.Select(x => x.Name)).Distinct().ToList();
+                    StartCoroutine(Roll(name, pool, v.Name));
+                }
+                else Tw.Pop(name.rectTransform, 0.15f, 0.8f, 0.4f);
             }, 1.6f);
         }
 
@@ -102,7 +116,7 @@ namespace Bolzena.RunUI
             return el;
         }
 
-        // 마을 공개 오른쪽 — 「이번 모험의 적 속성」 큰 아이콘 · 이름(슬롯처럼 돌다 멈춘다) → 멈춘 뒤에 「모든 적이 ○○ 속성입니다」 · 약점(보조) · 1층 / 2층 보스 클론 초상
+        // 마을 공개 오른쪽 — 「이번 모험의 적 속성」 큰 아이콘 · 이름(슬롯처럼 돌다 멈춘다) → 멈춘 뒤에 「모든 적이 ○○ 속성이다」 · 약점(보조) · 1층 / 2층 보스 클론 초상
         void FoeSide(RectTransform panel, Bolzena.Core.VillageDef v, string nat, float delay)
         {
             var col = Ui.Rect("foeside", panel).Column(1, SideW, 0, 0, 0);
@@ -116,10 +130,10 @@ namespace Bolzena.RunUI
             nm.Outline(0.12f); nm.textWrappingMode = TextWrappingModes.NoWrap;
             float done = delay + RollTime();   // 속성이 멈춘 때 — 이 뒤로만 속성을 드러내는 것(설명 · 약점 · 보스)을 띄운다
             var nc = Theme.NatureCardOf(nat);
-            var say = Ui.Title(col, $"모든 적과 두 보스가 <color={Hex(nc)}>{nat}</color> 속성입니다", Theme.FsMd + 2, Theme.Ink, TextAlignmentOptions.Center);
+            var say = Ui.Title(col, $"모든 적과 두 보스가 <color={Hex(nc)}>{nat}</color> 속성이다", Theme.FsMd + 2, Theme.Ink, TextAlignmentOptions.Center);
             say.rectTransform.Band(1, 32, 12, 12, -148); say.textWrappingMode = TextWrappingModes.NoWrap; say.enableAutoSizing = true; say.fontSizeMin = 14; say.fontSizeMax = Theme.FsMd + 2;
             var weak = RunPort.WeakTo(nat);
-            var wk = Ui.Text(col, weak.Count == 0 ? "" : $"<color={Theme.SubTag}>약점</color>  <color={Hex(Theme.NatureCardOf(weak[0]))}>{string.Join(" · ", weak)}</color> <color={Theme.SubTag}>— {nat}에 강한 성격으로 치면 강인도가 크게 깎입니다(공명은 늘)</color>",
+            var wk = Ui.Text(col, weak.Count == 0 ? "" : $"<color={Theme.SubTag}>약점</color>  <color={Hex(Theme.NatureCardOf(weak[0]))}>{string.Join(" · ", weak)}</color> <color={Theme.SubTag}>— {nat}에 강한 성격으로 치면 강인도가 크게 깎인다(공명은 늘)</color>",
                 Theme.FsSm, Theme.Ink, TextAlignmentOptions.Top);
             wk.rectTransform.Band(1, 46, 18, 18, -184);
             Tw.Pop(say.rectTransform, done, 0.9f, 0.35f);

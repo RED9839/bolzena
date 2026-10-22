@@ -32,6 +32,30 @@ namespace Bolzena.Core
         }
 
         void TallyDealt(Unit by, int v) { if (v > 0 && TallyOf(by) is HeroTally t) t.Dealt += v; }
+
+        /// <summary>측정 전용(2026-10-19 — 사도별 프론티어 딜, bz herodps) — 켜져 있을 때 새로 연 전투만 잰다(봇의 복사본은 Clone 이 끈다). 판 · 점수 · 지문에 들지 않는다.</summary>
+        public static volatile bool HpMeterOn;
+        /// <summary>사도 키(주인 모름은 "") → [보스(첫 적)가 잃은 HP, 다른 적(소환물 · 드론)이 잃은 HP] — Unit.Lost 와 같은 셈(넘친 피해 · 막은 몫 빼고).</summary>
+        public Dictionary<string, long[]> HpMeter;
+
+        /// <summary>측정 전용 — 「사도 키 · 한 대 종류(dot · counter · 쏘는 한 대 · hit) · 그때의 ModSrc」(탭으로 잇는다) → [보스, 다른 적]. 출처 나누기(bz herodps).</summary>
+        public Dictionary<string, long[]> HpSrc;
+        /// <summary>측정 전용 — ModSrc 없이 치는 곳(턴 끝 키워드 피해 · 탄환)의 꼬리표. 다음 한 대가 쓰고 지운다. HpSrc 가 켜졌을 때만 단다.</summary>
+        internal string HpCtx;
+
+        void HpMeterAdd(Unit by, Unit u, int lost, HurtOpts o = null)
+        {
+            if (HpMeter == null || lost <= 0) return;
+            string k = by != null && by.Side == Side.Party && by.BodyRef != null && by.Key != null ? by.Key : "";
+            if (!HpMeter.TryGetValue(k, out var a)) HpMeter[k] = a = new long[2];
+            int slot = Enemies.Count > 0 && ReferenceEquals(Enemies[0], u) ? 0 : 1;
+            a[slot] += lost;
+            if (HpSrc == null) return;
+            string kind = o == null ? "hit" : o.Dot ? "dot" : o.Counter ? "counter" : o.Shot ?? (o.Pure ? "pure" : "hit");
+            string sk = k + "\t" + kind + "\t" + (HpCtx ?? ModSrc ?? ""); HpCtx = null;
+            if (!HpSrc.TryGetValue(sk, out var b)) HpSrc[sk] = b = new long[2];
+            b[slot] += lost;
+        }
         void TallyShield(Unit by, int v) { if (v > 0 && TallyOf(by) is HeroTally t) t.Shield += v; }
         void TallyHeal(Unit by, int v) { if (v > 0 && TallyOf(by) is HeroTally t) t.Heal += v; }
 

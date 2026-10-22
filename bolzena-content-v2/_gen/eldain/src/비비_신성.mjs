@@ -17,10 +17,10 @@ export default hero({
   keyword: { name: K, desc: '손에 쥔 카드마다 자라는 새싹(카드 값)', carrier: 'self', cap: 4, cardValue: { grow: 'handEnd', reset: 'play' } },
   // 치명 정산(비비(신성) 소유 — 07 §3): 다른 아군이 치명을 내면 손의 카드 새싹 +1(P2 신성한 사냥 — 란 사냥감 치명이 새싹을 키움)
   // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
-  keywords: [{ name: '은총', desc: '세계수의 은총 — 아군 치명이 잦아짐', carrier: 'self', cap: 10, per: [{ stat: 'crit', v: 0.05, who: 'allies' }] }],   // 2026-10-11 사용자: 자신만 → 아군 전체 · 최대 3 → 10 · 치명마다 −1
+  keywords: [{ name: '은총', desc: '세계수의 은총 — 아군 치명이 잦아짐', carrier: 'self', cap: 6, /* 10-21 밸런스 조절: 최대 10 → 6(6 · 8차) */ per: [{ stat: 'crit', v: 0.05, who: 'allies' }] }],   // 2026-10-11 사용자: 자신만 → 아군 전체 · 최대 3 → 10 · 치명마다 −1
   // 사용자 10-11: 20명 모두 고유 능력 2개
   passives: [{ name: '신성한 품 속', when: { on: 'crit', who: 'any' }, fx: [{ k: 'spend', id: '은총', v: 1 }, grow(1)] },   // 10-11: 아군 · 자신의 치명마다 은총 −1(사용자) · 새싹 +1 — 자동 규칙 2개 한도라 한 규칙에 합침
-    { name: '이른 봄의 기운', when: { on: 'lowHp', pct: 0.3 }, fx: [status('끈기', 1)] },   // 원작 3성 하위 — 파티 HP 30% 이하가 되면 끈기 1(전투당 한 번)
+    { name: '이른 봄의 기운', when: { on: 'lowHp', pct: 0.2 }, fx: [status('끈기', 1)] },   // 원작 3성 하위 — 파티 HP 20% 이하가 되면 끈기 1(전투당 한 번 · 10-21 밸런스 조절: 30 → 20%)
   ],
   ult: { name: '모든 이를 굽어살피리', cost: 250, fx: [dmg(2.8, 'allEnemies'), { k: 'critDmg', v: 0.4, turns: 3, id: '신성', off: [status('취약', 1, { target: 'allEnemies' })] }, grow(1, { n: 0 })] },   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로
 }, {
@@ -40,13 +40,13 @@ export default hero({
     },
     {
       name: '셋의 몫', cost: 2, type: '공격', tags: KEEP,   // 4차 2코 — 이드 천상을 깨운다
-      fx: [dmg(2.4), ifSt(3), team(0.2), stack('은총', 2)],
+      fx: [dmg(2.8), ifSt(3), team(0.2), stack('은총', 2)],   // 10-21 밸런스 조절: 240 → 280%(신탁도)
       oracles: [
-        { tags: KEEP, fx: [dmg(2.4), ifSt(3), team(0.3)] },
-        { tags: KEEP, fx: [stack('은총', 2), dmg(2.4), { k: 'perCardSt', id: K }, dmg(0.5)] },   // 10-13 신탁 점검: 은총 되살림
+        { tags: KEEP, fx: [dmg(2.8), ifSt(3), team(0.3)] },
+        { tags: KEEP, fx: [stack('은총', 2), dmg(2.8), { k: 'perCardSt', id: K }, dmg(0.6)] },   // 10-13 신탁 점검: 은총 되살림
         { tags: KEEP, fx: [dmg(1.2, 'allEnemies'), ifSt(3), team(0.2)] },
-        { tags: KEEP, fx: [stack('은총', 2), dmg(2.4), ifSt(4), dmg(2.4)] },   // 10-13 신탁 점검: 은총 되살림
-        { tags: KEEP, fx: [dmg(3.2), { k: 'cardStatus', id: K, to: 'this', half: true }] },   // 10-13 신탁 점검
+        { tags: KEEP, fx: [stack('은총', 2), dmg(2.8), ifSt(4), dmg(2.8)] },   // 10-13 신탁 점검: 은총 되살림
+        { tags: KEEP, fx: [dmg(3.7), { k: 'cardStatus', id: K, to: 'this', half: true }] },   // 10-13 신탁 점검
       ],
       blesses: ['power', 'cost', [grow(1)]],
     },
@@ -76,13 +76,13 @@ export default hero({
     },
     { // 4차 8장 — 굴리기(원작 저학년 「작은 뜻」 의 공격 쪽): 묵힌 새싹이 3 이면 다음 동료 카드 치명
       name: '녹발의 기도', cost: 1, type: '공격', tags: KEEP,
-      fx: [dmg(0.5, 'randomEnemy', { hits: 3 }), ifSt(3), crit()],
+      fx: [dmg(0.8, 'randomEnemy', { hits: 2 }), ifSt(3), crit()],   // 10-19 타수(사용자 「카드 최대 2타」): 무작위 3회 × 50% → 2회 × 80%(한 대 ×1.5 = 75% 를 10% 단위로 올림 — 합 150 → 160% · 신탁도 ×1.5)
       oracles: [
-        { tags: KEEP, fx: [dmg(0.6, 'randomEnemy', { hits: 3 }), ifSt(3), crit()] },
-        { tags: KEEP, fx: [dmg(0.5, 'randomEnemy', { hits: 3 }), ifSt(3), team(0.2)] },
-        { tags: KEEP, fx: [dmg(0.5, 'randomEnemy', { hits: 3 }), grow(1)] },
+        { tags: KEEP, fx: [dmg(0.9, 'randomEnemy', { hits: 2 }), ifSt(3), crit()] },
+        { tags: KEEP, fx: [dmg(0.8, 'randomEnemy', { hits: 2 }), ifSt(3), team(0.2)] },
+        { tags: KEEP, fx: [dmg(0.8, 'randomEnemy', { hits: 2 }), grow(1)] },
         { tags: KEEP, fx: [{ k: 'perCardSt', id: K, n: 1 }, dmg(0.7, 'randomEnemy')] },   // 10-13 신탁 점검
-        { cost: 0, tags: KEEP, fx: [dmg(0.4, 'randomEnemy', { hits: 3 }), ifSt(3), crit()] },   // 10-13 신탁 점검
+        { cost: 0, tags: KEEP, fx: [dmg(0.6, 'randomEnemy', { hits: 2 }), ifSt(3), crit()] },   // 10-13 신탁 점검
       ],
       blesses: ['power', 'cost', [grow(1)]],
     },

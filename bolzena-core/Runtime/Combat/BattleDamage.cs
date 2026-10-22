@@ -60,6 +60,7 @@ namespace Bolzena.Core
                 var nw = R.NatureWeakSt(NatureOf(from)); if (nw != null && St(to, nw) > 0) return true;
             }
             if (MarkedWeak(to)) return true;
+            foreach (var k in Kw.Values) if (k.Def.WeakOwner && k.Carrier == "enemy" && k.Owner == from.Key && St(to, k.Id) > 0) return true;   // (아야 리워크) weakOwner — 키워드 주인만 약점
             var n = NatureOf(from);
             return !NoNature && n != null && (n == "공명" || WeakHas(to, n));
         }
@@ -119,9 +120,9 @@ namespace Bolzena.Core
                 if (Charge(from, "약화")) m *= 1 - R.SV("약화");
                 if (m != 1) d = Num.Round(d * m);
             }
-            // 성격 상성 — 사도 → 적은 약점이 곧 유리
+            // 성격 상성 — 사도 → 적은 약점이 곧 유리. 키워드 1개당 「약점 공격 피해」(stat weak — 2026-10-19 아야 「만년설」)는 약점으로 칠 때만 그 사도에게 더한다
             if (!plain && from != null)
-                d = Num.Round(d * (from.Side == Side.Party && u.Side == Side.Enemy && IsWeakHit(from, u, o.Tags) ? 1 + R.WEAK_DMG : NatureMod(from, u)));
+                d = Num.Round(d * (from.Side == Side.Party && u.Side == Side.Enemy && IsWeakHit(from, u, o.Tags) ? 1 + R.WEAK_DMG + StatMod(from, "weak") : NatureMod(from, u)));
             // 분쇄 · 잔불 · 잔광
             if (!plain && u.Side == Side.Enemy && from != null && from.Side == Side.Party && o.Card)
             {
@@ -181,6 +182,8 @@ namespace Bolzena.Core
             if (u.Side == Side.Party && d >= u.Hp && d > 0 && St(u, "끈기") > 0) { AddSt(u, "끈기", -1); d = Math.Max(0, u.Hp - 1); Say("파티: 끈기 — HP 1 로 버틴다"); StatusCue(u, "끈기!", true); Emit("endure", new EmitInfo { Who = u, From = from }); }   // 「적 1명」 = 그 대를 친 적(엘다인 3차 ▶E68)
             double before = (double)u.Hp / u.MaxHp; int hp0 = u.Hp;
             u.Hp -= d;
+            if (u.Side == Side.Enemy && d > 0 && hp0 > 0) u.Lost += Math.Min(d, hp0);   // 적이 잃은 HP 합(프론티어 점수) — 주인 없는 피해도
+            if (HpMeter != null && u.Side == Side.Enemy && d > 0 && hp0 > 0) HpMeterAdd(from ?? o.Credit, u, Math.Min(d, hp0), o);   // 측정 전용(사도별 HP 피해)
             // 전투 기록 — 적에게 실제로 깎인 HP(넘친 피해 빼고) + 벗긴 방어 · 실드. 반격 · 추가 공격 · 소환물 · 지속 피해도 From(없으면 Credit) 사도 몫
             if (u.Side == Side.Enemy) TallyDealt(from ?? o.Credit, Math.Max(0, Math.Min(d, hp0)) + guard);
             if (d > 0 || guard > 0) Cue("hurt", u, new Cue { V = d, Guard = guard, Crit = o.Crit, From = Math.Max(0, hp0), To = Math.Max(0, u.Hp),

@@ -24,64 +24,64 @@ export default hero({
   // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
   keywords: [{ name: '메아리', desc: '정각에 울린 포격의 메아리', carrier: 'self', cap: 3, endClear: true }],
   passives: [
-    { name: '우리들의 평화로운 시간', when: { on: 'play', paidMax: 0 }, fx: [{ k: 'dealtMod', v: 0.1, target: 'allAllies' }] },
+    { name: '우리들의 평화로운 시간', when: { on: 'play', paidMax: 0 }, fx: [{ k: 'dealtMod', v: 0.3, target: 'allAllies' }] },   // 10-21 밸런스 조절: +10 → +30%(1 · 6차)
     { name: '시공간, 저 너머로!', when: { on: 'ult', who: 'any' }, fx: [tick(1)] },   // 원작 2성 — 아군이 고학년을 쓰면 손의 리뉴아 카드 시간 +1
   ],
-  ult: { name: '타임 브레이크', cost: 250, fx: [dmg(0.5, 'allEnemies', { hits: 4 }),   /* 10-13 사용자: 고학년 비교에서 가장 약함(1.14) — 4회 × 30% → 50% */ tick(4), swift] },   // 사용자 10-11: 손의 리뉴아 카드 시간 +4(정각 근처로) · 이번 턴 남은 카드 신속 — 그 턴에 4~6코를 몰아 냄
+  ult: { name: '타임 브레이크', cost: 250, fx: [dmg(1, 'allEnemies', { hits: 2 }),   /* 10-19 타수: 4회 × 50% → 2회 × 100% */   /* 10-13 사용자: 고학년 비교에서 가장 약함(1.14) — 4회 × 30% → 50% */ tick(4), swift] },   // 사용자 10-11: 손의 리뉴아 카드 시간 +4(정각 근처로) · 이번 턴 남은 카드 신속 — 그 턴에 4~6코를 몰아 냄
 }, {
   basicNames: ['시공 사격', '호버보드 돌진', '호버보드 회피'], deck: 'light',
   uniques: [
     { // 시동 — 4코 · 정각이면 크게
-      name: '멈춰 버린 시계', cost: 4, type: '공격', tags: SW,
-      fx: [dmg(0.8, 'allEnemies'), JK, dmg(0.8, 'allEnemies'), stack('메아리', 1)],
+      name: '멈춰 버린 시계', cost: 3,   /* 10-21 밸런스 조절: 4 → 3 */ type: '공격', tags: SW,
+      fx: [dmg(1.2, 'allEnemies'), JK, dmg(1.2, 'allEnemies'), stack('메아리', 1)],   // 10-21 밸런스 조절: 80 + 80 → 120 + 120%(2 · 5차)
       oracles: [
         { tags: SW, fx: [dmg(1, 'allEnemies'), JK, dmg(1.4, 'allEnemies')] },
         { tags: SW, fx: [dmg(1, 'allEnemies'), tick(1)] },                                   // 비용 감소 더 빠르게
         { tags: SW, fx: [dmg(1, 'allEnemies'), JK, ally] },                                  // 동료 카드 비용도 -1
         { tags: SW, fx: [dmg(1, 'allEnemies'), { k: 'ifNth', n: 4, after: true }, dmg(1, 'allEnemies')] },   // 4번째 카드 박자(4차 정각의 옛 꼴)
-        { cost: 3, tags: SW, fx: [dmg(0.8, 'allEnemies'), JK, { k: 'recast', ratio: 1 }] },  // 0코면 두 번 발동
+        { cost: 2, tags: SW, fx: [dmg(0.8, 'allEnemies'), JK, { k: 'recast', ratio: 1 }] },   // 10-21: 3 → 2코(본판이 3코로 내려서)  // 0코면 두 번 발동
       ],
       blesses: ['cost', 'draw', [tick(1)]],
     },
     {
-      name: '시간 저 너머로', cost: 5, type: '공격', tags: KEEP,
-      fx: [dmg(0.5, 'randomEnemy', { hits: 3 }), JK, draw(2)],
+      name: '시간 저 너머로', cost: 4,   /* 10-21: 5 → 4 */ type: '공격', tags: KEEP,
+      fx: [dmg(1.4, 'randomEnemy', { hits: 2 }), JK, draw(2)],   /* 10-21 8차: 2 × 120 → 140% */   // 10-21 밸런스 조절: 2 × 80 → 120%(2 · 5차)   // 10-19 타수(사용자 「카드 최대 2타」): 무작위 3회 → 2회, 한 대 ×1.5(신탁도 · 10% 단위로 올림 — 본판 75 → 80%)
       oracles: [
-        { tags: KEEP, fx: [dmg(0.8, 'randomEnemy', { hits: 3 }), JK, draw(2)] },
-        { tags: KEEP, fx: [dmg(0.8, 'randomEnemy', { hits: 3 }), tick(1)] },   // 10-13 신탁 점검
-        { tags: KEEP, fx: [dmg(0.7, 'randomEnemy', { hits: 3 }), JK, ally] },   // 10-13 신탁 점검
-        { tags: KEEP, fx: [dmg(0.4, 'randomEnemy', { hits: 3 }), draw(2), JK, { k: 'gauge', v: 30 }] },   // 원작 쿨 감소 · 10-13 신탁 점검: 피해 되살림 · 드로우는 늘 · 게이지 20→30
-        { tags: KEEP, fx: [dmg(0.7, 'randomEnemy', { hits: 3 }), JK, { k: 'recast', ratio: 1 }] },   // 10-13 신탁 점검
+        { tags: KEEP, fx: [dmg(1.8, 'randomEnemy', { hits: 2 }), JK, draw(2)] },   // 10-21: 120 → 180%(본판이 오른 만큼)
+        { tags: KEEP, fx: [dmg(1.2, 'randomEnemy', { hits: 2 }), tick(1)] },   // 10-13 신탁 점검
+        { tags: KEEP, fx: [dmg(1.05, 'randomEnemy', { hits: 2 }), JK, ally] },   // 10-13 신탁 점검
+        { tags: KEEP, fx: [dmg(0.6, 'randomEnemy', { hits: 2 }), draw(2), JK, { k: 'gauge', v: 30 }] },   // 원작 쿨 감소 · 10-13 신탁 점검: 피해 되살림 · 드로우는 늘 · 게이지 20→30
+        { tags: KEEP, fx: [dmg(1.05, 'randomEnemy', { hits: 2 }), JK, { k: 'recast', ratio: 1 }] },   // 10-13 신탁 점검
       ],
       blesses: ['cost', 'draw', [tick(1)]],
     },
     { // 원작 저학년 — 버프 해제 · 정각이면 실드 파괴
-      name: '시공의 메아리', cost: 6, type: '공격', tags: KEEP,
-      fx: [dmg(0.3, 'oneEnemy', { hits: 5 }), { k: 'dispel', n: 1 }, JK, { k: 'strip', target: 'oneEnemy' }],
+      name: '시공의 메아리', cost: 5,   /* 10-21: 6 → 5 */ type: '공격', tags: KEEP,
+      fx: [dmg(1.3, 'oneEnemy', { hits: 2 }), { k: 'dispel', n: 1 }, JK, { k: 'strip', target: 'oneEnemy' }],   // 10-21 밸런스 조절: 2 × 80 → 130%(3 · 6차)   // 10-19 타수: 5회 → 2회, 한 대 ×2.5(신탁도 · 10% 단위로 올림 — 본판 75 → 80% · 신탁 1 · 4 125 → 130%)
       oracles: [
-        { tags: KEEP, fx: [dmg(0.5, 'oneEnemy', { hits: 5 }), { k: 'dispel', n: 1 }, JK, { k: 'strip', target: 'oneEnemy' }] },
-        { tags: KEEP, fx: [dmg(0.4, 'oneEnemy', { hits: 5 }), tick(1)] },
-        { tags: KEEP, fx: [dmg(0.2, 'allEnemies', { hits: 5 }), JK, { k: 'dispel', n: 1, target: 'allEnemies' }] },
-        { tags: KEEP, fx: [dmg(0.5, 'oneEnemy', { hits: 5 }), JK, slow('oneEnemy')] },   // 10-13 신탁 점검
-        { tags: KEEP, fx: [dmg(0.4, 'oneEnemy', { hits: 5 }), JK, { k: 'recast', ratio: 1 }] },
+        { tags: KEEP, fx: [dmg(1.3, 'oneEnemy', { hits: 2 }), { k: 'dispel', n: 1 }, JK, { k: 'strip', target: 'oneEnemy' }] },
+        { tags: KEEP, fx: [dmg(1, 'oneEnemy', { hits: 2 }), tick(1)] },
+        { tags: KEEP, fx: [dmg(0.5, 'allEnemies', { hits: 2 }), JK, { k: 'dispel', n: 1, target: 'allEnemies' }] },
+        { tags: KEEP, fx: [dmg(1.3, 'oneEnemy', { hits: 2 }), JK, slow('oneEnemy')] },   // 10-13 신탁 점검
+        { tags: KEEP, fx: [dmg(1, 'oneEnemy', { hits: 2 }), JK, { k: 'recast', ratio: 1 }] },
       ],
       blesses: ['power', 'cost', [tick(1)]],
     },
     { // 마무리 — 6코 · 정각이면 이번 턴 남은 카드 신속 · 적 전체 둔화
-      name: '정지된 6초', cost: 6, type: '공격', tags: KEEP,
-      fx: [dmg(0.3, 'allEnemies', { hitsPer: '메아리', hitsAdd: 6 }), JK, swift, slow()],
+      name: '정지된 6초', cost: 5,   /* 10-21: 6 → 5 */ type: '공격', tags: KEEP,
+      fx: [dmg(0.5, 'allEnemies', { hitsPer: '메아리', hitsAdd: 6 }), JK, swift, slow()],   // 10-21 밸런스 조절: 한 대 30 → 50%(4 · 7차)   // 10-19 타수: 엔진 R.PER_HIT_MERGE 가 (메아리+6)회를 한 대 × (메아리+6) 로 합친다(합 그대로 · 1타)
       oracles: [
         { power: true, fx: [slow(), power([rule({ on: 'play', who: 'any', nth: 4 }, [tick(2)])])] },   // 10-13 신탁 점검: 적 전체 둔화 · 시간 2
-        { tags: KEEP, fx: [dmg(0.7, 'oneEnemy', { hits: 6 }), JK, swift] },   // 10-13 신탁 점검
-        { tags: KEEP, fx: [dmg(0.4, 'allEnemies', { hits: 6 }), tick(2)] },
-        { tags: KEEP, fx: [dmg(0.4, 'allEnemies', { hits: 6 }), JK, { k: 'nextAp', v: 1 }] },
-        { tags: KEEP, fx: [dmg(0.4, 'allEnemies', { hits: 6 }), JK, ally] },
+        { tags: KEEP, fx: [dmg(2.1, 'oneEnemy', { hits: 2 }), JK, swift] },   // 10-13 신탁 점검 · 10-19 타수: 6회 → 2회, 한 대 ×3(아래 셋도)
+        { tags: KEEP, fx: [dmg(1.2, 'allEnemies', { hits: 2 }), tick(2)] },
+        { tags: KEEP, fx: [dmg(1.2, 'allEnemies', { hits: 2 }), JK, { k: 'nextAp', v: 1 }] },
+        { tags: KEEP, fx: [dmg(1.2, 'allEnemies', { hits: 2 }), JK, ally] },
       ],
       blesses: ['power', 'cost', [tick(1)]],
     },
     { // 4차 8장 — 열기(박자 잇기): 신속 · 정각이면 손을 채운다
-      name: '호버보드 질주', cost: 5, type: '공격', tags: SW,
-      fx: [dmg(0.6), JK, draw(2), stack('메아리', 1)],
+      name: '호버보드 질주', cost: 4,   /* 10-21: 5 → 4 */ type: '공격', tags: SW,
+      fx: [dmg(1.2), JK, draw(2), stack('메아리', 1)],   // 10-21 밸런스 조절: 60 → 120%(2 · 5차)
       oracles: [
         { tags: SW, fx: [dmg(1.1), JK, draw(2)] },
         { tags: SW, fx: [dmg(1), tick(1), stack('메아리', 1)] },   // 10-13 신탁 점검: 메아리 되살림(아래 넷도)

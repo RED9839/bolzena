@@ -1,97 +1,109 @@
-// 클로에 — 탱커(딜탱) · 광기 · 요정 · 변신 「탑승」.
-// 2026-10-14 리뉴얼(사용자 결정 「메리 고 라운드」 딜탱): 자원 하나 · 변신 하나.
-//   원작: 날개 없는 요정 재단사, 곰 인형 집사 세바스티안과 함께 — 저학년 「메리 고 라운드」 = 세바스티안에 올라타 큰 보호막 + 평타 3연타,
-//   평타가 맞을 때마다 바늘땀(최대 9) · 9면 탑승 연장 · 탑승하지 않을 때는 내려찍기 + 도발, 고학년 = 쁘띠 세바스티안 7마리 돌진.
-//   흐름: 클로에 카드가 적을 칠 때마다(타마다) 「바늘땀」 1 → 「메리 고 라운드」 로 3턴 탑승(큰 실드 · 고유 공격 카드 3연타 — 엔진 변신 덤 hits)
-//         → 탑승 중 바늘땀 9 를 쓰면 탑승 +1턴 → 탑승이 끝나면 내려찍기(적 전체). 「곰 인형 내려찍기」 는 바늘땀을 모두 쏟는 마무리.
-//   걷어 낸 것(10-11~10-13 판): 세바스티안 몸집(cap 5 · 대신 맞기 guard · 따라 치기 summon) · 「바느질」 파티 받는 피해 감소 · 「맞춤옷」 생성 카드와 맞춤 가봉 ·
-//     「맞춤 의상」(탐구심 · 보존) · 「인형의 의지」 매 턴 피해 감소 · 「런웨이 오프닝」 — 자원 셋 · 생성 카드 · 남의 카드 손대기가 겹쳐 「무엇을 하는 사도인지」 가 흐렸다.
-//     원작의 탑승 · 3연타 · 바늘땀 · 내려찍기 한 줄기로(10-14 도발 뺌) 덜어 냈다. 이전 판: C:\projects\_backup\chloe_before_20261014\클로에.mjs
-import { hero, dmg, ddmg, shield, heal, stack, spend, make, draw, discard, status, empower, ifStack, power, rule } from '../lib.mjs';
+// 클로에 — 탱커(딜탱) · 광기 · 요정 · 태세 「탑승」.
+// 2026-10-18 리뉴얼(사용자 「세바스티안을 타는 걸로, 원작처럼」 — 설계안 _measure/클로에_탑승_리뉴얼안.md 기본안 그대로):
+//   원작: 날개 없는 요정 재단사, 곰 인형 집사 세바스티안 — 저학년 「메리 고 라운드」 = 올라타 큰 보호막 + 탄 동안 평타가 3타(마지막은 범위),
+//   탄 동안 평타마다 중첩(최대 9) · 탑승 중 한 번 9 에 닿으면 연장, 탄 동안엔 강화 공격(내려찍기)을 안 쓴다. 고학년 = 쁘띠 세바스티안 7마리 돌진.
+//   흐름: 「메리 고 라운드」 로 2턴 탑승(큰 실드) → 탄 동안 1코 공격(기본 공격 · 「세바스티안, 공격!」)이 2연타 + 적 전체(탄 평타 — 맞음 3번)
+//         → 친 대마다 「바늘땀」 1(1개당 클로에 주는 피해 +5%) → 9 에 닿으면 탑승 +1턴(쓰지 않음 · 최대 3턴 = 한 번)
+//         → 내릴 때: 시간이 다 되면 작은 내려찍기(적 전체 80%), 「곰 인형 내려찍기」 로 스스로 내리면 바늘땀을 모두 쏟는 큰 한 방.
+//   사용자 결정(10-18): 갈림길 A 카드 하나로 켬 · B 큰 한 방은 스스로 내릴 때만 · C 1개당 클로에 주는 피해 +5% · D 연장 한 번 최대 3턴 · 탄 평타를 기본 공격에도.
+//   걷어 낸 것(10-14 판): 바늘땀 1개당 파티 받는 피해 -5% · 아무 타격이나 쌓기 · 9 를 써서 여러 번 연장(최대 6턴) · 늘 도는 풀림 피해 ·
+//     「건치 스마일」 · 「찢긴 곳 꿰매기」(원작 스킬 근거가 약함 — 고유 4장). 이전 판: C:\projects\_backup\chloe_before_20261018\클로에.mjs
+import { hero, ddmg, shield, heal, stack, spend, draw, empower, power, rule, ifStack } from '../lib.mjs';
 
 const H = '클로에', Q = '바늘땀', F = `${H}_탑승`;
 const ride = [{ k: 'form', id: F }];
-const SF = (...x) => [{ k: 'ifForm', id: F }, ...x];   // 「탑승」 : 덤(디아나 「백수공권」 꼴)
-// 10-14 사용자 「도발 시스템 없는 게 좋지 않음?」 → 도발을 뺐다(쓰는 사도가 클로에뿐이고 파티 공격엔 의미가 없어 읽기만 어려웠다)
-const extend = { k: 'formExtend', id: F, v: 1, max: 6 };
-const pour = (r, target = 'allEnemies') => [spend(Q, 'all'), { k: 'perEvent', n: 1 }, ddmg(r, target)];   // 바늘땀을 모두 써서 1개당(효과 3개 규칙이라 기본 피해 없이 — 쌓아 둔 만큼 내려찍는다)
+const off = { k: 'formEnd' };   // 「탑승」 해제 — 안 탔을 때는 아무 일 없다(효과 수에 안 든다)
+const inF = { k: 'ifForm', id: F };
+const keep = (turns = 1) => ({ k: 'formKeep', turns });
+const pour = (r, target = 'allEnemies') => [spend(Q, 'all'), { k: 'perEvent', n: 1 }, ddmg(r, target)];   // 바늘땀을 모두 써서 1개당
+// 탄 평타(원작 인형의 의지 평타 3타 · 마지막 범위) — 한 대 60% × 2연타 + 적 전체 40%(덤 피해엔 ratio 가 안 곱해진다 — 엔진 BattleForm.FormCard)
+// 10-19 타수(사용자 「카드 최대 2타」): 2연타 + 적 전체(3타) → 한 대 120% + 적 전체 40%(2타 · 합 그대로). 친 대가 3 → 2 로 줄어 「한 땀 한 땀」 바늘땀이 모자란 1을 덤으로 준다(탄 평타 한 번 바늘땀 3 그대로 — 연장 박자 유지)
+const rideHit = (card) => ({ card, ratio: 1.5, fx: [stack(Q, 1), ddmg(0.6, 'allEnemies')] });   // 10-21 밸런스 조절 5차: ×1.8 → ×1.5   // 10-19 밸런스(사용자 「클로에 탑승 중 피해」): ×1.2 + 전체 40% → ×1.8 + 전체 60%
 
 export default hero({
   id: H, name: '클로에', nature: '광기', race: '요정', role: '탱커', star: 3,
-  blurb: '날개 없는 요정 재단사. 곰 인형 집사 세바스티안에 올라타 큰 실드를 두르고, 꿰매듯 몰아치는 연타로 바늘땀을 채워 탑승을 이어 갑니다.',
-  keyword: { name: Q, desc: '세바스티안을 꿰매는 재단사의 바늘 자국', carrier: 'self', cap: 9, per: [{ stat: 'taken', v: -0.05, who: 'allies' }] },   // 1개당 파티가 받는 피해 -5%(탱커 — 쌓아 두면 단단하고, 쏟으면 세다)
+  blurb: '날개 없는 요정 재단사. 곰 인형 집사 세바스티안에 올라타 큰 실드를 두르고, 탄 채 휘두르는 연타로 바늘땀을 채워 탑승을 늘리다가 내려찍기로 쏟아 냅니다.',
+  keyword: { name: Q, desc: '세바스티안을 꿰매는 재단사의 바늘 자국', carrier: 'self', cap: 9, per: [{ stat: 'dealt', v: 0.05 }] },   // 1개당 클로에 주는 피해 +5%(원작 탄 평타 피해 +9%/중첩 — 갈림길 C 기본안)
   passives: [
-    { name: '한 땀 한 땀', when: { on: 'hit', each: true }, fx: [stack(Q, 1)] },   // 클로에 카드가 적을 칠 때마다(연타면 타마다) 바늘땀 1 — 엔진 hit each(10-14)
-    { name: '한 바퀴 더', when: { on: 'hit', each: true }, conds: [{ c: 'stack', id: Q, n: 9 }], fx: [...SF(spend(Q, 9), extend)] },   // 탑승 중 바늘땀 9 → 탑승 +1턴(최대 6턴)
+    { name: 'F/W 클로에록', when: { on: 'blocked' }, fx: [stack(Q, 1)] },   // 원작 어사이드 2성(직접 피해를 받으면 힘) — 실드로 막을 때마다 바늘땀(탄 밖에서도 탱커가 연료를 모은다). blocked 는 파티 누구든 다 막으면 돈다(엔진 Matches)
+    { name: '런웨이 오프닝', when: { on: 'formOn', id: F }, fx: [empower(0.3, { who: 'other' })] },   // 원작 어사이드 3성(전열 아군 피해 +) — 새로 탈 때 동료의 다음 카드 +30%(다시 타기 · 연장은 안 돈다)
   ],
   forms: [{
-    id: F, name: '탑승', desc: '세바스티안에 올라탄 클로에 — 3턴', stance: true, anim: 'Idle_Change', turns: 3,
-    bonus: [{ type: '공격', unique: true, ratio: 0.5, hits: 3 }],   // 고유 공격 카드 3연타(한 대 50% — 합 150%) · 엔진 변신 덤 hits(10-14)
-    off: [ddmg(0.8, 'allEnemies')],   // 내려오며 내려찍기(10-14 사용자: 도발 시스템 뺌)
+    // 원작 저학년처럼 쁘띠 세바스티안을 타고 변신(Skill1_1) · 탄 동안 _SebastianForm 조각(쉬기 Idle_SebastianForm · 평타 Attack1_1_SebastianForm 맞음 400 · 733 · 1667).
+    //   탄 평타는 1코 공격만 카드 id 로 고른다 — 2코 「곰 인형 내려찍기」 는 먼저 내리므로(formEnd) 내린 모습 Attack2_1 이 맞다.
+    id: F, name: '탑승', desc: '쁘띠 세바스티안을 탄 모습', stance: true, anim: 'Idle_SebastianForm', turns: 2,
+    bonus: [rideHit(`${H}_s1`), rideHit(`${H}_u2`)],
+    passives: [
+      { name: '한 땀 한 땀', when: { on: 'hit', each: true }, fx: [stack(Q, 1)] },   // 탄 동안 클로에 카드가 친 대마다 바늘땀 1
+      { name: '한 바퀴 더', when: { on: 'hit', each: true }, conds: [{ c: 'stack', id: Q, n: 9 }], fx: [{ k: 'formExtend', id: F, v: 1, max: 3 }] },   // 9 면 +1턴 — 쓰지 않는다 · 상한 3턴(기본 2 + 1 = 한 번, 원작 「탑승 중 한 번」)
+    ],
+    offExpire: [ddmg(1.2, 'allEnemies')],   // 10-21 밸런스 조절 4차: 150 → 120%   // 10-19 밸런스: 80 → 150%   // 시간이 다 돼 내리면 작은 내려찍기(갈림길 B 기본안 — 큰 한 방은 카드로 스스로 내릴 때만)
   }],
-  ult: { name: '쁘띠 세바스티안 돌격', cost: 250, fx: [ddmg(0.6, 'randomEnemy', { hits: 7 }), stack(Q, 9)] },   // 쁘띠 세바스티안 7마리 무작위 돌진 + 바늘땀 가득
+  ult: { name: '쁘띠 세바스티안 돌격', cost: 250, fx: [ddmg(1.4, 'randomEnemy', { hits: 3 }), stack(Q, 9)] },   // 원작 고학년 그대로 — 쁘띠 세바스티안 7마리 무작위 돌진 + 바늘땀 가득 · 10-19 타수(고학년 최대 3타): 7회 × 60% → 3회 × 140%(합 그대로)
 }, {
   basicNames: ['곰 인형 휘두르기', '곰 인형 찌르기', '재단사의 자세'], deck: 'light',
   uniques: [
-    { // 시동 — 탑승
+    { // 시동 — 원작 저학년(보호막 + 탑승)
       name: '메리 고 라운드', cost: 1, type: '스킬',
-      fx: [shield(2), ...ride],
+      fx: [shield(2.17), ...ride],   // 10-21 밸런스 조절: 실드 420 → 260%(1 · 2 · 5차)                                       // 실드 420%(10-18 봇: 설계 처음 값 240% 는 혼자 65% — 받는 피해 -45% 를 뺀 몫을 탈 때 실드로, §5-2 · 360% → 420%: 8장 덱에서 혼자 77% → 81%, 실험에서 가장 크게 움직인 값 — 신탁 ① · ④ · ⑤ 도 함께 맞춤)
       oracles: [
-        { fx: [shield(2.6), ...ride] },
-        { fx: [shield(1.6), ...ride, stack(Q, 4)] },
-        { fx: [shield(1.6), ...ride, draw(1)] },
-        { cost: 0, fx: [shield(1), ...ride] },
-        { fx: [shield(1.6), ...ride, status('피해 감소', 1)] },
+        { fx: [shield(3.25), ...ride] },   // 10-21: 630 → 390%                                // ① 큰 보호막 — 실드 630%(×1.5)
+        { fx: [shield(2.25), ...ride, stack(Q, 4)] },                   // ② 바늘 꿰기 — 실드 270% · 첫 연장이 앞당겨진다
+        { cost: 0, fx: [shield(2.5), ...ride] },                        // ③ 가벼운 올라타기 — 0코 · 실드 300%
+        { type: '공격', fx: [...ride, ddmg(1.4)] },                      // ④ 곰 박치기 — 원작 영상의 탄 채 박치기(실드 없음 · 본판 실드가 오른 만큼 120% → 140%)
+        { fx: [shield(1.5), ...ride, draw(1, { who: 'self', unique: true })] },   // 10-21: 288 → 180%    // ⑤ 재단사의 준비 — 실드 288% · 고유 카드 서치(본판 420% 에 맞춰 240% → 288%)
       ],
       blesses: ['guard', 'draw', [stack(Q, 1)]],
     },
-    { // 연타 공격 — 탑승 중 3연타
+    { // 연료 — 탄 동안 탄 평타(72% × 2 + 적 전체 40%)
       name: '세바스티안, 공격!', cost: 1, type: '공격',
       fx: [ddmg(1.2)],
       oracles: [
-        { fx: [ddmg(1.6)] },
-        { fx: [ddmg(0.6, 'oneEnemy', { hits: 2 }), stack(Q, 1)] },   // 바늘땀 갈래 — 탑승 중 6연타(꼴이 본판과 같으면 빌드가 비율을 본판으로 올려 바늘땀 1 을 붙여 꼴을 가른다)
-        { fx: [ddmg(0.7, 'allEnemies')] },
-        { cost: 0, fx: [ddmg(0.8)] },
-        { fx: [ddmg(1), shield(0.6)] },
+        { fx: [ddmg(1.8)] },                                            // ① 힘껏
+        { fx: [ddmg(1.2), stack(Q, 2)] },     // ② 연속 바느질 — 10-19 타수: 2연타 × 60%(탄 동안 4연타 + 적 전체 = 5타) → 120% 한 대 · 바늘땀 1 → 2(탄 동안 바늘땀 6 → 5, 안 탔을 때 1 → 2)
+        { fx: [ddmg(0.8, 'allEnemies')] },                              // ③ 휘감기
+        { fx: [ddmg(1), { ...inF, not: true }, shield(0.83)] },         // ④ 내린 채 지키기 — 탑승이 아니면 실드 100%
+        { cost: 0, needForm: F, fx: [ddmg(1.3)] },   // 10-19 밸런스: 100 → 130%                        // ⑤ 탄 채로만 — 탑승 중에만 · 0코
       ],
       blesses: ['power', 'cost', [stack(Q, 1)]],
     },
-    { // 마무리 — 내려찍기 · 도발 · 바늘땀을 모두 쏟는다
+    { // 결정타 — 스스로 내리며 바늘땀을 모두 쏟는다(원작 강화 공격 내려찍기)
       name: '곰 인형 내려찍기', cost: 2, type: '공격',
-      fx: [ddmg(0.4, 'allEnemies'), ...pour(0.3)],   // 10-14 사용자: 바늘땀 0 이어도 기본 피해 — 도발 뺀 뒤 혼자 84% 라 60 → 40%
+      fx: [off, ddmg(0.5, 'allEnemies'), ...pour(0.5)],   // 10-19 밸런스(사용자 「바늘땀 1개당」): 전체 40 → 50% · 1개당 30 → 50%
       oracles: [
-        { fx: [...pour(0.4)] },
-        { fx: [...pour(0.6, 'oneEnemy')] },
-        { cost: 1, fx: [...pour(0.2)] },
-        { fx: [ddmg(1.2, 'allEnemies'), status('피해 감소', 1)] },   // 쏟지 않는 갈래
-        { fx: [ddmg(1, 'allEnemies'), stack(Q, 3)] },   // 채우는 갈래
+        { fx: [off, ddmg(0.6, 'allEnemies'), ...pour(0.6)] },   // 10-19: 1개당 40 → 60%                        // ① 세게 내려찍기
+        { fx: [off, ddmg(0.6), ...pour(0.7, 'oneEnemy')] },   // 10-19: 1개당 40 → 70%                          // ② 한 놈만 — 보스 · 프론티어
+        { cost: 1, fx: [off, ddmg(0.5, 'allEnemies'), ...pour(0.6)] },   // 10-19: 전체 30 → 50% · 1개당 15 → 60%              // ③ 가볍게
+        { type: '스킬', fx: [off, spend(Q, 'all'), { k: 'perEvent', n: 1 }, shield(0.25)] },   // ④ 꿰맨 방패 — 쏟아서 지킨다(1개당 실드 30%)
+        { cost: 3, fx: [off, ...pour(0.5), ...ride] },   // 10-19: 1개당 30 → 50%                               // ⑤ 다시 한 바퀴 — 내려찍고 곧바로 다시 탄다
       ],
       blesses: ['power', 'cost', [stack(Q, 1)]],
     },
-    { // 실드 · 바늘땀
-      name: '건치 스마일', cost: 1, type: '스킬',
-      fx: [shield(1.2), stack(Q, 2)],
+    { // 원작 자유 — 「인형의 의지는 해제할 수 없다」
+      name: '인형의 의지', cost: 1, type: '스킬',
+      fx: [shield(1.67), stack(Q, 2), inF, keep(1)],   // 10-21 밸런스 조절: 280 → 200%(2 · 8차)                    // 실드 280%(10-18 봇: 140% → 280%, 실드 카드가 5장 → 3장으로 준 몫 — 설계안 §5-2 「u4 실드를 올리거나」)
       oracles: [
-        { fx: [shield(1.6), stack(Q, 2)] },
-        { fx: [shield(0.8), stack(Q, 4)] },
-        { power: true, fx: [shield(1.2), power([rule({ on: 'turnStart' }, [stack(Q, 2)])])] },
-        { cost: 0, fx: [shield(0.8), stack(Q, 1)] },
-        { fx: [shield(1), stack(Q, 2), draw(1)] },
-      ],
-      blesses: ['guard', 'draw', [stack(Q, 1)]],
-    },
-    { // 실드 · 회복 — 탑승 중이면 +1턴
-      name: '찢긴 곳 꿰매기', cost: 1, type: '스킬',
-      fx: [shield(0.8), heal(0.6)],
-      oracles: [
-        { fx: [shield(1), heal(0.8)] },
-        { fx: [shield(0.6), heal(0.6), stack(Q, 3)] },
-        { fx: [shield(0.6), heal(0.6), ...SF(extend)] },
-        { cost: 0, fx: [shield(0.5), heal(0.4)] },
-        { fx: [heal(1.2), status('피해 감소', 1)] },
+        { fx: [shield(2.5), stack(Q, 3), inF, keep(1)] },   // 10-21: 420 → 300%               // ① 질긴 실 — 실드 420%
+        { fx: [heal(2.33), stack(Q, 2), inF, keep(1)] },                // ② 셀러브리티 — 회복 280%(실드 → 회복 · 어사이드 F/W 매초 회복)
+        { power: true, fx: [shield(1.67), power([rule({ on: 'formOn', who: 'any' }, [stack(Q, 2)])])] },   // ③ 무대 의상 — 실드 200% · 같은 운영(변신 · 태세) 시너지 부품
+        { needForm: F, fx: [stack(Q, 3), keep(2)] },                    // ④ 의지의 끝 — 탑승 중에만 · 2턴 보존
+        { power: true, fx: [shield(1.67), power([rule({ on: 'turnStart' }, [inF, shield(0.5)])])] },   // ⑤ 단골 손님 — 실드 200% · 탄 동안 매 턴 실드 60%
       ],
       blesses: ['guard', 'ap', [stack(Q, 1)]],
+    },
+    { // 팀 고리 — 재단사가 동료에게 옷을 지어 준다(설정: 요정 재단사 · 원작 어사이드 3성 「런웨이 오프닝」 아군 피해 +).
+      //   10-18 사용자 「7장 → 8장」: 바늘땀을 내 연장 · 내려찍기에 쥘지, 동료의 다음 카드에 쓸지 고르는 카드. 피해 없는 스킬이라 몸짓 없음(탄 쉬기 그대로).
+      //   「전부 써서 1개당」 이 아니라 정해진 3을 쓴다(검사기 6 — 엘다인 4명 상한에 새로 안 든다).
+      name: '맞춤 의상', cost: 1, type: '스킬',
+      fx: [shield(1), ifStack(Q, 3), spend(Q, 3), empower(0.6, { who: 'other' })],          // 실드 120%, 바늘땀 3을 써서: 다른 아군의 다음 카드 +60%
+      oracles: [
+        { fx: [shield(1.5), ifStack(Q, 3), spend(Q, 3), empower(0.9, { who: 'other' })] },   // ① 넉넉한 옷감 — 수치만(×1.5)
+        { fx: [shield(1.67), inF, empower(1, { who: 'other' })] },                           // ② 탄 채 재단 — 실드 200% · 탑승 중이면 바늘땀을 안 쓰고 +100%(축 조건 — 검사기 값어치 1.15 맞춤)
+        { cost: 0, fx: [shield(0.85), ifStack(Q, 3), spend(Q, 3), empower(0.5, { who: 'other' })] },   // ③ 가벼운 손 — 0코(×0.85)
+        { fx: [stack(Q, 3), empower(0.4, { who: 'other' })] },                               // ④ 바늘땀 나눔 — 쓰지 않고 바늘땀 3 · 다른 아군 +40%(실드 없음 · 연료 쪽)
+        { power: true, fx: [shield(1.5), power([rule({ on: 'spend', id: Q }, [empower(0.4, { who: 'other' })])])] },   // ⑤ 런웨이 — 강화 · 실드 180% · 바늘땀을 쓸 때마다 동료 다음 카드 +40%(내려찍기와 이어진다)
+      ],
+      blesses: ['guard', 'cost', [stack(Q, 1)]],
     },
   ],
 });

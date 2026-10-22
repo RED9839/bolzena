@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
@@ -88,6 +89,62 @@ namespace Bolzena.Core.Tests
             Assert.IsTrue(e.Any(x => x.Contains("n연타(2~5)")), "hits 7");
             Assert.IsTrue(e.Any(x => x.Contains("공격 카드 덤")), "스킬에 hits");
             Assert.IsTrue(e.Any(x => x.Contains("each(맞힌 대마다)")), "play 에 each");
+        }
+
+        // ── (2026-10-18 클로에 탑승 리뉴얼) 설계안 §5-1 엔진 확인 — 엔진은 그대로, 이 동작에 기대는 것을 보증한다 ──
+        const string HEROES2 = @"[
+ {id:'r', name:'탄', role:'탱커', row:'front', hp:1000, atk:100, def:50, crit:0, keyword:{name:'바늘', cap:9},
+  forms:[{id:'mount', name:'탑승', stance:true, turns:2,
+   bonus:[{card:'r_basic', ratio:0.5, hits:2, fx:[{k:'dmg', ratio:1.0, target:'allEnemies'}]}],
+   passives:[{name:'한 바퀴', when:{on:'hit', each:true}, conds:[{c:'stack', id:'바늘', n:9}], fx:[{k:'formExtend', id:'mount', v:1, max:3}]}],
+   offExpire:[{k:'dmg', ratio:0.8, target:'allEnemies'}]}]}
+]";
+        const string CARDS2 = @"[
+ {id:'r_basic', name:'휘두르기', hero:'r', cost:0, type:'공격', fx:[{k:'dmg', ratio:1.0, target:'oneEnemy'}]},
+ {id:'r_on', name:'타기', hero:'r', unique:true, cost:0, type:'스킬', fx:[{k:'form', id:'mount'}]},
+ {id:'r_fill', name:'채우기', hero:'r', unique:true, cost:0, type:'스킬', fx:[{k:'stack', id:'바늘', v:9}]},
+ {id:'r_slam', name:'내려찍기', hero:'r', unique:true, cost:0, type:'공격', fx:[{k:'formEnd'}, {k:'dmg', ratio:1.0, target:'oneEnemy'}]}
+]";
+        static Battle R(List<Cue> cues = null) => K.Fight(K.Data(heroes: HEROES2, cards: CARDS2), new[] { "r" }, new[] { "dummy" }, null, cues);
+
+        [Test] public void 덤_피해에는_변신_ratio_가_안_곱해진다_card_거르개는_기본_카드도()
+        {
+            var b0 = R(); int hp0 = K.Hp(b0); K.Hand(b0, "r_basic"); K.Play(b0, "r_basic"); int one = hp0 - K.Hp(b0);
+            var b = R(); K.Hand(b, "r_on", "r_basic"); K.Play(b, "r_on"); int hp1 = K.Hp(b); K.Play(b, "r_basic");
+            Assert.Greater(one, 0);
+            Assert.AreEqual(one * 2, hp1 - K.Hp(b), 3, "×0.5 두 대(= 1) + 덤 피해 100% 그대로(= 1) — 덤 fx 가 ×0.5 로 줄면 1.5배");
+        }
+
+        [Test] public void formExtend_max_3_은_한_번만_늘린다()
+        {
+            var b = R(); K.Hand(b, "r_on", "r_fill", "r_basic", "r_basic"); K.Play(b, "r_on"); K.Play(b, "r_fill");
+            Assert.AreEqual(2, b.FormOf("r").Left);
+            K.Play(b, "r_basic");
+            Assert.AreEqual(3, b.FormOf("r").Left, "9 이상 · 친 대마다 → 처음 한 번 +1");
+            K.Play(b, "r_basic");
+            Assert.AreEqual(3, b.FormOf("r").Left, "상한 3턴(기본 2 + 1)");
+            Assert.AreEqual(9, b.StackOf("r", "바늘"), "연장은 겹을 쓰지 않는다");
+        }
+
+        [Test] public void offExpire_는_시간_만료에만_formEnd_카드로_내리면_안_돈다()
+        {
+            var cues = new List<Cue>();
+            var b = R(cues); K.Hand(b, "r_on"); K.Play(b, "r_on");
+            int hp0 = K.Hp(b);
+            b.EndTurn(); b.EndTurn();
+            Assert.IsFalse(b.InForm("r"));
+            Assert.AreEqual("time", cues.Last(c => c.K == "formOff").Label);
+            Assert.Greater(hp0 - K.Hp(b), 0, "시간이 다 되면 내려찍기");
+
+            var cues2 = new List<Cue>();
+            var b0 = R(); int h0 = K.Hp(b0); K.Hand(b0, "r_slam"); K.Play(b0, "r_slam"); int slam = h0 - K.Hp(b0);
+            var b2 = R(cues2); K.Hand(b2, "r_on", "r_slam"); K.Play(b2, "r_on"); int h1 = K.Hp(b2); K.Play(b2, "r_slam");
+            Assert.IsFalse(b2.InForm("r"));
+            Assert.AreEqual("card", cues2.Last(c => c.K == "formOff").Label);
+            Assert.AreEqual(slam, h1 - K.Hp(b2), 1, "스스로 내리면 offExpire 없음 — 카드 피해만");
+            // 몸짓 순서(화면): 쪽지 formOff 가 카드의 첫 피해보다 먼저 — 화면 pre 묶음에서 쉬기가 내린 모습으로 바뀐다
+            int iAct = cues2.FindLastIndex(c => c.K == "act"), iOff = cues2.FindLastIndex(c => c.K == "formOff"), iHurt = cues2.FindLastIndex(c => c.K == "hurt");
+            Assert.Less(iAct, iOff); Assert.Less(iOff, iHurt);
         }
     }
 }

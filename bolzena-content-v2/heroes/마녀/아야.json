@@ -11,51 +11,47 @@
       "atk": 140,
       "def": 40,
       "crit": 10,
-      "blurb": "만년설의 현자, 영원살이 맏이. 서리와 동상으로 적을 얼려 약점을 드러내고, 금이 간 자리를 빙설화도로 깨뜨립니다.",
+      "blurb": "만년설의 현자, 영원살이 맏이. 적에게 자신만 아는 눈꽃을 피워 틈을 열고, 그 틈을 하나씩 베어 내다 얼음이 깨지는 순간 빙설화도를 내리칩니다.",
       "keyword": {
-        "name": "서리",
-        "desc": "아야가 새긴 서리 — 강인도가 잘 깎임",
-        "carrier": "enemy",
+        "name": "만년설",
+        "desc": "눈꽃을 벨 때마다 쌓이는 현자의 눈 — 약점 공격이 더 깊어짐",
+        "carrier": "self",
         "cap": 5,
         "per": [
           {
-            "stat": "tough",
-            "v": 0.05
+            "stat": "weak",
+            "v": 0.08
           }
         ]
       },
       "keywords": [
         {
-          "name": "만년설",
-          "desc": "현자가 쌓아 온 만년설",
-          "carrier": "self",
-          "cap": 3
+          "name": "눈꽃",
+          "desc": "아야가 피운 눈꽃 — 아야만 아는 틈",
+          "carrier": "enemy",
+          "cap": 5,
+          "weakOwner": true,
+          "per": [
+            {
+              "stat": "taken",
+              "v": 0.04,
+              "from": "owner"
+            }
+          ]
         }
       ],
       "passives": [
         {
           "name": "만년설의 현자님!",
           "when": {
-            "on": "fightStart"
-          },
-          "fx": [
-            {
-              "k": "draw",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "눈꽃의 날개짓",
-          "when": {
-            "on": "debuff"
+            "on": "hit",
+            "weak": true
           },
           "fx": [
             {
               "k": "stack",
-              "id": "서리",
-              "v": 1,
-              "target": "oneEnemy"
+              "id": "만년설",
+              "v": 1
             }
           ]
         }
@@ -70,9 +66,9 @@
             "target": "allEnemies"
           },
           {
-            "k": "status",
-            "id": "냉정 약점",
-            "v": 1,
+            "k": "stack",
+            "id": "눈꽃",
+            "v": 3,
             "target": "allEnemies"
           },
           {
@@ -86,7 +82,7 @@
           },
           {
             "k": "dmg",
-            "ratio": 1.5,
+            "ratio": 2.5,
             "target": "allEnemies"
           }
         ]
@@ -142,14 +138,14 @@
           "hits": 2
         },
         {
-          "k": "status",
-          "id": "약화",
-          "v": 1,
+          "k": "stack",
+          "id": "눈꽃",
+          "v": 2,
           "target": "oneEnemy"
         },
         {
-          "k": "stack",
-          "id": "서리",
+          "k": "status",
+          "id": "약화",
           "v": 1,
           "target": "oneEnemy"
         }
@@ -165,14 +161,14 @@
               "hits": 2
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
+              "k": "stack",
+              "id": "눈꽃",
+              "v": 2,
               "target": "oneEnemy"
             },
             {
-              "k": "stack",
-              "id": "서리",
+              "k": "status",
+              "id": "약화",
               "v": 1,
               "target": "oneEnemy"
             }
@@ -183,23 +179,17 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.8,
               "target": "randomEnemy",
-              "hits": 3,
+              "hits": 2,
               "hitFx": [
                 {
                   "k": "stack",
-                  "id": "서리",
+                  "id": "눈꽃",
                   "v": 1,
                   "target": "oneEnemy"
                 }
               ]
-            },
-            {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
             }
           ]
         },
@@ -213,8 +203,8 @@
               "hits": 2
             },
             {
-              "k": "status",
-              "id": "약화",
+              "k": "stack",
+              "id": "눈꽃",
               "v": 1,
               "target": "allEnemies"
             }
@@ -230,15 +220,9 @@
               "hits": 2
             },
             {
-              "k": "status",
-              "id": "약화",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
               "k": "stack",
-              "id": "서리",
-              "v": 2,
+              "id": "눈꽃",
+              "v": 3,
               "target": "oneEnemy"
             }
           ]
@@ -248,18 +232,19 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.5,
+              "ratio": 0.4,
               "target": "oneEnemy",
               "hits": 2
             },
             {
-              "k": "status",
-              "id": "냉정 약점",
-              "v": 1,
+              "k": "stack",
+              "id": "눈꽃",
+              "v": 2,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
+              "k": "stack",
+              "id": "만년설",
               "v": 1
             }
           ]
@@ -279,7 +264,7 @@
           "fx": [
             {
               "k": "stack",
-              "id": "서리",
+              "id": "눈꽃",
               "v": 1,
               "target": "oneEnemy"
             }
@@ -296,8 +281,8 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "status",
-          "id": "냉정 약점",
+          "k": "stack",
+          "id": "눈꽃",
           "v": 1,
           "target": "oneEnemy"
         },
@@ -317,8 +302,8 @@
           "name": "신탁 1",
           "fx": [
             {
-              "k": "status",
-              "id": "냉정 약점",
+              "k": "stack",
+              "id": "눈꽃",
               "v": 2,
               "target": "oneEnemy"
             },
@@ -329,9 +314,8 @@
             },
             {
               "k": "stack",
-              "id": "서리",
-              "v": 1,
-              "target": "oneEnemy"
+              "id": "만년설",
+              "v": 1
             }
           ]
         },
@@ -339,14 +323,8 @@
           "name": "신탁 2",
           "fx": [
             {
-              "k": "status",
-              "id": "냉정 약점",
-              "v": 1,
-              "target": "allEnemies"
-            },
-            {
               "k": "stack",
-              "id": "서리",
+              "id": "눈꽃",
               "v": 1,
               "target": "allEnemies"
             },
@@ -361,16 +339,15 @@
           "name": "신탁 3",
           "fx": [
             {
-              "k": "status",
-              "id": "냉정 약점",
+              "k": "stack",
+              "id": "눈꽃",
               "v": 1,
               "target": "oneEnemy"
             },
             {
               "k": "stack",
-              "id": "서리",
-              "v": 1,
-              "target": "oneEnemy"
+              "id": "만년설",
+              "v": 1
             },
             {
               "k": "draw",
@@ -388,7 +365,7 @@
             },
             {
               "k": "stack",
-              "id": "서리",
+              "id": "눈꽃",
               "v": 1,
               "target": "oneEnemy"
             },
@@ -403,19 +380,15 @@
           "name": "신탁 5",
           "fx": [
             {
-              "k": "status",
-              "id": "냉정 약점",
+              "k": "stack",
+              "id": "눈꽃",
               "v": 1,
               "target": "oneEnemy"
             },
             {
-              "k": "rushDown",
-              "v": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "stack",
+              "id": "만년설",
+              "v": 2
             }
           ]
         }
@@ -434,7 +407,7 @@
           "fx": [
             {
               "k": "stack",
-              "id": "서리",
+              "id": "눈꽃",
               "v": 1,
               "target": "oneEnemy"
             }
@@ -456,8 +429,8 @@
           "target": "oneEnemy"
         },
         {
-          "k": "status",
-          "id": "약점 노출",
+          "k": "stack",
+          "id": "눈꽃",
           "v": 1,
           "target": "oneEnemy"
         },
@@ -480,8 +453,8 @@
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약점 노출",
+              "k": "stack",
+              "id": "눈꽃",
               "v": 1,
               "target": "oneEnemy"
             },
@@ -504,8 +477,8 @@
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약점 노출",
+              "k": "stack",
+              "id": "눈꽃",
               "v": 2,
               "target": "oneEnemy"
             }
@@ -520,8 +493,8 @@
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "약점 노출",
+              "k": "stack",
+              "id": "눈꽃",
               "v": 1,
               "target": "allEnemies"
             },
@@ -541,8 +514,8 @@
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약점 노출",
+              "k": "stack",
+              "id": "눈꽃",
               "v": 1,
               "target": "oneEnemy"
             },
@@ -565,8 +538,8 @@
               "target": "oneEnemy"
             },
             {
-              "k": "status",
-              "id": "약점 노출",
+              "k": "stack",
+              "id": "눈꽃",
               "v": 1,
               "target": "oneEnemy"
             },
@@ -591,7 +564,7 @@
           "fx": [
             {
               "k": "stack",
-              "id": "서리",
+              "id": "눈꽃",
               "v": 1,
               "target": "oneEnemy"
             }
@@ -606,128 +579,164 @@
       "unique": true,
       "cost": 1,
       "type": "공격",
-      "tags": [
-        "약점 공격"
-      ],
       "fx": [
         {
           "k": "dmg",
-          "ratio": 0.9,
+          "ratio": 0.8,
           "target": "oneEnemy"
         },
         {
-          "k": "perStack",
-          "id": "만년설"
+          "k": "ifStack",
+          "id": "눈꽃",
+          "n": 1
         },
         {
-          "k": "tough",
-          "v": 1
+          "k": "dmg",
+          "ratio": 0.8,
+          "target": "oneEnemy"
         },
         {
-          "k": "stack",
-          "id": "만년설",
+          "k": "spend",
+          "id": "눈꽃",
           "v": 1
         }
       ],
       "oracles": [
         {
           "name": "신탁 1",
-          "tags": [
-            "약점 공격"
-          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 1.1,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
-              "v": 1
-            },
-            {
               "k": "ifStack",
-              "id": "서리",
-              "n": 2
+              "id": "눈꽃",
+              "n": 1
             },
             {
-              "k": "tough",
+              "k": "dmg",
+              "ratio": 1,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "눈꽃",
               "v": 1
             }
           ]
         },
         {
           "name": "신탁 2",
-          "tags": [
-            "약점 공격"
-          ],
           "fx": [
             {
               "k": "dmg",
               "ratio": 0.6,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "눈꽃",
+              "n": 1
+            },
+            {
+              "k": "spend",
+              "id": "눈꽃",
+              "all": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "ifStack",
+              "id": "눈꽃",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.5,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "눈꽃",
+              "v": 1
+            }
+          ]
+        },
+        {
+          "name": "신탁 4",
+          "fx": [
+            {
+              "k": "dmg",
+              "ratio": 0.5,
               "target": "allEnemies"
             },
             {
               "k": "tough",
               "v": 1,
               "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "신탁 3",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
+            },
+            {
+              "k": "ifStack",
+              "id": "눈꽃",
+              "n": 1
+            },
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 0.6,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
-              "v": 2
-            }
-          ]
-        },
-        {
-          "name": "신탁 4",
-          "tags": [
-            "약점 공격"
-          ],
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "target": "oneEnemy"
-            },
-            {
-              "k": "tough",
+              "k": "spend",
+              "id": "눈꽃",
               "v": 1
-            },
-            {
-              "k": "stack",
-              "id": "서리",
-              "v": 2,
-              "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 5",
-          "cost": 1,
-          "tags": [
-            "약점 공격"
-          ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 0.7,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
+              "k": "ifStack",
+              "id": "눈꽃",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.7,
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "눈꽃",
+              "v": 1
+            },
+            {
+              "k": "stack",
+              "id": "만년설",
               "v": 1
             }
           ]
@@ -747,7 +756,7 @@
           "fx": [
             {
               "k": "stack",
-              "id": "서리",
+              "id": "눈꽃",
               "v": 1,
               "target": "oneEnemy"
             }
@@ -768,7 +777,7 @@
       "fx": [
         {
           "k": "dmg",
-          "ratio": 1.5,
+          "ratio": 2.2,
           "target": "oneEnemy"
         },
         {
@@ -777,12 +786,19 @@
         },
         {
           "k": "ifFoe",
-          "id": "tough",
-          "pct": 0.5
+          "id": "broken"
+        },
+        {
+          "k": "spend",
+          "id": "만년설",
+          "all": true
+        },
+        {
+          "k": "perEvent"
         },
         {
           "k": "dmg",
-          "ratio": 1.1,
+          "ratio": 3.3,
           "target": "oneEnemy"
         }
       ],
@@ -795,7 +811,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.8,
+              "ratio": 3,
               "target": "oneEnemy"
             },
             {
@@ -804,12 +820,19 @@
             },
             {
               "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.5
+              "id": "broken"
+            },
+            {
+              "k": "spend",
+              "id": "만년설",
+              "all": true
+            },
+            {
+              "k": "perEvent"
             },
             {
               "k": "dmg",
-              "ratio": 2.4,
+              "ratio": 3.3,
               "target": "oneEnemy"
             }
           ]
@@ -827,15 +850,23 @@
             },
             {
               "k": "tough",
-              "v": 1
+              "v": 2
             },
             {
               "k": "ifFoe",
-              "id": "약점 노출"
+              "id": "broken"
+            },
+            {
+              "k": "spend",
+              "id": "만년설",
+              "all": true
+            },
+            {
+              "k": "perEvent"
             },
             {
               "k": "dmg",
-              "ratio": 2.4,
+              "ratio": 3.3,
               "target": "oneEnemy"
             }
           ]
@@ -848,13 +879,25 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.4,
+              "ratio": 2,
               "target": "allEnemies"
             },
             {
-              "k": "tough",
-              "v": 1,
-              "target": "allEnemies"
+              "k": "ifFoe",
+              "id": "broken"
+            },
+            {
+              "k": "spend",
+              "id": "만년설",
+              "all": true
+            },
+            {
+              "k": "perEvent"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.4,
+              "target": "oneEnemy"
             }
           ]
         },
@@ -866,7 +909,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.4,
+              "ratio": 2,
               "target": "oneEnemy"
             },
             {
@@ -874,39 +917,44 @@
               "v": 1
             },
             {
-              "k": "ifFoe",
-              "id": "alone"
+              "k": "ifStack",
+              "id": "눈꽃",
+              "n": 1
             },
             {
               "k": "dmg",
-              "ratio": 2.4,
+              "ratio": 1.5,
               "target": "oneEnemy"
             }
           ]
         },
         {
           "name": "신탁 5",
+          "cost": 1,
           "tags": [
             "보존"
           ],
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.4,
+              "ratio": 1.2,
               "target": "oneEnemy"
             },
             {
-              "k": "tough",
-              "v": 2
+              "k": "ifFoe",
+              "id": "broken"
             },
             {
-              "k": "ifFoe",
-              "id": "tough",
-              "pct": 0.3
+              "k": "spend",
+              "id": "만년설",
+              "all": true
+            },
+            {
+              "k": "perEvent"
             },
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 1.5,
               "target": "oneEnemy"
             }
           ]
@@ -926,7 +974,7 @@
           "fx": [
             {
               "k": "stack",
-              "id": "서리",
+              "id": "눈꽃",
               "v": 1,
               "target": "oneEnemy"
             }

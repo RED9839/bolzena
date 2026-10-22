@@ -5,6 +5,7 @@
 // - 쌓는 곳: KV bolzena-records(바인딩 RECORDS) — 키 v2/<yyyymmdd(UTC, 받은 날)>/<익명 id>/<씨앗>/<결과>, 180일 뒤 지운다. 같은 판 · 같은 결과는 덮어쓴다.
 // - 읽는 주소는 없다(GET 405). 읽기는 wrangler 로그인한 사람만(bz records pull).
 // - 사람을 알아볼 것은 받지도 적지도 않는다 — IP · User-Agent 를 KV 에 남기지 않는다(분당 횟수 막기에 메모리에서만 잠깐 쓴다).
+// - tier(난이도 단계 0~9 — 2026-10-20, 성장 켬일 때만 게임이 적는다)는 알려진 키로 받는다. 이 서버를 먼저 배포한 뒤에 tier 를 적는 게임을 내야 한다(모르는 키는 400).
 // - 남용 막기: 크기 64KB · 모양 검사(위쪽 키 허용 목록) · 다른 사이트에서 오는 요청 거절 · 같은 IP 분당 6번(이 서버 조각의 메모리 — 느슨함) ·
 //   KV 쓰기 한도(무료 하루 1000번)를 넘으면 503 — 게임은 실패한 기록을 기기에 5개까지 두었다 다음 실행 때 다시 보낸다.
 const MAX = 64 * 1024;
@@ -12,7 +13,7 @@ const TTL = 60 * 60 * 24 * 180;
 const PER_MIN = 6;
 const RESULTS = new Set(["win", "lose", "abandon", "quit"]);
 const TOP = new Set(["kind", "v", "app", "anon", "ver", "build", "os", "phone", "low", "seed", "village", "nature", "began", "ended", "min", "result",
-  "party", "floor", "node", "step", "at", "grade", "credits", "board", "fast", "gold", "hp", "maxHp", "removals", "fights", "picks", "deck", "arts", "death", "trim"]);
+  "party", "floor", "node", "step", "at", "grade", "credits", "board", "fast", "gold", "hp", "maxHp", "removals", "fights", "picks", "deck", "arts", "death", "trim", "tier"]);
 const ID = /^[^\s<>"'`\\/]{1,64}$/u;   // 사도 · 카드 · 마을 id(한글 포함) — 공백 · 꺾쇠 · 따옴표 · 빗금 없이
 const HEX = /^[0-9a-f]{16,64}$/;
 const TIME = /^\d{4}-\d\d-\d\dT\d\d:\d\dZ$/;
@@ -43,6 +44,7 @@ function check(rec) {
   if (typeof rec.village !== "string" || !ID.test(rec.village) || !str(rec.nature, 16)) return "village";
   for (const t of [rec.began, rec.ended]) if (t !== undefined && !TIME.test(t)) return "time";
   for (const n of ["min", "floor", "node", "step", "grade", "credits", "board", "gold", "hp", "maxHp", "removals", "trim"]) if (!int(rec[n])) return "number " + n;
+  if (rec.tier !== undefined && !(Number.isSafeInteger(rec.tier) && rec.tier >= 0 && rec.tier <= 9)) return "tier";   // 난이도 단계(성장 켬일 때만 게임이 적는다 — 0 · 없음 = 단계 없음)
   if (rec.fast !== undefined && !(typeof rec.fast === "number" && rec.fast >= 0 && rec.fast <= 1)) return "fast";
   if (!Array.isArray(rec.party) || rec.party.length < 1 || rec.party.length > 4 || !rec.party.every((p) => p && typeof p.id === "string" && ID.test(p.id) && int(p.slot))) return "party";
   if (!Array.isArray(rec.fights) || rec.fights.length > 80 || !rec.fights.every((f) => f && typeof f === "object" && Array.isArray(f.foes) && (f.log === undefined || (Array.isArray(f.log) && f.log.length <= 60)))) return "fights";

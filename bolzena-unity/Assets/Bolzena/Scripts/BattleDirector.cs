@@ -88,6 +88,11 @@ namespace Bolzena
             return new Vector3(x, i % 2 == 0 ? -0.85f : -0.3f, 0);
         }
         const float UnitScale = 0.3f;
+        /// <summary>
+        /// 거대 보스(2026-10-18 사용자: 프론티어 M.E.O.W 는 원작에서 몸통이 화면 오른쪽 위 밖에 있고 앞발 · 머리가 내려온다) — 적 id → (보통 보스 크기의 몇 배,
+        /// 보이는 그림 상자 왼쪽 끝 x · 아래 끝 y — 싸움터 단위). 배치(EnemyLayout)에서 빼고 따로 세운다 — 몸통은 오른쪽 위로 잘려 나가고, 머리 위 묶음은 오른쪽 위 화면 안에.
+        /// </summary>
+        static readonly Dictionary<string, (float scale, float left, float bottom)> Giants = new Dictionary<string, (float, float, float)> { ["frontier_meow"] = (1.4f, 0.8f, -1.7f) };   // 10-19 사용자 「너무 크다」 — 1.7 · -0.5 · -3.0 → 앞발이 손패 위로 안 오게
         /// <summary>적 크기 — 사도보다 살짝 작게(2026-10-09 사용자 「적군 크기 살짝 줄여줘」).</summary>
         const float EnemyShrink = 0.9f;
 
@@ -170,7 +175,7 @@ namespace Bolzena
             var mats = ShaderWarm.Pending();
             yield return ShaderWarm.Run(mats, Application.platform == RuntimePlatform.WebGLPlayer ? 60 : 40, p => Bolzena.RunUI.LoadingScreen.Progress(B + (C - B) * p));
             // 장면을 몇 프레임 그려 둔다(로딩 화면 아래) — 화면 효과 · 글꼴 · 막 세운 재질의 첫 그리기를 여기서
-            for (int i = 0; i < 3; i++) { Bolzena.RunUI.LoadingScreen.Progress(C + (1 - C) * (i + 1) / 3f, "거의 다 됐습니다"); yield return null; }
+            for (int i = 0; i < 3; i++) { Bolzena.RunUI.LoadingScreen.Progress(C + (1 - C) * (i + 1) / 3f, "거의 다 됐다"); yield return null; }
             Debug.Log($"[Battle] 준비 끝 — 셰이더 변형 {mats.Count}개 데움(누적 {ShaderWarm.Warmed})");
             Bolzena.RunUI.Hitch.Mark("전투 준비 끝(등장 연출)");
             Bolzena.RunUI.LoadingScreen.Hide(0.2f);
@@ -283,7 +288,7 @@ namespace Bolzena
 
             // 배경 — 흔들림 · 줌에 모자라지 않게 화면보다 크게
             var run = BattleBridge.Fight;
-            var bg = Make.Sprite("bg", FieldRoot, BattleBridge.BgSprite(run?.Ticket.Bg) ?? Res.Sprite("Bg/stage3_2"), new Vector3(0, 0.4f, 0), 0);
+            var bg = Make.Sprite("bg", FieldRoot, BattleBridge.BgSprite(run?.Ticket?.Bg ?? run?.Bg) ?? Res.Sprite("Bg/stage3_2"), new Vector3(0, 0.4f, 0), 0);
             bgSprite = bg;
             FitBg();
             // 바닥 쪽을 살짝 어둡게(유닛이 떠 보이게) · 위쪽 빛
@@ -294,7 +299,7 @@ namespace Bolzena
             ScreenFx.Create(ScreenRoot);
             Tooltip.Create(UiRoot);
             SayHook();
-            if (run != null) Battle = run.Battle;                  // 판에서 연 싸움(Run.OpenFight)
+            if (run != null) Battle = run.Battle;                  // 판에서 연 싸움(Run.OpenFight) · 프론티어(Frontier.Start)
             else
             {
                 var data = CoreBattle.LoadData();
@@ -305,6 +310,8 @@ namespace Bolzena
                 var fbg = BattleBridge.BgSprite(BgFrame.Arg() ?? cb.Fx.Bg);
                 if (fbg != null) { bg.sprite = fbg; FitBg(); }
             }
+            if (run?.Frontier != null) FrontierHud.Create(UiRoot, run.Battle, run.Frontier);   // 프론티어 — 남은 턴 · 점수 · 「성격 상성 없음」
+            else if (run?.Port?.S != null && run.Port.S.Tier > 0) TierHud.Create(UiRoot, run.Port.S.Tier);   // 판 전투 — 난이도 단계(성장 켬일 때만)
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "-artaudit") >= 0) { Look.Audit(); Application.Quit(0); return; }   // 그림 감사만 하고 끝
             var evs0 = Battle.Begin();
             pendingBegin = evs0;
@@ -317,6 +324,7 @@ namespace Bolzena
                 u.Ref = UnitRef.Party(i);
                 u.FxKey = h.Id;
                 Heroes.Add(u);
+                PetSpawn(u, h.Id);   // 곁에 늘 서 있는 소환수(에피카의 에피칸 — BattleDirector.Pets.cs)
             }
             // 앞줄이 위에 오게(발이 낮을수록 앞)
             ResetHeroOrder();
@@ -360,6 +368,7 @@ namespace Bolzena
             var o = new List<(string, string, Action)>();
             // 원작 이펙트 — 공용(맞음 · 회복 …)은 첫 사도와 함께, 그다음 사도마다 고학년 · 카드
             foreach (var h in s.Heroes) { var id = h.Id; o.Add(("이펙트 데우기", "이펙트 준비 중", () => Bolzena.Fx.BolzenaFx.Prewarm(new[] { id }, sounds: false))); }
+            foreach (var e in s.Enemies) { var cl = CloneHeroOf(e.Id); if (cl != null) o.Add(("이펙트 데우기", "이펙트 준비 중", () => Bolzena.Fx.BolzenaFx.Prewarm(new[] { cl }, sounds: false))); }   // 클론이 빌려 쓰는 그 사도 이펙트
             o.Add(("몸짓 · 소리 목록", "사도 준비 중", () => { foreach (var hv in Heroes) { hv.PrewarmTravel(); HeroClips(hv.name.Replace("hero_", "")); } }));   // 고학년 순간에 재지 않게(몸짓 이동 · 소리 목록)
             o.Add(("고학년 데우기", "고학년 준비 중", () => PrewarmUlt(s)));
             foreach (var h in s.Heroes) { var key = h.Key; o.Add(("소리 미리 읽기", "목소리 준비 중", () => { Sfx.Preload(key); foreach (Motion m in Enum.GetValues(typeof(Motion))) { HeroSfx(key, m, true); HeroSfx(key, m, false); } })); }
@@ -829,7 +838,8 @@ namespace Bolzena
 
         // ── 이벤트 연출 ──
         static bool Boundary(EventKind k) => k == EventKind.Act || k == EventKind.WaveStart || k == EventKind.TurnStart || k == EventKind.Victory
-                                             || k == EventKind.Defeat || k == EventKind.Discard || k == EventKind.Exhaust || k == EventKind.CardPlayed || k == EventKind.EpiphanyApplied;
+                                             || k == EventKind.Defeat || k == EventKind.Discard || k == EventKind.Exhaust || k == EventKind.CardPlayed || k == EventKind.EpiphanyApplied
+                                             || k == EventKind.TimeUp;   // 프론티어 시간 끝 — 마지막 적 수의 묶음에 삼켜지면 Over 가 서지 않아 턴 넘기기가 끝없이 돈다(2026-10-19 frontier-ui 멈춤)
 
         // 소환 — 규칙이 적을 b.Enemies 끝에 붙였는데 화면에 아직 없으면 세운다(빈 자리에 연기와 함께 솟아난다)
         static readonly Vector3[] SummonPos = { new Vector3(6.1f, -1.35f, 0), new Vector3(1.4f, -1.45f, 0), new Vector3(5.0f, -0.2f, 0), new Vector3(7.0f, -0.4f, 0), new Vector3(2.8f, -1.7f, 0) };
@@ -1074,6 +1084,11 @@ namespace Bolzena
                     Over = true;
                     yield return Banners.Defeat(UiRoot);
                     break;
+                case EventKind.TimeUp:   // 프론티어 턴 제한 끝 — 띠 「시간 종료」 + 점수(보스가 잃은 HP)
+                    Over = true;
+                    Hand.Hidden = true;
+                    yield return Banners.TimeUp(UiRoot, e.Value);
+                    break;
                 default:
                     yield return ApplyConsequence(e, null);
                     break;
@@ -1105,7 +1120,7 @@ namespace Bolzena
                     Sfx.Play("block_gain", 0.6f);
                     foreach (var h in Heroes)
                     {
-                        if (Bolzena.Fx.BolzenaFx.Common("shield", h.Fx) == null)   // 원작 실드(이드) — 없으면 자체 고리
+                        if (!Bolzena.Fx.BolzenaFx.OriginalOnly && Bolzena.Fx.BolzenaFx.Common("shield", h.Fx) == null)   // 원작 실드(이드) — 없으면 자체 고리. 원작대로 모드는 방어 획득 몸 연출 없음 — 대체 고리도 끈다(10-18 사용자 「디아나 스킬 끝 방패 문양」)
                             Vfx.Glow(h.Center, 2.6f, new Color(0.45f, 0.75f, 1f, 0.8f), 0.45f, 2.4f, "FX_IN_Ring_ShockWave_03", 120);
                         h.Flash(new Color(0.6f, 0.85f, 1f), 0.3f, 0.6f);
                     }
@@ -1140,8 +1155,22 @@ namespace Bolzena
         {
             var l = new List<EnemyLayout.Item>();
             for (int i = 0; i < Enemies.Count && i < EnemyHuds.Count; i++)
-                if (Enemies[i] != null && EnemyHuds[i] != null) l.Add(new EnemyLayout.Item { U = Enemies[i], Hud = EnemyHuds[i], Want = Enemies[i].Slot, Pos = Enemies[i].Home, Bar = EnemyHuds[i].BarPos });
+                if (Enemies[i] != null && EnemyHuds[i] != null && !Enemies[i].Giant) l.Add(new EnemyLayout.Item { U = Enemies[i], Hud = EnemyHuds[i], Want = Enemies[i].Slot, Pos = Enemies[i].Home, Bar = EnemyHuds[i].BarPos });
             return l;
+        }
+
+        // 거대 보스 자리 — 보이는 그림 상자의 왼쪽 아래 끝을 (left, bottom) 에. 머리 위 묶음은 오른쪽 위(파티 HP · 메뉴 띠 밑 · 오른쪽 더미 앞) 화면 안에 고정.
+        void PlaceGiant(UnitView u, EnemyHud hud, float left, float bottom)
+        {
+            var v = u.Visible;
+            var pos = new Vector3(left - v.xMin, bottom - v.yMin, 0);
+            u.Home = u.Slot = pos;
+            u.transform.localPosition = pos;
+            hud.SetHudMul(1f);
+            var lb = hud.LocalBox; var bar = hud.BarPos;
+            var want = new Vector3(EnemyLayout.XMax - (lb.xMax - bar.x), EnemyLayout.TopLimit - (lb.yMax - bar.y), 0);
+            hud.BarPos = want - pos;
+            Debug.Log($"[Battle] 거대 보스 {u.name} — 배율 {u.Scale:0.###} · 그림 상자 {v} · 발 {pos} · 묶음 {want}");
         }
 
         bool AliveItem(EnemyLayout.Item it) { int i = Enemies.IndexOf(it.U); return i >= 0 && !Dead(i); }
@@ -1240,9 +1269,12 @@ namespace Bolzena
                 else if (bossI >= 0) { pos = k == 0 ? new Vector3(6.3f, -0.95f, 0) : k == 1 ? new Vector3(6.7f, -1.6f, 0) : new Vector3(1.5f + (k - 2) * 0.9f, -1.6f + (k % 2) * 0.5f, 0); k++; }
                 else pos = EnemySlot(n, i);
                 float sc = (es.Boss ? UnitScale * 1.0f : UnitScale * 1.1f) * EnemyShrink;
+                bool giant = Giants.TryGetValue(es.Id ?? "", out var gi);
+                if (giant) sc *= gi.scale;
                 using var _h = Bolzena.RunUI.Hitch.Span("적 유닛 세우기");
                 var u = UnitView.Create(FieldRoot, "enemy_" + es.Key, es.Key, es.Skin, false, sc, pos, es.Boss ? 30 : 36 - i * 2, Look.EnemyIconAs(es.Id, es.Nature), es.Name, Look.IsStandIn(es.Id));
                 u.Ref = UnitRef.Enemy(i);
+                u.Giant = giant;
                 u.Mood = (es.Skin ?? "").Replace("Skin_", "").Replace("Joly", "Jolly");   // 판 성격 애니(Attack1_1_Cool …) — 오리카 오타 스킨도
                 Enemies.Add(u);
                 var hud = EnemyHud.Attach(u, es, i);
@@ -1252,6 +1284,7 @@ namespace Bolzena
             }
             // 자리 — 몸 · 머리 위 묶음이 서로 겹치지 않게(EnemyLayout). 예전 자리(-oldlayout)면 표 그대로
             if (!EnemyHud.OldLayout) LayoutEnemies();
+            for (int i = 0; i < n; i++) if (Enemies[i].Giant && Giants.TryGetValue(s.Enemies[i].Id ?? "", out var gp)) PlaceGiant(Enemies[i], EnemyHuds[i], gp.left, gp.bottom);
             for (int i = 0; i < n; i++)
             {
                 var es = s.Enemies[i];
@@ -1318,7 +1351,9 @@ namespace Bolzena
                 var stageNames = cbs.StagePickNames(handIndex, choice);
                 if (stageNames.Count > 0)
                 {
-                    yield return ChoiceWindow.Run(UiRoot, info, stageNames, "단계를 고르세요", v => stagePick = v, DemoBranchPick);
+                    var stId = cbs.StagePickId(handIndex, choice);
+                    var stIcons = new List<Sprite>(); for (int si = 1; si <= stageNames.Count; si++) stIcons.Add(ChipRow.StageIcon(stId, si));   // 단계마다 아이콘(요미 달)
+                    yield return ChoiceWindow.Run(UiRoot, info, stageNames, "단계 고르기", v => stagePick = v, DemoBranchPick, stIcons);
                     if (stagePick <= 0) { Hand.Cards.Insert(Mathf.Min(handIndex, Hand.Cards.Count), cv); Hand.Layout(); yield break; }   // 물렀다
                 }
             }

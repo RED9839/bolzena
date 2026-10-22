@@ -27,7 +27,7 @@ namespace Bolzena.RunUI
         {
             Ui.Clear(root);
             string used = P.CampChoice;
-            W.StatusBar(root, this, true, false, true, withShop ? "휴식 · 골디의 좌판" : "휴식", $"{P.Floor.Name} — 모닥불 곁에서 한숨 돌립니다 · 쉬기 · 수련 가운데 하나를 꼭 고릅니다");
+            W.StatusBar(root, this, true, false, true, withShop ? "휴식 · 골디의 좌판" : "휴식", $"{P.Floor.Name} — 모닥불 곁에서 한숨 돌린다 · 쉬기 · 수련 중 하나를 꼭 고른다");
             // 휴식은 쉬기 · 수련 가운데 하나를 반드시 고른다(2026-10-06 사용자) — 고르기 전에는 출발 단추가 없고 뒤로 키도 듣지 않는다(Stage.OnBack 없음).
             //   수련할 카드가 없거나(고유 · 교주 카드에 붙일 신탁이 없음) 정신 붕괴면 쉬기만 고를 수 있다. 상점(좌판)은 고르기와 상관없이 드나든다.
             float optH = Theme.C(150, 132);
@@ -69,7 +69,7 @@ namespace Bolzena.RunUI
             bottom.offsetMin = new Vector2(Theme.Gutter, Theme.Gutter); bottom.offsetMax = new Vector2(-320, Theme.Gutter + optH);
             Ui.Row(bottom, Theme.Gap, TextAnchor.LowerLeft, null, false, false);
             int heal = P.CampHeal;
-            var rest = W.Option(bottom, "쉬기", used == "rest" ? "<color=#6EE0A0>푹 쉬었습니다</color>" : heal > 0 ? $"파티 HP 를 최대의 30% 채웁니다  <color=#6EE0A0>+{heal} HP</color>" : "HP 가 가득합니다 — 쉬기만 하고 지나갑니다", () =>
+            var rest = W.Option(bottom, "쉬기", used == "rest" ? "<color=#6EE0A0>푹 쉬었다</color>" : heal > 0 ? $"파티 HP 를 최대의 30% 채웁니다  <color=#6EE0A0>+{heal} HP</color>" : "HP 가 가득하다 — 쉬기만 하고 지나간다", () =>
             {
                 int before = P.S.PartyHp;
                 var why = P.CampRest();
@@ -77,30 +77,30 @@ namespace Bolzena.RunUI
                 Sfx.Play("heal");
                 int after = P.S.PartyHp, max = P.S.PartyMaxHp;
                 Tw.Run(root, 0.6f, k => HudHp?.Invoke(Mathf.RoundToInt(Mathf.Lerp(before, after, k)), max), Tw.OutCubic);
-                Toast.Show($"푹 쉬었습니다 — HP {before:N0} → {P.S.PartyHp:N0}");
+                Toast.Show($"푹 쉬었다 — HP {before:N0} → {P.S.PartyHp:N0}");
                 P.Save("camp", kind);
                 Tw.After(0.7f, () => { if (root) BuildCamp(root, kind, withShop); });
             }, optH, Theme.S("ic_moon"), "rest");
             rest.Pref(300, -1, 1);
             rest.Interactable = used == "";   // HP 가 가득해도 고를 수 있다 — 수련할 카드가 없으면 쉬기가 유일한 길
-            rest.Why = "이번 휴식에서는 이미 골랐습니다";
+            rest.Why = "이번 휴식에서는 이미 골랐다";
             if (used == "rest") W.Select(rest, true);
             Stage.Hot["camp.rest"] = rest;
 
             var targets = P.Run.CampTargets();
             bool anyT = targets.Count > 0;
-            string noTrain = "신탁을 붙일 고유 카드가 없습니다 — 쉬기만 고를 수 있습니다";   // 정신 붕괴는 수련을 막지 않는다(2026-10-12 — 다음 전투의 「망령의 속삭임」 으로 바뀜)
-            var tr = W.Option(bottom, "수련", used == "train" ? "<color=#6EE0A0>손을 익혔습니다</color>" : anyT ? "강화할 카드를 고르면 신탁 셋이 나옵니다 — 하나를 붙입니다" : noTrain, () => TrainPick(root, kind, withShop), optH, Theme.S("ic_spark"), "train");
+            string noTrain = "신탁을 붙일 고유 카드가 없다 — 쉬기만 고를 수 있다";   // 정신 붕괴는 수련을 막지 않는다(2026-10-12 — 다음 전투의 「망령의 속삭임」 으로 바뀜)
+            var tr = W.Option(bottom, "수련", used == "train" ? "<color=#6EE0A0>손을 익혔다</color>" : anyT ? "강화할 카드를 고르면 신탁 셋이 나온다 — 하나를 붙인다" : noTrain, () => TrainPick(root, kind, withShop), optH, Theme.S("ic_spark"), "train");
             tr.Pref(300, -1, 1);
             tr.Interactable = used == "" && anyT;
-            tr.Why = used != "" ? "이번 휴식에서는 이미 골랐습니다" : noTrain;
+            tr.Why = used != "" ? "이번 휴식에서는 이미 골랐다" : noTrain;
             if (used == "train") W.Select(tr, true);
             Stage.Hot["camp.trainopen"] = tr;
 
             // 장비 칸은 없앴다(2026-10-06 사용자) — 낀 장비는 머리 띠의 장비 단추 · 덱 보기의 장비 탭에서 본다
             if (withShop)
             {
-                var shop = W.Option(bottom, "골디의 좌판", "「어서 오세요, 고객님!」 카드 · 아티팩트 · 카드 제거 — 들러도 휴식 선택은 그대로 남습니다", () => Shop(kind), optH, Theme.S("ic_bag"), "shop");
+                var shop = W.Option(bottom, "골디의 좌판", "「어서 오세요, 고객님!」 카드 · 아티팩트 · 카드 제거 — 들러도 휴식 선택은 그대로 남는다", () => Shop(kind), optH, Theme.S("ic_bag"), "shop");
                 shop.Pref(320, -1, 1);
                 Stage.Hot["camp.shop"] = shop;
             }
@@ -116,7 +116,7 @@ namespace Bolzena.RunUI
             }
             else
             {   // 출발 자리 — 고르기 전에는 안내만
-                var hint = Ui.Text(root, "쉬기 · 수련 가운데\n하나를 고르세요", Theme.FsMd, Theme.Sub, TextAlignmentOptions.Center);
+                var hint = Ui.Text(root, "쉬기 · 수련 중\n하나를 고를 수 있다", Theme.FsMd, Theme.Sub, TextAlignmentOptions.Center);
                 hint.rectTransform.At(1, 0, -Theme.Gutter, Theme.Gutter + (optH - 66) / 2, 272, 66);
             }
             if (used == "") Stage.Hot.Remove("camp.leave");   // 다시 세울 때 옛 출발 단추가 남지 않게
@@ -129,7 +129,7 @@ namespace Bolzena.RunUI
             var ids = P.Run.CampTargets();
             if (ids.Count == 0) return;
             float mw = Mathf.Min(Theme.Compact ? 1240 : Mathf.Max(1240, 8 * (170 + 12) + 80), Stage.Size.x - 40);
-            var (right, closeM, _) = Stage.ModalBox("trainpick", mw, Mathf.Min(680, Stage.Size.y - 24), "강화할 카드를 고릅니다", "신탁을 붙이거나 다시 뽑을 카드 — 고르면 신탁 셋이 나옵니다(이미 붙은 신탁은 빠짐)", true, null, 0, false);
+            var (right, closeM, _) = Stage.ModalBox("trainpick", mw, Mathf.Min(680, Stage.Size.y - 24), "강화할 카드 고르기", "신탁을 붙이거나 다시 뽑을 카드 — 고르면 신탁 셋이 나온다(이미 붙은 신탁은 빠짐)", true, null, 0, false);
             Ui.Col(right, Theme.Gap, TextAnchor.UpperLeft, new RectOffset(4, 4, 0, 4));
             var area = Ui.Rect("pick", right); area.Pref(-1, 200, -1, 1);
             var content = Ui.Scroll(area, out _);
@@ -153,7 +153,7 @@ namespace Bolzena.RunUI
             var opts = P.Run.FlashOptions(train);
             OracleReveal.Show(this, new RevealOpts
             {
-                Title = "신탁!", Sub = "카드를 누르면 자세히 보고, 한 번 더 누르면 결정합니다.",
+                Title = "신탁!", Sub = "카드를 누르면 자세히 보고, 한 번 더 누르면 결정한다",
                 BaseCardId = null, Picks = RevealPick.Of(P.Data, train.CardId, opts), Cancel = true, Hot = "camp.train",
                 Try = i => P.CampTrain(opts[i].N),
                 Done = i =>
@@ -171,7 +171,7 @@ namespace Bolzena.RunUI
             {
                 var b = Btn.Make(parent, null, done ? BtnStyle.Cell : BtnStyle.Dark, go, 0, title);
                 b.Interactable = can;
-                if (!can) b.Why = done ? "이미 골랐습니다" : desc;
+                if (!can) b.Why = done ? "이미 골랐다" : desc;
                 bg = b.Bg;
             }
             else bg = Ui.Img(parent, done ? Theme.CellOn : Theme.S("btn_dark", 26), Color.white, title, true);

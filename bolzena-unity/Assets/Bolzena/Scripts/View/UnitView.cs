@@ -68,6 +68,9 @@ namespace Bolzena.View
                 if (wear != null) { v.Sa.Skeleton.SetSkin(wear); v.Sa.Skeleton.SetSlotsToSetupPose(); }
             }
             v.Sa.Skeleton.ScaleX = faceRight ? -1 : 1;     // 원작 SD 는 왼쪽을 본다
+            // 쉬는 동작이 시작되면 슬롯을 기본 자세로 — 앞 몸짓이 켠 부착물(네르 스킬 깃발 · 고학년 보석)을 쉬는 동작은 건드리지 않아 그대로 남았다(10-17 사용자 「깃발이 꽂히고 안 사라짐」)
+            var saRef = v.Sa;
+            v.Sa.AnimationState.Start += e => { if (e.Loop && e.Animation != null && e.Animation.Name.StartsWith("Idle")) saRef.Skeleton.SetSlotsToSetupPose(); };
             v.mr = v.Sa.GetComponent<MeshRenderer>();
             v.mr.sortingOrder = order;
             v.mpb = new MaterialPropertyBlock();
@@ -252,6 +255,25 @@ namespace Bolzena.View
                     }
                 yield return null;
             }
+        }
+
+        // 조각들의 한 이벤트 칸(Event_Front · Middle · Back)의 원작 ID — (이어 튼 몸짓 1배속 ms, ID). 이펙트 이벤트 표(FxRules.EVENT_FX)가 쓴다
+        public List<KeyValuePair<int, int>> RowEvents(IList<string> names, string evName)
+        {
+            var res = new List<KeyValuePair<int, int>>(); float o = 0;
+            foreach (var n in names)
+            {
+                var a = data.GetSkeletonData(true).FindAnimation(F(n));
+                if (a == null) continue;
+                foreach (var tl in a.Timelines)
+                    if (tl is EventTimeline et)
+                        foreach (var ev in et.Events)
+                            if (ev.Data.Name == evName)
+                                foreach (var s in (ev.String ?? "").Split(','))
+                                    if (int.TryParse(s, out var id)) res.Add(new KeyValuePair<int, int>(Mathf.RoundToInt((o + ev.Time) * 1000), id));
+                o += a.Duration;
+            }
+            return res;
         }
 
         // 조각들의 모든 스파인 이벤트 시각(이어 튼 전체 초)과 조각 경계
@@ -474,7 +496,9 @@ namespace Bolzena.View
 
         // 몸 가운데(싸움터 좌표) — 맞는 자리
         public Vector3 Center => Bone("Point_Middle", new Vector3(0, Height() * 0.42f, 0));
-        public Vector3 Top => Bone("Point_Top", new Vector3(0, Height() * 0.85f, 0));
+        public Vector3 Top { get { var t = Bone("Point_Top", new Vector3(0, Height() * 0.85f, 0)); return Giant ? new Vector3(Mathf.Min(t.x, Bolzena.UI.Tone.HalfW - 2f), Mathf.Min(t.y, Bolzena.UI.Tone.HalfH - 1.6f), t.z) : t; } }
+        /// <summary>거대 보스(BattleDirector.Giants) — 배치에서 빠지고, 머리 위 글(Top)은 화면 안으로 당긴다.</summary>
+        public bool Giant;
         public Vector3 Feet => transform.localPosition + Art.localPosition;
 
         // 원작 이펙트(com.bolzena.fx) 쪽 몸 — 자리는 모두 싸움터 좌표(BolzenaFx.Parent = FieldRoot).

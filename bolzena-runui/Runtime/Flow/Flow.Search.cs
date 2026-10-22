@@ -60,7 +60,7 @@ namespace Bolzena.RunUI
 
     // 도감 검색 칸(2026-10 사용자: 「도감에 검색 · 초성으로도」) — 사도 · 교주 카드 · 장비 · 적 도감 위 오른쪽 도구 줄 맨 앞.
     //   입력 즉시 걸러진다 — 격자를 다시 그리지 않고 칸을 숨기기만 해서(정렬 · 스크롤 · 입력 칸 초점이 그대로) 폰 자판도 닫히지 않는다.
-    //   검색어는 도감마다 따로 기억한다(dexQuery). 결과가 없으면 「찾는 것이 없습니다」, 지우기 단추(×).
+    //   검색어는 도감마다 따로 기억한다(dexQuery). 결과가 없으면 「찾는 것이 없다」, 지우기 단추(×).
     public partial class Flow
     {
         readonly Dictionary<string, string> dexQuery = new Dictionary<string, string>();
@@ -85,7 +85,7 @@ namespace Bolzena.RunUI
             var input = SearchInput(row, "이름 · 초성 찾기", out var clear);
             input.transform.SetAsFirstSibling();
             DexSearchField = input;
-            var empty = Ui.Text(area, "찾는 것이 없습니다", Theme.FsLg, Theme.Sub, TextAlignmentOptions.Center, false, "nomatch");
+            var empty = Ui.Text(area, "찾는 것이 없다", Theme.FsLg, Theme.Sub, TextAlignmentOptions.Center, false, "nomatch");
             empty.rectTransform.At(0.5f, 1, 0, -60, 600, 60);
             string infoBase = info != null ? info.text : null;
             void Apply(string q)

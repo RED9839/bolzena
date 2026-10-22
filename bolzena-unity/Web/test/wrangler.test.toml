@@ -1,0 +1,11 @@
+# 로컬 시험 전용 — 로컬 D1 에 마이그레이션을 걸 때만 쓴다(test/run-local.mjs). 배포에는 쓰지 않는다(배포 설정은 ../wrangler.toml).
+#   wrangler d1 migrations apply DB --local -c test/wrangler.test.toml --persist-to test/.state
+# database_id 는 가짜(로컬 파일 이름 열쇠) — pages dev 의 --d1 DB=bolzena-frontier-local 과 같아야 같은 파일을 쓴다.
+name = "bolzena-frontier-test"
+compatibility_date = "2026-10-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "bolzena-frontier-local"
+database_id = "bolzena-frontier-local"
+migrations_dir = "../migrations"

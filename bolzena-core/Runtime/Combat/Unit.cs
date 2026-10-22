@@ -102,6 +102,11 @@ namespace Bolzena.Core
         public bool Confused;
         /// <summary>보스 클론 — 다음에 고학년을 예고할 턴(0 = 아직 안 정함). BossUlt.</summary>
         public int UltAt;
+        /// <summary>
+        /// 적 — 이 전투에서 실제로 잃은 HP 합(넘친 피해 · 방어 · 실드가 막은 몫 빼고, 주인 모를 피해 · 지속 피해 · 반사 · 고정 피해는 모두 넣는다. 회복해도 줄지 않는다).
+        /// 프론티어 점수(Frontier.Score)가 읽는다. 판 규칙에는 안 쓴다(턴 지문에도 안 든다).
+        /// </summary>
+        public int Lost;
         /// <summary>상태 겹마다 건 쪽 — 상태 id → 건 쪽(hero:키 · enemy:Idx · gear:키 · neutral · event) → 겹. 화면은 Battle.StatusViews 로 읽는다.</summary>
         public Dictionary<string, Dictionary<string, int>> Src = new();
 
@@ -124,6 +129,7 @@ namespace Bolzena.Core
             u.StUse = new Dictionary<string, int>(StUse);
             u.Hist = new List<string>(Hist);
             u.PUsed = new Dictionary<string, int>(PUsed);
+            u.Seized = new List<string>(Seized);   // 빼앗은 카드 — 복사본(봇 · 미리보기)이 빼앗으면 진짜 판의 적도 쥐던 것(2026-10-18 다시 돌리기 시험이 찾음)
             return u;
         }
 

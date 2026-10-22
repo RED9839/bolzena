@@ -45,7 +45,7 @@ namespace Bolzena
             var title = Make.Text("title", root, "은총!", new Vector3(zoom.x, Tone.HalfH - 0.62f * Tone.K, 0), 0.7f, O + 40, new Color(1f, 0.95f, 0.75f));
             title.colorGradient = new VertexGradient(Color.white, Color.white, new Color(1f, 0.78f, 0.3f), new Color(1f, 0.78f, 0.3f));
             Make.Outline(title, 0.2f, new Color(0.35f, 0.15f, 0));
-            string what = toHand ? $"{who}의 고유 카드를 손에 얻습니다 · 이번 턴 비용 0" : $"{who}의 고유 카드 — 손이 가득해 버린 더미로";
+            string what = toHand ? $"{who}의 고유 카드를 손에 얻는다 · 이번 턴 비용 0" : $"{who}의 고유 카드 — 손이 가득해 버린 더미로";
             string line = string.IsNullOrEmpty(graceFrom) ? what : $"<color=#ffd76a>「{graceFrom}」</color>의 은총 — {what}";
             var sub = Make.Text("sub", root, line, new Vector3(zoom.x, Tone.HalfH - 1.28f * Tone.K, 0), 0.22f, O + 40, new Color(1f, 0.92f, 0.8f));
             Make.Outline(sub, 0.25f, Color.black);

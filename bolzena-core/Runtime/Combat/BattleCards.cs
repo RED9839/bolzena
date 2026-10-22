@@ -30,7 +30,19 @@ namespace Bolzena.Core
             // 변신 — 그 사도가 변신 중이면 변신판 모습(카드 바꾸기 · 덤)
             if (Forms.Count > 0) v = Blessed(id, FormCard(id, v));
             if (stageOn != false && Kw.Count > 0) v = StageCard(id, v);   // 단계 카드 덤(▶E75)
+            if (ProgOf != null && v?.Hero != null) v = ProgCard(id, v);   // 영구 성장 — 잠재력 사도 칸의 카드 덤(없으면 그대로)
             return v;
+        }
+
+        // 잠재력 사도 칸 카드 덤 — 모습 캐시(바뀌지 않는 덤이라 같은 바탕 모습이면 같은 결과 · 복사본과 나눠 쓴다)
+        readonly Dictionary<CardView, CardView> progViews = new();
+        CardView ProgCard(string id, CardView v)
+        {
+            if (!ProgOf.TryGetValue(v.Hero, out var pm) || pm.Cards == null || pm.Cards.Count == 0) return v;
+            if (progViews.TryGetValue(v, out var hit)) return hit;
+            var o = Prog.CardWith(Data, v, GameData.BaseId(id), pm.Cards);
+            progViews[v] = o;
+            return o;
         }
 
         /// <summary>그 카드(id)에 얹힌 그 카드만의 축복까지 본 모습 — 카드 종류는 늘 이것(CardOf)으로 읽는다.</summary>
@@ -163,18 +175,19 @@ namespace Bolzena.Core
         public string CanUlt(string heroKey)
         {
             var u = HeroUnit(heroKey);
-            if (u == null || u.Dead) return "나설 수 없습니다";
+            if (u == null || u.Dead) return "나설 수 없다";
             var ult = UltOf(heroKey);
-            if (ult == null) return "고학년 스킬이 없습니다";
+            if (ult == null) return "고학년 스킬이 없다";
             int uc = UltCostOf(heroKey);   // 요구 게이지 증감(엘다인 4차 ▶E78)
-            if (Gauge < uc) return $"게이지가 모자랍니다 ({Gauge}% / {uc}%)";
-            if (St(Pool, "정신 붕괴") > 0) return "정신 붕괴 — 고학년 스킬을 쓸 수 없습니다";
+            if (Gauge < uc) return $"게이지가 모자라다 ({Gauge}% / {uc}%)";
+            if (St(Pool, "정신 붕괴") > 0) return "정신 붕괴 — 고학년 스킬을 쓸 수 없다";
             return null;
         }
 
         /// <summary>stage — 단계를 고르는 쌓기(stack pick)가 든 고학년의 고른 단계(PlayOpts.Stage 와 같음 · 없으면 다음 단계, 2026-10-13).</summary>
         public PlayResult UseUlt(string heroKey, int targetIdx = 0, int? stage = null)
         {
+            Input?.Ult(this, heroKey, targetIdx, stage);   // 입력 테이프(BattleInput.cs) — 못 써도 적는다(다시 돌리면 같은 까닭으로 못 쓴다)
             var why = CanUlt(heroKey);
             if (why != null) return PlayResult.Fail(why);
             var ult = UltOf(heroKey);
@@ -228,13 +241,31 @@ namespace Bolzena.Core
                 if (i != handIdx && Hand[i] != cardId && GameData.BaseId(Hand[i]) == ci.InHand) return ci.Add;
             return 0;
         }
+        /// <summary>영구 성장 비용 덤(잠재력 사도 칸) — 그 카드 주인의 카드 덤(ProgMods.Cards) 가운데 그 카드에 맞는 비용 덤 합.</summary>
+        int ProgCostOf(string cardId)
+        {
+            var def = Data.Card(cardId);
+            if (def?.Hero == null || !ProgOf.TryGetValue(def.Hero, out var pm) || pm.Cards == null) return 0;
+            return Prog.CostOfMods(CardOf(cardId), GameData.BaseId(cardId), pm.Cards);
+        }
+
+        /// <summary>영구 성장 카드군 덤 — 그 사도가 낸 카드가 고유(복제 · 생성 카드 포함 — 사도 카드이고 고유이거나 생성) · 기본(사도 카드, 고유 아님) · 교주(주인을 붙인 중립 카드)인지 보고 그 몫.</summary>
+        double ProgCardOf(string ownerKey, string cardId)
+        {
+            if (!ProgOf.TryGetValue(ownerKey, out var pm)) return 0;
+            var def = Data.Card(cardId);
+            if (def == null) return 0;
+            if (def.Hero != null) return def.Unique || def.Token ? pm.Unique : pm.Basic;
+            return GameData.OwnerOf(cardId) != null ? pm.Neutral : 0;
+        }
+
         public int CostOf(string cardId, int? handIdx = null)
         {
             var c = CardOf(cardId);
             if (FreeOnce.Contains(cardId) || GraceFree(cardId, handIdx)) return 0;
             int divine = ShinKind(Data.Card(cardId), ShinOf(cardId)) == "cost" ? 1 : 0;
             int lead = LeadOn.Contains(cardId) && PlayedThisTurn <= 0 ? 1 : 0;
-            int adj = (CardStOf(cardId, "침체") > 0 ? 1 : 0) + CardStOf(cardId, "비용") + (CostMods.Count > 0 ? CostModOf(cardId) : 0) + CardValueCost(cardId) + CostIfAdd(c, cardId, handIdx);   // costIf — 손에 그 카드가 있으면 +N(2026-10-13 이드)   // 카드 값 1당 비용(엘다인 4차 리뉴아 「시간」)   // 침체 +1 · 적이 바꾼 비용(착란 …)
+            int adj = (CardStOf(cardId, "침체") > 0 ? 1 : 0) + CardStOf(cardId, "비용") + (CostMods.Count > 0 ? CostModOf(cardId) : 0) + CardValueCost(cardId) + CostIfAdd(c, cardId, handIdx) + (ProgOf != null ? ProgCostOf(cardId) : 0);   // 영구 성장 — 잠재력 사도 칸 비용 덤   // costIf — 손에 그 카드가 있으면 +N(2026-10-13 이드)   // 카드 값 1당 비용(엘다인 4차 리뉴아 「시간」)   // 침체 +1 · 적이 바꾼 비용(착란 …)
             return Math.Max(0, c.Cost - divine - lead - NextCheaper + adj);
         }
 
@@ -245,6 +276,7 @@ namespace Bolzena.Core
         /// <summary>빛나는 카드의 신탁을 고른다 — choice 는 선택지 번호. 카드 신탁은 그 카드가 바로 바뀌고 이번에는 코스트 0, 은총은 고유 카드가 손에(그 턴 코스트 0).</summary>
         public string ApplyEpiphany(string cardId, int choice)
         {
+            Input?.Epi(this, cardId, choice);   // 입력 테이프(BattleInput.cs)
             var g = GlowOf(cardId);
             if (g == null || choice < 0 || choice >= g.Count) return null;
             Glow.Remove(cardId);
@@ -276,10 +308,10 @@ namespace Bolzena.Core
         public string CanPlay(string cardId, bool free = false, int? handIdx = null)
         {
             var c = CardOf(cardId);
-            if (c == null) return "그런 카드가 없습니다";
-            if (c.HasTag(Tag.Unplayable)) return "낼 수 없는 카드입니다";
-            if (FinaleLock) return "종극 — 이번 턴은 끝났습니다";
-            if (IsFrozen(cardId)) return "빙결 — 뽑은 턴에는 낼 수 없습니다";
+            if (c == null) return "그런 카드가 없다";
+            if (c.HasTag(Tag.Unplayable)) return "낼 수 없는 카드다";
+            if (FinaleLock) return "종극 — 이번 턴은 끝났다";
+            if (IsFrozen(cardId)) return "빙결 — 뽑은 턴에는 낼 수 없다";
             var def = Data.Card(cardId);
             if (!free)
             {
@@ -287,13 +319,13 @@ namespace Bolzena.Core
                 if (def?.PayWith != null)
                 {
                     int rate = Math.Max(1, def.PayRate), have = StackOf(c.Hero, def.PayWith) / rate;
-                    if (def.PayMix ? have + Ap < cost : have < cost) return $"{Ko.J("「" + def.PayWith + "」", "이가")} 모자랍니다";
+                    if (def.PayMix ? have + Ap < cost : have < cost) return $"{Ko.J("「" + def.PayWith + "」", "이가")} 모자라다";
                 }
-                else if (cost > Ap && !(def?.Debt ?? false)) return "AP가 모자랍니다";
+                else if (cost > Ap && !(def?.Debt ?? false)) return "AP가 모자라다";
             }
             var owner = c.Hero != null ? HeroUnit(c.Hero) : null;
-            if (c.Hero != null && (owner == null || owner.Dead)) return $"{Data.Hero(c.Hero)?.Name ?? c.Hero} — 나설 수 없습니다";
-            if (NeedFormWhy(c) is string nf) return $"「{nf}」 중에만 낼 수 있습니다";   // 태세일 때만 사용 가능(엘다인 4차)
+            if (c.Hero != null && (owner == null || owner.Dead)) return $"{Data.Hero(c.Hero)?.Name ?? c.Hero} — 나설 수 없다";
+            if (NeedFormWhy(c) is string nf) return $"「{nf}」 중에만 낼 수 있다";   // 태세일 때만 사용 가능(엘다인 4차)
             return null;
         }
 
@@ -304,8 +336,9 @@ namespace Bolzena.Core
         public PlayResult PlayCard(int handIdx, int targetIdx, PlayOpts opts = null)
         {
             opts ??= new PlayOpts();
-            if (Over != null) return PlayResult.Fail("전투가 끝났습니다");
-            if (handIdx < 0 || handIdx >= Hand.Count) return PlayResult.Fail("그런 카드가 없습니다");
+            if (Input != null && !opts.Auto) Input.Play(this, handIdx, targetIdx, opts);   // 입력 테이프(BattleInput.cs) — 저절로 내는 카드(Auto)는 결과라 적지 않는다
+            if (Over != null) return PlayResult.Fail("전투가 끝났다");
+            if (handIdx < 0 || handIdx >= Hand.Count) return PlayResult.Fail("그런 카드가 없다");
             var cardId = Hand[handIdx];
             var why = CanPlay(cardId, false, handIdx);
             if (why != null) return PlayResult.Fail(why);
@@ -333,6 +366,11 @@ namespace Bolzena.Core
             bool tune = !c.X && !payKw && paid == Ap;
             Ap -= paid;
             ApSpent += paid;
+            if (c.X && owner?.Key == TraceHero && TraceHero != null)
+            {   // (10-22 에르핀) X 카드에 쓴 AP · 그때 쌓인 X 겹(xStack) — bz sim --trace
+                TraceAdd("xPlay"); TraceAdd("xAp", paid); TraceAdd("xAp:" + paid);
+                foreach (var xs in c.Fx.Where(f => f.XStack != null).Select(f => f.XStack).Distinct()) TraceAdd("xStack", StackOf(owner.Key, xs));
+            }
             // 직전보다 비싼가(시범 16 리코타) — 이번 턴 바로 앞 카드의 비용과 견준다(턴 첫 카드는 아니다)
             int prevCost = Counts.TryGetValue("lastCostT", out var lct) && lct == Turn && Counts.TryGetValue("lastCost", out var lcv) ? lcv : -1;
             bool pricier = prevCost >= 0 && cost0 > prevCost;
@@ -368,6 +406,7 @@ namespace Bolzena.Core
             if (!c.IsStatus && !c.IsCurse && Counts.Count > 0 && EmpowerOf(c.Hero) > 0) ctx.Scale *= EmpowerUse(c.Hero);
             // 다른 아군이 걸어 둔 다음 카드 강화(empower who other · minCost — 엘다인 4차 요청)
             if (!c.IsStatus && !c.IsCurse && Counts.Count > 0) { int eo = EmpowerOther(c.Hero, c.X ? paid : Math.Max(c.Cost + costUp, c.CountAs), true); if (eo > 0) { ctx.Scale *= 1 + eo / 100.0; Say($"동료 강화 +{eo}% — 이 카드에"); } }
+            if (ProgOf != null && owner != null && !c.IsStatus && !c.IsCurse) ctx.Scale *= 1 + ProgCardOf(owner.Key, cardId);   // 영구 성장 — 잠재력의 카드군 피해 · 실드 · 치유 +%
             bool sealedNow = HasTagB(cardId, Tag.Seal) && !Unsealed.Contains(cardId);
             bool blockedNow = CardStOf(cardId, "봉쇄") > 0;
             if (blockedNow) DelCardSt(cardId, "봉쇄");

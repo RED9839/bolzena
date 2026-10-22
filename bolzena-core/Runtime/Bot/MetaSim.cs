@@ -38,12 +38,8 @@ namespace Bolzena.Core
             /// <summary>연속 이벤트 깃발 — 판당 선 수 · 깃발마다 선 판 비율(%).</summary>
             public double FlagsPerRun, FlagReadsPerRun;
             public Dictionary<string, double> FlagPct = new();
-            /// <summary>학점제 학년 — 판 끝 학년 분포(%) · 마지막 보스를 연 판의 그때 학년 분포(%) · 판당 이긴 싸움 수(종류마다, 전체 판 평균) · 판당 학점.</summary>
-            public Dictionary<int, double> GradeEnd = new(), GradeLastBoss = new();
+            /// <summary>판당 이긴 싸움 수(종류마다, 전체 판 평균).</summary>
             public Dictionary<string, double> WinsPerRun = new();
-            public double AvgCredits; public int LastBossRuns;
-            /// <summary>마지막 보스를 연 판의 그때 학점 — 사분위(25 · 50 · 75) · 엘리트를 하나도 안 이긴 판의 평균(판 수).</summary>
-            public int[] CreditsLastBossQ = new int[3]; public double CreditsLastBossNoElite; public int NoEliteRuns;
         }
 
         static readonly Dictionary<string, string> LETTER = new() { ["탱커"] = "T", ["서포터"] = "S", ["딜러"] = "D" };
@@ -96,7 +92,7 @@ namespace Bolzena.Core
             Parallel.ForEach(jobs, po, j =>
             {
                 var rb = new RunBot(d);
-                res[j.i] = rb.RunFull(j.party, j.seed, new SimOpts { Hpx = hpx, Dmgx = dmgx, Skilled = skilled, UniqueOnly = uonly, Perks = bot?.Perks });
+                res[j.i] = rb.RunFull(j.party, j.seed, new SimOpts { Hpx = hpx, Dmgx = dmgx, Skilled = skilled, UniqueOnly = uonly, Prog = bot?.Prog, Tier = bot?.Tier ?? 0 });
                 progress?.Invoke(System.Threading.Interlocked.Increment(ref done), jobs.Count);
             });
             double Pct(int w, int n) => n > 0 ? 100.0 * w / n : 0;
@@ -132,32 +128,23 @@ namespace Bolzena.Core
                 AvgTurnsFight = fN > 0 ? (double)fT / fN : 0, AvgTurnsBoss = bN > 0 ? (double)bT / bN : 0,
                 BreaksPerRun = jobs.Count > 0 ? (double)brk / jobs.Count : 0, WeakPct = Pct(tw, th),
                 BreaksPerFight = bk.ToDictionary(kv => kv.Key, kv => kv.Value[0] > 0 ? (double)kv.Value[1] / kv.Value[0] : 0),
-                Label = $"{(skilled ? "숙련" : "초보")} 봇 · {PartyName(party)} 편성{(uonly ? " · 고유 카드만" : "")}{(bot?.Perks != null ? " · 교주 보드 전부" : "")}",
+                Label = $"{(skilled ? "숙련" : "초보")} 봇 · {PartyName(party)} 편성{(uonly ? " · 고유 카드만" : "")}{(bot?.Prog != null ? $" · 잠재력 {bot.Prog}" : "")}{(bot?.Tier > 0 ? $" · 단계 {bot.Tier}" : "")}",
                 AvgDeck = res.Length > 0 ? res.Average(x => x.Deck) : 0, AvgUniques = res.Length > 0 ? res.Average(x => x.Uniques) : 0, AvgBasics = res.Length > 0 ? res.Average(x => x.Basics) : 0, AvgRemovals = res.Length > 0 ? res.Average(x => x.Removals) : 0,
                 FlagsPerRun = res.Length > 0 ? res.Average(x => x.Flags.Count) : 0,
                 FlagReadsPerRun = res.Length > 0 ? res.Average(x => x.FlagReads) : 0,
                 FlagPct = res.SelectMany(x => x.Flags).GroupBy(x => x).ToDictionary(g => g.Key, g => Pct(g.Count(), res.Length)),
-                GradeEnd = res.GroupBy(x => x.Grade).OrderBy(g => g.Key).ToDictionary(g => g.Key, g => Pct(g.Count(), res.Length)),
-                GradeLastBoss = res.Where(x => x.GradeLastBoss > 0).GroupBy(x => x.GradeLastBoss).OrderBy(g => g.Key).ToDictionary(g => g.Key, g => Pct(g.Count(), res.Count(x => x.GradeLastBoss > 0))),
-                LastBossRuns = res.Count(x => x.GradeLastBoss > 0),
                 WinsPerRun = res.SelectMany(x => x.Kinds).GroupBy(kv => kv.Key.Substring(kv.Key.IndexOf(':') + 1)).ToDictionary(g => g.Key, g => res.Length > 0 ? (double)g.Sum(kv => kv.Value.win) / res.Length : 0),
-                AvgCredits = res.Length > 0 ? res.Average(x => x.Credits) : 0,
-                CreditsLastBossQ = Quart(res.Where(x => x.GradeLastBoss > 0).Select(x => x.CreditsLastBoss).ToList()),
-                NoEliteRuns = res.Count(x => x.GradeLastBoss > 0 && !x.Kinds.Any(kv => kv.Key.EndsWith(":elite") && kv.Value.win > 0)),
-                CreditsLastBossNoElite = res.Where(x => x.GradeLastBoss > 0 && !x.Kinds.Any(kv => kv.Key.EndsWith(":elite") && kv.Value.win > 0)).Select(x => (double)x.CreditsLastBoss).DefaultIfEmpty(0).Average(),
             };
         }
-
-        static int[] Quart(List<int> l) { if (l.Count == 0) return new int[3]; l.Sort(); return new[] { l[l.Count / 4], l[l.Count / 2], l[Math.Min(l.Count - 1, l.Count * 3 / 4)] }; }
 
         public static string PartyName(string mode) => mode == PartyPick.Role ? "역할" : mode == PartyPick.Synergy ? "시너지" : "무작위";
 
         /// <summary>판 묶음을 병렬로 — 완주했나만(짝 재기 따위).</summary>
-        public static bool[] RunJobs(GameData d, List<(int i, List<string> party, long seed)> jobs, int threads = 0, double hpx = 1, double dmgx = 1)
+        public static bool[] RunJobs(GameData d, List<(int i, List<string> party, long seed)> jobs, int threads = 0, double hpx = 1, double dmgx = 1, string prog = null, int tier = 0)
         {
             var res = new bool[jobs.Count];
             var po = new ParallelOptions { MaxDegreeOfParallelism = threads > 0 ? threads : Math.Max(1, Environment.ProcessorCount - 1) };
-            Parallel.ForEach(jobs, po, j => { res[j.i] = new RunBot(d).RunFull(j.party, j.seed, new SimOpts { Hpx = hpx, Dmgx = dmgx }).Clear; });
+            Parallel.ForEach(jobs, po, j => { res[j.i] = new RunBot(d).RunFull(j.party, j.seed, new SimOpts { Hpx = hpx, Dmgx = dmgx, Prog = prog, Tier = tier }).Clear; });
             return res;
         }
 
@@ -361,7 +348,7 @@ namespace Bolzena.Core
         /// 사도마다 「혼자」 완주율 — 그 사도를 늘 넣고 나머지 둘을 무작위로. 먼저 min 판씩 다 돌린 뒤, 95% 오차가 err(%p) 를 넘는 사도만
         /// 필요한 판 수(1.96²·p(1-p)/err²)까지 더 돌린다(max 판까지). 전부 병렬 — 사도 135 × 판을 한 번에 깐다.
         /// </summary>
-        public static List<SoloRow> Solo(GameData d, double err = 2, int min = 300, int max = 3000, int seed = 0, int threads = 0, List<string> heroes = null, Action<string> log = null)
+        public static List<SoloRow> Solo(GameData d, double err = 2, int min = 300, int max = 3000, int seed = 0, int threads = 0, List<string> heroes = null, Action<string> log = null, string prog = null, double hpx = 1, double dmgx = 1, int tier = 0)
         {
             var ids = heroes ?? d.Heroes.Keys.OrderBy(x => x, StringComparer.Ordinal).ToList();
             var n = ids.ToDictionary(k => k, k => 0); var w = ids.ToDictionary(k => k, k => 0);
@@ -372,7 +359,7 @@ namespace Bolzena.Core
                     foreach (var j in JobsWith(d, kv.Key, n[kv.Key] + kv.Value, seed).Skip(n[kv.Key])) { jobs.Add((jobs.Count, j.party, j.seed)); who.Add(kv.Key); }
                 if (jobs.Count == 0) return;
                 var t0 = DateTime.Now;
-                var res = RunJobs(d, jobs, threads);
+                var res = RunJobs(d, jobs, threads, hpx, dmgx, prog, tier);
                 for (int i = 0; i < jobs.Count; i++) { n[who[i]]++; if (res[i]) w[who[i]]++; }
                 log?.Invoke($"  {jobs.Count}판 · {(DateTime.Now - t0).TotalSeconds:0}초");
             }
@@ -475,14 +462,7 @@ namespace Bolzena.Core
             sb.AppendLine($"  평균 턴 — 일반 싸움 {r.AvgTurnsFight:0.0} · 보스 {r.AvgTurnsBoss:0.0}");
             if (r.FlagPct.Count > 0) sb.AppendLine($"  깃발(연속 이벤트) — 판당 선 깃발 {r.FlagsPerRun:0.00} · 줄기 뒤 이벤트를 만남 {r.FlagReadsPerRun:0.000} · {string.Join(" · ", r.FlagPct.OrderByDescending(kv => kv.Value).Select(kv => $"{kv.Key} {kv.Value:0.0}%"))}");
             sb.AppendLine($"  격파 — 판당 {r.BreaksPerRun:0.0} · 싸움당 {string.Join(" · ", r.BreaksPerFight.OrderBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => $"{kv.Key} {kv.Value:0.00}"))} · 강인도 깎은 카드 가운데 약점 공격 {r.WeakPct:0}%");
-            if (!R.GRADE_ON) sb.AppendLine($"  이긴 싸움 판당 {string.Join(" · ", r.WinsPerRun.OrderBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => $"{kv.Key} {kv.Value:0.00}"))}");
-            else if (r.GradeEnd.Count > 0)
-            {
-                sb.AppendLine($"  학년 — 판당 학점 {r.AvgCredits:0.0} · 이긴 싸움 판당 {string.Join(" · ", r.WinsPerRun.OrderBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => $"{kv.Key} {kv.Value:0.00}"))}");
-                sb.AppendLine($"    판 끝 학년 {string.Join(" · ", r.GradeEnd.Select(kv => $"{kv.Key}학년 {kv.Value:0.0}%"))}");
-                sb.AppendLine($"    마지막 보스 때 학년({r.LastBossRuns}판) {string.Join(" · ", r.GradeLastBoss.Select(kv => $"{kv.Key}학년 {kv.Value:0.0}%"))}");
-                sb.AppendLine($"    마지막 보스 때 학점 사분위 {r.CreditsLastBossQ[0]} · {r.CreditsLastBossQ[1]} · {r.CreditsLastBossQ[2]} · 엘리트 안 이긴 판({r.NoEliteRuns}판) 평균 {r.CreditsLastBossNoElite:0.0}");
-            }
+            sb.AppendLine($"  이긴 싸움 판당 {string.Join(" · ", r.WinsPerRun.OrderBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => $"{kv.Key} {kv.Value:0.00}"))}");
             sb.AppendLine("편성(역할 셋)");
             foreach (var kv in r.Comps.OrderByDescending(x => x.Value.win)) sb.AppendLine($"  {kv.Key}  {kv.Value.win,5:0}%  ({kv.Value.n}판)");
             sb.AppendLine("사도");

@@ -7,14 +7,15 @@ import { hero, dmg, ddmg, shield, heal, stack, spend, make, draw, discard, statu
 const H = '디아나_왕년', Q = '나른한 삶', F = `${H}_백수공권`;
 const tough = (v) => ({ k: 'tough', v });
 const enter = [{ k: 'form', id: F }];
-const SF = (...x) => [{ k: 'ifForm', id: F }, ...x];   // 「백수공권」 : 덤(태세 중이면 — 린 「흑운검법 :」 꼴, 사용자 「고유 카드에 백수공권 추가 효과」)
+const SF = (...x) => [{ k: 'ifForm', id: F }, ...x];
+const inSF = { k: 'ifForm', id: F };   // 10-19 타수: 「백수공권」 덤 피해를 친 대에 더하는 조건(plusIf)   // 「백수공권」 : 덤(태세 중이면 — 린 「흑운검법 :」 꼴, 사용자 「고유 카드에 백수공권 추가 효과」)
 const vuln = status('취약', 1, { target: 'allEnemies' });   // 찢는다 — 땅이 갈라져 적 전체 취약
 const pour = (r, target = 'oneEnemy') => [spend(Q, 'all'), { k: 'perEvent', n: 1 }, dmg(r, target)];   // 기혈을 모두 써서 1개당
 
 export default hero({
   id: H, name: '디아나(왕년)', nature: '냉정', race: '수인', role: '딜러', star: 3,
   blurb: '전성기의 디아나. 평소엔 귀찮아서 도끼만 휘두르지만, 기혈이 차오르면 도끼를 박살 내고 맨주먹으로 땅과 하늘을 호령합니다.',
-  keyword: { name: Q, desc: '도끼질로 모이는 기혈', carrier: 'self', cap: 5 },
+  keyword: { name: Q, desc: '도끼질로 모이는 기혈', carrier: 'self', cap: 5, per: [{ stat: 'dealt', v: 0.08 }] },   // 10-22 디아나 딜 보강(퓨어 딜러 — 키워 가는 요소): 1당 주는 피해 +8%
   passives: [
     { name: '귀찮아도 도끼질', when: { on: 'play', type: '공격' }, fx: [stack(Q, 1)] },   // 디아나 공격 카드마다 기혈 1
   ],
@@ -28,12 +29,12 @@ export default hero({
   uniques: [
     { // 시동 — 적 전체 · 취약
       name: '찢는다', cost: 1, type: '공격',
-      fx: [dmg(1.2, 'allEnemies'), vuln, ...SF(dmg(0.6, 'allEnemies'))],
+      fx: [dmg(1.6, 'allEnemies'), vuln, ...SF(dmg(0.6, 'allEnemies'))],   // 10-21 밸런스 조절: 120 → 140 → 160%(2차)
       oracles: [
         { fx: [dmg(1.6, 'allEnemies'), vuln, ...SF(dmg(0.6, 'allEnemies'))] },
         { fx: [dmg(1, 'allEnemies'), vuln, stack(Q, 2), ...SF(dmg(0.6, 'allEnemies'))] },
         { fx: [dmg(1.6, 'allEnemies'), { k: 'takenMod', v: 0.2, turns: 2, target: 'allEnemies' }, ...SF(dmg(0.6, 'allEnemies'))] },
-        { fx: [dmg(0.7, 'allEnemies', { hits: 2 }), vuln, ...SF(dmg(0.6, 'allEnemies'))] },
+        { fx: [dmg(1.2, 'allEnemies', { hits: 2, plus: 0.3, plusIf: inSF }), vuln] },   // 10-19 타수: 2회 × 120%(신탁 맞춤이 기본 120% 로 올리던 값) + 백수공권 60% → 백수공권이면 대마다 +30%
         { fx: [dmg(1, 'allEnemies'), vuln, { k: 'nextAp', v: 1 }, ...SF(dmg(0.6, 'allEnemies'))] },
       ],
       blesses: ['power', 'draw', [stack(Q, 1)]],
@@ -52,9 +53,9 @@ export default hero({
     },
     { // 백수공권에 든다
       name: '도끼 부수기', cost: 2, type: '공격',
-      fx: [dmg(3.4), ...enter],
+      fx: [dmg(4.2), ...enter],   // 10-21 밸런스 조절: 340 → 420%(1 · 7차)
       oracles: [
-        { fx: [dmg(4), ...enter] },
+        { fx: [dmg(4.8), ...enter] },   // 10-21: 400 → 480%
         { cost: 1, fx: [dmg(2.4), ...enter] },
         { fx: [dmg(2.4), ...enter, stack(Q, 2)] },
         { fx: [dmg(1.6, 'allEnemies'), ...enter] },
@@ -64,11 +65,11 @@ export default hero({
     },
     { // 마무리 — 기혈을 모두 쏟는다
       name: '하늘을 호령하는 포효', cost: 1, type: '공격',
-      fx: [dmg(1.5), ...pour(0.4), ...SF(dmg(1.5))],   // 10-13 저녁 너프(사용자): 기혈 1개당 60→40% — 백수공권 한 방 900→750%
+      fx: [dmg(2, 'oneEnemy', { plus: 1.5, plusIf: inSF }), ...pour(0.4)],   /* 10-21 8차: 180 → 200% */   // 10-21 밸런스 조절 2차: 150 → 180%   // 10-19 타수: 150% + 1개당 40% + 백수공권 150% → 150%(백수공권 300%) + 1개당 40%(2타 · 합 그대로)   // 10-13 저녁 너프(사용자): 기혈 1개당 60→40% — 백수공권 한 방 900→750%
       oracles: [
-        { fx: [dmg(2), ...pour(0.5), ...SF(dmg(1.5))] },
-        { fx: [dmg(1, 'allEnemies'), ...pour(0.3, 'allEnemies'), ...SF(dmg(1.5))] },
-        { tags: ['보존'], fx: [dmg(1.5), ...pour(0.4), ...SF(dmg(1.5))] },
+        { fx: [dmg(2.4, 'oneEnemy', { plus: 1.5, plusIf: inSF }), ...pour(0.5)] },   // 10-21 2차: 200 → 240%
+        { fx: [dmg(1, 'allEnemies', { plus: 1.5, plusIf: inSF }), ...pour(0.3, 'allEnemies')] },   // 10-19 타수: 백수공권 한 대 150% 를 적 전체 한 대에 더함
+        { tags: ['보존'], fx: [dmg(1.5, 'oneEnemy', { plus: 1.5, plusIf: inSF }), ...pour(0.4)] },
         { cost: 0, fx: [...pour(0.4), ...SF(dmg(1.5))] },
         { fx: [dmg(1.5), ...pour(0.4), ...SF(tough(2))] },   // 백수공권이면 강인도 2
       ],
@@ -76,9 +77,9 @@ export default hero({
     },
     { // 강인도
       name: '바위 던지기', cost: 1, type: '공격',
-      fx: [dmg(2.2), tough(1), stack(Q, 1), ...SF(tough(1))],
+      fx: [dmg(2.8), tough(1), stack(Q, 1), ...SF(tough(1))],   // 10-21 밸런스 조절: 220 → 280%(1 · 6차)
       oracles: [
-        { fx: [dmg(2.6), tough(1), stack(Q, 1), ...SF(tough(1))] },
+        { fx: [dmg(3.2), tough(1), stack(Q, 1), ...SF(tough(1))] },   // 10-21: 260 → 320%
         { fx: [dmg(1, 'allEnemies'), tough(1), stack(Q, 1), ...SF(tough(1))] },
         { fx: [dmg(1.2), tough(2), ...SF(tough(1))] },
         { cost: 0, fx: [dmg(1.2), tough(1), stack(Q, 1), ...SF(tough(1))] },

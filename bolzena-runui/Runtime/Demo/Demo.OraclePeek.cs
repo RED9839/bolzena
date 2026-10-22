@@ -44,7 +44,7 @@ namespace Bolzena.RunUI
             f.DemoEye(false);
             yield return Wait(0.3f);
             yield return Press("zoom.oracle", 1.3f);
-            Expect(Texts().Any(t => t.Contains("이 카드에는 아래의 신탁이 나올 수 있습니다")), "신탁 미리보기 안내 글");
+            Expect(Texts().Any(t => t.Contains("이 카드에는 아래의 신탁이 나올 수 있다")), "신탁 미리보기 안내 글");
             Expect(!Texts().Any(t => t.Contains("축복")), "신탁 미리보기에 축복이 없다");
             yield return Shot("op_04_oracles");
             f.Stage.Back();

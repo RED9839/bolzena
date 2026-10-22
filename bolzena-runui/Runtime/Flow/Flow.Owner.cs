@@ -23,7 +23,7 @@ namespace Bolzena.RunUI
             {
                 var why = P.AssignNeutral(key);
                 if (why != null) Toast.Show(why);
-                else Toast.Show($"「{P.Data.Card(id)?.Name}」 — {Roster.OfCore(key)?.ko} 덱에 넣었습니다");
+                else Toast.Show($"「{P.Data.Card(id)?.Name}」 — {Roster.OfCore(key)?.ko} 덱에 넣었다");
                 PickOwners(done);
             });
         }
@@ -32,9 +32,9 @@ namespace Bolzena.RunUI
         string OwnerSub(string cardId, string name)
         {
             var c = P.Data.Card(cardId);
-            if (c == null || c.Neutral) return $"교주 카드 「{name}」 — 넣은 사도의 공격력 · 방어력으로 위력이 정해지고, 카드 틀이 그 사도 성격 색이 됩니다";
+            if (c == null || c.Neutral) return $"교주 카드 「{name}」 — 넣은 사도의 공격력 · 방어력으로 위력이 정해지고, 카드 틀이 그 사도 성격 색이 된다";
             string kind = c.IsStatusCard ? "상태 카드" : "선물 카드";
-            return $"{kind} 「{name}」 — 고른 사도의 카드 묶음 맨 끝에 들어갑니다(효과는 누구에게 넣어도 같습니다)";
+            return $"{kind} 「{name}」 — 고른 사도의 카드 묶음 맨 끝에 들어간다(효과는 누구에게 넣어도 같다)";
         }
 
         /// <summary>교주 카드(id)를 넣을 사도를 고르는 창 — 화면만(덱에 넣기는 chosen 이). view 를 주면 그 모습(시범의 가짜 카드), 안 주면 사도마다 core 의 그 사도 카드 모습.</summary>
@@ -45,7 +45,7 @@ namespace Bolzena.RunUI
             var keys = (party ?? P.S?.Party ?? new List<string>()).Take(3).ToList();
             if (v == null || keys.Count == 0) { done?.Invoke(keys.FirstOrDefault()); return; }
             float H = Theme.C(680, 640);
-            var (body, close, _) = Stage.ModalBox("ownerpick", 1240, H, "누구 덱에 넣겠습니까?", OwnerSub(cardId, v.Name), false, null, 0, false);
+            var (body, close, _) = Stage.ModalBox("ownerpick", 1240, H, "누구 덱에 넣을까?", OwnerSub(cardId, v.Name), false, null, 0, false);
 
             // 왼쪽 — 얻은 카드
             float cardW = Theme.C(220, 196);
@@ -125,7 +125,7 @@ namespace Bolzena.RunUI
                 y -= 26;
                 if (r.lines.Count == 0)
                 {
-                    var none = Ui.Text(rt, "공격력 · 방어력과 상관없는 카드 — 누구에게 넣어도 같습니다", Theme.FsSm, Theme.Dim, TextAlignmentOptions.TopLeft);
+                    var none = Ui.Text(rt, "공격력 · 방어력과 상관없는 카드 — 누구에게 넣어도 같다", Theme.FsSm, Theme.Dim, TextAlignmentOptions.TopLeft);
                     none.rectTransform.Band(1, 50, 18, 14, y);
                 }
                 foreach (var l in r.lines.Take(3))

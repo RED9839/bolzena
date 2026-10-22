@@ -4,15 +4,15 @@ using UnityEngine.UI;
 
 namespace Bolzena.RunUI
 {
-    // 사도 말풍선 — 사도가 말하는 모든 곳의 단 하나의 진입점(2026-10-09): 로비(메인 사도 · 만지기) · 진급 · 졸업 · 판 진행(전투 승리 · 보스 시작 따위).
+    // 사도 말풍선 — 사도가 말하는 모든 곳의 단 하나의 진입점(2026-10-09): 로비(메인 사도 · 만지기) · 판 진행(전투 승리 · 보스 시작 따위).
     //   부르는 쪽은 위치(anchor · pos · pivot — Ui.At 과 같은 뜻) · 대상 사도 · 글 · 시간만 넘긴다. 모양은 이 파일 안에만 둔다.
     //   모양(2026-10-09 사용자 결정 — D1 「원작 말풍선」, 「채팅 치듯 나온다」 를 고침):
     //     · 흰 둥근 몸통 + 두꺼운 갈색 테(원작 Common_TalkBubble_1 을 구운 RunArt/Ui/bubble_body — Tools~/bubble_art.py, 9칸)
     //     · 말하는 사도 쪽을 가리키는 꼬리(원작 Common_TalkBubbleTail_1 — bubble_tail 은 몸통 뒤, bubble_tail_fill 은 몸통 위에 덮어 이음매 테를 지운다)
-    //       판 진행(anchor 0 · pos = 머리 꼭대기)은 꼬리 끝이 머리에 닿는다 — 풍선을 화면 안으로 밀면 꼬리 자리만 옮긴다. 로비는 오른쪽 아래(서 있는 사도), 진급 · 졸업은 왼쪽 아래.
+    //       판 진행(anchor 0 · pos = 머리 꼭대기)은 꼬리 끝이 머리에 닿는다 — 풍선을 화면 안으로 밀면 꼬리 자리만 옮긴다. 로비는 오른쪽 아래(서 있는 사도).
     //     · 이름은 성격 색 리본(위 왼쪽, 살짝 기울게) — 동그란 얼굴은 없다(메신저처럼 보이던 까닭)
     //     · 글은 한 번에 통째로 「톡」(0.85 → 1.06 → 1, 0.25초) — 한 글자씩 찍지 않는다. 움직임 줄이기면 커지기 없이 나타나기만, 저사양이면 그림자를 뺀다
-    //   kind 별로 크기만 다르다: lobby(폭 ≤ 360) · promote/graduate(≤ 620, 글 조금 크게) · 그 밖(판 진행, ≤ 360 · 화면 폭 40%).
+    //   kind 별로 크기만 다르다: lobby(폭 ≤ 360) · 그 밖(판 진행, ≤ 360 · 화면 폭 40%).
     //   NPC(골디 상점 주인)는 사도가 아니라 W.Bubble 을 그대로 쓴다.
     public sealed class HeroBubble
     {
@@ -26,7 +26,7 @@ namespace Bolzena.RunUI
 
         public bool Alive => Rect != null;
 
-        /// <summary>사도 말풍선 글 스위치(2026-10-09 사용자 결정) — 전투 중 가만있을 때(idle)만 띄운다. 로비 · 보스 시작 · 승리 · 편성 · 진급 · 졸업은 true 로 하면 되살아난다.</summary>
+        /// <summary>사도 말풍선 글 스위치(2026-10-09 사용자 결정) — 전투 중 가만있을 때(idle)만 띄운다. 로비 · 보스 시작 · 승리 · 편성은 true 로 하면 되살아난다.</summary>
         public static bool AllKinds = false;
 
         // 원작 그림 치수(Tools~/bubble_art.py 와 짝) — 몸통 9칸 테두리 · 화면 배율, 꼬리 판(232×176)의 끝점 · 윗변
@@ -37,11 +37,11 @@ namespace Bolzena.RunUI
         /// <summary>몸통 아래로 보이는 꼬리 길이(끝점 ~ 몸통 바닥).</summary>
         static float TailDrop => (TailTipY - TailTopY) * TailScale - TailInset;
 
-        bool Run => kind != "lobby" && kind != "promote" && kind != "graduate";
+        bool Run => kind != "lobby";
 
         /// <summary>
         /// 말풍선을 띄운다. anchor · pos · pivot 은 부모 안 자리(Ui.At 과 같은 뜻 — pivot 이 pos 에 온다). 판 진행(anchor 0 · pivot 아래 가운데)은 pos 가 꼬리 끝(머리 꼭대기).
-        /// hold &gt; 0 이면 그 초만큼 머물다 사라지고, 0 이면 남는다. kind 는 상황 이름(lobby · promote · graduate · victory · bossStart …) — 크기 고르기와 시범 찾기(이름 「herosay:갈래」)에 쓴다.
+        /// hold &gt; 0 이면 그 초만큼 머물다 사라지고, 0 이면 남는다. kind 는 상황 이름(lobby · victory · bossStart …) — 크기 고르기와 시범 찾기(이름 「herosay:갈래」)에 쓴다.
         /// </summary>
         public static HeroBubble Show(RectTransform parent, HeroInfo h, string line, Vector2 anchor, Vector2 pos, Vector2 pivot, float hold = 0, float delay = 0, string kind = null)
         {
@@ -65,9 +65,8 @@ namespace Bolzena.RunUI
         // ── 만들기 ──
         void Build(string line, float hold, float delay)
         {
-            bool grade = kind == "promote" || kind == "graduate";
-            maxW = kind == "lobby" ? 360 : grade ? 620 : Mathf.Min(360, Mathf.Max(240, parent.rect.width * 0.4f));
-            fs = grade ? Theme.FsMd + 2 : Theme.FsMd;   // Ui.Text 가 글자 크게 배율을 곱한다
+            maxW = kind == "lobby" ? 360 : Mathf.Min(360, Mathf.Max(240, parent.rect.width * 0.4f));
+            fs = Theme.FsMd;   // Ui.Text 가 글자 크게 배율을 곱한다
             var holder = Ui.Rect(Run ? "herosay:" + kind : kind == "lobby" ? "bubble" : "bubble:" + kind, parent);
             Rect = holder;
             holder.anchorMin = holder.anchorMax = anchor; holder.pivot = pivot;

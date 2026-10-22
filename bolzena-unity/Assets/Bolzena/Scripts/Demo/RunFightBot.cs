@@ -32,6 +32,8 @@ namespace Bolzena.Demo
             bool boss = t != null && t.B.Enemies.Exists(e => e.Boss);
             lose = RunDemo.FightMode == "lose";
             label = $"fight{fightNo}" + (boss ? "_boss" : t != null && t.Event ? "_event" : "");
+            frontier = BattleBridge.Fight?.Frontier != null;
+            if (frontier) label = "frontier";   // 프론티어(-demo-frontier) — 턴 제한까지 싸운다
             PointerInput.Simulated = true;
             PointerInput.SimPos = new Vector2(0, -6);
             if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-speed") < 0) Clock.Speed = 2f;   // 데모는 2배속(-speed N 이면 그 배속 — 템포 점검)
@@ -60,7 +62,8 @@ namespace Bolzena.Demo
             if (m == "hit" || m == "boss_in" || m == "victory") StartCoroutine(Later(m, m == "hit" ? 1 : 4));
         }
         void OnUlt(string s) { if (s == "ult2_slide") Snap("ult"); }
-        void OnBanner(string s) { if (s == "boss_entry") Snap("boss_entry"); }
+        void OnBanner(string s) { if (s == "boss_entry") Snap("boss_entry"); if (s == "timeup") Snap("timeup"); }
+        bool frontier;
 
         IEnumerator Later(string what, int frames)
         {
@@ -72,7 +75,7 @@ namespace Bolzena.Demo
         IEnumerator Guard()
         {
             float t = 0;
-            while (t < 300f) { t += Time.unscaledDeltaTime; yield return null; }
+            while (t < (frontier ? 720f : 300f)) { t += Time.unscaledDeltaTime; yield return null; }
             throw new System.TimeoutException("[Demo] 싸움 하나가 300초를 넘었습니다 — " + label);
         }
 
@@ -170,7 +173,7 @@ namespace Bolzena.Demo
                 yield break;
             }
             int acts = 0, played = 0;   // played = 이 싸움에서 낸 카드(판 전체는 playedAll)
-            while (!d.Over && acts++ < 200)
+            while (!d.Over && acts++ < (frontier ? 400 : 200))
             {
                 yield return WaitInput();
                 if (d.Over) break;

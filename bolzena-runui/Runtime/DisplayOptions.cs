@@ -70,9 +70,9 @@ namespace Bolzena.RunUI
         /// <summary>화면 모드 한 줄 설명(설정 창 아래 줄).</summary>
         public static string ModeHint(int modeIndex) => modeIndex switch
         {
-            0 => "고른 해상도 크기의 창 · 모니터보다 크면 맞춰 줄입니다",
-            1 => "모니터를 꽉 채운 채 그리는 해상도만 바뀝니다 · 알트탭이 빠릅니다",
-            _ => "모니터를 그 해상도로 바꿔 차지합니다 · 알트탭이 느립니다",
+            0 => "고른 해상도 크기의 창 · 모니터보다 크면 맞춰 줄인다",
+            1 => "모니터를 꽉 채운 채 그리는 해상도만 바뀐다 · 알트탭이 빠르다",
+            _ => "모니터를 그 해상도로 바꿔 차지한다 · 알트탭이 느리다",
         };
 
         const string KMode = "bz.disp.mode", KPreset = "bz.disp.preset", KFps = "bz.disp.fps", KVsync = "bz.disp.vsync", KPost = "bz.disp.post",

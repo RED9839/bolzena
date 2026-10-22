@@ -140,7 +140,7 @@ static class Records
                     Inc2(s.Offer, "신탁|(넘김)", 1, p.Pick == null ? 1 : 0);
                     continue;
                 }
-                string g = p.K switch { "grade" => "진급", "grace" => "은총", "equip" => "아티팩트", "ev.card" => "카드", "copy" => "복제", "buy" => "구매", "remove" or "gradeRemove" or "ev.remove" => "빼기", _ => null };
+                string g = p.K switch { "grace" => "은총", "equip" => "아티팩트", "ev.card" => "카드", "copy" => "복제", "buy" => "구매", "remove" or "ev.remove" => "빼기", _ => null };
                 if (g == null) continue;
                 if (p.Offer != null && p.Offer.Count > 0) { foreach (var o in p.Offer.Distinct()) Inc2(s.Offer, g + "|" + o, 1, p.Pick == o ? 1 : 0); Inc2(s.Offer, g + "|(넘김)", 1, p.Pick == null ? 1 : 0); }
                 else if (p.Pick != null) Inc2(s.Offer, g + "|" + p.Pick, 0, 1);
@@ -218,11 +218,11 @@ static class Records
             {
                 string C(Dictionary<string, int[]> m) => m.TryGetValue(k, out var v) ? (v[0] > 0 ? $"{v[0]} · {Pct(v[1], v[0])}" : $"고름 {v[1]}") : "-";
                 var id = k.Substring(group.Length + 1);
-                string nm = group == "진급" ? Grades.Describe(new GradeChoice { Kind = id }).name ?? id : group == "신탁" ? (id == "(넘김)" ? id : $"신탁 {id}") : Name(id);
+                string nm = group == "신탁" ? (id == "(넘김)" ? id : $"신탁 {id}") : Name(id);
                 sb.AppendLine($"| {nm} | {C(H.Offer)} | {C(B.Offer)} |");
             }
         }
-        Offers("진급 보상", "진급", 20); Offers("신탁(번호)", "신탁", 10); Offers("은총(고유 카드)", "은총", 30); Offers("이벤트 카드", "카드", 20);
+        Offers("신탁(번호)", "신탁", 10); Offers("은총(고유 카드)", "은총", 30); Offers("이벤트 카드", "카드", 20);
         Offers("전리품 아티팩트", "아티팩트", 20); Offers("상점 구매", "구매", 20); Offers("빼기", "빼기", 20); Offers("보스 복제", "복제", 15);
         sb.AppendLine().AppendLine("## 카드 실제 사용률 — 낸 수 / 덱에 있던 싸움(사람 기준 많은 순)").AppendLine().AppendLine("| 카드 | 사람 싸움 · 싸움당 | 봇 싸움 · 싸움당 |").AppendLine("|---|---|---|");
         foreach (var k in H.CardUse.Keys.Union(B.CardUse.Keys).OrderByDescending(k => H.CardUse.TryGetValue(k, out var x) ? x[0] : 0).ThenByDescending(k => B.CardUse.TryGetValue(k, out var y) ? y[0] : 0).Take(60))

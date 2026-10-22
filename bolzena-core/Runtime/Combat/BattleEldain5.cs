@@ -118,7 +118,8 @@ namespace Bolzena.Core
         {
             if (u == null || u.Side != Side.Party) return 0;
             double b = CritDmgState.v;
-            return b == 0 ? CritDmgX : (R.CRIT_MULT + CritDmgX) * (1 + b) - R.CRIT_MULT;
+            double cx = CritDmgX + (ProgOf != null && ProgOf.TryGetValue(u.Key, out var pm) ? pm.StatOf("critDmg") : 0);   // 영구 성장 치명 피해(사도마다)
+            return b == 0 ? cx : (R.CRIT_MULT + cx) * (1 + b) - R.CRIT_MULT;
         }
 
         // ── 이번 턴 맞은 대 수(▶E85) ──────────────────────────────────

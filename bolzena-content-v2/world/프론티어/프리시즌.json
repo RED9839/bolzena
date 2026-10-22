@@ -1,0 +1,70 @@
+{
+  "enemies": [
+    {
+      "id": "frontier_meow",
+      "name": "M.E.O.W",
+      "hp": 150000,
+      "row": "back",
+      "boss": true,
+      "tough": 10,
+      "toughOwn": true,
+      "pick": "shuffle",
+      "art": { "spine": "monsterspine/meow", "skin": "none", "icon": "icon_meownone" },
+      "blurb": "프론티어 프리시즌 보스 — 고양이 모양 전투 기계. 정해진 턴 안에 얼마나 깎는지를 겨룹니다(성격 상성 없음 — 카드로 거는 약점은 통함). 맞을 때마다 「출력」 이 올라 공격이 점점 세지고(많이 때릴수록 빨리 — 막고 버티는 힘이 필요합니다), 실드를 두르고, 「통제 신호」 를 덱에 끼워 넣고, 드론을 부릅니다. 「M.E.O.W 캐논」 충전은 격파로 끊을 수 있고, 「냥냥 프레스」 예고는 실드로 받아 내세요. 오래 안 때리면 「심심함」 이 차올라 「냥냥 대난동」 을 부립니다. HP 가 줄면 사냥 모드 · 폭주 모드로 바뀝니다.",
+      "open": { "t": "guard", "v": 900, "say": "전투 모드 기동" },
+      "intents": [
+        { "t": "attack", "v": 235, "say": "냥냥 펀치", "w": 3 },
+        { "t": "multi", "v": 68, "n": 4, "id": "약화", "per": 1, "say": "레이저 포인터", "w": 3 },
+        { "t": "block", "v": 1400, "say": "털 방어막", "w": 2 },
+        { "t": "addCard", "id": "st_signal", "n": 2, "to": "draw", "say": "통제 신호 송출", "w": 2 },
+        { "t": "charge", "say": "캐논 충전", "brk": true, "next": { "t": "attackAll", "v": 170, "say": "M.E.O.W 캐논" }, "w": 2 },
+        { "t": "summon", "id": "frontier_meow_drone", "n": 1, "max": 2, "noTough": true, "say": "드론 호출", "w": 1 },
+        { "t": "charge", "say": "프레스 조준", "next": { "t": "attack", "v": 400, "say": "냥냥 프레스" }, "w": 2 }
+      ],
+      "phase": {
+        "at": 0.75,
+        "say": "「사냥 모드 — 목표 고정」",
+        "intents": [
+          { "t": "back", "v": 280, "say": "발톱 관통", "w": 3 },
+          { "t": "multi", "v": 78, "n": 5, "id": "취약", "per": 1, "say": "추적 레이저", "w": 3 },
+          { "t": "debuff", "id": "약화", "v": 2, "say": "교란 전파", "w": 2 },
+          { "t": "charge", "say": "캐논 과충전", "brk": true, "next": { "t": "attackAll", "v": 208, "say": "M.E.O.W 캐논 · 연사" }, "w": 2 },
+          { "t": "block", "v": 1800, "say": "강화 방어막", "w": 2 },
+          { "t": "charge", "say": "프레스 정밀 조준", "next": { "t": "attack", "v": 480, "say": "냥냥 프레스 · 표적" }, "w": 2 }
+        ]
+      },
+      "phase2": {
+        "at": 0.5,
+        "say": "「폭주 — 냐아아아옹!!」",
+        "intents": [
+          { "t": "multi", "v": 85, "n": 6, "say": "폭주 연타", "w": 3 },
+          { "t": "attackAll", "v": 190, "id": "약화", "n": 1, "say": "과열 방출", "w": 3 },
+          { "t": "addCard", "id": "st_overheat", "n": 2, "to": "hand", "say": "과열 경고", "w": 2 },
+          { "t": "summon", "id": "frontier_meow_drone", "n": 2, "max": 2, "noTough": true, "say": "드론 총동원", "w": 1 }
+        ]
+      },
+      "counters": [
+        { "name": "출력", "desc": "맞을 때마다 오르는 기계 출력 — 1개당 주는 피해 +5%", "start": 0, "onHit": 1, "dealt": 0.05, "max": 99 },
+        { "name": "심심함", "desc": "턴이 끝날 때마다 +4 · 맞을 때마다 -1 — 8 이 되면 다음 차례에 「냥냥 대난동」(파티 전체 공격)", "start": 0, "onTurnEnd": 4, "onHit": -1, "max": 10, "at": 8, "mode": "next", "act": { "t": "attackAll", "v": 230, "say": "심심해! 냥냥 대난동" } }
+      ],
+      "passives": [
+        { "name": "자가 수리", "on": "broken", "do": { "t": "block", "v": 1200, "say": "자가 수리" } },
+        { "name": "드론 보복", "on": "allyDown", "who": "frontier_meow_drone", "limit": 0, "do": { "t": "buff", "id": "사기", "v": 1, "say": "드론 보복" } }
+      ]
+    },
+    {
+      "id": "frontier_meow_drone",
+      "name": "M.E.O.W 드론",
+      "hp": 1500,
+      "row": "front",
+      "pick": "cycle",
+      "art": { "spine": "monsterspine/drones", "skin": "none", "icon": "icon_dronesnone" },
+      "blurb": "M.E.O.W 가 부르는 드론 — 보스를 감싸 실드를 두르고 레이저를 쏘고, 오래 두면 「출력 증폭」 으로 적 전체에 사기를 겁니다. 점수는 보스가 잃은 HP 만 셉니다.",
+      "intents": [
+        { "t": "guard", "v": 500, "say": "보호막 중계" },
+        { "t": "attack", "v": 118, "say": "드론 레이저" },
+        { "t": "buff", "id": "사기", "v": 1, "all": true, "say": "출력 증폭" }
+      ]
+    }
+  ]
+}

@@ -555,6 +555,25 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(b.Pool.MaxHp, b.Pool.Hp, "벌떼가 대신 맞았다"); Assert.AreEqual(1, b.StackOf("g", "벌떼"));
         }
 
+        [Test] public void 주인_전용_표식은_주인만_약점이고_저절로_안_준다()
+        {
+            // (아야 리워크 10-20) weakOwner — 걸린 적은 키워드 주인의 타격만 약점, 동료는 아님. 겹은 spend 로만 준다.
+            var d = K.Data(heroes: @"[{id:'w', name:'눈꽃 주인', role:'딜러', row:'back', hp:600, atk:100, def:20, crit:0, keywords:[{name:'눈꽃', carrier:'enemy', cap:5, weakOwner:true}]},
+ {id:'p', name:'동료', role:'딜러', row:'back', hp:600, atk:100, def:20, crit:0}]",
+                cards: @"[{id:'bl', name:'피우기', hero:'w', cost:0, type:'스킬', fx:[{k:'stack', id:'눈꽃', v:2, target:'oneEnemy'}]},
+ {id:'wh', name:'주인 베기', hero:'w', cost:0, type:'공격', fx:[{k:'dmg', ratio:1.0, target:'oneEnemy'}]},
+ {id:'ph', name:'동료 베기', hero:'p', cost:0, type:'공격', fx:[{k:'dmg', ratio:1.0, target:'oneEnemy'}]},
+ {id:'ph2', name:'동료 베기', hero:'p', cost:0, type:'공격', fx:[{k:'dmg', ratio:1.0, target:'oneEnemy'}]}]");
+            var b = K.Fight(d, new[] { "w", "p" }, new[] { "dummy" }); K.Hand(b, "ph", "bl", "ph2", "wh");
+            K.Play(b, "ph"); int plain = 1000 - K.Hp(b);
+            K.Play(b, "bl"); Assert.AreEqual(2, b.St(K.E(b), "눈꽃"));
+            int h0 = K.Hp(b); K.Play(b, "ph2");
+            Assert.AreEqual(plain, h0 - K.Hp(b), "동료는 눈꽃이 있어도 약점이 아니다");
+            int h1 = K.Hp(b); K.Play(b, "wh");
+            Assert.AreEqual(plain * 1.25, h1 - K.Hp(b), 1.0, "주인은 약점(×1.25)");
+            Assert.AreEqual(2, b.St(K.E(b), "눈꽃"), "쳐도 저절로 안 준다");
+        }
+
         [Test] public void 조건_연속_N장째_손패_낸_카드_비례_판_단위_성장()
         {
             var d = D(@"[{id:'st', name:'잇기', hero:'a', cost:0, type:'스킬', fx:[{k:'ifStreak', n:2}, {k:'gauge', v:30}]},
@@ -628,7 +647,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(5, run.S.Growth["rico"].Atk);
             Assert.IsTrue(run.MindBroken, "전투 정신 붕괴가 남은 채 끝나면 다음 싸움에 「망령의 속삭임」(2026-10-12 — 카드 얻기는 막지 않는다)");
             var (b2, _) = run.OpenFight();
-            Assert.AreEqual(d.Hero("rico").Atk + 5 + Num.Round(d.Hero("rico").Atk * Grades.STAT_PCT * (run.Grade - 1)), b2.Party[0].Atk, "판 단위 성장은 다음 싸움에도(보스 학점으로 진급한 학년 몫과 함께)");
+            Assert.AreEqual(d.Hero("rico").Atk + 5, b2.Party[0].Atk, "판 단위 성장은 다음 싸움에도");
             run.AfterFight(b2);
             Assert.IsFalse(run.MindBroken, "한 싸움이 지나면 풀린다");
         }

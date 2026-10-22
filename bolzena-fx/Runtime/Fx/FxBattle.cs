@@ -19,6 +19,9 @@ namespace Bolzena.Fx
         public bool Dash;                    // 달려가 부딪친다(에르핀 · 에르핀_왕도)
         public Vector3? DashFrom, DashTo;    // 달리기 처음 자리 · 부딪치는 자리
         public IList<SoundEvent> Snd;        // 스파인 SFX 칸
+        // 원작 스파인 이벤트(몸짓 1배속 ms, ID) — 이 사도 열의 Event_Front · Middle · Back 칸. FxRules.EVENT_FX 가 있는 사도는 장을 이 시각에 튼다.
+        //   몸짓 ms 그대로 둔다(Scaled 가 안 당긴다) — 화면 ms 로는 BolzenaFx.Card 가 CardClock 으로 한 번만 옮긴다
+        public IList<KeyValuePair<int, int>> Events;
         public float Speed = 1f;             // 동작을 이 배속으로 튼다(전투가 고학년 1.05 · 카드 1.3) — 시각을 이만큼 당긴다
 
         internal FxSync Scaled()
@@ -215,6 +218,7 @@ namespace Bolzena.Fx
             {
                 o.SeqPerTarget = true;
                 o.TargetFeet = targets?.Where(t => t != null && t.Alive).Select(t => t.Feet).OrderBy(p => p.x).ToList();
+                o.TargetTops = targets?.Where(t => t != null && t.Alive).OrderBy(t => t.Feet.x).Select(t => t.At(FxAnchor.Head)).ToList();   // (10-18 2차) 아야 얼음 씨앗 높이
             }
             int fallback = sync?.Impact ?? (plan.Count > 0 ? UltFx.ImpactMs(plan) : MotionTables.ULT_HIT);
             var hits = HitTimes(sync, lag, fallback);
@@ -226,14 +230,30 @@ namespace Bolzena.Fx
             return Launch(plan, o, hits, onHit);
         }
 
+        // 카드 장은 동작 끝(+0.9초)을 넘어 많아야 이만큼만 — 원작 반복 이미터의 dur 은 한 바퀴 길이일 뿐이고 원작은 동작 끝에 걷는다.
+        //   고학년처럼 6초까지 두니 고리 · 바닥 얼룩 · 빛기둥이 2~5초 더 남았다(2026-10-15 20명 대조: 디아나 · 벨라 · 비비(신성) · 에르핀 스킬 · 리뉴아 스킬 · 티그 스킬 · 죠안 · 아야 강공)
+        public const float CARD_KEEP_MAX = 1.2f;
+        const float INVITE_UP = 0.5f;   // (10-18 4차) 실비아 초대장 가운데 — 머리 위(초대장 그림 3.5 원작 ≈ 1.05 의 반쯤)
+        // 카드 장 시각(몸짓 1배속 ms) → 이펙트 시계(화면 ms). 전투가 카드 몸짓마다 걸고(줄인 몫 Rm · 배속) 다 쓰면 null
+        public static Func<float, float> CardClock;
+
         // ── 카드 몸짓 ── 그 사도의 원작 평타 · 센 공격 · 스킬 · 시그니처 이펙트(동작 이름으로 갈래). 원작 이펙트가 없는 동작이면
         // 이펙트 없이 맞는 시각만(onHit 은 그대로 불린다). 강화 · 방어처럼 대상이 아군이면 targets 에 아군을 넣는다
+        // dropShot — 탄(move) 장을 빼고 대상 장을 비행 몫 없이(티그(영웅) 강공 가까운 적 — 검기 없이 올려 베기, 10-18 4차)
         public static FxCall Card(string heroKey, FxActor caster, IList<FxActor> targets, FxSync sync, Action<int> onHit = null, bool aoe = false,
-            IList<float> hitMs = null, UltClock clock = null)
+            IList<float> hitMs = null, UltClock clock = null, IList<FxActor> allies = null, bool dropShot = false)
         {
             if (caster == null) return null;
+            float sp0 = sync != null && sync.Speed > 0 ? sync.Speed : 1f;   // 배속(Scaled 가 1 로 바꾸기 전)
             sync = sync?.Scaled();
-            var plan = FxRules.CardPlan(heroKey, sync?.Anim, sync?.Tier);
+            // 원작 이벤트 ID 표가 있는 사도(FxRules.EVENT_FX)는 이벤트마다 그 장을 그 시각에 — 없으면 이름 낱말 · 손 표(CardPlan)
+            var plan = (sync?.Tier != "sig" ? FxRules.EventPlan(heroKey, sync?.Anim, sync?.Events) : null) ?? FxRules.CardPlan(heroKey, sync?.Anim, sync?.Tier);
+            if (dropShot && plan.RemoveAll(p => p.At == "move") > 0)
+                foreach (var p in plan) if (p.At == "target" && p.AtMs.HasValue) p.AtMs -= UltFx.PROJ_LAG;   // (10-18 4차) 티그 강공 가까운 적 — 검기 없이 올려 베기 맞음(EventPlan 이 더한 비행 몫을 뺀다). 아직 몸짓 ms
+            // (10-18 2차) 카드는 정한 장만 아군에게(실비아 초대장 — UltFx.ALLIES_ONLY) — 이름이 buff 인 다른 장은 예전처럼 시전자에만(전엔 카드에 아군을 안 넘겨 아군 갈래를 늘 건너뛰었다)
+            foreach (var p in plan) if (p.Ally && !UltFx.ALLIES_ONLY.Contains(p.Name)) p.Ally = false;
+            // 표로 시각을 받은 장(FxRules.CARD_TIME — 몸짓 ms)을 이펙트 시계(화면 ms)로 — 여기서 한 번만 옮긴다. 전투가 CardClock 을 주면(줄인 몫 · 배속) 그것, 없으면 ÷ 배속
+            foreach (var p in plan) if (p.AtMs.HasValue) p.AtMs = CardClock != null ? CardClock(p.AtMs.Value) : p.AtMs.Value / sp0;
             int lag = plan.Any(p => p.At == "move") ? UltFx.PROJ_LAG : 0;
             Aim(caster, targets, aoe, out var to, out var body, out var width);
             var castPoint = FxRules.CastPoint(sync?.Anim);
@@ -251,6 +271,10 @@ namespace Bolzena.Fx
                 Scale = FxRules.CardScale(heroKey, sync?.Anim),   // 강공이 평타 장을 빌린 사도는 크게(FxRules.CARD_SCALE)
                 FitTop = true,   // 화면 위로 나가는 장은 줄이고 · 내린다(FxRun.FitTop)
                 Order = CardOrder, Parent = Parent, HitMs = hitMs, Clock = clock,
+                KeepMax = CARD_KEEP_MAX,
+                // (10-18 4차 사용자 「초대장은 머리 위」) 카드에서 아군 갈래를 타는 장은 ALLIES_ONLY(실비아 초대장)뿐 — 장 이미터가 원점 위 3.0(원작 단위)이라 발에 두면 몸통이었다.
+                //   머리(Top 뼈) 위 INVITE_UP 에 초대장 가운데가 오게 원점을 그만큼 내린다(고학년 아군 장은 위 Ult 그대로 발밑)
+                Allies = allies?.Where(a => a != null && a != caster && a.Alive).Select(a => (Func<Vector3>)(() => a.At(FxAnchor.Head) + new Vector3(0, INVITE_UP - 3.0f * UnitWorld, 0))).ToList(),
             };
             var hits = HitTimes(sync, lag, FxRules.CARD_HIT);
             if (Sound && sync != null && sync.Group != null) BolzenaAudio.Action(heroKey, sync.Group, sync.Snd, sync.Group);
@@ -296,6 +320,8 @@ namespace Bolzena.Fx
         public static FxRun Common(string kind, FxActor at, float scale = 1f)
         {
             if (at == null || Calm || kind == null) return null;
+            // 방어도 표시(이드 원작 보호막 구체 · 바닥 문양을 빌려 씀)는 원작대로 모드에서 끈다 — 원작 사도들은 방어를 얻어도 이 구체가 안 뜬다(10-16 사용자 「디아나 방패랑 문양 나오는 버그」)
+            if (OriginalOnly && (kind == "shield" || kind == "shieldHit")) return null;
             FxRules.COMMON.TryGetValue(kind, out var rule);
             rule = rule ?? new CommonRule();
             FxRun first = null;

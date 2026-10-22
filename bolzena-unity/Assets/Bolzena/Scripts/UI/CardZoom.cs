@@ -46,7 +46,7 @@ namespace Bolzena.UI
             boxes.Clear(); boxH.Clear();
             float y = 0;
             var terms = new List<Term>(info.Terms ?? new List<Term>());
-            if (note != null) terms.Insert(0, new Term("지금은 못 냅니다", note, "no"));
+            if (note != null) terms.Insert(0, new Term("지금은 못 냄", note, "no"));
             for (int i = 0; i < terms.Count; i++)
             {
                 var pn = Make.Node("p" + i, panels, new Vector3(0, y, 0));
@@ -79,7 +79,7 @@ namespace Bolzena.UI
             // 머리줄 — 아이콘 + 이름
             float ic = 0.24f * k, hx = 0.2f, hy = -0.14f;
             string stIc = t.Kind == "status" ? ChipRow.IconOf(t.Word, !bad) : null;   // 상태 — 적 머리 위 칩과 같은 그림
-            Color tint = stIc == null ? edge : stIc.StartsWith("state:") ? Color.white : bad ? Tone.Bad : Tone.Good;
+            Color tint = stIc == null ? edge : stIc.StartsWith("state:") || stIc.StartsWith("ours:") ? Color.white : bad ? Tone.Bad : Tone.Good;
             if (t.Kind == "kw" || t.Kind == "tag") ic *= 0.7f;   // 키워드 · 태그는 작은 마름모
             var icon = Make.Box("ic", pn, stIc != null ? ChipRow.IconSprite(stIc) : IconFor(t), new Vector3(hx + 0.12f * k, hy - 0.13f * k, 0), new Vector2(ic, ic), O + 3, tint);
             ic = 0.24f * k;

@@ -306,6 +306,23 @@ namespace Bolzena.Core.Tests
             finally { R.TOUGH_FIXED = false; }
         }
 
+        /// <summary>(2026-10-19 사용자 「M.E.O.W 강인도 10」) toughOwn — 고정 규칙 대신 데이터 tough 그대로. 데이터 tough 가 없으면 고정 규칙.</summary>
+        [Test] public void toughOwn_이면_고정_규칙_대신_데이터_강인도()
+        {
+            R.TOUGH_FIXED = true;
+            try
+            {
+                Assert.AreEqual(10, Battle.ToughOf(new EnemyDef { Id = "frontier_x", Boss = true, Tough = 10, ToughOwn = true }, false), "보스 toughOwn — 10");
+                Assert.AreEqual(R.BOSS_TOUGH, Battle.ToughOf(new EnemyDef { Id = "boss", Boss = true, Tough = 10 }, false), "toughOwn 없으면 고정 7");
+                Assert.AreEqual(R.BOSS_TOUGH, Battle.ToughOf(new EnemyDef { Id = "boss", Boss = true, ToughOwn = true }, false), "tough 가 없으면 고정 규칙");
+                var d = K.Data(enemies: "[{id:'own', name:'고집', hp:1000, boss:true, tough:10, toughOwn:true, intents:[{t:'jam', v:0, rush:0}]}]");
+                Assert.AreEqual(10, K.E(K.Fight(d, new[] { "a" }, new[] { "own" })).ToughMax, "전투에서도 10");
+                var bad = K.Data(enemies: "[{id:'own2', name:'고집', hp:1000, boss:true, toughOwn:true, intents:[{t:'jam', v:0, rush:0}]}]");
+                Assert.IsTrue(Validator.Check(bad).Errors.Any(e => e.Contains("toughOwn")), "tough 없는 toughOwn 은 검사 오류");
+            }
+            finally { R.TOUGH_FIXED = false; }
+        }
+
         [Test] public void 판이_바뀌면_수가_바뀌지만_강인도는_차지_않는다()
         {
             var d = K.Data(enemies: "[{id:'boss', name:'보스', hp:1000, boss:true, intents:[{t:'jam', v:0, rush:0}], phase:{at:0.5, say:'성났다', intents:[{t:'attack', v:50, rush:0}]}}]");

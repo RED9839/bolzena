@@ -183,7 +183,7 @@ namespace Bolzena.View
         static string IntentTip(EnemyState e)
         {
             if (e == null || e.Dead) return null;
-            if (e.Broken) return Tip.Head("격파") + "\n1턴 동안 행동하지 못합니다 — 격파한 쪽 AP +1";
+            if (e.Broken) return Tip.Head("격파") + "\n1턴 동안 행동하지 못한다 — 격파한 쪽 AP +1";
             var s = Tip.Head("다음 수") + "\n" + e.IntentText;
             if (!string.IsNullOrEmpty(e.IntentSay)) s += "\n" + Tip.Dim("「" + e.IntentSay + "」");
             var r = InfoPanel.Rush(e, true);
@@ -208,12 +208,12 @@ namespace Bolzena.View
         {
             float max = e.ToughMaxV;
             var s = Tip.Head("강인도") + (e.Broken ? "  <color=#ffd65a>격파</color>" : $"  {Thirds(v)} / {Thirds(max)}") + "\n" + Terms.WordText("강인도");
-            if (e.Weak != null && e.Weak.Count > 0) s += "\n" + Tip.Dim($"약점({string.Join(" · ", e.Weak)}) 사도의 카드는 비용만큼(0코는 1/2), 아니면 그 1/3만큼(0코는 0) 깎습니다");
+            if (e.Weak != null && e.Weak.Count > 0) s += "\n" + Tip.Dim($"약점({string.Join(" · ", e.Weak)}) 사도의 카드는 비용만큼(0코는 1/2), 아니면 그 1/3만큼(0코는 0) 깎는다");
             return s;
         }
 
         public static string WeakTip(List<string> weak) =>
-            Tip.Head("약점 속성") + "  " + string.Join(" · ", weak) + "\n이 성격 사도의 카드는 강인도를 비용만큼 깎습니다(아니면 1/3).\n" + Tip.Dim("「공명」 사도는 늘 약점으로 칩니다");
+            Tip.Head("약점 속성") + "  " + string.Join(" · ", weak) + "\n이 성격 사도의 카드는 강인도를 비용만큼 깎는다(아니면 1/3)\n" + Tip.Dim("「공명」 사도는 늘 약점으로 친다");
 
         void BuildWeak(List<string> list)
         {
@@ -635,7 +635,7 @@ namespace Bolzena.View
             ["절대 무적"] = 56, // 원작 버티기(받는 피해 상한)
             ["정신 붕괴"] = 60, // 원작 호기심(뜻 다름) — 원작 없음 · 그림으로 고름, 더 맞는 그림 없음
             ["면역"] = 202, ["빙벽"] = 9, ["봉쇄"] = 154, ["침체"] = 140, ["행동 둔화"] = 149, ["급속"] = 138, ["고동"] = 134,   // 원작 없음 · 그림으로 고름
-            //   「빙결」 은 뺌 — 눈꽃(5)은 원작 아야 동상이라 「서리」 몫, 216장에 다른 얼음 그림이 없어 우리 글리프로
+            //   「빙결」 은 뺌 — 눈꽃(5)은 원작 아야 동상이라 「눈꽃」(아야) 몫, 216장에 다른 얼음 그림이 없어 우리 글리프로
             // 엘다인 사도 고유 효과 · 변신
             ["탄창"] = 69,                                              // 시온 — 원작 시온 마탄
             ["이 몸, 등장★"] = 180,                                      // 시온 — 원작 없음 · 그림으로 고름(원작 스타☆샤인)
@@ -645,7 +645,7 @@ namespace Bolzena.View
             ["행복한 아기 늑대"] = 97,                                   // 란 — 원작 없음 · 그림으로 고름
             ["수은 중독"] = 40,                                         // 비비 — 원작 비비의 관심(적 방어력 감소)
             ["사랑받은 새싹"] = 224, ["은총"] = 225,                      // 비비(신성) — 원작 비비(신성) 신성 · 비비의 은총
-            ["달바라기 꽃"] = 217,                                      // 요미 — 원작 없음 · 그림으로 고름(초승달, 원작은 오로라 긍정의 기운)
+            //   요미 「달바라기 꽃」 은 우리 아이콘(Ours — 단계마다 다른 달)으로 옮김(217 은 원작 오로라 긍정의 기운이었다)
             ["소망을 머금은 꽃"] = 161,                                  // 요미 — 원작 없음 · 그림으로 고름(꽃 — 225 는 원작 비비의 은총)
             ["축복의 왕관"] = 197,                                      // 에르핀(왕도) — 원작 에르핀(왕도) 여왕의 의지
             ["용기"] = 156,                                             // 티그(영웅) — 원작 티그(영웅) 영웅심(199 는 원작 헤일리(멀쩡) 극복의 훈장)
@@ -656,7 +656,7 @@ namespace Bolzena.View
             ["에피콘의 분신술"] = 191,                                   // 에피카 — 원작 에피카 만족스러운 연주
             ["분산"] = 84,                                              // 죠안 — 원작 죠안 분산
             ["주교의 경전"] = 215,                                      // 죠안 — 원작 없음 · 그림으로 고름(책, 원작은 에슈르(마도) 연구 집중)
-            ["서리"] = 5,                                               // 아야 — 원작 아야 동상
+            ["눈꽃"] = 5,                                               // 아야 — 원작 아야 동상(10-20 리워크: 「서리」 칩 그림을 「눈꽃」 으로 옮김)
             ["찻잔"] = 209,                                             // 실비아 — 원작 실비아 초청객
             ["존재감"] = 117,                                           // 벨라 — 원작 벨라 영속
             // 클론(적이 된 사도) 고유 효과 · 변신 — 그 사도의 원작 상태 그림
@@ -670,18 +670,57 @@ namespace Bolzena.View
             ["낫 자국"] = 6, ["다이아 쓰라림"] = 6, ["빵 센디오"] = 2,                        // 림 · 다야 쓰라림 · 에슈르 화상(평타)
         };
 
-        /// <summary>칩 그림 — IconOf 의 이름("state:N" = 원작 상태 아이콘, 그 밖 = Resources/UI 글리프).</summary>
+        // 우리가 만든 상태 아이콘(RunArt/State/Ours, git 밖 — 원본은 C:\projects\아이콘_작업) — 원작 빈 틀에 상징만 얹은 것(compose.py). 원작 사전보다 먼저 본다.
+        //   틀 색 규칙: 파랑 집 = 버프 · 노랑 육각 = 사도 고유(검은 상징) · 빨강 육각 = 우로스 본성
+        public static readonly Dictionary<string, string> Ours = new Dictionary<string, string>
+        {
+            ["근면"] = "diligence", ["결의"] = "resolve",                                       // 파랑 집
+            ["허물"] = "uros_shed", ["본성"] = "uros_nature", ["영역 위"] = "uros_domain",       // 우로스 태세 두 가지 · 고유 효과
+            ["달바라기 꽃"] = "yomi_moon_1",                                                   // 요미 — 단계마다 다른 달(OurIcon)
+            // 2026-10-14 밤 ChatGPT 상징 + 원작 빈 틀(compose.py) — 파랑 집(버프) · 빨강 방패(디버프) · 노랑 육각(사도 고유, 그 사도의 실제 소품 실루엣)
+            ["계몽"] = "enlighten", ["실드 보존"] = "shield_keep", ["끈기"] = "grit", ["공명"] = "resonance", ["집중"] = "focus",
+            ["잔광"] = "afterglow", ["저장"] = "store", ["은방울"] = "lily_bell", ["칼날 벼리기"] = "blade_hone",
+            ["약점 노출"] = "weak_expose", ["미끄러움"] = "slippery", ["손상"] = "damaged", ["냉정 약점"] = "cool_weak",
+            ["만년설"] = "aya_snow", ["에피칸"] = "epica_epicon", ["이드 더 이터널 불릿"] = "ed_bullet", ["나타"] = "ed_nata",
+            ["왕마력"] = "erpin_royal_mana", ["꿈결 형상"] = "joanne_dream", ["바늘땀"] = "chloe_stitch", ["탑승"] = "chloe_ride",
+            ["언해피 우이"] = "ui_unhappy", ["에루의 우비"] = "ui_raincoat", ["행복한 에루"] = "uimemory_happy_eru", ["에루 리턴즈"] = "uimemory_eru_returns",
+        };
+
+        /// <summary>우리 아이콘 이름("ours:파일") — 없으면 null. 달바라기 꽃은 단계(1 초승 · 2 반달 · 3 보름 · 4 그믐) 값으로 그림을 고른다.</summary>
+        static string OurIcon(string id, string value)
+        {
+            if (id == null || !Ours.TryGetValue(id, out var f)) return null;
+            if (id == "달바라기 꽃" && int.TryParse(value, out var st) && st >= 1 && st <= 4) f = "yomi_moon_" + st;
+            return Bolzena.RunUI.Theme.Art("State/Ours/" + f) != null ? "ours:" + f : null;
+        }
+
+        /// <summary>단계 고르기 창의 단계 칸 아이콘 — 그 고유 효과의 stage 단계 그림(요미 달). 없으면 null(칸은 글만).</summary>
+        public static Sprite StageIcon(string id, int stage)
+        {
+            var ic = OurIcon(id, stage.ToString());
+            if (ic == null && id != null && Original.TryGetValue(id, out var n) && Bolzena.RunUI.Theme.Art("State/StateIcon_" + n) != null) ic = "state:" + n;
+            return ic == null ? null : IconSprite(ic);
+        }
+
+        /// <summary>칩 그림 — IconOf 의 이름("state:N" = 원작 상태 아이콘, "ours:파일" = 우리 아이콘, 그 밖 = Resources/UI 글리프).</summary>
         public static Sprite IconSprite(string icon) =>
-            icon == null ? null : icon.StartsWith("state:") ? Bolzena.RunUI.Theme.Art("State/StateIcon_" + icon.Substring(6)) ?? Res.UI("ic_up") : Res.UI(icon);
+            icon == null ? null
+            : icon.StartsWith("state:") ? Bolzena.RunUI.Theme.Art("State/StateIcon_" + icon.Substring(6)) ?? Res.UI("ic_up")
+            : icon.StartsWith("ours:") ? Bolzena.RunUI.Theme.Art("State/Ours/" + icon.Substring(5)) ?? Res.UI("ic_up")
+            : Res.UI(icon);
 
         public static string IconOf(string id, bool good)
         {
+            var ours = OurIcon(id, null);
+            if (ours != null) return ours;
             if (id != null && Original.TryGetValue(id, out var n) && Bolzena.RunUI.Theme.Art("State/StateIcon_" + n) != null) return "state:" + n;
             return id == "취약" ? "ic_vuln" : good ? "ic_up" : "ic_weak";
         }
 
         public static string IconOf(StatusChip c)
         {
+            var ours = OurIcon(c.Id, c.Value);
+            if (ours != null) return ours;
             if (c.Id != null && Original.TryGetValue(c.Id, out var n) && Bolzena.RunUI.Theme.Art("State/StateIcon_" + n) != null) return "state:" + n;
             switch (c.Id)
             {

@@ -70,7 +70,7 @@ namespace Bolzena.RunUI
                 Tw.Rise(partyBox, 0.15f, 30, 0.45f, Vector2.left);
 
                 // 결과 받기
-                var note = Ui.Text(root, "전투 화면(트랙 C)이 들어올 자리입니다 — 지금은 결과만 받습니다. 「봇 전투」는 코어 규칙으로 실제 전투를 한 번 돌립니다.", 17, Theme.Sub, TextAlignmentOptions.Center);
+                var note = Ui.Text(root, "전투 화면(트랙 C)이 들어올 자리다 — 지금은 결과만 받는다. 「봇 전투」는 코어 규칙으로 실제 전투를 한 번 돌린다", 17, Theme.Sub, TextAlignmentOptions.Center);
                 note.rectTransform.Band(0, 30, 200, 200, 140);
                 note.Outline(0.2f);
                 var bar = Ui.Rect("actions", root).Band(0, 80, 300, 300, 40);
@@ -82,7 +82,7 @@ namespace Bolzena.RunUI
                 }
                 var win = Btn.Make(bar, "전투 결과 받기 — 이김", BtnStyle.PillGold, () => Go("win"), Theme.FsLg); win.Pref(380, 80);
                 var bot = Btn.Make(bar, "봇 전투", BtnStyle.PillDark, () => Go("bot"), Theme.FsLg); bot.Pref(260, 80);
-                var lose = Btn.Make(bar, "짐", BtnStyle.PillDark, () => Confirm("진 것으로 받겠습니까?", "모험이 끝납니다.", "진 것으로", () => Go("lose"), true), Theme.FsLg); lose.Pref(140, 80);
+                var lose = Btn.Make(bar, "짐", BtnStyle.PillDark, () => Confirm("진 것으로 받을까?", "모험이 끝난다", "진 것으로", () => Go("lose"), true), Theme.FsLg); lose.Pref(140, 80);
                 Stage.Hot["fight.win"] = win; Stage.Hot["fight.bot"] = bot; Stage.Hot["fight.lose"] = lose;
                 Tw.Rise(bar, 0.4f, 30, 0.4f);
             });
@@ -180,7 +180,6 @@ namespace Bolzena.RunUI
             var ct = Ui.Title(chip, $"<size=62%><color={Theme.SubTag}>{o.Turns}턴 · 승리</color></size>\n전투 끝", Theme.FsLg, Theme.Gold, TextAlignmentOptions.Center);
             ct.rectTransform.Fill(8, 4, 8, 4); ct.lineSpacing = -18;
             Tw.Rise(chip, 0.1f, 20, 0.4f, Vector2.left);
-            if (Core.R.GRADE_ON) RewardCredit(root, chip);   // 학점(Flow.Grade.cs) — 학년 꺼짐이면 스티커 없음
 
             // 오른쪽 보상 줄
             float rowH = Theme.C(78, 70), gap = Theme.C(14, 10), listW = 380;
@@ -203,7 +202,7 @@ namespace Bolzena.RunUI
                 var nring = Ui.Img(node.transform, Theme.S("ring"), taken ? Theme.Good : Theme.Edge, "ring"); nring.rectTransform.Fill();
                 if (taken) { var ck = Ui.Img(node.transform, Theme.S("ic_check"), Theme.Night, "ck"); ck.rectTransform.Fill(5, 5, 5, 5); ck.preserveAspect = true; }
                 b.Interactable = !taken;
-                if (taken) b.Why = "받았습니다";
+                if (taken) b.Why = "받았다";
                 Stage.Hot[hot] = b;
                 Tw.Rise(rt, 0.15f + n * 0.07f, 30, 0.4f, Vector2.right);
                 items.Add((title, taken));
@@ -235,7 +234,7 @@ namespace Bolzena.RunUI
                 string what = g.Kind == "hero" ? $"은총 · {Roster.OfCore(g.Hero).ko}" : "신탁";
                 Line("glow", "빛났던 카드", what, Theme.S("ic_spark"), Theme.Gold, false, () => GlowPick(kv.Key, g, () => { glows.Remove(kv.Key); if (root) BuildReward(root, o, loot, glows, bare); }), "reward.glow");
             }
-            if (n == 0) { var none = Ui.Text(list, "챙길 것이 없습니다", Theme.FsMd, Theme.Sub, TextAlignmentOptions.MidlineRight); none.rectTransform.At(1, 1, -34, 0, listW, 40); none.Outline(0.2f); }
+            if (n == 0) { var none = Ui.Text(list, "챙길 것이 없다", Theme.FsMd, Theme.Sub, TextAlignmentOptions.MidlineRight); none.rectTransform.At(1, 1, -34, 0, listW, 40); none.Outline(0.2f); }
             // 점선 세로줄 — 줄들을 오른쪽 끝에서 잇는다
             if (n > 0)
             {
@@ -264,7 +263,7 @@ namespace Bolzena.RunUI
                 if (loot?.Equip != null && loot.Equip.Count > 0 && loot.EquipTaken == null) missed.Add("아티팩트");
                 if (glows.Count > 0) missed.Add("빛났던 카드");
                 if (missed.Count == 0) { Leave(); return; }
-                Confirm("받지 않고 떠나겠습니까?", $"{string.Join(" · ", missed)} — 떠나면 사라집니다." + (loot != null && !loot.GoldTaken ? " 골드는 챙깁니다." : ""), "떠나기", Leave, true);
+                Confirm("받지 않고 떠날까?", $"{string.Join(" · ", missed)} — 떠나면 사라진다" + (loot != null && !loot.GoldTaken ? " 골드는 챙긴다" : ""), "떠나기", Leave, true);
             }, 0, "next");
             var nrt = next.GetComponent<RectTransform>(); nrt.At(1, 0, -Theme.Gutter, Theme.Gutter, 300, Theme.BtnMainH);
             var play = Ui.Img(nrt, Theme.S("circle"), Theme.Brown.A(0.18f), "disc"); play.rectTransform.At(0, 0.5f, 12, 0, 46, 46);
@@ -343,7 +342,7 @@ namespace Bolzena.RunUI
                 gcs = CardSnap();
                 var why = P.ClaimGlow(cardId, g, 0);
                 if (why != null) { Toast.Show(why); return; }
-                GainCards(NewCards(gcs), picked, "은총!", $"「{baseCard?.Name}」의 은총 — {Roster.OfCore(g.Hero).ko}의 고유 카드 · 덱에 넣습니다", GraceHold);
+                GainCards(NewCards(gcs), picked, "은총!", $"「{baseCard?.Name}」의 은총 — {Roster.OfCore(g.Hero).ko}의 고유 카드 · 덱에 넣는다", GraceHold);
                 return;
             }
             var opts = card ? Core.OracleOption.Of(P.Data, cardId, g.Picks) : null;
@@ -366,7 +365,7 @@ namespace Bolzena.RunUI
                 Done = k =>
                 {
                     var o = card ? opts[order[k]] : null;
-                    Toast.Show($"{(string.IsNullOrEmpty(picks[k].Label) ? baseCard?.Name : picks[k].Label)} — 받았습니다" + (o != null && o.Blessed ? " · 축복" : ""));
+                    Toast.Show($"{(string.IsNullOrEmpty(picks[k].Label) ? baseCard?.Name : picks[k].Label)} — 받았다" + (o != null && o.Blessed ? " · 축복" : ""));
                     GainCards(gcs != null ? NewCards(gcs) : null, picked);   // 은총 고유 카드 — 다시 태어난 뒤 가운데에서 덱으로(신탁은 새 카드가 없어 그대로)
                 },
             });
@@ -402,7 +401,7 @@ namespace Bolzena.RunUI
             ids = CardOrder.Sort(ids, P.Data, P.S.Party);
             Stage.Show("bosscopy", root =>
             {
-                W.StatusBar(root, this, true, true, true, "층 보스의 몫", "고유 카드 하나를 복제합니다 — 지금 신탁 · 축복 그대로, 그 뒤로는 받을 수 없습니다");
+                W.StatusBar(root, this, true, true, true, "층 보스의 몫", "고유 카드 하나를 복제한다 — 지금 신탁 · 축복 그대로, 그 뒤로는 받을 수 없다");
                 // 2026-10-12 사용자 「원하는 사도 카드 복제로」 — 무작위 셋 대신 덱의 파티 사도 고유 카드 전부를 사도별로(수련 화면과 같은 꼴 · 스크롤)
                 float mw = Mathf.Min(1240, Stage.Size.x - 40);
                 var area = Ui.Rect("cards", root).At(0.5f, 0.5f, 0, Theme.C(4, 2), mw, Stage.Size.y - Theme.C(250, 190));
@@ -427,12 +426,12 @@ namespace Bolzena.RunUI
                     b.OnHold = () => CardZoom(id, ids);   // 꾹 누르면 카드 상세(고르기는 그냥 누름)
                     Stage.Hot["copy" + i] = b;
                 });
-                var hint = Ui.Text(root, "복제할 카드를 하나 고르세요", Theme.FsMd, Theme.Sub, TextAlignmentOptions.Center);
+                var hint = Ui.Text(root, "복제할 카드를 고를 수 있다", Theme.FsMd, Theme.Sub, TextAlignmentOptions.Center);
                 hint.rectTransform.At(0.5f, 0, 0, Theme.Gutter + 18, 600, 30); hint.Outline(0.2f);
-                go = Btn.Make(root, "카드를 고르세요", BtnStyle.PillGold, () => pick(chosen), Theme.FsLg);
+                go = Btn.Make(root, "카드 고르기", BtnStyle.PillGold, () => pick(chosen), Theme.FsLg);
                 go.GetComponent<RectTransform>().At(1, 0, -Theme.Gutter, Theme.Gutter, 320, 66);
                 go.Interactable = false;
-                go.Why = "카드를 하나 고르세요";
+                go.Why = "카드를 골라야 한다";
                 Stage.Hot["copy.go"] = go;
                 var skip = Btn.Make(root, "받지 않기", BtnStyle.PillDark, () => pick(null), Theme.FsMd);
                 skip.GetComponent<RectTransform>().At(0, 0, Theme.Gutter, Theme.Gutter, 240, 66);

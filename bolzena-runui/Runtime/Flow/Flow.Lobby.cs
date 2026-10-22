@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Spine.Unity;
 using TMPro;
@@ -33,7 +33,7 @@ namespace Bolzena.RunUI
 
                 // 가운데 — 메인 사도
                 var stage = Ui.Rect("hero", root);
-                stage.anchorMin = new Vector2(0, 0); stage.anchorMax = new Vector2(0.62f, 1);
+                stage.anchorMin = new Vector2(0, 0); stage.anchorMax = new Vector2(0.7f, 1);   // 메뉴가 얇은 아이콘 기둥이라(카제나식) 사도 칸을 넓혔다
                 stage.offsetMin = Vector2.zero; stage.offsetMax = Vector2.zero;
                 var floor = Ui.Img(stage, Theme.S("soft"), new Color(0, 0, 0, 0.45f), "shadow");
                 floor.rectTransform.At(0.5f, 0, 40, 10, 520, 90);
@@ -106,78 +106,126 @@ namespace Bolzena.RunUI
                     bubble = HeroBubble.Show(stage, hero, lines[0], new Vector2(0, 1), new Vector2(70, -200), new Vector2(0, 1), 0, 0.25f, "lobby");
                 });
 
-                // 오른쪽 — 메뉴
-                var menu = Ui.Rect("menu", root);
-                menu.anchorMin = new Vector2(1, 0); menu.anchorMax = new Vector2(1, 1); menu.pivot = new Vector2(1, 0.5f);
-                menu.offsetMin = new Vector2(-470, Theme.C(110, 70)); menu.offsetMax = new Vector2(-Theme.Gutter - 8, Theme.C(-140, -90));
-                Ui.Col(menu, Theme.Gap, TextAnchor.UpperRight, null, true, false);
-
+                // 카제나식 배치(2026-10-21, Docs/참고_카제나_UI.md §메인 로비) — 오른쪽 끝 아이콘 세로 메뉴 하나에 모험 · 프론티어 · 도감 · 보관함 차례로
+                //   (2026-10-22 사용자 — 큰 「모험 시작」 단추 없앰). 칸의 자세한 상태는 귀퉁이 배지로, 설정은 오른쪽 위 톱니
                 bool hasSave = RunPort.HasSave;
                 string summary = hasSave ? P.SaveSummary() : null;
                 if (hasSave && summary == null) { RunPort.ClearSave(); hasSave = false; }
-                var start = BigStart(menu, hasSave ? "이어하기" : "모험 시작", hasSave ? summary : "마을 하나가 정해지면 사도 셋을 고릅니다",
-                    () => { if (hasSave) Resume(); else NewAdventure(); });
-                Stage.Hot["start"] = start;
+                float legalTop = 12 + 62 + Theme.C(14, 10);
+                float pillH = Theme.C(50, 44);
+                float railBottom = legalTop + (hasSave ? pillH + Theme.Gap : 0);
                 if (hasSave)
-                    Stage.Hot["new"] = MenuItem(menu, Theme.S("ic_spark"), "새 모험", "지금 모험을 버리고 사도 셋을 새로 고릅니다", new Color(0.95f, 0.75f, 0.35f), () =>
-                        Confirm("지금 모험을 버리겠습니까?", "이어하던 모험은 사라집니다. 새 마을로 떠납니다.", "버리고 출발", () => { PlayRecord.Send(P.SavedRun(), "abandon"); RunPort.ClearSave(); NewAdventure(); }, true));
-                { var cs = CrayonStore.Save; var ct = CrayonStore.Table;
-                  Stage.Hot["crayon"] = MenuItem(menu, Theme.BoardIcon, "교주 보드", $"크레파스 보드로 파티 영구 강화 · 칠한 단계 {ct.Cells.Where(x => !x.Blank).Sum(x => System.Math.Min(x.Levels, cs.LevelOf(x.Id)))}/{ct.Cells.Where(x => !x.Blank).Sum(x => x.Levels)}", Theme.Hex("FFB648"), CrayonScreen); }
-                Stage.Hot["dex"] = MenuItem(menu, Theme.S("ic_book"), "도감", $"사도 {Roster.Players.Count()}명 · 적 · 아티팩트 · 교주 카드", Theme.Hex("7FE0B4"), () => Dex(Lobby));
-                Stage.Hot["settings"] = MenuItem(menu, Theme.S("ic_cog"), "설정", "소리 · 움직임 · 글자 · 화면", Theme.Hex("B9A8FF"), () => SettingsPanel(false));
+                {
+                    // 이어할 판이 있으면 메뉴 아래에 「새 모험」 — 지금 판을 버린다고 한 번 묻는다
+                    var nw = Btn.Make(root, "새 모험", BtnStyle.PillDark, () =>
+                        Confirm("지금 모험을 버릴까?", "이어하던 모험은 사라진다", "버리고 출발", () => { var sr = P.SavedRun(); PlayRecord.Send(sr, "abandon"); ProgStore.Earn(sr, "abandon"); RunPort.ClearSave(); NewAdventure(); }, true), Theme.FsSm, "new");
+                    nw.GetComponent<RectTransform>().At(1, 0, -Theme.Gutter, legalTop, Theme.C(118, 100), pillH);
+                    Stage.Hot["new"] = nw;
+                }
+
+                // 오른쪽 끝 — 아이콘 세로 메뉴. 칸 높이는 위 띠(버전 알약) 아래 · 안내 판 위 남은 높이로 나눈다(폰 Compact 에서 특히)
+                const int items = 4;   // 모험 · 프론티어 · 도감 · 보관함
+                float railTop = Theme.C(22, 14) + Theme.C(46, 40) + Theme.Gap + 8;
+                float railH = Stage.Size.y - railTop - railBottom;
+                menuItemH = Mathf.Min(Theme.C(104, 86), (railH - Theme.Gap * (items - 1)) / items);
+                var menu = Ui.Rect("menu", root);
+                menu.anchorMin = new Vector2(1, 0); menu.anchorMax = new Vector2(1, 1); menu.pivot = new Vector2(1, 0.5f);
+                menu.offsetMin = new Vector2(-Theme.Gutter - Theme.C(118, 100), railBottom); menu.offsetMax = new Vector2(-Theme.Gutter, -railTop);
+                Ui.Col(menu, Theme.Gap, TextAnchor.MiddleRight, null, true, false);
+
+                // 모험 — 이어할 판이 있으면 이어하기(배지), 없으면 새 모험(마을 고르기부터)
+                var adv = MenuItem(menu, Theme.S("ic_swords"), "모험", Theme.Gold, () => { if (hasSave) Resume(); else NewAdventure(); });
+                MenuBadge(adv, hasSave ? "이어하기" : "");
+                Stage.Hot["start"] = adv;
+                // 프론티어(보스 랭킹전 — Flow.Frontier.cs) — 서버가 열려 있으면 시즌 이름, 없으면 「준비 중」 배지(보스 소개 · 보관함 기기 사본은 열린다)
+                var fr = MenuItem(menu, Theme.S("ic_crown"), "프론티어", Theme.Hex("FF9A7A"), FrontierScreen);
+                Stage.Hot["frontier"] = fr;
+                void PaintFr()
+                {
+                    if (!fr) { Online.Changed -= PaintFr; return; }
+                    MenuBadge(fr, Online.Up ? (Online.Season?["label"]?.ToString() ?? "프리시즌") : Online.Now == Online.State.Unknown ? "…" : "준비 중", !Online.Up);
+                }
+                Online.Changed += PaintFr;
+                PaintFr();
+                Stage.Hot["dex"] = MenuItem(menu, Theme.S("ic_book"), "도감", Theme.Hex("7FE0B4"), () => Dex(Lobby));
+                // 보관함(옛 「사도 저장함」, 2026-10-19 — 프론티어 밖에서도) — 로그인했으면 계정 칸, 아니면 이 기기 사본(Flow.HeroSave.cs). 배지 = 저장한 덱 수
+                var bx = MenuItem(menu, Theme.S("ic_deck"), "보관함", Theme.Hex("8FC8FF"), () => SlotBox(Lobby));
+                Stage.Hot["lobby.box"] = bx;
+                void PaintBox()
+                {
+                    if (!bx) { Online.Changed -= PaintBox; return; }
+                    MenuBadge(bx, SlotStore.Copies.Count > 0 ? SlotStore.Copies.Count.ToString() : "");
+                }
+                Online.Changed += PaintBox;
+                PaintBox();
+                // 설정 — 오른쪽 위 끝 톱니(카제나 ☰ 자리). 버전 · 계정 알약은 그 왼쪽으로 한 칸 비킨다(LobbyCogW)
+                var cog = Btn.Icon(root, Theme.S("ic_cog"), () => SettingsPanel(false), Theme.C(46, 40), "settings");
+                cog.GetComponent<RectTransform>().At(1, 1, -Theme.Gutter - 8, -Theme.C(22, 14), Theme.C(46, 40), Theme.C(46, 40));
+                Stage.Hot["settings"] = cog;
+                Tw.Pop((RectTransform)cog.transform, 0.5f, 0.85f, 0.4f);
 
                 int i = 0;
-                foreach (Transform c in menu) Tw.Pop((RectTransform)c, 0.15f + 0.07f * i++, 0.85f, 0.4f);
+                foreach (Transform c in menu) Tw.Pop((RectTransform)c, 0.2f + 0.06f * i++, 0.85f, 0.4f);
 
                 logo.SetAsLastSibling();
                 // 비공식 팬게임 안내 — 배경 위에서도 읽히게 마을 공개 창과 같은 남색 판(금 테 · 둥근 모서리)을 깔고 오른쪽 아래 작게(사용자 2026-10-07)
                 var legalBox = Ui.Panel(root, Theme.Panel, null, "legal").rectTransform;
                 legalBox.At(1, 0, -Theme.Gutter, 12, Mathf.Min(560, Stage.Size.x - 2 * Theme.Gutter), 62);
                 legalBox.GetComponent<UnityEngine.UI.Image>().color = Color.white.A(0.9f);
-                var legal = Ui.Text(legalBox, $"<color={Theme.GoldTag}>비공식 팬 게임 · 비영리</color> — 트릭컬 리바이브의 그림 · 음성 · 설정의 저작권은 EPID Games 에 있습니다. 공식과 무관하며, 권리자의 요청이 있으면 즉시 내립니다.", Theme.FsCap - 1, Theme.Sub, TextAlignmentOptions.MidlineLeft);
+                var legal = Ui.Text(legalBox, $"<color={Theme.GoldTag}>비공식 팬 게임 · 비영리</color> — 트릭컬 리바이브의 그림 · 음성 · 설정의 저작권은 EPID Games 에 있다. 공식과 무관하며, 권리자의 요청이 있으면 즉시 내린다.", Theme.FsCap - 1, Theme.Sub, TextAlignmentOptions.MidlineLeft);
                 legal.rectTransform.Fill(16, 6, 14, 6); legal.textWrappingMode = TextWrappingModes.Normal;
                 legal.enableAutoSizing = true; legal.fontSizeMin = 10; legal.fontSizeMax = Theme.FsCap - 1;
                 LobbyVersion(root);   // 오른쪽 위 — 버전 · 업데이트 내용(Flow.PatchNotes.cs)
+                LobbyAccount(root);   // 그 왼쪽 — 계정(프론티어 로그인 · 닉네임, Flow.Online.cs)
+                LobbyDeckLab(root);   // 왼쪽 위 이름 아래 — 「덱 만들기 · 시험」(이 PC 시험 모드 -decklab · 시험 계정만 보인다, Flow.DeckLab.cs)
+                LobbyProg(root);      // 왼쪽 위 이름 아래 — 잠재력 · 재료 · 최고 완주 단계(성장 켬일 때만, Flow.Prog.cs)
             });
         }
 
-        Btn BigStart(Transform parent, string title, string sub, System.Action go)
+        /// <summary>오른쪽 위 설정 톱니가 차지하는 너비(간격 포함) — 버전 · 계정 알약이 이만큼 왼쪽으로 비킨다.</summary>
+        static float LobbyCogW => Theme.C(46, 40) + 10;
+
+        float menuItemH = 104;
+        // 아이콘 세로 메뉴 한 칸 — 위에 동그란 그림, 아래에 이름. 상태는 오른쪽 위 귀퉁이 배지(MenuBadge)
+        Btn MenuItem(Transform parent, Sprite icon, string title, Color tone, System.Action go)
         {
-            var b = Btn.Make(parent, null, BtnStyle.Gold, go, 0, "start");
-            float h = Theme.C(124, 108);
+            var b = Btn.Make(parent, null, BtnStyle.Dark, go, 0, "item " + title);
+            float h = menuItemH, d = Mathf.Min(Theme.C(56, 46), h * 0.56f);
             b.Pref(-1, h);
-            var t = Ui.Title(b.transform, title, Theme.Fs2xl, Theme.Brown, TextAlignmentOptions.BottomLeft);
-            t.rectTransform.Fill(30, h * 0.42f, 90, 10);
+            var disc = Ui.Img(b.transform, Theme.S("circle"), Theme.NavyWell, "disc");
+            disc.rectTransform.At(0.5f, 1, 0, -h * 0.1f, d, d);
+            var ring = Ui.Img(disc.transform, Theme.S("ring"), tone.A(0.9f), "ring"); ring.rectTransform.Fill();
+            // 원작 그림(RunArt)은 제 색 그대로 크게, 화면 아이콘(RunUI/Sprites)은 칸 색으로 칠한다
+            bool art = icon != null && icon.name.StartsWith("RunArt/");
+            float pad = art ? 4 : d * 0.24f;
+            var ic = Ui.Img(disc.transform, icon, art ? Color.white : tone, "icon");
+            ic.rectTransform.Fill(pad, pad, pad, pad); ic.preserveAspect = true;
+            var t = Ui.Title(b.transform, title, Theme.C(Theme.FsSm + 1, Theme.FsCap), Theme.Ink, TextAlignmentOptions.Bottom);
+            t.rectTransform.Fill(4, h * 0.08f, 4, h * 0.7f);
             t.textWrappingMode = TextWrappingModes.NoWrap;
-            var s = Ui.Text(b.transform, sub, Theme.FsSm, Theme.Hex("5A3A10"), TextAlignmentOptions.TopLeft);
-            s.rectTransform.Fill(32, 10, 90, h * 0.6f);
-            s.textWrappingMode = TextWrappingModes.NoWrap;
-            var glow = Ui.Img(b.transform, Theme.S("soft"), new Color(1f, 0.95f, 0.7f, 0.4f), "glow");
-            glow.rectTransform.At(1, 0.5f, -50, 0, 140, 140);
-            Tw.Pulse(glow, 0.1f, 0.5f, 1.8f);
-            var play = Ui.Img(b.transform, Theme.S("ic_play"), new Color(0.35f, 0.18f, 0.04f, 0.85f), "play");
-            play.rectTransform.At(1, 0.5f, -46, 0, 44, 44);
+            t.enableAutoSizing = true; t.fontSizeMin = Theme.FsCap - 2; t.fontSizeMax = t.fontSize;
             return b;
         }
 
-        Btn MenuItem(Transform parent, Sprite icon, string title, string sub, Color tone, System.Action go)
+        /// <summary>메뉴 칸 오른쪽 위 귀퉁이 배지 — 빈 글이면 숨긴다. dim = 못 쓰는 상태(준비 중 · 로그인 전)라 흐린 글.</summary>
+        static void MenuBadge(Btn item, string text, bool dim = false)
         {
-            var b = Btn.Make(parent, null, BtnStyle.Dark, go, 0, "item " + title);
-            float h = Theme.C(80, 70);
-            b.Pref(-1, h);
-            var disc = Ui.Img(b.transform, Theme.S("circle"), Theme.NavyWell, "disc");
-            disc.rectTransform.At(0, 0.5f, 18, 0, 48, 48);
-            var ring = Ui.Img(disc.transform, Theme.S("ring"), tone.A(0.9f), "ring"); ring.rectTransform.Fill();
-            // 원작 그림(RunArt — 교주 보드의 크레파스)은 제 색 그대로 크게, 화면 아이콘(RunUI/Sprites)은 칸 색으로 칠한다
-            bool art = icon != null && icon.name.StartsWith("RunArt/");
-            var ic = Ui.Img(disc.transform, icon, art ? Color.white : tone, "icon");
-            ic.rectTransform.Fill(art ? 4 : 12, art ? 4 : 12, art ? 4 : 12, art ? 4 : 12); ic.preserveAspect = true;
-            var t = Ui.Title(b.transform, title, Theme.FsLg + 2, Theme.Ink, TextAlignmentOptions.BottomLeft);
-            t.rectTransform.Fill(84, h * 0.46f, 16, 6);
-            var s = Ui.Text(b.transform, sub, Theme.FsSm, Theme.Sub, TextAlignmentOptions.TopLeft);
-            s.rectTransform.Fill(86, 6, 16, h * 0.56f);
-            s.textWrappingMode = TextWrappingModes.NoWrap;
-            return b;
+            var host = item.transform.Find("badge");
+            TextMeshProUGUI t;
+            if (host == null)
+            {
+                var bg = Ui.Img(item.transform, Theme.S("pill_dark", 46), Color.white, "badge");
+                bg.rectTransform.At(1, 1, 6, -4, 40, 24);
+                t = Ui.Title(bg.transform, "", Theme.FsCap - 1, Theme.Gold, TextAlignmentOptions.Center);
+                t.rectTransform.Fill(8, 0, 8, 0);
+                t.textWrappingMode = TextWrappingModes.NoWrap;
+                host = bg.transform;
+            }
+            else t = host.GetComponentInChildren<TextMeshProUGUI>();
+            host.gameObject.SetActive(!string.IsNullOrEmpty(text));
+            t.text = text;
+            t.color = dim ? Theme.Sub : Theme.Gold;
+            ((RectTransform)host).sizeDelta = new Vector2(Mathf.Max(34, t.GetPreferredValues(text).x + 18), 24);
         }
 
         /// <summary>두 번 묻기 — 「정말?」 창.</summary>

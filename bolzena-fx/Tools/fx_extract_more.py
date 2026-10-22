@@ -25,7 +25,7 @@ WEB = r"C:\projects\볼제나"
 
 
 def load_x():
-    spec = importlib.util.spec_from_file_location("extract_fx", os.path.join(WEB, "tools", "extract-fx.py"))
+    spec = importlib.util.spec_from_file_location("extract_fx", os.path.join(os.path.dirname(os.path.abspath(__file__)), "fx_extract_core.py"))   # (10-15) 볼제나 판 변환(중심점 sy · 원본 값)
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
     return m
@@ -63,6 +63,19 @@ LOCAL_ALIAS = {"ui": "uieru"}
 ULT_EXTRA = {
     "우이": ["fx_uieru_ultimate_flower_1_default", "fx_uieru_ultimate_flowerbuff_1_default", "fx_uieru_ultimate_flowerbuff_2_default",
              "fx_uieru_ultimate_flowerdebuff_1_default", "fx_uieru_ultimate_shield_1_default"],
+}
+# (10-18 2차) 갈래 색인에는 넣지 않고 장만 뽑는 것(그림 이름 → 장들) — 재생기가 이름으로 부른다
+#   비비(신성) 고학년 성격 갈래(웹판 고학년 추출은 jolly 한 갈래만) · 화면 층 레이저(fx_ui_* — 웹판이 뺐다), 비비 수은 쉴드 끝 단계
+EXTRA = {
+    "vividivine": [f"fx_vividivine_ultimate_{b}_{m}_default" for m in ("cool", "mad", "naive", "gloomy", "resonance")
+                   for b in ("full_boll_1", "full_boll_2", "full_boll_3", "full_boll_4", "full_end", "full_laser_one")]
+                  + [f"fx_ui_vividivine_ultimate_attack_{i}" for i in (1, 2, 3, 4, 5, 6)] + ["fx_ui_vividivine_ultimate_attack_end"],
+    "vivi": ["fx_vivi_skill_barrier_1_end"],
+}
+# 한 번들을 단계(X.STAGES)별 장으로 나눠 뽑는 것 — 장 이름 → (번들 이름, 켤 단계)
+STAGE_SPLIT = {
+    "fx_vivi_skill_barrier_1": ("fx_vivi_skill_barrier_1", ("Root_Start", "Root_Loop")),   # 수은 구(시작 · 유지)
+    "fx_vivi_skill_barrier_1_end": ("fx_vivi_skill_barrier_1", ("Root_End",)),             # 구가 터지는 끝
 }
 
 
@@ -139,25 +152,28 @@ def _work(job):
     import gc
     path, name, owner = job
     try:
-        fx = X.effect(_ctx, path, owner)
+        fx = X.effect(_ctx, path, owner, STAGE_SPLIT[name][1] if name in STAGE_SPLIT else None)
         err = None
     except Exception as ex:
         fx, err = None, str(ex)[:160]
     rec = {"name": name, "err": err, "fx": None, "tex": {}}
     if fx is not None:
         for e in fx["em"]:
-            k = e["tex"]; h = tkey(k)
-            t = _ctx.tex[k]
-            png = os.path.join(_cache, "tex", h + ".png")
-            if not os.path.exists(png):
-                tmp = f"{png}.{os.getpid()}.tmp.png"   # 일꾼끼리 같은 그림을 동시에 쓸 수 있다 — 먼저 쓴 쪽이 이긴다
-                (t["img"].convert("RGB") if t["opaque"] else t["img"]).save(tmp)
-                try: os.replace(tmp, png)
-                except OSError:
-                    if not os.path.exists(png): raise
-                    os.remove(tmp)
-            rec["tex"][h] = {"name": t["name"], "opaque": t["opaque"]}
-            e["tex"] = h
+            refs = [(e, fld) for fld in ("tex", "mask") if fld in e]
+            if "sg" in e: refs += [(e["sg"]["tex"], tn) for tn in list(e["sg"]["tex"])]   # (10-15) 셰이더 그래프 그림들도
+            for holder, fld in refs:   # (10-15) 가리개 그림도 같은 그림 창고에
+                k = holder[fld]; h = tkey(k)
+                t = _ctx.tex[k]
+                png = os.path.join(_cache, "tex", h + ".png")
+                if not os.path.exists(png):
+                    tmp = f"{png}.{os.getpid()}.tmp.png"   # 일꾼끼리 같은 그림을 동시에 쓸 수 있다 — 먼저 쓴 쪽이 이긴다
+                    (t["img"].convert("RGB") if t["opaque"] else t["img"]).save(tmp)
+                    try: os.replace(tmp, png)
+                    except OSError:
+                        if not os.path.exists(png): raise
+                        os.remove(tmp)
+                rec["tex"][h] = {"name": t["name"], "opaque": t["opaque"]}
+                holder[fld] = h
         rec["fx"] = fx
     _ctx.tex.clear()                     # 그림을 쥐지 않는다(다음 이펙트가 같은 그림을 쓰면 다시 읽는다)
     gc.collect()                         # 다 쓴 UnityPy env(순환 참조)를 바로 놓는다
@@ -189,7 +205,7 @@ def main():
 
     def job(f, owner):
         if f in seen: return True
-        p = os.path.join(unit_dir, f)
+        p = os.path.join(unit_dir, STAGE_SPLIT[f][0] if f in STAGE_SPLIT else f)
         if not os.path.exists(p): p = os.path.join(hit_dir, f)
         if not os.path.exists(p): return False
         seen.add(f); jobs.append((p, f, owner)); return True
@@ -207,6 +223,7 @@ def main():
             for f in l: job(f, name)
         if key in ULT_EXTRA:   # 고학년 추출(웹판 extract-fx.py)이 빠뜨린 사도 — 여기서 고학년 장을 뽑아 index 의 ult 로(FxImport 가 비어 있을 때 쓴다)
             heroes[key]["ult"] = [f for f in ULT_EXTRA[key] if job(f, name)]
+        for f in EXTRA.get(name, []): job(f, name)
     if not a.no_common:
         for k, l in COMMON.items():
             common[k] = [f for f in l if job(f, "_common")]
@@ -275,7 +292,10 @@ def main():
         tex_path[k] = fn
     per = {}
     for f, fx in effects.items():
-        for e in fx["em"]: e["tex"] = tex_path[e["tex"]]
+        for e in fx["em"]:
+            e["tex"] = tex_path[e["tex"]]
+            if "mask" in e: e["mask"] = tex_path[e["mask"]]
+            if "sg" in e: e["sg"]["tex"] = {k: tex_path[v] for k, v in e["sg"]["tex"].items()}
         per.setdefault(owner[f], {})[f] = fx
     for o, fxs in per.items():
         os.makedirs(os.path.join(out, o), exist_ok=True)

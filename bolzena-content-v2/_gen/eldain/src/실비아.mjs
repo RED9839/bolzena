@@ -48,25 +48,25 @@ export default hero({
     },
     { // 원작 강화 공격 — 가장 센 적(HP 가 가장 많은 적)을 치고 그 적 주는 피해 -40%
       name: '장갑 던지기', cost: 1, type: '공격',
-      fx: [dmg(1.2, 'topEnemy'), glove],
+      fx: [dmg(1.6, 'topEnemy'), glove],   // 10-19 밸런스(사용자 「실비아 딜 카드 계수」): 120 → 160%
       oracles: [
-        { fx: [dmg(1.8, 'topEnemy'), glove] },                                                          // 수치
-        { fx: [dmg(1.2, 'topEnemy'), glove, cup(1)] },                                                  // 찻잔
-        { cost: 0, fx: [dmg(0.8, 'topEnemy'), glove] },                                                 // 0코
-        { fx: [dmg(1.2, 'topEnemy'), glove, draw(1)] },                                                // 드로우
-        { fx: [dmg(1, 'allEnemies'), { k: 'dealtMod', v: -0.2, target: 'allEnemies' }] },               // 모든 적을 무디게
+        { fx: [dmg(2.2, 'topEnemy'), glove] },                                                          // 수치
+        { fx: [dmg(1.6, 'topEnemy'), glove, cup(1)] },                                                  // 찻잔
+        { cost: 0, fx: [dmg(1.3, 'topEnemy'), glove] },                                                 // 0코
+        { fx: [dmg(1.6, 'topEnemy'), glove, draw(1)] },                                                // 드로우
+        { fx: [dmg(1.3, 'allEnemies'), { k: 'dealtMod', v: -0.2, target: 'allEnemies' }] },               // 모든 적을 무디게
       ],
       blesses: ['power', 'cost', [cup(1)]],
     },
     { // 티파티 — 원작 「궁극의 유희」: 초청객 스킬이 적중하면 추가 피해, 대가로 실비아 SP 회복 불가(→ 게이지 잠금)
       name: '궁극의 유희', cost: 2, type: '강화',
-      fx: [host([dmg(0.3, 'randomEnemy')]), lock],
+      fx: [host([dmg(0.5, 'randomEnemy')]), lock],   // 10-19 밸런스(지원이 점수로 남게): 동료 스킬마다 30 → 50%
       oracles: [
-        { cost: 1, fx: [host([dmg(0.3, 'randomEnemy')]), lock] },                 // 1코
-        { fx: [host([dmg(0.2, 'randomEnemy')])] },                               // 대가 없이 · 덜 세게
+        { cost: 1, fx: [host([dmg(0.5, 'randomEnemy')]), lock] },                 // 1코
+        { fx: [host([dmg(0.4, 'randomEnemy')])] },                               // 대가 없이 · 덜 세게
         { fx: [host([cup(1)]), lock] },                                             // 찻잔이 두 배로
-        { tags: ['개전'], fx: [host([dmg(0.3, 'randomEnemy')]), lock] },           // 개전
-        { fx: [host([dmg(0.4, 'randomEnemy')], '공격'), lock] },                   // 공격 카드 손님
+        { tags: ['개전'], fx: [host([dmg(0.5, 'randomEnemy')]), lock] },           // 개전
+        { fx: [host([dmg(0.8, 'randomEnemy')], '공격'), lock] },                   // 공격 카드 손님
       ],
       blesses: ['cost', 'draw', [cup(1)]],
     },
@@ -88,7 +88,7 @@ export default hero({
       oracles: [
         { fx: [...pour, shield(0.4), bell(3)] },                                                       // 은방울
         { fx: [...pour, heal(0.4), atLeast(3), draw(2)] },                                            // 회복 · 드로우
-        { type: '공격', fx: [...pour, dmg(0.5, 'allEnemies'), bell(2)] },                              // 충격파
+        { type: '공격', fx: [...pour, dmg(0.6, 'allEnemies'), bell(2)] },   // 10-19: 1개당 50 → 60%                              // 충격파
         { tags: ['보존'], fx: [...pour, shield(0.3), atLeast(5), { k: 'ap', v: 2 }] },                 // 가득 채워 AP 2
         { cost: 0, fx: [spend(K, 2), atLeast(2), draw(2)] },                                           // 두 잔만 · 0코 드로우
       ],

@@ -43,7 +43,7 @@ namespace Bolzena.UI
             }
             float tk = Mathf.Min(1f, Tone.HalfH / 4.5f);
             var title = Tone.Text("title", root, "", new Vector3(0, 3.35f * tk, 0), Tone.Xl * k, O + 30, Tone.Ink);
-            Tone.Text("sub", root, $"{played.Name} — 손패에서 {need}장을 눌러 고르세요", new Vector3(0, 2.8f * tk, 0), Tone.Md * k, O + 30, Tone.Sub, TextAlignmentOptions.Center, true, 12f);
+            Tone.Text("sub", root, $"{played.Name} — 손패에서 {need}장을 고를 수 있다", new Vector3(0, 2.8f * tk, 0), Tone.Md * k, O + 30, Tone.Sub, TextAlignmentOptions.Center, true, 12f);
             float by = -Tone.HalfH + 0.85f;
             var okBg = Make.Sliced("ok", root, Res.UI("pill_gold_9s"), new Vector3(1.6f, by, 0), new Vector2(2.6f, 0.78f), O + 30);
             var okT = Make.Text("okt", root, "확인", new Vector3(1.6f, by, 0), Tone.Lg * k, O + 32, Tone.Brown);
@@ -51,7 +51,7 @@ namespace Bolzena.UI
             Make.Text("cnt", root, "취소", new Vector3(-1.6f, by, 0), Tone.Lg * k, O + 32, Tone.Ink);
             void Refresh()
             {
-                title.text = $"{kind} 카드를 고르세요 <color={Tone.GoldTag}>({chosen.Count}/{need})</color>";
+                title.text = $"{kind} 카드 고르기 <color={Tone.GoldTag}>({chosen.Count}/{need})</color>";
                 bool ok = chosen.Count == need;
                 okBg.color = new Color(1, 1, 1, ok ? 1f : 0.4f); okT.alpha = ok ? 1f : 0.5f;
                 for (int i = 0; i < n; i++)

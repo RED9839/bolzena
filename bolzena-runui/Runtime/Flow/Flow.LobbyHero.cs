@@ -69,7 +69,7 @@ namespace Bolzena.RunUI
         /// <summary>메인 사도 고르기 창 — 고르면 저장하고 picked(사도)를 부른다. 창 밖 · 닫기로 닫는다.</summary>
         public void LobbyHeroPicker(Action<HeroInfo> picked)
         {
-            var (body, close, _) = Stage.ModalBox("lobbyhero", Mathf.Min(1500, Stage.Size.x - 40), Stage.Size.y - Theme.C(60, 30), "메인 사도 바꾸기", "로비에 설 사도를 고릅니다 — 누르면 바로 바뀝니다");
+            var (body, close, _) = Stage.ModalBox("lobbyhero", Mathf.Min(1500, Stage.Size.x - 40), Stage.Size.y - Theme.C(60, 30), "메인 사도 바꾸기", "누르면 로비에 서는 사도가 바로 바뀐다");
             var cur = LobbyHeroInfo();
             // 위 — 검색 칸
             var tools = Ui.Rect("tools", body).At(1, 1, 0, 0, 900, 52);
@@ -91,7 +91,7 @@ namespace Bolzena.RunUI
                 var nc = NatureCol(h);
                 var b = Btn.Make(content, null, BtnStyle.Ghost, () =>
                 {
-                    if (!CanLobby(hh)) { Toast.Show($"{hh.ko} — 스탠딩 그림이 아직 없습니다"); return; }
+                    if (!CanLobby(hh)) { Toast.Show($"{hh.ko} — 스탠딩 그림이 아직 없다"); return; }
                     Settings.LobbyHero = hh.key;
                     PlayerPrefs.Save();
                     close();

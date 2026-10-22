@@ -63,7 +63,7 @@ namespace Bolzena.View
             // 펀치 중심이 화면에서 그 자리에 머물도록 중심을 보정한다
             Vector2 c = Center;
             if (Mathf.Abs(punch) > 1e-4f) c = punchAt - (punchAt - Center) * (Zoom / z);
-            transform.localScale = new Vector3(z, z, 1);
+            transform.localScale = new Vector3(z, z, z);   // (10-18 사용자 2차 「이드 구 찌그러짐」) 깊이도 같이 — (z, z, 1) 이면 −20° 눕힌 3D 장(바닥 고리 · 판)이 확대 동안 깊이 몫만 덜 커져 납작해졌다(스프라이트는 z 배율 영향 없음)
             transform.localPosition = new Vector3(-c.x * z + shake.x, -c.y * z + shake.y, 0);
             transform.localRotation = Quaternion.Euler(0, 0, rot);
         }

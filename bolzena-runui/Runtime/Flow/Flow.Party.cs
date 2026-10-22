@@ -48,13 +48,13 @@ namespace Bolzena.RunUI
             Ui.Row(head, 14, TextAnchor.MiddleLeft, null, false, false);
             var bk = Btn.Icon(head, Theme.S("ic_back"), () => { if (st.Dex) (back ?? Lobby)(); else VillageReveal(st.Village, () => Party(st.Village)); }, 54);
             Stage.Hot["back"] = bk;
-            var t = Ui.Title(head, st.Dex ? "사도 도감" : "팀 편성", Theme.Fs2xl - 4, Theme.Ink);
+            var t = Ui.Title(head, st.Dex ? "사도 도감" : "편성", Theme.Fs2xl - 4, Theme.Ink);
             t.Outline(0.2f); t.textWrappingMode = TextWrappingModes.NoWrap; t.Pref(t.preferredWidth + 12, 60);
             if (!st.Dex)
             {
                 var (cb, ct) = Ui.Chip(head, null, $"{count} / 3", 42, count == 3 ? Theme.Gold : Theme.NavyCell, null, Theme.FsMd);
                 ct.color = count == 3 ? Theme.Brown : Theme.Gold;
-                var hint = Ui.Text(head, count == 3 ? "준비됐습니다 — 오른쪽 아래에서 떠납니다" : "아래 목록에서 사도를 눌러 넣습니다 · 칸을 누르면 뺍니다", Theme.FsSm, Theme.Sub);
+                var hint = Ui.Text(head, count == 3 ? "준비됐다" : "사도를 눌러 넣고 칸을 눌러 뺀다", Theme.FsSm, Theme.Sub);
                 hint.textWrappingMode = TextWrappingModes.NoWrap; hint.Pref(560, 40); hint.Outline(0.2f);
             }
             else
@@ -131,7 +131,7 @@ namespace Bolzena.RunUI
                     .OrderByDescending(h => h.Playable).ThenBy(h => h.ko, StringComparer.Ordinal).ToList();
                 int i = 0;
                 foreach (var h in list) GridHero(content, st, h, root, back, i++);
-                if (list.Count == 0) Ui.Text(content, "맞는 사도가 없습니다", 22, Theme.Sub, TextAlignmentOptions.Center);
+                if (list.Count == 0) Ui.Text(content, "맞는 사도가 없다", 22, Theme.Sub, TextAlignmentOptions.Center);
             }
             else if (st.Tab == "교주 카드")
             {
@@ -178,7 +178,7 @@ namespace Bolzena.RunUI
                 }, Theme.FsXl - 2, "go");
                 go.GetComponent<RectTransform>().At(1, 0, -Theme.Gutter, Theme.Gutter, side, Theme.C(78, 64));
                 go.Interactable = count == 3;
-                go.Why = "사도 셋을 고르세요";
+                go.Why = "사도 셋을 골라야 한다";
                 Stage.Hot["party.go"] = go;
                 if (count == 3) Tw.Breathe(go.transform, 0.02f, 1.4f);
             }
@@ -221,7 +221,7 @@ namespace Bolzena.RunUI
                 Tw.Breathe(plus.transform, 0.05f, 1.5f, i * 0.3f);
                 var tt = Ui.Title(rt, "사도 넣기", Theme.FsLg, Theme.Ink, TextAlignmentOptions.Center);
                 tt.rectTransform.At(0.5f, 0.5f, 0, -50, 300, 32);
-                var tt2 = Ui.Text(rt, "아래 목록에서 고르세요", Theme.FsCap + 1, Theme.Sub, TextAlignmentOptions.Center);
+                var tt2 = Ui.Text(rt, "사도를 고를 수 있다", Theme.FsCap + 1, Theme.Sub, TextAlignmentOptions.Center);
                 tt2.rectTransform.At(0.5f, 0.5f, 0, -80, 300, 24);
                 return;
             }
@@ -263,10 +263,10 @@ namespace Bolzena.RunUI
                         // 앞쪽 빈 칸
                         int slot = Array.IndexOf(st.Slots, null);
                         if (slot >= 0) st.Slots[slot] = h.key;
-                        else Toast.Show("세 칸이 다 찼습니다 — 위 칸을 눌러 빼세요");
+                        else Toast.Show("세 칸이 다 찼다 — 칸을 눌러 뺄 수 있다");
                     }
                 }
-                else if (!st.Dex && !h.Playable) Toast.Show($"{h.ko} — 아직 판에 데려갈 수 없습니다(코어 데이터 준비 중)");
+                else if (!st.Dex && !h.Playable) Toast.Show($"{h.ko} — 아직 모험에 데려갈 수 없다(코어 데이터 준비 중)");
                 BuildParty(root, st, back);
             }, 0, "hero " + h.key);
             float k = Theme.C(1f, 96f / 118f);
@@ -341,21 +341,21 @@ namespace Bolzena.RunUI
             {
                 Ui.Title(box.transform, st.Tab == "아티팩트" ? "아티팩트 도감" : "교주 카드", 30, Theme.Ink).Pref(-1, 40);
                 Ui.Text(box.transform, st.Tab == "아티팩트"
-                    ? $"{P.Data.Equips.Count}개 — 사도 하나에 무기 · 방어구 · 장신구 한 칸씩. 애착 아티팩트는 그 사도가 끼면 더 셉니다. 얻으면 곧장 끼거나 팝니다."
-                    : "교주님이 직접 쓰는 카드와 사도 고유 카드. 교주 카드는 상점에서, 고유 카드는 싸우며 은총으로 얻습니다.", 18, Theme.Sub).Pref(-1, 120);
+                    ? $"{P.Data.Equips.Count}개 — 사도 하나에 무기 · 방어구 · 장신구 한 칸씩. 애착 아티팩트는 그 사도가 끼면 더 세진다. 얻으면 곧장 끼거나 판다."
+                    : "교주가 직접 쓰는 카드와 사도 고유 카드. 교주 카드는 상점에서, 고유 카드는 싸우며 은총으로 얻는다.", 18, Theme.Sub).Pref(-1, 120);
                 return;
             }
             if (h == null)
             {
-                Ui.Title(box.transform, st.Dex ? "사도를 고르면 능력이 여기 뜹니다" : "파티 성격 · 시작 덱", 24, Theme.Ink).Pref(-1, 34);
+                Ui.Title(box.transform, st.Dex ? "사도를 고르면 능력이 여기 뜬다" : "파티 성격 · 시작 덱", 24, Theme.Ink).Pref(-1, 34);
                 if (!st.Dex)
                 {
                     var picked = st.Slots.Where(k => k != null).Select(Roster.ByKey).ToList();
-                    var nat = picked.Count == 0 ? "사도를 고르면 셋의 성격이 여기 뜹니다." : string.Join(" · ", picked.GroupBy(x => x.nature).Select(g => $"<color=#{ColorUtility.ToHtmlStringRGB(Theme.NatureOf(g.Key))}>{g.Key}</color> {g.Count()}"));
+                    var nat = picked.Count == 0 ? "사도를 고르면 셋의 성격이 여기 뜬다" : string.Join(" · ", picked.GroupBy(x => x.nature).Select(g => $"<color=#{ColorUtility.ToHtmlStringRGB(Theme.NatureOf(g.Key))}>{g.Key}</color> {g.Count()}"));
                     Ui.Text(box.transform, nat, 19, Theme.Ink).Pref(-1, 30);
                     // 같은 카드 2장(가벼운 덱의 1코 기본 공격 — 2026-10-11)은 「이름 ×2」 로
                     var deck = picked.Where(x => x.Playable).SelectMany(x => P.Data.Hero(x.CoreId).Starter).GroupBy(id => id).Select(g => (P.Data.Card(g.Key)?.Name ?? g.Key) + (g.Count() > 1 ? $" ×{g.Count()}" : ""));
-                    Ui.Text(box.transform, picked.Count == 0 ? "사도마다 시작 카드 넉 장. 고유 카드는 싸우며 은총으로 얻습니다." : "시작 덱  " + string.Join(" · ", deck), 17, Theme.Sub).Pref(-1, 80);
+                    Ui.Text(box.transform, picked.Count == 0 ? "사도마다 시작 카드 넉 장. 고유 카드는 싸우며 은총으로 얻는다" : "시작 덱  " + string.Join(" · ", deck), 17, Theme.Sub).Pref(-1, 80);
                 }
                 return;
             }
@@ -397,7 +397,7 @@ namespace Bolzena.RunUI
             }
             else
             {
-                var bt = Ui.Text(box.transform, $"<color=#F2CF7A>키워드</color>  {h.keyword}\n<color=#F2CF7A>고학년</color>  {h.ult}\n\n<color=#A7B1CC>코어 데이터에 아직 없는 사도입니다 — 도감으로만 봅니다.</color>", 17, Theme.Ink);
+                var bt = Ui.Text(box.transform, $"<color=#F2CF7A>키워드</color>  {h.keyword}\n<color=#F2CF7A>고학년</color>  {h.ult}\n\n<color=#A7B1CC>코어 데이터에 아직 없는 사도다 — 도감으로만 본다</color>", 17, Theme.Ink);
                 bt.Pref(-1, 160);
             }
         }

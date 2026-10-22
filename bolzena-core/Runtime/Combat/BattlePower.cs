@@ -10,6 +10,8 @@ namespace Bolzena.Core
         public string Hero, Id, Name, Card;
         public int N;
         public List<PassiveRule> Rules = new();
+        /// <summary>규칙 캐시 — 이 강화의 Rules 로 지은 RuleRt(Copy 는 같은 것을 나눠 쓴다 · 저장하지 않는다).</summary>
+        internal List<RuleRt> Rt;
         public PowerRt Copy() => (PowerRt)MemberwiseClone();
     }
 
@@ -33,7 +35,6 @@ namespace Bolzena.Core
     {
         /// <summary>켜진 강화 — 켠 차례대로.</summary>
         public List<PowerRt> Powers = new();
-        Dictionary<string, List<RuleRt>> powerRules = new();
 
         // ── 화면 API ──────────────────────────────────────────────────
         /// <summary>켜진 강화 칩 목록(heroKey 를 주면 그 사도 것만) — 이름 · 겹 · 규칙 글.</summary>
@@ -70,14 +71,12 @@ namespace Bolzena.Core
             Cue("powerOn", owner, new Cue { Hero = owner.Key, Id = id, Name = name, CardId = baseId, V = p.N });
         }
 
-        /// <summary>그 강화의 규칙(RuleRt) — 강화마다 한 번 만들어 둔다.</summary>
-        List<RuleRt> PowerRules(PowerRt p)
-        {
-            string key = p.Hero + "|" + p.Id;
-            if (!powerRules.TryGetValue(key, out var l))
-                powerRules[key] = l = (p.Rules ?? new List<PassiveRule>()).Where(r => r.When?.On != "always").Select(r => new RuleRt { R = r, Power = p.Name }).ToList();
-            return l;
-        }
+        /// <summary>
+        /// 그 강화의 규칙(RuleRt) — 강화마다 한 번 만들어 둔다. 옛 캐시는 「사도|id」 열쇠로 복사본과 나눠 써서, 봇 · 미리보기 복사본이 다른 신탁 모습으로 켠 규칙을
+        /// 진짜 판이 받아 쓰는 일이 있었다(2026-10-18 다시 돌리기 시험 — 미리보기를 끼우면 결과가 달라짐). 이제 그 강화(PowerRt) 자신에 둔다.
+        /// </summary>
+        List<RuleRt> PowerRules(PowerRt p) =>
+            p.Rt ??= (p.Rules ?? new List<PassiveRule>()).Where(r => r.When?.On != "always").Select(r => new RuleRt { R = r, Power = p.Name }).ToList();
 
         /// <summary>켜진 강화의 「항상」 증감(StatMod 가 더한다) — 대상 allAllies · party 면 파티 전원, otherAllies 면 주인 빼고, 아니면 주인만. 겹 수만큼.</summary>
         double PowerMod(Unit u, string stat)

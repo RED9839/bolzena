@@ -134,3 +134,22 @@ for name, e in idx.items():
                 "ax": e["anchor"][0], "ay": e["anchor"][1], "ppu": e["ppu"]})
 json.dump({"sheets": out}, open(f"{DST}/Fx/sheets.json", "w", encoding="utf-8"), indent=1)
 print("ok", len(out), "sheets")
+
+# 소환수 · 이펙트 스파인(2026-10-15) — 원작은 에피칸 · 리뉴아 차원문 · 비비 거대 형상 · 네르 깃발/사제 · 우이(기억) 에루/연못을 따로 움직이는 스파인으로 그린다
+#   (minionspine = 웹판 extract-spine.py --kinds minion, effectspine = 같은 도구에 effect 갈래를 더해 꺼낸 것)
+SUMMON = {"minionspine/epicon": "epicon", "minionspine/epicon_ult": "epicon_ult", "minionspine/renewaawaken_portal": "renewaawaken_portal",
+          "minionspine/nerrageflag": "nerrageflag", "minionspine/vivi_ult": "vivi_ult",
+          "effectspine/uimemoryeru": "uimemoryeru", "effectspine/uimemorypond": "uimemorypond", "effectspine/nerragepriests": "nerragepriests"}
+for src, name in SUMMON.items():
+    sd = f"{SRC}/{src}"
+    dd = f"{DST}/Spine/{name}"
+    if not os.path.isdir(sd): print("소환수 스파인 없음", src); continue
+    os.makedirs(dd, exist_ok=True)
+    for f in os.listdir(sd):
+        if f.endswith(".skel"): cp(f"{sd}/{f}", f"{dd}/{f}.bytes")
+        elif f.endswith(".atlas"): cp(f"{sd}/{f}", f"{dd}/{f}.txt")
+        elif f.endswith(".png") and not os.path.exists(f"{dd}/{f}"):
+            sys.path.insert(0, "C:/projects/bolzena-runui/Tools~")
+            import spine_straight
+            spine_straight.convert(f"{sd}/{f}", f"{dd}/{f}")
+print("소환수 스파인", len(SUMMON))

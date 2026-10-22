@@ -47,7 +47,9 @@ namespace Bolzena
             }
             var f = Flow.Boot();
             DontDestroyOnLoad(f.gameObject);
-            f.FightScreen = new BattleBridge();
+            var bridge = new BattleBridge();
+            f.FightScreen = bridge;
+            f.FrontierFight = bridge;   // 프론티어 전투(runui Flow.Frontier.cs) — 같은 전투 장면
             if (demo) RunDemo.Attach(f);
         }
 

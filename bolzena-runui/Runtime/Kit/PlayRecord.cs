@@ -23,7 +23,7 @@ namespace Bolzena.RunUI
     {
         const string KOn = "bz.rec.send", KNoticed = "bz.rec.noticed", KAnon = "bz.rec.anon";
         const int QUEUE_MAX = 5, LOCAL_MAX = 20;
-        public const string NOTICE = "밸런스를 다듬으려고 판 기록을 익명으로 보냅니다. 개인 정보는 없고, 설정에서 끌 수 있습니다.";
+        public const string NOTICE = "밸런스를 다듬으려고 모험 기록을 익명으로 보낸다. 개인 정보는 없고 설정에서 끌 수 있다.";
 
         /// <summary>설정 — 보내기 켬(기본).</summary>
         public static bool On { get => PlayerPrefs.GetInt(KOn, 1) == 1; set { PlayerPrefs.SetInt(KOn, value ? 1 : 0); PlayerPrefs.Save(); } }
@@ -106,12 +106,6 @@ namespace Bolzena.RunUI
             get { var t = Resources.Load<TextAsset>("RunUI/build_stamp"); return t != null ? t.text.Trim() : null; }
         }
 
-        static int BoardCells()
-        {
-            try { var s = CrayonStore.Save; return CrayonStore.Table.Cells.Where(x => !x.Blank).Sum(x => Math.Min(x.Levels, s.LevelOf(x.Id))); }
-            catch { return 0; }
-        }
-
         /// <summary>
         /// 이 판의 기록을 보낸다(또는 파일로) — result: win · lose · abandon · quit. 판이 없으면 아무것도 않는다.
         /// 설정이 꺼져 있으면 보내지도 남기지도 않는다(시험 실행의 파일 남기기만은 한다).
@@ -129,7 +123,7 @@ namespace Bolzena.RunUI
                 {
                     Anon = Anon, Ver = PatchNotes.Version, Build = BuildStamp,   // 버전 = 로비에 보이는 것(패치노트 맨 위 판)
                     Os = Application.isEditor ? "editor" : Application.platform == RuntimePlatform.WebGLPlayer ? "web" : "pc",
-                    Phone = Application.isMobilePlatform, Low = DisplayOptions.LowSpec, Result = result, Board = BoardCells(), Ended = DateTime.UtcNow,
+                    Phone = Application.isMobilePlatform, Low = DisplayOptions.LowSpec, Result = result, Ended = DateTime.UtcNow,
                 });
                 json = RunRecord.Json(rec);
                 var why = RunRecord.Check(json);

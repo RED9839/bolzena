@@ -20,11 +20,12 @@ namespace Bolzena.RunUI
         static readonly string[] Grades = { "일반", "고급", "희귀", "전설" };
 
         /// <summary>도감 — 처음은 사도 탭. 탭을 오가도 같은 화면 안에서 다시 그린다.</summary>
-        public void Dex(Action back)
+        /// <param name="after">화면을 세운 뒤 할 일(저장함에서 돌아와 사도 상세를 다시 띄울 때 — Stage.Show 가 창 층을 비운 다음이어야 한다).</param>
+        public void Dex(Action back, Action after = null)
         {
             dexHeroes = new ListState(); dexCards = new ItemListState(); dexEquips = new ItemListState(); dexFoes = new FoeListState();
             Stage.SetBg("stage1_1", 0.7f);
-            Stage.Show("dex", root => DexTab(root, "사도", back));
+            Stage.Show("dex", root => { DexTab(root, "사도", back); after?.Invoke(); });
         }
 
         void DexTab(RectTransform host, string tab, Action back)
@@ -69,7 +70,7 @@ namespace Bolzena.RunUI
             RosterHead(host, eq ? "아티팩트 도감" : "교주 카드 도감", back);
 
             // 위 오른쪽 — 정렬 · 도감 탭
-            var tr = Ui.Rect("tools", host).At(1, 1, -Theme.Gutter, -20, 1240, 52);
+            var tr = Ui.Rect("tools", host).At(1, 1, HeadToolsX, -24, 1240, 52);   // 머리 오른쪽 묶음(홈 · 설정) 왼쪽
             Ui.Row(tr, 10, TextAnchor.MiddleRight, null, false, true);
             var sorts = eq ? new[] { "등급", "이름", "종류" } : new[] { "등급", "이름", "비용" };
             if (Array.IndexOf(sorts, ls.Sort) < 0) ls.Sort = "등급";
@@ -179,7 +180,7 @@ namespace Bolzena.RunUI
                     idx++;
                 }
             }
-            if (keys.Count == 0) { var none = Ui.Text(content, "맞는 것이 없습니다", Theme.FsLg, Theme.Sub, TextAlignmentOptions.Center); none.Pref(400, 80); }
+            if (keys.Count == 0) { var none = Ui.Text(content, "맞는 것이 없다", Theme.FsLg, Theme.Sub, TextAlignmentOptions.Center); none.Pref(400, 80); }
             ls.Drawn = true;
             if (ls.ScrollY > 0)
             {
@@ -200,7 +201,7 @@ namespace Bolzena.RunUI
             var drt = detail.GetComponent<RectTransform>(); drt.At(1, 0.5f, 0, 0, 250, 58);
             var dzi = Ui.Img(drt, Theme.S("ic_zoom"), Theme.Gold, "ic"); dzi.rectTransform.At(0, 0.5f, 22, 0, 24, 24); dzi.preserveAspect = true;
             var dl = Ui.Title(drt, "상세 정보", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineRight); dl.rectTransform.Fill(50, 0, 26, 0);
-            detail.Interactable = focusName != null; detail.Why = eq ? "아티팩트를 먼저 고르세요" : "카드를 먼저 고르세요";
+            detail.Interactable = focusName != null; detail.Why = eq ? "아티팩트를 먼저 골라야 한다" : "카드를 먼저 골라야 한다";
             Stage.Hot["list.detail"] = detail;
             // 검색 칸 — 이름 · 초성(도감마다 따로 기억)
             DexSearch(tr, tab, content, area, n =>

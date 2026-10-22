@@ -8,6 +8,7 @@ Shader "Bolzena/FxParticle"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _MaskTex ("Mask", 2D) = "white" {}
         _Edge ("Edge", Float) = 0.05
     }
     SubShader
@@ -23,16 +24,18 @@ Shader "Bolzena/FxParticle"
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
-            sampler2D _MainTex;
+            sampler2D _MainTex, _MaskTex;
             float _Edge;
-            struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; float4 l : TEXCOORD1; float4 color : COLOR; };
-            struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; float4 l : TEXCOORD1; float4 color : COLOR; };
+            // uv2(TEXCOORD2) = 가리개 그림 자리(10-15 — 원작 _Mask_Tex). 가리개가 없으면 흰 그림이라 그대로
+            struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; float4 l : TEXCOORD1; float2 m : TEXCOORD2; float4 color : COLOR; };
+            struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; float4 l : TEXCOORD1; float2 m : TEXCOORD2; float4 color : COLOR; };
             v2f vert (appdata v)
             {
                 v2f o;
                 o.pos = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
                 o.l = v.l;
+                o.m = v.m;
                 o.color = v.color;
                 return o;
             }
@@ -49,7 +52,8 @@ Shader "Bolzena/FxParticle"
                 float f = smoothstep(0.0, max(1e-4, abs(i.l.w)), d);
                 float3 rgb = xc * i.color.rgb * i.color.a;
                 float a = xa * i.color.a * (1.0 - add);
-                return float4(rgb, a) * f;
+                float4 mk = tex2D(_MaskTex, i.m);
+                return float4(rgb, a) * f * (mk.r * mk.a);
             }
             ENDCG
         }

@@ -228,7 +228,8 @@ namespace Bolzena.Core
         /// <summary>조건 머리가 키워드 꼴(「처치:」 · 「연속:」 · 갈래 이름)인가 — 아니면 말로 쓴 조건(「낸 뒤 손패가 없으면 …」).</summary>
         static bool KwHead(Fx f) => f.K switch
         {
-            FxK.IfBroken or FxK.IfTune or FxK.IfChain or FxK.IfLink or FxK.IfPrev or FxK.IfSwitched or FxK.IfRepeat or FxK.IfKill or FxK.IfBreak or FxK.IfChoice or FxK.IfRoll => true,
+            FxK.IfBroken or FxK.IfTune or FxK.IfChain or FxK.IfLink or FxK.IfPrev or FxK.IfSwitched or FxK.IfRepeat or FxK.IfBreak or FxK.IfChoice or FxK.IfRoll => true,
+            FxK.IfKill => f.Id != "orBoss",   // (2026-10-19) 「처치하거나 대상이 보스면」 은 말로 쓴 조건
             FxK.IfWounded => f.Target != "oneEnemy",
             FxK.When => f.On != "handEnd" && f.On != "shieldLeft",   // 말로 쓴 조건(「… 실드가 남았으면」)은 쌍점 없이
             FxK.IfForm => !f.Not && stanceHead,
@@ -502,7 +503,7 @@ namespace Bolzena.Core
             FxK.IfHunted => $"{Foe()}이 찍혀 있으면",
             FxK.IfDebuffs => $"{Foe()}의 디버프가 {Math.Max(1, f.N)}가지 이상이면",
             FxK.IfHp => f.Not ? $"파티 HP가 {Num.Round((f.Pct > 0 ? f.Pct : 0.5) * 100)}%보다 많으면" : $"파티 HP가 {Num.Round((f.Pct > 0 ? f.Pct : 0.5) * 100)}% 이하면",
-            FxK.IfKill => f.Id == "boss" ? (f.Not ? "보스를 처치하지 못했으면" : "보스를 처치하면") : f.Id == "elite" ? (f.Not ? "엘리트 · 보스를 처치하지 못했으면" : "엘리트 · 보스를 처치하면") : f.Not ? "처치하지 못했으면" : "처치",
+            FxK.IfKill => f.Id == "orBoss" ? "처치하거나 보스면" : f.Id == "boss" ? (f.Not ? "보스를 처치하지 못했으면" : "보스를 처치하면") : f.Id == "elite" ? (f.Not ? "엘리트 · 보스를 처치하지 못했으면" : "엘리트 · 보스를 처치하면") : f.Not ? "처치하지 못했으면" : "처치",
             FxK.IfBreak => f.Not ? "격파하지 못했으면" : "붕괴",
             FxK.IfPricier => f.Not ? "바로 앞 카드의 비용 이하면" : "바로 앞 카드의 비용을 넘으면",
             FxK.IfGained => f.Not ? $"이번 전투에 쌓은 {Ko.J(Q(f.Id), "이가")} {Math.Max(1, f.N)} 미만이면" : $"이번 전투에 쌓은 {Ko.J(Q(f.Id), "이가")} {Math.Max(1, f.N)} 이상이면",
@@ -520,7 +521,7 @@ namespace Bolzena.Core
             FxK.IfAllHeroes => "이번 턴 사도 모두가 카드를 냈으면(이 카드 포함)",
             FxK.IfFoe when f.HitsBy != null => f.Not ? $"{KoNum(f.N)} 번 친 적이 아니면" : $"{KoNum(f.N)} 번 친 적이면",   // 글 길이(엘다인 3차)
             FxK.IfFoe when f.Id == null && f.HpBelow > 0 => FoeNamed ? $"HP {Num.Round(f.HpBelow * 100)}% 이하면" : $"{Foe()}의 HP가 {Num.Round(f.HpBelow * 100)}% 이하면",   // 앞 피해와 같은 적이면 짧게(엘다인 4차 글 길이)
-            FxK.IfFoe => (f.Id switch { "broken" => FoeNamed ? "격파 상태면" : $"{Foe()}이 격파 상태면", "tough" => $"{Foe()}의 강인도가 {Num.Round((f.Pct > 0 ? f.Pct : 0.5) * 100)}% 이하면", "guarded" => $"{Foe()}에게 실드가 있으면", "attack" => $"{Foe()}이 공격하려 하면", "hp" => FoeNamed ? $"HP {Num.Round((f.Pct > 0 ? f.Pct : 0.3) * 100)}% 이하면" : $"{Foe()}의 HP가 {Num.Round((f.Pct > 0 ? f.Pct : 0.3) * 100)}% 이하면", "hpMob" => $"{Foe()}이 보스가 아니고 HP가 {Num.Round((f.Pct > 0 ? f.Pct : 0.3) * 100)}% 이하면", "alone" => f.Not ? "적이 둘 이상이면" : "적이 하나뿐이면", "known" => f.Not ? "모르는 수면" : "아는 수면", "anyAttack" => f.Not ? "공격하려는 적이 없으면" : "공격하려는 적이 있으면", var st when R.ALL_ST.Contains(st) => $"{Foe()}에게 {Ko.J(st, "이가")} {(f.Not ? "없으면" : "있으면")}", _ => f.Id }) + (f.Not && !R.ALL_ST.Contains(f.Id ?? "") ? "(아니면)" : ""),
+            FxK.IfFoe => (f.Id switch { "broken" => FoeNamed ? "격파 상태면" : $"{Foe()}이 격파 상태면", "tough" => $"{Foe()}의 강인도가 {Num.Round((f.Pct > 0 ? f.Pct : 0.5) * 100)}% 이하면", "guarded" => $"{Foe()}에게 실드가 있으면", "attack" => $"{Foe()}이 공격하려 하면", "hp" => FoeNamed ? $"HP {Num.Round((f.Pct > 0 ? f.Pct : 0.3) * 100)}% 이하면" : $"{Foe()}의 HP가 {Num.Round((f.Pct > 0 ? f.Pct : 0.3) * 100)}% 이하면", "hpMob" => $"{Foe()}이 보스가 아니고 HP가 {Num.Round((f.Pct > 0 ? f.Pct : 0.3) * 100)}% 이하면", "alone" => f.Not ? "적이 둘 이상이면" : "적이 하나뿐이면", "boss" => $"{Foe()}이 보스면", "known" => f.Not ? "모르는 수면" : "아는 수면", "anyAttack" => f.Not ? "공격하려는 적이 없으면" : "공격하려는 적이 있으면", var st when R.ALL_ST.Contains(st) => $"{Foe()}에게 {Ko.J(st, "이가")} {(f.Not ? "없으면" : "있으면")}", _ => f.Id }) + (f.Not && !R.ALL_ST.Contains(f.Id ?? "") ? "(아니면)" : ""),
             FxK.IfRoll => $"{f.N}",
             FxK.IfPrevSame => f.Not ? "바로 앞 카드와 종류가 다르면" : "바로 앞 카드와 종류가 같으면",
             FxK.IfInHand => costIf != null && !f.Not && f.Id == costIf.InHand ? $"손에 {Ko.J(Q(CardName(f.Id)), "이가")} 있으면 비용 +{costIf.Add}," : $"손에 다른 {Ko.J(Q(CardName(f.Id)), "이가")} 있으면",   // costIf 와 한 조건(2026-10-13 이드)
@@ -540,6 +541,26 @@ namespace Bolzena.Core
         static string KoNum(int n) => n switch { 1 => "한", 2 => "두", 3 => "세", 4 => "네", 5 => "다섯", _ => n.ToString() };
 
         /// <summary>「「백수공권 모드」면」 · 「… 가 아니면」 — 변신 이름으로(id 없으면 「변신 중이면」).</summary>
+        /// <summary>(2026-10-19 타수 합치기) dmg plusIf — 「피해 100%(「본성」이면 140%)」 꼴의 괄호 덧말.</summary>
+        string PlusTxt(Fx f)
+        {
+            if (f.PlusIf == null || !(f.Plus > 0)) return "";
+            var c = f.PlusIf;
+            string cond;
+            if (c.K == FxK.IfForm && !c.Not && StanceOf(c.Id) is { } sd) cond = $"{Q(sd.Name)}{(Ko.HasFinal(sd.Name) ? "이면" : "면")}";
+            else if (c.K == FxK.IfFoe && c.Id == "boss" && !c.Not) cond = (f.Target ?? "oneEnemy") == "oneEnemy" ? "보스면" : "보스에게";   // (2026-10-19) 「피해 220%(보스면 320%)」 · 적 전체는 「(보스에게 …)」 — 맞는 적마다 본다
+            else
+            {   // 한 적을 치는 대면 조건의 적도 그 적 — 「대상의 」 를 떼어 짧게(「피해 90%(격파 상태면 240%)」)
+                bool one = (f.Target ?? "oneEnemy") == "oneEnemy", s0 = sawOne;
+                if (one) sawOne = true;
+                cond = CondHead(c) ?? "";
+                sawOne = s0;
+                if (one) foreach (var pre in new[] { "대상의 ", "대상이 ", "대상에게 " }) if (cond.StartsWith(pre, StringComparison.Ordinal)) { cond = cond.Substring(pre.Length); break; }
+                if (!cond.EndsWith("면", StringComparison.Ordinal)) cond += (cond.Length > 0 && Ko.HasFinal(cond) ? "이면" : "면");
+            }
+            return $"({cond} {P(f.Ratio + f.Plus)})";
+        }
+
         string FormIf(Fx f)
         {
             var sd = StanceOf(f.Id);
@@ -584,7 +605,7 @@ namespace Bolzena.Core
         /// 주는 피해(dealt)는 곱연산이라 「x% 증가」 로 쓴다. 그 밖의 능력(공격력 · 방어력 · 받는 피해 …)은 「+x%」 그대로.
         /// </summary>
         static string StatPct(string stat, int pct) => stat == "dealt" ? (pct >= 0 ? $"{pct}% 증가" : $"{-pct}% 감소") : $"{(pct >= 0 ? "+" : "")}{pct}%";
-        static readonly Dictionary<string, string> STAT_KO = new() { ["dealt"] = "주는 피해", ["taken"] = "받는 피해", ["atk"] = "공격력", ["def"] = "방어력", ["crit"] = "치명 확률", ["tough"] = "받는 강인도 피해", ["guard"] = "주는 실드", ["counter"] = "반격 피해", ["ultCost"] = "고학년 게이지" };
+        static readonly Dictionary<string, string> STAT_KO = new() { ["dealt"] = "주는 피해", ["taken"] = "받는 피해", ["atk"] = "공격력", ["def"] = "방어력", ["crit"] = "치명 확률", ["tough"] = "받는 강인도 피해", ["guard"] = "주는 실드", ["counter"] = "반격 피해", ["ultCost"] = "고학년 게이지", ["weak"] = "약점 공격 피해" };
 
         /// <summary>대상 표기(Docs/키워드.md §0) — 표기 없음 = 파티 전원 · 「자신의」 = 카드 주인 · 「아군의」 = 자신을 뺀 사도.</summary>
         /// <summary>적을 가리키는 대상인가(글에서 「적 …」 으로 적을 것) — 2026-10-06 nextEnemy · topEnemy 등이 「파티」 로 읽히던 것 고침.</summary>
@@ -604,14 +625,17 @@ namespace Bolzena.Core
                         if (f.OfForm > 0) return $"{WhoTo(f.Target)} 이번 {Q(FormNameOf(formHero) ?? ctxHero?.Forms?.FirstOrDefault()?.Name ?? "변신")} 준 피해의 {P(f.OfForm)} 고정 피해";   // ▶E76
                         if (f.OfEvent > 0) return f.OfStack != null ? $"{WhoTo(f.Target)} {Q(f.OfStack)} 1당 {Num.Round(f.OfEvent)} 고정 피해" : f.OfShield ? $"{WhoTo(f.Target)} 파티 실드의 {P(f.OfEvent)} 고정 피해" : prev != null && prev.K == FxK.SpendShield ? $"{WhoTo(f.Target)} 쓴 양의 {P(f.OfEvent)} 고정 피해" : $"{WhoTo(f.Target)} 그 값의 {P(f.OfEvent)} 고정 피해";
                         string hitFx = f.HitFx != null && f.HitFx.Count > 0 ? ", 맞은 적마다 " + StripFoe(Fx(f.HitFx)) : "";
+                        if (f.HitsPer != null && R.PER_HIT_MERGE)   // (2026-10-19) 겹 수 타수는 한 대 — 「「왕마력」 1당 피해 30%」 · 「(「용기」+2)당 피해 50%」
+                            return $"{WhoTo(f.Target)} {(f.HitsAdd != 0 ? $"({Q(f.HitsPer)}{(f.HitsAdd > 0 ? "+" : "")}{f.HitsAdd})당" : $"{Q(f.HitsPer)} 1당")} {(f.Base == "def" ? "방어 기반 피해" : "피해")} {P(f.Ratio)}{PlusTxt(f)}{hitFx}";
                         if (f.HitsPer != null) return $"{(f.Target == "randomEnemy" ? "무작위 적" : WhoTo(f.Target))} ({Q(f.HitsPer)}{(f.HitsAdd != 0 ? $"{(f.HitsAdd > 0 ? "+" : "")}{f.HitsAdd}" : "")})회 × {(f.Base == "def" ? "방어 기반 피해" : "피해")} {P(f.Ratio)}{hitFx}";
-                        string hits = f.XHits ? $"X회{(f.XStack != null ? $"(+{Q(f.XStack)} 수)" : "")} × " : f.HitsOr1 > 1 ? $"{f.HitsOr1}회 × " : "";
+                        string hits = f.XHits ? (R.PER_HIT_MERGE ? $"(X{(f.XStack != null ? $"+{Q(f.XStack)}" : "")})당 " : $"X회{(f.XStack != null ? $"(+{Q(f.XStack)} 수)" : "")} × ")   // (2026-10-19) X 타수는 한 대 — 「(X+「왕마력」)당 피해 N%」
+                            : f.HitsOr1 > 1 ? $"{f.HitsOr1}회 × " : "";
                         // 2026-10-07 카제나 꼴 — 피해 % 의 바탕은 공격력(Docs/키워드.md 「피해량」), 「공격력 N% 피해」 → 「피해 N%」
                         string what = f.Base == "def" ? $"방어 기반 피해 {P(f.Ratio)}" : f.Dot ? $"고정 지속 피해 {P(f.Ratio)}" : $"{(f.Fixed ? "고정 " : "")}피해 {P(f.Ratio)}";
-                        string to = f.Target == "randomEnemy" && hits.Length > 0 ? "무작위 적" : WhoTo(f.Target);
+                        string to = f.Target == "randomEnemy" && hits.Length > 0 && !(f.XHits && R.PER_HIT_MERGE) ? "무작위 적" : WhoTo(f.Target);
                         string kn = f.KnownHits > 1 ? $", 아는 수를 하는 적은 {f.KnownHits}회" : "";
                         string more = f.KillMore ? $", 처치하면 1회 더(최대 {(f.Max > 0 ? f.Max : Battle.KILL_MORE_MAX)})" : "";   // ▶E79
-                        return $"{to} {hits}{what}{hitFx}{more}{kn}";
+                        return $"{to} {hits}{what}{PlusTxt(f)}{hitFx}{more}{kn}";
                     }
                 case FxK.Block:
                 case FxK.Shield:
@@ -1525,6 +1549,7 @@ namespace Bolzena.Core
                 }
             }
             // 성질
+            if (k.WeakOwner) s.Add($"{Has()}는 적은 이 사도에게만 약점으로 맞음");
             if (k.Weakens) s.Add($"{Has()}는 적은 아군 카드에 약점으로 맞음 — 카드 1장이 칠 때마다 −1");
             if (k.Guard)
             {

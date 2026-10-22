@@ -94,8 +94,8 @@ stamp = time.strftime("%Y-%m-%d %H:%M")
 version = time.strftime("%Y%m%d%H%M")
 
 # ── 2) index.html ──
-LEGAL = ("비공식 팬 게임 · 비영리 — 트릭컬 리바이브의 그림 · 음성 · 설정의 저작권은 EPID Games 에 있습니다. "
-         "공식과 무관하며, 권리자의 요청이 있으면 즉시 내립니다.")
+LEGAL = ("비공식 팬 게임 · 비영리 — 트릭컬 리바이브의 그림 · 음성 · 설정의 저작권은 EPID Games 에 있다. "
+         "공식과 무관하며, 권리자의 요청이 있으면 즉시 내린다.")
 
 html = r"""<!doctype html>
 <html lang="ko">
@@ -131,11 +131,11 @@ html = r"""<!doctype html>
   <div class="tag">트릭컬 리바이브 팬 덱빌딩 로그라이크</div>
   <div id="bar"><div id="fill"></div></div>
   <div id="status">불러오는 중…</div>
-  <div id="note">처음 한 번은 <span id="mb">%(total_mb)s</span>MB 를 내려받습니다(다음부터는 브라우저에 저장된 것을 씁니다).<br>
-    PC 의 크롬 · 엣지 · 파이어폭스를 권합니다. 소리는 화면을 한 번 누른 뒤부터 납니다.</div>
+  <div id="note">처음 한 번은 <span id="mb">%(total_mb)s</span>MB 를 내려받는다(다음부터는 브라우저에 저장된 것을 쓴다).<br>
+    PC 의 크롬 · 엣지 · 파이어폭스가 알맞다. 소리는 화면을 한 번 누른 뒤부터 난다.</div>
   <div id="error"></div>
 </div>
-<div id="legal"><b>비공식 팬 게임 · 비영리</b> — 트릭컬 리바이브의 그림 · 음성 · 설정의 저작권은 EPID Games 에 있습니다. 공식과 무관하며, 권리자의 요청이 있으면 즉시 내립니다. · 빌드 %(stamp)s</div>
+<div id="legal"><b>비공식 팬 게임 · 비영리</b> — 트릭컬 리바이브의 그림 · 음성 · 설정의 저작권은 EPID Games 에 있다. 공식과 무관하며, 권리자의 요청이 있으면 즉시 내린다. · 빌드 %(stamp)s</div>
 <script>
 // 25MB 넘는 파일은 조각으로 올렸다 — 로더가 원래 이름을 부르면 조각을 차례로 받아 한 줄기로 잇는다
 const SPLIT = %(split)s;
@@ -272,9 +272,9 @@ script.onload = () => {
     if (!bzBusy) loadingEl.style.display = "none";
     document.getElementById("legal").style.display = "none";   // 게임 로비가 같은 표기를 띄운다
     canvas.focus();
-  }).catch((e) => { err.textContent += String(e) + "\n"; status.textContent = "불러오지 못했습니다"; });
+  }).catch((e) => { err.textContent += String(e) + "\n"; status.textContent = "불러오지 못했다"; });
 };
-script.onerror = () => { status.textContent = "로더를 받지 못했습니다"; };
+script.onerror = () => { status.textContent = "로더를 받지 못했다"; };
 document.body.appendChild(script);
 </script>
 </body>
@@ -339,3 +339,10 @@ if over:
     sys.exit("[web] 25MB 넘는 파일: %r" % over)
 if count > 20000:
     sys.exit("[web] 파일이 2만 개를 넘는다")
+
+# ── 3) 고정 페이지(개인정보 처리방침 등) — Tools/web_static/ 을 그대로 복사(구글 OAuth 브랜딩이 이 주소를 가리킨다) ──
+import shutil as _sh
+_static = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web_static")
+for _n in os.listdir(_static):
+    _sh.copy2(os.path.join(_static, _n), os.path.join(ROOT, _n))
+print("[web] 고정 페이지: " + ", ".join(sorted(os.listdir(_static))))

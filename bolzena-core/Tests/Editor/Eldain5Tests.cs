@@ -585,6 +585,28 @@ namespace Bolzena.Core.Tests
             Assert.IsFalse(Validator.Check(d).Errors.Any(e => e.Contains("1개당")), string.Join(" | ", Validator.Check(d).Errors));
         }
 
+        // 2026-10-19 아야 4차 — 키워드 1개당 「약점 공격 피해」(stat weak): 그 사도가 약점으로 칠 때만 기본 약점 덤 위에 더한다
+        [Test] public void 만년설_1당_약점_공격_피해는_약점으로_칠_때만()
+        {
+            var d = K.Data(heroes: @"[{id:'sn', name:'눈', role:'딜러', hp:600, atk:100, def:20, crit:0, keyword:{name:'만년설', cap:3, per:[{stat:'weak', v:0.1}]}}]",
+                cards: @"[{id:'hitN', name:'치기', hero:'sn', cost:0, type:'공격', fx:[{k:'dmg', ratio:1.0, target:'oneEnemy'}]}," +
+                       "{id:'hitW', name:'약점 치기', hero:'sn', cost:0, type:'공격', tags:['약점'], fx:[{k:'dmg', ratio:1.0, target:'oneEnemy'}]}]",
+                enemies: @"[{id:'tf', name:'단단', hp:100000, intents:[{t:'jam', v:0, rush:0}]}]");
+            int Dmg(string card, int snow)
+            {
+                var b = K.Fight(d, new[] { "sn" }, new[] { "tf" }, st => st.NoNature = true);
+                b.Stacks["sn"] = new Dictionary<string, int> { ["만년설"] = snow };
+                K.Hand(b, card); int h0 = K.Hp(b); K.Play(b, card);
+                return h0 - K.Hp(b);
+            }
+            int plain = Dmg("hitN", 0);
+            Assert.AreEqual(plain, Dmg("hitN", 3), "약점이 아니면 만년설 덤 없음");
+            Assert.AreEqual(Num.Round(plain * (1 + R.WEAK_DMG)), Dmg("hitW", 0), "만년설 0 이면 기본 약점 덤만");
+            Assert.AreEqual(Num.Round(plain * (1 + R.WEAK_DMG + 0.3)), Dmg("hitW", 3), "만년설 3 × 10% 를 약점 덤에 더한다");
+            StringAssert.Contains("「만년설」 1당 자신의 약점 공격 피해 +10%", new CardText(d).Keyword(d.Hero("sn").Keyword));
+            Assert.IsFalse(Validator.Check(d).Errors.Any(e => e.Contains("stat")), string.Join(" | ", Validator.Check(d).Errors));
+        }
+
         // ── 글 ──
         [Test] public void 글_4차()
         {

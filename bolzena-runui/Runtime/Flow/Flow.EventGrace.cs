@@ -22,8 +22,8 @@ namespace Bolzena.RunUI
             var party = P.S.Party.Take(3).ToList();
             float H = Mathf.Min(Theme.C(620, 560), Stage.Size.y - 24);
             float W0 = Mathf.Min(Theme.C(1180, 1100), Stage.Size.x - 32);
-            string sub = p.N > 1 ? $"고른 사도의 아직 없는 고유 카드 가운데 무작위 {p.N}장을 얻습니다" : "고른 사도의 아직 없는 고유 카드 가운데 무작위 한 장을 얻습니다";
-            var (body, close, _) = Stage.ModalBox("grace", W0, H, "은총 — 누구의 고유 카드를 받겠습니까?", sub, false, null, 0, false);
+            string sub = p.N > 1 ? $"고른 사도의 아직 없는 고유 카드 가운데 무작위 {p.N}장을 얻는다" : "고른 사도의 아직 없는 고유 카드 가운데 무작위 한 장을 얻는다";
+            var (body, close, _) = Stage.ModalBox("grace", W0, H, "은총 — 누구의 고유 카드를 받을까?", sub, false, null, 0, false);
 
             void Done(string key)
             {
@@ -32,7 +32,7 @@ namespace Bolzena.RunUI
                 if (why != null) { Toast.Show(why); return; }
                 close();
                 // 은총 — 고르는 것은 사도까지. 얻은 카드는 「은총!」 으로 크게 0.9초 보인 뒤 저절로 덱으로(누르면 바로 · 2026-10-07 사용자)
-                GainCards(NewCards(cs), () => { P.Save("event"); BuildEvent(root, -1); }, "은총!", key != null ? $"{Roster.OfCore(key).ko}의 고유 카드 — 덱에 넣습니다" : null, GraceHold);
+                GainCards(NewCards(cs), () => { P.Save("event"); BuildEvent(root, -1); }, "은총!", key != null ? $"{Roster.OfCore(key).ko}의 고유 카드 — 덱에 넣는다" : null, GraceHold);
             }
 
             float footH = Theme.C(64, 54), gap = 16;

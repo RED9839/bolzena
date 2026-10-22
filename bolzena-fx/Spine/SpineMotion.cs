@@ -301,6 +301,7 @@ namespace Bolzena.Fx
             var slots = sk.Slots.Where(s => re.IsMatch(s.Data.Name)).ToArray();
             if (slots.Length == 0) return null;
             var buf = new float[64];
+            bool mid = MotionTables.WEAPON_CENTER.Contains(heroKey);   // (10-18 4차) 이드 — 나타 그림들의 가운데
             return () =>
             {
                 if (sa == null || sa.Skeleton == null) return null;
@@ -308,6 +309,7 @@ namespace Bolzena.Fx
                 var t = sa.transform;
                 float fw = -sa.Skeleton.ScaleX * t.lossyScale.x >= 0 ? 1f : -1f;   // 원작 SD 는 왼쪽(-x)을 본다 — 월드에서 앞쪽 부호
                 bool got = false; float bestX = float.MinValue; Vector3 best = Vector3.zero;
+                Vector3 lo = new Vector3(float.MaxValue, float.MaxValue, 0), hi = new Vector3(float.MinValue, float.MinValue, 0);
                 foreach (var s in slots)
                 {
                     if (s.A <= 0.01f || s.Attachment == null) continue;
@@ -323,8 +325,10 @@ namespace Bolzena.Fx
                     {
                         var w = t.TransformPoint(new Vector3(buf[i], buf[i + 1], 0));
                         if (w.x * fw > bestX) { bestX = w.x * fw; best = w; got = true; }
+                        lo = Vector3.Min(lo, w); hi = Vector3.Max(hi, w);
                     }
                 }
+                if (got && mid) return new Vector3((lo.x + hi.x) * 0.5f, (lo.y + hi.y) * 0.5f, best.z);
                 return got ? best : (Vector3?)null;
             };
         }

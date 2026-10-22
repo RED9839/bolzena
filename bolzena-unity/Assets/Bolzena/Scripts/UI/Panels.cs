@@ -171,7 +171,7 @@ namespace Bolzena.UI
             if (trialUntil > 0)
             {
                 float left = trialUntil - Time.unscaledTime;
-                if (confirmText != null) confirmText.text = $"이 화면을 유지하겠습니까?  <color={Tone.GoldTag}>{Mathf.CeilToInt(Mathf.Max(0, left))}</color>";
+                if (confirmText != null) confirmText.text = $"이 화면으로 둘까?  <color={Tone.GoldTag}>{Mathf.CeilToInt(Mathf.Max(0, left))}</color>";
                 if (left <= 0) { trialUntil = -1; Bolzena.RunUI.DisplayOptions.Revert(); }
             }
         }
@@ -198,7 +198,7 @@ namespace Bolzena.UI
             else
             {
                 Make.Sliced("xbar", T, Res.UI("cell_on_9s"), new Vector3(Wd / 2, y - 0.65f, 0), new Vector2(Wd - Pad * 2, 1.3f), OC - 1);
-                Tone.Text("xt", T, "진행은 저장됩니다. 메인 화면으로 나가겠습니까?\n<size=80%><color=" + Tone.SubTag + ">전투 중에는 저장되지 않아, 이 전투가 시작되기 전(지도)에서 이어집니다.</color></size>", new Vector3(Wd / 2, y - 0.3f, 0), Tone.Body, OC, Tone.Ink, TextAlignmentOptions.Center, true, Wd - Pad * 2 - 0.2f);
+                Tone.Text("xt", T, "메인 화면으로 나갈까?\n<size=80%><color=" + Tone.SubTag + ">전투는 저장되지 않아 이 전투 전(지도)에서 이어진다</color></size>", new Vector3(Wd / 2, y - 0.3f, 0), Tone.Body, OC, Tone.Ink, TextAlignmentOptions.Center, true, Wd - Pad * 2 - 0.2f);
                 Pill(T, "xyes", new Vector3(Wd / 2 - 1.1f, y - 0.92f, 0), 1.9f, "나가기", true, () => { m.Close(); Bolzena.BattleBridge.LeaveToLobby(); }, 0.62f);
                 Pill(T, "xno", new Vector3(Wd / 2 + 1.1f, y - 0.92f, 0), 1.9f, "취소", false, () => { askExit = false; Draw(); }, 0.62f);
                 y -= 1.3f + 0.2f;
@@ -216,7 +216,7 @@ namespace Bolzena.UI
             if (Bolzena.RunUI.DisplayOptions.Web)
             {
                 // 웹 — 창 모드 · 해상도는 브라우저가 정한다. 브라우저 창 · 전체 화면 두 칸만
-                y = Label(T, y, "화면 모드", "Esc 로 전체 화면에서 나옵니다");
+                y = Label(T, y, "화면 모드", "Esc 로 전체 화면에서 나온다");
                 bool full = Screen.fullScreen;
                 float cw = (rowW - gap) / 2;
                 Chip(T, Pad, y, "브라우저 창", null, !full, true, null, () => Bolzena.RunUI.DisplayOptions.SetWebFullScreen(false), cw);
@@ -232,14 +232,14 @@ namespace Bolzena.UI
                 int k = i;
                 bool ok = Bolzena.RunUI.DisplayOptions.ModeAvailable(i);
                 float cw = (rowW - gap * (nm - 1)) / nm;
-                Chip(T, Pad + i * (cw + gap), y, Bolzena.RunUI.DisplayOptions.Modes[i].Name, null, i == curMode, ok, ok ? null : "이 기기에서는 쓸 수 없습니다", () => Pick(k, -1, curMode, curPreset), cw);
+                Chip(T, Pad + i * (cw + gap), y, Bolzena.RunUI.DisplayOptions.Modes[i].Name, null, i == curMode, ok, ok ? null : "이 기기에서는 쓸 수 없다", () => Pick(k, -1, curMode, curPreset), cw);
             }
             y -= 0.64f + 0.06f;
             Tone.Text("mh", T, "· " + Bolzena.RunUI.DisplayOptions.ModeHint(curMode), new Vector3(Pad, y - 0.12f, 0), Tone.Cap, OC, Tone.Sub, TextAlignmentOptions.Left, true);
             y -= 0.3f;
 
             var mon = Bolzena.RunUI.DisplayOptions.Monitor;
-            y = Label(T, y, "해상도", $"이 모니터 {mon.x}×{mon.y} · 더 큰 것은 잠깁니다");
+            y = Label(T, y, "해상도", $"이 모니터 {mon.x}×{mon.y} · 더 큰 것은 잠긴다");
             int np = Bolzena.RunUI.DisplayOptions.Presets.Count;
             for (int i = 0; i < np; i++)
             {
@@ -247,20 +247,20 @@ namespace Bolzena.UI
                 var sz = Bolzena.RunUI.DisplayOptions.SizeOf(i);
                 bool ok = Bolzena.RunUI.DisplayOptions.Fits(i);
                 float cw = (rowW - gap * (np - 1)) / np;
-                Chip(T, Pad + i * (cw + gap), y, Bolzena.RunUI.DisplayOptions.Presets[i].Name, $"{sz.x}×{sz.y}", i == curPreset, ok, ok ? null : $"이 모니터({mon.x}×{mon.y})보다 큽니다", () => Pick(-1, k, curMode, curPreset), cw);
+                Chip(T, Pad + i * (cw + gap), y, Bolzena.RunUI.DisplayOptions.Presets[i].Name, $"{sz.x}×{sz.y}", i == curPreset, ok, ok ? null : $"이 모니터({mon.x}×{mon.y})보다 크다", () => Pick(-1, k, curMode, curPreset), cw);
             }
             y -= 0.74f + 0.12f;
             }
 
             bool low = Bolzena.RunUI.DisplayOptions.LowSpec;   // 저사양 모드 — 프레임 30 · 수직동기 쉼(판 화면 설정 창에서 바꾼다)
             bool vs = Bolzena.RunUI.DisplayOptions.VSync && !low;
-            y = Label(T, y, "프레임 제한", low ? "저사양 모드라 30 으로 그립니다 · 판 화면 설정의 화면 탭에서 바꿉니다" : "초당 그리는 횟수 — 낮추면 전기 · 열이 줄어듭니다");
+            y = Label(T, y, "프레임 제한", low ? "저사양 모드라 30 으로 그린다 · 메인 화면 설정의 화면 탭에서 바꿀 수 있다" : "초당 그리는 횟수 — 낮추면 전기 · 열이 준다");
             int nf = Bolzena.RunUI.DisplayOptions.FrameCaps.Count;
             for (int i = 0; i < nf; i++)
             {
                 int k = i;
                 float cw = (rowW - gap * (nf - 1)) / nf;
-                Chip(T, Pad + i * (cw + gap), y, Bolzena.RunUI.DisplayOptions.FrameCapName(i), null, !vs && i == Bolzena.RunUI.DisplayOptions.FpsIndexOn, !vs && !low, low ? "저사양 모드를 끄면 고를 수 있습니다" : vs ? "수직동기를 끄면 고를 수 있습니다" : null,
+                Chip(T, Pad + i * (cw + gap), y, Bolzena.RunUI.DisplayOptions.FrameCapName(i), null, !vs && i == Bolzena.RunUI.DisplayOptions.FpsIndexOn, !vs && !low, low ? "저사양 모드를 끄면 고를 수 있다" : vs ? "수직동기를 끄면 고를 수 있다" : null,
                     () => Bolzena.RunUI.DisplayOptions.SetFrameCap(k), cw);
             }
             y -= 0.64f + 0.12f;
@@ -272,7 +272,7 @@ namespace Bolzena.UI
                 var hl = Make.Sliced("lrowhl", T, Res.UI("cell_on_9s"), rc, new Vector2(rowW, rh), OC, new Color(1, 1, 1, 0));
                 var lt = Tone.Text("ll", T, "저사양 모드", new Vector3(Pad + 0.2f, rc.y, 0), Tone.Body, OC + 1, Tone.Ink, TextAlignmentOptions.Left, false);
                 lt.ForceMeshUpdate();
-                Tone.Text("ls", T, "효과 · 프레임을 줄입니다(밝기 · 모양은 그대로)", new Vector3(Pad + 0.32f + lt.preferredWidth, rc.y - 0.01f, 0), Tone.Cap, OC + 1, Tone.Sub, TextAlignmentOptions.Left, false);
+                Tone.Text("ls", T, "효과 · 프레임을 줄인다(밝기 · 모양은 그대로)", new Vector3(Pad + 0.32f + lt.preferredWidth, rc.y - 0.01f, 0), Tone.Cap, OC + 1, Tone.Sub, TextAlignmentOptions.Left, false);
                 var track = new Vector3(Wd - Pad - 0.5f, rc.y, 0);
                 Make.Sliced("ltrack", T, Res.UI("bar_fill_9s"), track, new Vector2(0.64f, 0.3f), OC + 1, low ? Tone.Gold : new Color(0.1f, 0.13f, 0.24f));
                 Make.Box("lknob", T, Res.UI("circle"), track + new Vector3(low ? 0.17f : -0.17f, 0, 0), new Vector2(0.26f, 0.26f), OC + 2, Color.white);
@@ -290,14 +290,14 @@ namespace Bolzena.UI
                 var hl = Make.Sliced("vrowhl", T, Res.UI("cell_on_9s"), rc, new Vector2(rowW, rh), OC, new Color(1, 1, 1, 0));
                 var lt = Tone.Text("vl", T, "수직동기", new Vector3(Pad + 0.2f, rc.y, 0), Tone.Body, OC + 1, Tone.Ink, TextAlignmentOptions.Left, false);
                 lt.ForceMeshUpdate();
-                Tone.Text("vs", T, "주사율에 맞춰 찢김 없이 그립니다 · 켜면 프레임 제한은 쉽니다", new Vector3(Pad + 0.32f + lt.preferredWidth, rc.y - 0.01f, 0), Tone.Cap, OC + 1, Tone.Sub, TextAlignmentOptions.Left, true);
+                Tone.Text("vs", T, "주사율에 맞춰 찢김 없이 그린다 · 켜면 프레임 제한은 쉰다", new Vector3(Pad + 0.32f + lt.preferredWidth, rc.y - 0.01f, 0), Tone.Cap, OC + 1, Tone.Sub, TextAlignmentOptions.Left, true);
                 var track = new Vector3(Wd - Pad - 0.5f, rc.y, 0);
                 Make.Sliced("vtrack", T, Res.UI("bar_fill_9s"), track, new Vector2(0.64f, 0.3f), OC + 1, vs ? Tone.Gold : new Color(0.1f, 0.13f, 0.24f));
                 Make.Box("vknob", T, Res.UI("circle"), track + new Vector3(vs ? 0.17f : -0.17f, 0, 0), new Vector2(0.26f, 0.26f), OC + 2, Color.white);
                 var b = row.gameObject.AddComponent<Button>();
                 b.Size = new Vector2(rowW, rh);
                 b.Highlight = hl;
-                b.OnClick = () => { if (low) { Bolzena.RunUI.Toast.Show("저사양 모드를 끄면 고를 수 있습니다"); return; } Bolzena.RunUI.DisplayOptions.SetVSync(!vs); };
+                b.OnClick = () => { if (low) { Bolzena.RunUI.Toast.Show("저사양 모드를 끄면 고를 수 있다"); return; } Bolzena.RunUI.DisplayOptions.SetVSync(!vs); };
                 y -= rh;
             }
 
@@ -315,7 +315,7 @@ namespace Bolzena.UI
             else { confirmText = null; trialUntil = -1; }
 
             y -= 0.16f;
-            Tone.Text("hint", T, "Esc · 바깥을 누르면 계속합니다", new Vector3(Wd / 2, y - 0.12f, 0), Tone.Cap, OC, Tone.Dim, TextAlignmentOptions.Center, true, Wd);
+            Tone.Text("hint", T, "Esc · 바깥을 누르면 계속한다", new Vector3(Wd / 2, y - 0.12f, 0), Tone.Cap, OC, Tone.Dim, TextAlignmentOptions.Center, true, Wd);
             y -= 0.24f + Pad;
 
             // 크기 — 폰은 1.25 배, 다만 화면 높이를 넘지 않게

@@ -77,18 +77,21 @@ namespace Bolzena.Core
         /// 화면은 Run.PendingNeutral 이 있으면 사도를 고르게 하고 Run.AssignNeutral 로 넣는다. 덱의 교주 카드는 「id@사도」.
         /// </summary>
         public List<string> NeutralWait = new();
-        /// <summary>학점제 학년(RunGrade.cs · Grades) — 누적 학점 · 지금 학년(1~6, 옛 저장은 1) · 마지막 싸움에서 받은 학점.</summary>
-        public int Credits, Grade = Grades.FIRST, LastCredit;
-        /// <summary>진급 소식 — 화면이 아직 안 보인 새 학년(Run.PopGradeNews 로 꺼낸다).</summary>
-        public List<int> GradeNews = new();
-        /// <summary>아직 안 고른 진급 보상(진급마다 후보 셋 — Run.GradeOfferNow · TakeGrade).</summary>
-        public List<GradeOffer> GradeOffers = new();
-        /// <summary>졸업 선물로 받은 고유 카드(화면이 졸업장에 보인다). null = 아직 · 없음.</summary>
+        /// <summary>
+        /// 옛 저장 호환 — 학점제 학년(2026-10-09 꺼 두고 2026-10-22 코드에서 지움)이 적던 칸. 아무것도 읽지 않는다.
+        /// 저장을 읽을 때 모르는 키는 오류라(GameData.Json) 진행 중이던 옛 판을 불러오려고만 남긴다. 새 판은 비워 둔다(저장에 안 적힌다).
+        /// </summary>
+        public int Credits, Grade, LastCredit, PrepLeft, PrepHand, MockLeft, MockMorale;
+        /// <summary>옛 저장 호환 — 진급 소식 · 진급 보상 후보 · 졸업 선물(위와 같은 까닭).</summary>
+        public List<int> GradeNews;
+        public List<object> GradeOffers;
         public string GradeGift;
-        /// <summary>진급 보상 효과 남은 것 — 예습 노트(남은 전투 · 첫 손패 +) · 전술 교본(남은 엘리트 · 보스 전투 · 시작 사기).</summary>
-        public int PrepLeft, PrepHand, MockLeft, MockMorale;
-        /// <summary>교주 보드(크레파스 — RunCrayon.cs, 판을 열 때 Run.ApplyPerks 가 적는다, atk · def · hp → 사도 기본치 비율). null = 없음.</summary>
+        /// <summary>옛 저장 호환 — 교주 보드(크레파스) 효과를 적던 칸. 2026-10-21 보드를 없애 아무것도 읽지 않는다(진행 중이던 옛 판을 불러올 때 모르는 키 오류가 나지 않게만 남김). 새 판은 비워 둔다(null — 저장에 안 적힌다).</summary>
         public Dictionary<string, double> Perks;
+        /// <summary>사도 영구 성장 몫(Prog.Build → Run.ApplyProg 가 판 시작에 적는다) — 싸움마다 BattleSetup.Prog 로. null = 없음.</summary>
+        public Dictionary<string, ProgMods> Prog;
+        /// <summary>난이도 단계(1 ~ Tiers.MAX — 판을 열 때 Run.SetTier 가 적는다). 싸움마다 적 체력 · 피해에 Tiers.Scale 을 곱한다. 0 = 단계 없음(지금 판과 같다 · 저장에 안 적힌다).</summary>
+        public int Tier;
         /// <summary>플레이 기록용(RunRecord.cs) — 판 시작 시각 · 전투 시간과 그 가운데 배속 시간(화면이 채운다) · 선택 기록(Run 이 적는다). 판 규칙에는 안 쓴다.</summary>
         public RecState Rec = new();
     }
@@ -106,7 +109,7 @@ namespace Bolzena.Core
 
     /// <summary>
     /// 선택 하나 — K 갈래 · F 층(1 · 2) · S 걸음(RunState.Step) · Card 대상(카드 · 사도 — 신탁 · 은총 · 수련) · Offer 제시된 것 · Pick 고른 것(null = 넘김 · 아직).
-    /// 갈래: oracle(신탁 — Offer · Pick 은 신탁 번호) · grace(은총 — 카드 id) · equip(전리품 아티팩트) · grade(진급 보상 — 종류) · shop(진열 — Offer 만) · buy · remove(상점 빼기) · gradeRemove ·
+    /// 갈래: oracle(신탁 — Offer · Pick 은 신탁 번호) · grace(은총 — 카드 id) · equip(전리품 아티팩트) · shop(진열 — Offer 만) · buy · remove(상점 빼기) ·
     /// train(휴식 수련 — 강화) · rest · copy(보스 복제) · event(Offer = 이벤트 id, Pick = 선택지 차례) · ev.card · ev.flash · ev.remove · ev.grace · ev.dupe · ev.shinPick · ev.bless(축복 종류) · ev.gambleChoice.
     /// At — 전투 중에 고른 빛이면 "fight", 끝난 뒤 보상이면 null.
     /// </summary>
@@ -156,7 +159,7 @@ namespace Bolzena.Core
         /// <summary>neutral · equip.</summary>
         public string Kind;
         public int Price;
-        /// <summary>할인 전 값(교주 보드 「골디 할인권」) — 할인이 없으면 0. 화면이 취소선으로 보인다.</summary>
+        /// <summary>옛 저장 호환 — 할인 전 값(교주 보드 「골디 할인권」, 2026-10-21 보드와 함께 없앰). 새 물건은 늘 0(저장에 안 적힌다) · 아무것도 읽지 않는다.</summary>
         public int Base;
         public bool Sold;
         public bool Delivery;

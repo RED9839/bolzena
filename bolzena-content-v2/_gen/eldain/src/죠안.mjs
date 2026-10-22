@@ -26,9 +26,10 @@ export default hero({
   forms: [{
     // 4차 태세(사용자 10-11): 경전 4로 들고 · 교리 ③ 으로 지키고 · 3턴 뒤 풀림(반동 없음). 태세 중 죠안 카드가 적을 치면 파티 회복(꿈결의 사슬 — 피해 기반 회복 소유)
     id: F, name: '꿈결 형상', desc: '꿈결에 든 주교', stance: true, anim: 'Idle_DreamForm',   // 원작 꿈결 형상 쉬는 동작(10-11 붙임)
-    turns: 3,
+    turns: 4,   // 10-21 밸런스 조절: 3 → 4턴
     bonus: [{ type: '공격', ratio: 1.6 }],
-    passives: [{ name: '꿈결의 사슬', when: { on: 'hit' }, fx: [heal(0.6)] }, { name: '은혜 갚은 죠안', when: { on: 'turnStart' }, fx: [draw(1), bread(1)] }],
+    // 10-19 밸런스(사용자 「죠안 지원이 점수로」): 소개 글대로 매 턴 사슬이 적 전체 160%
+    passives: [{ name: '꿈결의 사슬', when: { on: 'turnStart' }, fx: [dmg(1.6, 'allEnemies')] }, { name: '꿈결의 사슬', when: { on: 'hit' }, fx: [heal(0.6)] }, { name: '은혜 갚은 죠안', when: { on: 'turnStart' }, fx: [draw(1), bread(1)] }],
   }],
   ult: { name: '제가 목도한 것을', cost: 250, fx: [dmg(0.8, 'allEnemies'), shield(2.5), heal(1.5), { k: 'form', id: F }] },   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 실드 200→250% · 회복 150% 더함
 }, {
@@ -85,13 +86,13 @@ export default hero({
     },
     { // 4차 8장 — 열기(서포터 메인딜 갈래 · 말 한마디 「가라사대」)
       name: '가라사대', cost: 1, type: '공격',
-      fx: [dmg(1.1, 'allEnemies'), bread(1)],
+      fx: [dmg(1.7, 'allEnemies'), bread(1)],   // 10-21 밸런스 조절: 150 → 170%   // 10-19 밸런스: 110 → 150%
       oracles: [
-        { fx: [dmg(1.4, 'allEnemies'), bread(1)] },
-        { fx: [dmg(0.7, 'allEnemies'), bread(1), page(1)] },   // 10-13 신탁 점검: 빵 되살림
-        { fx: [dmg(0.6, 'allEnemies'), bread(1), inF, dmg(0.6, 'allEnemies')] },   // 10-13 신탁 점검: 빵 되살림
-        { fx: [dmg(1.5), bread(1, 'strongestAlly')] },   // 10-13 신탁 점검
-        { cost: 0, fx: [dmg(0.6, 'allEnemies'), bread(1)] },   // 10-13 신탁 점검 3차: 경전 대신 빵   // 10-13 신탁 점검
+        { fx: [dmg(2.2, 'allEnemies'), bread(1)] },   // 10-21: 190 → 220%
+        { fx: [dmg(1, 'allEnemies'), bread(1), page(1)] },   // 10-13 신탁 점검: 빵 되살림
+        { fx: [dmg(0.8, 'allEnemies'), bread(1), inF, dmg(0.8, 'allEnemies')] },   // 10-13 신탁 점검: 빵 되살림
+        { fx: [dmg(2.1), bread(1, 'strongestAlly')] },   // 10-13 신탁 점검
+        { cost: 0, fx: [dmg(1.6, 'allEnemies'), bread(1)] },   // 10-13 신탁 점검 3차: 경전 대신 빵   // 10-13 신탁 점검
       ],
       blesses: ['power', 'draw', [page(1)]],
     },

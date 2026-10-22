@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 namespace Bolzena.Demo
 {
     // 모션 확인 화면(개발 · 점검용, 2026-10-13 사용자 「기존 공격 모션들 분리해서 정리 — 우선 인게임 확인 화면」).
-    //   들어가는 길: 도감 → 사도 → 상세 정보 → 세로 메뉴 맨 아래 흐린 「모션 확인」(Flow.MotionLab — 판 진행 중엔 안 보인다).
+    //   들어가는 길: 도감 → 사도 → 상세 정보 → 세로 메뉴 맨 아래 흐린 「모션 확인」(Flow.MotionLab — 판 진행 중엔 안 보인다 · 에디터나 실행 인자 -motionlab 일 때만, 2026-10-19).
     //   전투 장면을 그대로 띄운다(BattleBridge.Fight 없음 → CoreBattle.Fixture.Override: 그 사도 혼자 · 요정 셋 1웨이브). 손패 · HUD 는 치우고
     //   사도가 첫 자리에, 맞은편에 적 셋이 선다. 단추는 BattleDirector.LabPlay(BattleDirector.Lab.cs)로 실제 전투와 같은 길(Present → HeroAct …)을 탄다.
     //   왼쪽: 사도 20명(누르면 그 사도로 전투를 다시 연다) · 위: 지금 튼 것의 이름 · 길이 · 이펙트 · 타격 갈래 · 아래: 몸짓 · 대상 · 타수 · 반복 · 느리게 · 애니 이름 전부.
@@ -142,6 +142,8 @@ namespace Bolzena.Demo
             (BattleDirector.LabMove.Ult, "5고학년"),
         };
         static bool shotsUltOnly;
+        static bool shotsSeq;     // -motionlab-seq — 동작마다 0.1초 간격 작은 그림(seq/<이름>/<ms>.jpg) — Tools/vs_orig.py 가 원작 영상과 같은 시각으로 나란히(2026-10-15)
+        static bool shotsFxDex;   // -motionlab-fxdex — 장 도감: 사도 원작 장을 하나씩 따로 틀어 찍는다(2026-10-15 「이름 ↔ 모습」 짐작 없애기)
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void ShotsBoot()
@@ -151,6 +153,9 @@ namespace Bolzena.Demo
             if (i < 0 || i + 1 >= a.Length || shotsDir != null) return;
             shotsDir = a[i + 1];
             shotsUltOnly = System.Array.IndexOf(a, "-motionlab-ult") >= 0;
+            shotsFxDex = System.Array.IndexOf(a, "-motionlab-fxdex") >= 0;
+            shotsSeq = System.Array.IndexOf(a, "-motionlab-seq") >= 0;
+            int fi = System.Array.IndexOf(a, "-motionlab-seqfps"); if (fi >= 0 && fi + 1 < a.Length && float.TryParse(a[fi + 1], out var fps) && fps > 0) seqEvery = 1f / fps;   // 동영상용 — 30 이면 매 프레임
             System.IO.Directory.CreateDirectory(shotsDir);
             AudioListener.volume = 0f;   // 시험 실행은 음소거
             int j = System.Array.IndexOf(a, "-motionlab-heroes");
@@ -198,6 +203,12 @@ namespace Bolzena.Demo
             all = false; hits = 1; volley = 0; repeat = false;
             shotKind = Mathf.Max(0, System.Array.IndexOf(ShotKinds, "bullet"));
             shotsLog.Append($"== {idx + 1:D2} {ko}({hero})\n");
+            if (shotsFxDex)
+            {
+                yield return ShootFxDex(idx, ko);
+                if (idx >= 0 && idx + 1 < shotsQueue.Count) Enter(shotsQueue[idx + 1]); else FinishShots();
+                yield break;
+            }
             foreach (var (mv, label) in ShotMoves)
             {
                 string name = $"{idx + 1:D2}_{ko}_{label}";
@@ -209,6 +220,7 @@ namespace Bolzena.Demo
                 bool done = false;
                 float t0 = Time.time;
                 StartCoroutine(Wrap(PlayOnce(new Req { K = Kind.Move, Mv = mv, Label = label }), () => done = true));
+                if (shotsSeq) StartCoroutine(SeqRec(name, t0, () => done && Bolzena.Fx.FxRun.Running == 0, 8f));   // 몸짓이 끝나도 이펙트가 다 걷힐 때까지(10-16 — 몸짓 끝 0.3초에 끊겨 대조 영상이 마지막 장면을 늘여 「남는 이펙트」로 보였다)
                 while (first < 0 && !done && Time.time - t0 < 8f) yield return null;
                 if (first >= 0)
                 {
@@ -224,6 +236,7 @@ namespace Bolzena.Demo
                     yield return Snap(name + "_x");
                 }
                 while (!done && Time.time - t0 < 8f) yield return null;
+                if (shotsSeq) while (Bolzena.Fx.FxRun.Running > 0 && Time.time - t0 < 8f) yield return null;   // 이펙트가 다 걷힐 때까지 찍고 넘어간다
                 BattleDirector.Trace = prev;
                 shotsLog.Append($"[{label}] {(first >= 0 ? $"첫 타격 {first - t0:F2}초" : "타격 없음")}\n{(d != null ? d.LabInfo : "")}\n");
                 yield return new WaitForSecondsRealtime(0.4f);
@@ -248,6 +261,7 @@ namespace Bolzena.Demo
             StartCoroutine(Wrap(PlayOnce(new Req { K = Kind.Move, Mv = BattleDirector.LabMove.Ult, Label = label }), () => done = true));
             while (d.LabActAt < 0 && !done && Time.realtimeSinceStartup - rt0 < 15f) yield return null;   // 컷인이 끝나기까지
             float a0 = d.LabActAt >= 0 ? d.LabActAt : Time.time;
+            if (shotsSeq) StartCoroutine(SeqRec(name, a0, () => done, 10f));
             var tsv = new System.Text.StringBuilder($"#hero\t{ko}\n#every\t{EVERY * 1000:0}\n");
             int n = 0, nt = 0, nh = 0;
             float next = a0;
@@ -272,8 +286,70 @@ namespace Bolzena.Demo
 
         static IEnumerator Wrap(IEnumerator e, System.Action fin) { yield return e; fin(); }
 
+        // ── 장 도감(-motionlab-fxdex) ── 사도의 원작 장(평타 · 강공 · 스킬 · 시그니처 · 고학년 갈래)을 하나씩, 시전자 발밑(원작 장의 원점)에
+        //   제 크기 · 오른쪽 보기로 틀고 0.3초 · 0.9초 두 장을 <번호>_<사도>_fxNN_<갈래>_<a|b>.png 로. _done.txt 에 번호 · 갈래 · 장 이름 · 길이 · 장 안 범위.
+        //   Tools/fxdex_sheet.py 가 사도마다 이름 붙은 시트로 묶는다
+        IEnumerator ShootFxDex(int idx, string ko)
+        {
+            var hid = d.Battle.Snapshot.Heroes[0].Id;
+            var u = d.Heroes.Count > 0 ? d.Heroes[0] : null;
+            if (u == null) yield break;
+            int i = 0;
+            foreach (var kind in new[] { "attack", "power", "skill", "sig", "ult" })
+                foreach (var n in Bolzena.Fx.FxLibrary.Get(hid, kind))
+                {
+                    i++;
+                    float dur = Bolzena.Fx.FxLibrary.Duration(n);
+                    var b = Bolzena.Fx.UltFx.GeoBounds(n);
+                    shotsLog.Append($"fx{i:D2}\t{kind}\t{n}\t{dur:F2}s\t{(b.HasValue ? $"x {b.Value.xMin:F0}~{b.Value.xMax:F0} · y {b.Value.yMin:F0}~{b.Value.yMax:F0}" : "-")}\n");
+                    var r = Bolzena.Fx.BolzenaFx.Play(n, new Bolzena.Fx.FxPlayOptions { At = u.Fx.Feet, Flip = false, Until = Mathf.Min(dur, 2.5f), Order = 330, Parent = Bolzena.Fx.BolzenaFx.Parent });
+                    float t0 = Time.time;
+                    while (Time.time - t0 < 0.3f) yield return null;
+                    yield return Snap($"{idx + 1:D2}_{ko}_fx{i:D2}_{kind}_a");
+                    while (Time.time - t0 < 0.9f) yield return null;
+                    yield return Snap($"{idx + 1:D2}_{ko}_fx{i:D2}_{kind}_b");
+                    r?.Stop(0.05f);
+                    float t1 = Time.time;
+                    while (Time.time - t1 < 0.25f) yield return null;
+                }
+            shotsLog.Append("\n");
+        }
+
+        // 연속 그림 — start(게임 시계)부터 0.1초마다 640×360 jpg, 동작이 끝나고 0.3초 또는 maxSec 까지
+        static RenderTexture seqRt; static Texture2D seqRead; static float seqEvery = 0.1f;
+        IEnumerator SeqRec(string name, float start, System.Func<bool> done, float maxSec)
+        {
+            var dir = System.IO.Path.Combine(shotsDir, "seq", name);
+            System.IO.Directory.CreateDirectory(dir);
+            if (seqRt == null) seqRt = new RenderTexture(640, 360, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+            if (seqRead == null) seqRead = new Texture2D(640, 360, TextureFormat.RGB24, false);
+            float next = 0, doneAt = -1;
+            while (Time.time - start < maxSec)
+            {
+                float t = Time.time - start;
+                if (done() && doneAt < 0) doneAt = t;
+                if (doneAt >= 0 && t > doneAt + 0.3f) break;
+                if (t >= next)
+                {
+                    yield return new WaitForEndOfFrame();
+                    var tex = ScreenCapture.CaptureScreenshotAsTexture();
+                    Graphics.Blit(tex, seqRt);
+                    var prevRt = RenderTexture.active; RenderTexture.active = seqRt;
+                    seqRead.ReadPixels(new Rect(0, 0, 640, 360), 0, 0); seqRead.Apply();
+                    RenderTexture.active = prevRt;
+                    try { System.IO.File.WriteAllBytes(System.IO.Path.Combine(dir, $"{Mathf.RoundToInt(t * 1000):D5}.jpg"), seqRead.EncodeToJPG(85)); } catch (System.Exception) { }
+                    Destroy(tex);
+                    next += seqEvery;
+                    continue;
+                }
+                yield return null;
+            }
+        }
+
         static IEnumerator Snap(string name)
         {
+            // 동영상 모드(-motionlab-seqfps 30)는 원본 크기 PNG 를 건너뛴다 — 한 장에 0.1초쯤 멈춰 영상이 타격 순간마다 끊겼다(2026-10-15 사용자 「렉 걸리는 거냐」 — 게임이 아니라 캡처 탓)
+            if (shotsSeq && seqEvery < 0.05f) { Debug.Log("[Capture] (동영상 모드 — PNG 건너뜀) " + name); yield break; }
             yield return new WaitForEndOfFrame();
             var tex = ScreenCapture.CaptureScreenshotAsTexture();
             try { System.IO.File.WriteAllBytes(System.IO.Path.Combine(shotsDir, name + ".png"), tex.EncodeToPNG()); }

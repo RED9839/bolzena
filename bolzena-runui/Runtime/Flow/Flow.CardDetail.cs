@@ -133,24 +133,25 @@ namespace Bolzena.RunUI
                 holder.Pref(-1, bx.sizeDelta.y); boxTotal += bx.sizeDelta.y + 10;
             }
             foreach (var t in boxes) Box(t);
+            if (RealTerm(v) is CardTerms.Term real) Box(real);   // 실제 수치(성장 켬일 때만 — Flow.Prog.cs)
             var mark = detailPlain ? Core.CardMark.Of(P.Data, id, 0, null) : P.Mark(id);
             if (mark.Any)
             {
                 var got = new List<string>();
-                if (mark.Oracle != null) got.Add($"<color={Theme.GoldTag}>신탁</color> 이번 모험에서 신탁으로 바뀐 카드입니다 — 비용 아래 금빛 별 마크가 그 표시입니다.");   // 신탁 이름은 보이지 않는다(2026-10-07)
-                if (mark.Blessed) got.Add($"<color=#D9C7FF>축복</color> {mark.BlessText} — 비용 아래 연보라 날개 마크와 본문 맨 아래 줄이 그 표시입니다.");   // 받은 축복만(받을 수 있는 축복 목록은 보이지 않는다)
-                if (mark.Copy) got.Add($"<color=#C7DBFF>{Core.CardMark.COPY_LINE}</color> — 복제 — 이 카드는 신탁 · 축복을 받을 수 없고, 원본이 나중에 받는 것도 따라오지 않습니다.");
+                if (mark.Oracle != null) got.Add($"<color={Theme.GoldTag}>신탁</color> 이번 모험에서 신탁으로 바뀐 카드 — 비용 아래 금빛 별 마크가 표시다");   // 신탁 이름은 보이지 않는다(2026-10-07)
+                if (mark.Blessed) got.Add($"<color=#D9C7FF>축복</color> {mark.BlessText} — 비용 아래 연보라 날개 마크와 본문 맨 아래 줄이 표시다");   // 받은 축복만(받을 수 있는 축복 목록은 보이지 않는다)
+                if (mark.Copy) got.Add($"<color=#C7DBFF>{Core.CardMark.COPY_LINE}</color> — 복제 — 이 카드는 신탁 · 축복을 받을 수 없고, 원본이 나중에 받는 것도 따라오지 않는다");
                 Box(new CardTerms.Term { Name = "이 카드에 얹힌 것", Kind = mark.Copy ? "복제할 때 모습 그대로" : null, Body = string.Join("\n", got) });
             }
             if (hasOracle)
                 Box(new CardTerms.Term { Name = "신탁", Hero = true, Kind = "오른쪽 아래 「신탁」 단추",
-                    Body = "이 카드에는 신탁이 나올 수 있습니다. 신탁이 나오면 카드의 비용 · 효과가 바뀝니다." });
+                    Body = "이 카드에는 신탁이 나올 수 있다. 신탁이 나오면 카드의 비용 · 효과가 바뀐다" });
             if (def != null && def.Complete)
                 Box(new CardTerms.Term { Name = "완성형", Hero = true, Kind = "신탁 없음",
-                    Body = "처음부터 완성된 카드입니다 — 신탁이 나오지 않고, 축복은 받을 수 있습니다." });
+                    Body = "처음부터 완성된 카드다 — 신탁은 나오지 않고 축복은 받을 수 있다" });
             if (boxes.Count == 0 && !mark.Any && !hasOracle && !(def != null && def.Complete))
             {
-                var none = Ui.Text(rc, "설명할 낱말이 없는 카드입니다.", Theme.FsSm, Theme.Sub, TextAlignmentOptions.TopLeft); none.Pref(-1, 40);
+                var none = Ui.Text(rc, "설명할 낱말이 없는 카드다", Theme.FsSm, Theme.Sub, TextAlignmentOptions.TopLeft); none.Pref(-1, 40);
             }
 
             // 풀이 상자 묶음은 카드 세로 가운데에 — 칸보다 짧으면 위 여백을 늘려 가운데로(넘치면 스크롤)
@@ -306,7 +307,7 @@ namespace Bolzena.RunUI
             dot.rectTransform.anchorMin = dot.rectTransform.anchorMax = new Vector2(0.5f, 1); dot.rectTransform.pivot = new Vector2(0.5f, 0.5f);
             dot.rectTransform.sizeDelta = new Vector2(10, 10); dot.rectTransform.anchoredPosition = new Vector2(0, ly - 0.8f);
             dot.rectTransform.localRotation = Quaternion.Euler(0, 0, 45);
-            var guide = Ui.Text(layer, $"이 카드에는 아래의 신탁이 나올 수 있습니다.", Theme.FsMd, Theme.Ink, TextAlignmentOptions.Center, false, "guide");
+            var guide = Ui.Text(layer, $"이 카드에는 아래의 신탁이 나올 수 있다", Theme.FsMd, Theme.Ink, TextAlignmentOptions.Center, false, "guide");
             guide.rectTransform.At(0.5f, 1, 0, ly - 14, 900, 34); guide.Outline(0.2f);
             var x = Btn.Icon(layer, Theme.S("ic_x"), close, Theme.IconBtn, "close"); x.GetComponent<RectTransform>().At(1, 1, -Theme.Gutter, -18, Theme.IconBtn, Theme.IconBtn);
             Stage.Hot["oracles.close"] = x;

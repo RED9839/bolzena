@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Bolzena.RunUI
 {
     // 사도별 대사(2026-10-08 사용자: 「에르핀이 존댓말할 일이 없는데」) — 로비 · 만지기 반응 · 편성 한마디를 사도마다 원작 말투로.
-    //   표: Resources/RunUI/hero_lines.json — 사도 키마다 reg(말 단계) · lobby · cheek · tickle · angry · knock(꿀밤) · pat · party · promote(진급) · graduate(졸업).
+    //   표: Resources/RunUI/hero_lines.json — 사도 키마다 reg(말 단계) · lobby · cheek · tickle · angry · knock(꿀밤) · pat · party.
     //     판 진행(2026-10-09): rest · shop · reward · victory · bossStart · lowhp · event 를 표에 둔다 — 지금 화면에 띄우는 판 진행 말풍선은 idle(전투 중 가만있을 때)뿐 — 나머지는 HeroBubble.AllKinds 스위치로 꺼 둠(사용자 결정 2026-10-09, 나중에 되살릴 수 있게).
     //     reg = casual(반말) · royal(왕 말투, 반말 계열) · polite(존댓말) · special(하오체 · 「~사와요」 · 로봇 따위 특이 말투).
     //   우리가 쓴 2차 창작 대사다(원작 대사 원문이 아니다). 검사: Tools~/hero_lines_check.py
@@ -16,7 +16,7 @@ namespace Bolzena.RunUI
         class Entry
         {
             public string key, reg, note;
-            public string[] lobby, cheek, tickle, angry, knock, pat, party, promote, graduate;
+            public string[] lobby, cheek, tickle, angry, knock, pat, party;
             // 판 진행 중 한마디(2026-10-09) — 휴식 · 상점 · 보상 · 승리 · 엘리트/보스 시작 · 위기(파티 HP 30% 아래) · 이벤트
             public string[] rest, shop, reward, victory, bossStart, lowhp, @event;
             public string[] idle;   // 전투 중 내 턴에 한참 가만있을 때 혼잣말 · 재촉(2026-10-09 — 지금 화면에 띄우는 판 진행 말풍선은 이것뿐)
@@ -50,8 +50,6 @@ namespace Bolzena.RunUI
             ["knock"] = new[] { "아야! 머리는 때리지 마세요!", "으앗, 갑자기 꿀밤이에요?" },
             ["pat"] = new[] { "헤헤… 기분 좋아요." },
             ["party"] = new[] { "같이 가요. 맡겨 주세요!" },
-            ["promote"] = new[] { "진급이에요! 한 학년 올라갔어요!", "와, 진급했어요! 다음 학년도 같이 가요!", "진급 도장 받았어요. 헤헤!" },
-            ["graduate"] = new[] { "졸업이에요! 그동안 정말 고마웠어요!", "졸업장 받았어요! 꼭 간직할게요." },
             ["rest"] = new[] { "잠깐 쉬어 가요. 불이 따뜻하네요.", "숨 좀 돌리고 다시 가요." },
             ["shop"] = new[] { "뭐 살 만한 게 있을까요?", "골드는 아껴 써야 해요." },
             ["reward"] = new[] { "전리품이에요! 하나 골라 봐요.", "수고했으니 챙겨 가요." },
@@ -70,8 +68,6 @@ namespace Bolzena.RunUI
             ["knock"] = new[] { "아야! 머리 때리지 마!", "으앗, 갑자기 꿀밤이야?" },   // 문체:허용 — 사도 대사(반말)
             ["pat"] = new[] { "헤헤… 기분 좋다." },   // 문체:허용 — 사도 대사(반말)
             ["party"] = new[] { "같이 가자. 나만 믿어!" },   // 문체:허용 — 사도 대사(반말)
-            ["promote"] = new[] { "진급이다! 한 학년 올라갔어!", "와, 진급했어! 다음 학년도 같이 가자!", "진급 도장 받았다. 헤헤!" },   // 문체:허용 — 사도 대사(반말)
-            ["graduate"] = new[] { "졸업이다! 그동안 진짜 고마웠어!", "졸업장 받았어! 꼭 간직할게." },   // 문체:허용 — 사도 대사(반말)
             ["rest"] = new[] { "잠깐 쉬었다 가자. 불 따뜻하다.", "숨 좀 돌리고 다시 가자." },   // 문체:허용 — 사도 대사(반말)
             ["shop"] = new[] { "뭐 살 만한 거 있나?", "골드는 아껴 써야 해." },   // 문체:허용 — 사도 대사(반말)
             ["reward"] = new[] { "전리품이다! 하나 골라 봐.", "수고했으니 챙겨 가자." },   // 문체:허용 — 사도 대사(반말)
@@ -96,7 +92,7 @@ namespace Bolzena.RunUI
         {
             string[] a = null;
             if (h != null && Map.TryGetValue(h.key, out var e))
-                a = kind switch { "lobby" => e.lobby, "cheek" => e.cheek, "tickle" => e.tickle, "angry" => e.angry, "knock" => e.knock, "pat" => e.pat, "party" => e.party, "promote" => e.promote, "graduate" => e.graduate,
+                a = kind switch { "lobby" => e.lobby, "cheek" => e.cheek, "tickle" => e.tickle, "angry" => e.angry, "knock" => e.knock, "pat" => e.pat, "party" => e.party,
                     "rest" => e.rest, "shop" => e.shop, "reward" => e.reward, "victory" => e.victory, "bossStart" => e.bossStart, "lowhp" => e.lowhp, "event" => e.@event, "idle" => e.idle, _ => null };
             if (a != null && a.Length > 0) return a;
             var set = IsCasual(h) ? Casual : Polite;

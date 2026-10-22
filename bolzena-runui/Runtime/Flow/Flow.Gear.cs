@@ -10,7 +10,7 @@ namespace Bolzena.RunUI
     public partial class Flow
     {
         // 장비 고르기 — 화면 하나를 덮는 창(카제나 장비 고르기의 배치만: 왼쪽 받은 장비 카드 → 가지 선 → 오른쪽 사도 셋 줄 · 아래 띠).
-        //   위: 머리 띠(파티 HP · 초상 · 「장비」 · 골드) · 그 아래 오른쪽 「낄 사도를 고르세요」
+        //   위: 머리 띠(파티 HP · 초상 · 「장비」 · 골드) · 그 아래 오른쪽 「낄 사도를 고를 수 있다」
         //   왼쪽: 받은 장비 — 그림 칸(등급색 바탕 + 칸 아이콘 + 등급 별) · 종류 아이콘 · 이름(등급색) · 수치 띠 · 효과 글(수치 금빛) · 돋보기
         //   오른쪽: 사도 줄 셋 — 초상 · 역할/줄 · 무기 · 방어구 · 장신구 칸(받은 장비와 같은 칸은 금 테). 찬 칸을 길게 누르면 지금 것 ↔ 새 것
         //   아래: 덱 정보(장수 · 고유 카드 평균 비용) · 팔기(+골드 — 산 장비는 없음) · 확인
@@ -36,7 +36,7 @@ namespace Bolzena.RunUI
             var obar = Ui.Img(orn, Theme.Round, Theme.Gold.A(0.8f), "bar"); obar.rectTransform.At(0.5f, 0.5f, 0, 0, 120, 3);
             var dia = Ui.Img(orn, Theme.White, Theme.Gold, "dia"); dia.rectTransform.At(0.5f, 0.5f, 0, 0, 8, 8); dia.rectTransform.localRotation = Quaternion.Euler(0, 0, 45);
             var rule = Ui.Img(layer, Theme.White, Theme.Line, "rule"); rule.rectTransform.Band(1, 1, Theme.Gutter, Theme.Gutter, -92);
-            var guide = Ui.Title(layer, bought ? "낄 사도를 고르세요" : "낄 사도를 고르거나 파세요", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineRight);
+            var guide = Ui.Title(layer, bought ? "낄 사도를 고를 수 있다" : "낄 사도를 고르거나 팔 수 있다", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineRight);
             guide.rectTransform.At(1, 1, -Theme.Gutter - 8, -100, 600, 34);
             guide.Outline(0.2f);
 
@@ -106,7 +106,7 @@ namespace Bolzena.RunUI
             Tw.Rise(card, 0.05f, 30, 0.45f, Vector2.left);
 
             var hint = Ui.Img(stage, Theme.Glass, new Color(1, 1, 1, 0.8f), "hint"); hint.rectTransform.At(0, 1, 10, -(cardTop + cardH + 14), cardW - 20, hintH);
-            var ht = Ui.Text(hint.transform, "낀 아티팩트 칸을 길게 누르면 지금 것과 새 것을 견줍니다", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center); ht.rectTransform.Fill(12, 0, 12, 0);
+            var ht = Ui.Text(hint.transform, "낀 아티팩트 칸을 길게 누르면 지금 것과 새 것을 견준다", Theme.FsSm, Theme.Sub, TextAlignmentOptions.Center); ht.rectTransform.Fill(12, 0, 12, 0);
 
             // 가지 선 — 카드 오른쪽 가운데 → 줄기 → 사도 줄마다
             float rowX = Wd - rowW, trunk = cardW + (rowX - cardW) * 0.55f, cy = cardTop + cardH / 2;
@@ -137,7 +137,7 @@ namespace Bolzena.RunUI
                 pick = k;
                 foreach (var (key, b, n) in rows) { b.Bg.sprite = key == k ? Theme.CellOn : Theme.Cell; if (n) n.color = key == k ? Theme.Gold : Theme.Ink; }
                 confirm.Interactable = true;
-                confirm.SetLabel($"{Roster.OfCore(k).ko} 에게 낍니다");
+                confirm.SetLabel($"{Roster.OfCore(k).ko} 에게 낀다");
             }
             int ri = 0;
             foreach (var k in P.S.Party)
@@ -222,32 +222,32 @@ namespace Bolzena.RunUI
             var deckBtn = deckChip.gameObject.AddComponent<Button>(); deckBtn.transition = Selectable.Transition.None;
             deckBtn.onClick.AddListener(DeckView);
 
-            confirm = Btn.Make(foot, "낄 사도를 고르세요", BtnStyle.PillGold, () =>
+            confirm = Btn.Make(foot, "낄 사도를 고를 수 있다", BtnStyle.PillGold, () =>
             {
                 string why = P.Equip(pick, equipId, true);
                 if (why != null) { Toast.Show(why); return; }
                 Sfx.Play("equip");
                 var who = Roster.OfCore(pick).ko;
-                Close(() => { Toast.Show($"{who} — 「{e.Name}」 을 꼈습니다"); done(); });
+                Close(() => { Toast.Show($"{who} — 「{e.Name}」 을 꼈다"); done(); });
             }, Theme.FsLg);
             confirm.GetComponent<RectTransform>().At(1, 0.5f, 0, 0, 340, 64);
             var ck2 = Ui.Img(confirm.transform, Theme.S("ic_check"), Theme.Brown, "check"); ck2.rectTransform.At(0, 0.5f, 24, 0, 26, 26); ck2.preserveAspect = true;
             confirm.Label.rectTransform.Fill(56, 4, 20, 4);
             confirm.Label.enableAutoSizing = true; confirm.Label.fontSizeMin = Theme.FsSm; confirm.Label.fontSizeMax = Theme.FsLg;
             confirm.Interactable = false;
-            confirm.Why = "낄 사도를 먼저 고르세요";
+            confirm.Why = "낄 사도를 먼저 골라야 한다";
             Stage.Hot["gear.ok"] = confirm;
             // 애착 장비 — 그 사도가 파티에 있으면 미리 골라 둔다(누르면 바로 그 사도에게 · 다른 사도로 바꿀 수도 있음)
             if (e?.Affinity != null && rows.Exists(r => r.key == e.Affinity)) Select(e.Affinity);
             if (!bought)
             {
                 int price = P.SellPrice(equipId);
-                var sellB = Btn.Make(foot, null, BtnStyle.PillRose, () => Confirm($"「{e.Name}」 을 팔겠습니까?", $"아무에게도 끼지 않고 {price} 골드를 받습니다.", "팔기", () =>
+                var sellB = Btn.Make(foot, null, BtnStyle.PillRose, () => Confirm($"「{e.Name}」 을 팔까?", $"아무에게도 끼지 않고 {price} 골드를 받는다", "팔기", () =>
                 {
                     string why = P.Sell(equipId);
                     if (why != null) { Toast.Show(why); return; }
                     Sfx.Play("coin");
-                    Close(() => { Toast.Show($"「{e.Name}」 — 팔았습니다 (+{price} 골드)"); done(); });
+                    Close(() => { Toast.Show($"「{e.Name}」 — 팔았다 (+{price} 골드)"); done(); });
                 }, true), 0, "sell");
                 var srt = sellB.GetComponent<RectTransform>(); srt.At(1, 0.5f, -356, 0, 260, 64);
                 var ti = Ui.Img(srt, Theme.S("ic_trash"), Color.white, "ic"); ti.rectTransform.At(0, 0.5f, 24, 0, 26, 26); ti.preserveAspect = true;
@@ -259,7 +259,7 @@ namespace Bolzena.RunUI
             }
             else
             {
-                var note = Ui.Text(foot, "산 아티팩트는 팔 수 없습니다", Theme.FsSm, Theme.Dim, TextAlignmentOptions.MidlineRight);
+                var note = Ui.Text(foot, "산 아티팩트는 팔 수 없다", Theme.FsSm, Theme.Dim, TextAlignmentOptions.MidlineRight);
                 note.rectTransform.At(1, 0.5f, -356, 0, 260, 40);
             }
         }
@@ -303,7 +303,7 @@ namespace Bolzena.RunUI
         /// <summary>낀 장비 보기(지도 · 캠프의 「장비」).</summary>
         public void GearView()
         {
-            var (row, close, _) = Stage.ModalBox("gearview", 1100, 500, "낀 아티팩트", "사도 하나에 무기 · 방어구 · 장신구 한 칸씩 · 애착 아티팩트는 그 사도가 끼면 더 셉니다");
+            var (row, close, _) = Stage.ModalBox("gearview", 1100, 500, "낀 아티팩트", "사도 하나에 무기 · 방어구 · 장신구 한 칸씩 · 애착 아티팩트는 그 사도가 끼면 더 세진다");
             Ui.Row(row, Theme.Gap, TextAnchor.UpperCenter, null, true, true);
             foreach (var k in P.S.Party)
             {

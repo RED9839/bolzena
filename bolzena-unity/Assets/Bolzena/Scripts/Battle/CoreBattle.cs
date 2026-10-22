@@ -181,6 +181,8 @@ namespace Bolzena.Battle
         // ── 판에서 연 싸움(Run.OpenFight) — 웨이브 하나. 쪽지는 CueSink 로 받는다 ──
         CoreFight preset;
         public static CoreBattle ForRun(GameData data) => new CoreBattle(data, new Fixture());
+        /// <summary>프론티어 전투(BattleBridge.OpenFrontier) — 시즌(턴 제한). 있으면 턴 제한을 다 쓴 때 TimeUp 으로 끝낸다. 판 전투는 null.</summary>
+        public FrontierSeason FrontierSeason;
         public List<Cue> CueSink => cues;
         /// <summary>판 전체 전투 기록의 앞몫 — 이 싸움을 열 때까지 끝낸 싸움들의 사도별 합(BattleBridge 가 판의 RunState.Tally 를 베껴 넣는다). null 이면 판 탭 없음(전투 시범).</summary>
         public Dictionary<string, HeroTally> RunTally;
@@ -216,6 +218,7 @@ namespace Bolzena.Battle
             if (partyHp >= 0) st.PartyHp = partyHp;
             cues.Clear();
             var nb = CoreFight.Start(data, st, cues);
+            nb.Record(st);   // 입력 테이프(엔진 BattleInput) — 판에서 연 싸움은 Run.OpenFight 가 단다. 여기는 전투 시범 · 명령줄 차림의 웨이브
             shownIntent.Clear();
             chargeSeen.Clear();
             guard.Clear();
@@ -283,8 +286,8 @@ namespace Bolzena.Battle
         public bool CanPlay(int i, out string reason)
         {
             reason = null;
-            if (over || b == null) { reason = "전투가 끝났습니다"; return false; }
-            if (i < 0 || i >= b.Hand.Count) { reason = "그런 카드가 없습니다"; return false; }
+            if (over || b == null) { reason = "전투가 끝났다"; return false; }
+            if (i < 0 || i >= b.Hand.Count) { reason = "그런 카드가 없다"; return false; }
             reason = b.CanPlay(b.Hand[i], false, i);
             return reason == null;
         }
@@ -358,17 +361,22 @@ namespace Bolzena.Battle
         public int PendingStage;       // 단계를 고르는 쌓기(stack pick)의 고른 단계(1부터, 0 = 고르지 않음 → 다음 단계) — PlayCard · UseUlt 가 한 번 쓰고 비운다(2026-10-13)
 
         /// <summary>낼 카드가 단계를 고르는 쌓기(stack pick)면 단계 이름들(1단계부터), 아니면 빈 목록. 신탁을 고른 카드(choice ≥ 0)는 그 신탁의 모습으로 본다.</summary>
-        public List<string> StagePickNames(int i, int choice = -1)
+        public List<string> StagePickNames(int i, int choice = -1) => b == null ? new List<string>() : b.StagePickNames(CardFx(i, choice));
+        /// <summary>고학년이 단계를 고르는 쌓기(stack pick)면 단계 이름들, 아니면 빈 목록.</summary>
+        public List<string> UltStagePickNames(int hero) => b == null ? new List<string>() : b.StagePickNames(UltFx(hero));
+        /// <summary>단계를 고르는 쌓기가 쌓는 고유 효과 이름(「달바라기 꽃」) — 고르는 창의 단계 칸 아이콘용. 없으면 null.</summary>
+        public string StagePickId(int i, int choice = -1) => PickId(CardFx(i, choice));
+        public string UltStagePickId(int hero) => PickId(UltFx(hero));
+
+        List<CoreFx> CardFx(int i, int choice)
         {
-            if (over || b == null || i < 0 || i >= b.Hand.Count) return new List<string>();
+            if (over || b == null || i < 0 || i >= b.Hand.Count) return null;
             var id = b.Hand[i];
             var g = b.GlowOf(id);
-            var fx = g != null && g.Kind == "card" && choice >= 0 && choice < g.Picks.Count ? data.View(id, g.Picks[choice].N)?.Fx : b.CardOf(id)?.Fx;
-            return b.StagePickNames(fx);
+            return g != null && g.Kind == "card" && choice >= 0 && choice < g.Picks.Count ? data.View(id, g.Picks[choice].N)?.Fx : b.CardOf(id)?.Fx;
         }
-        /// <summary>고학년이 단계를 고르는 쌓기(stack pick)면 단계 이름들, 아니면 빈 목록.</summary>
-        public List<string> UltStagePickNames(int hero) =>
-            over || b == null || hero < 0 || hero >= b.Party.Count ? new List<string>() : b.StagePickNames(b.UltOf(b.Party[hero].Key)?.Fx);
+        List<CoreFx> UltFx(int hero) => over || b == null || hero < 0 || hero >= b.Party.Count ? null : b.UltOf(b.Party[hero].Key)?.Fx;
+        static string PickId(List<CoreFx> fx) => fx?.FirstOrDefault(x => x.K == FxK.Stack && x.Pick)?.Id;
 
         public IReadOnlyList<BattleEvent> PlayCard(int i, int target, int choice = -1, int branch = 0, int spend = 0)
         {
@@ -460,7 +468,7 @@ namespace Bolzena.Battle
             chips.Add(new StatusChip
             {
                 Id = "다음 카드 강화", Value = "×" + MulText(1 + best / 100.0), Kind = "empower",
-                Text = string.Join("\n", lines) + "\n내는 순간 한 번 쓰이고 사라집니다 — 피해 · 실드 · 회복이 커집니다.",
+                Text = string.Join("\n", lines) + "\n내는 순간 한 번 쓰이고 사라진다 — 피해 · 실드 · 회복이 커진다",
             });
         }
 
@@ -506,7 +514,7 @@ namespace Bolzena.Battle
         public bool CanUlt(int hero, out string reason)
         {
             reason = null;
-            if (over || b == null || hero < 0 || hero >= b.Party.Count) { reason = "쓸 수 없습니다"; return false; }
+            if (over || b == null || hero < 0 || hero >= b.Party.Count) { reason = "쓸 수 없다"; return false; }
             reason = b.CanUlt(b.Party[hero].Key);
             return reason == null;
         }
@@ -842,6 +850,14 @@ namespace Bolzena.Battle
             }
             snap = null;
             if (b.Over == "lose") { over = true; evs.Add(new BattleEvent { Kind = EventKind.Defeat }); return; }
+            // 프론티어 — 턴 제한을 다 썼다(마지막 턴 종료 → 적 차례 뒤). 다음 턴의 시작(턴 띠 · 뽑기)은 보이지 않는다 — 전투는 여기서 끝
+            if (FrontierSeason != null && b.Over == null && Bolzena.Core.Frontier.Over(b, FrontierSeason) == Bolzena.Core.Frontier.TIME)
+            {
+                over = true;
+                evs.RemoveAll(e => e.Kind == EventKind.TurnStart || e.Kind == EventKind.Draw);
+                evs.Add(new BattleEvent { Kind = EventKind.TimeUp, Value = Bolzena.Core.Frontier.Score(b) });
+                return;
+            }
             if (b.Over != "win") return;
             if (wave + 1 < fx.Waves.Count)
             {
@@ -865,6 +881,35 @@ namespace Bolzena.Battle
 
         // ── 카드 · 상태 그리기 자료 ─────────────────────────────────────
         /// <summary>사도 고유 효과 글 — 부제(desc) + CardText.Trait(그 키워드를 쓰는 패시브까지 · 「계기 → 결과」 줄). 칩 · 카드 확대 · 정보 창이 같은 글.</summary>
+        /// <summary>
+        /// 단계 고유 효과 글 표시 — 「(단계)이면」 으로 시작하는 줄(앞 「·」 · 색 태그 무시)은 지금 단계(cur, 1부터)면 금빛, 아니면 흐리게.
+        /// 우로스 태세 줄(「허물」: · 「본성」:)과 같은 색(2026-10-18). 단계가 없으면 글 그대로.
+        /// </summary>
+        static string StageMark(string text, List<string> stages, int cur)
+        {
+            if (string.IsNullOrEmpty(text) || stages == null || stages.Count == 0) return text;
+            var lines = text.Split('\n');
+            int on = -1;   // 지금 칠하는 단계(줄이 길어 다음 줄로 이어지면 다음 단계 줄 · 빈 줄 전까지 같은 색)
+            for (int i = 0; i < lines.Length; i++)
+            {
+                // 태그 · 보이지 않는 이음 글자(줄 안 끊기 — NBSP · 단어 이음 · 폭 없는 공백)를 빼고 앞의 글자 아닌 것(· 공백)도 떼어 견준다
+                var bare = System.Text.RegularExpressions.Regex.Replace(lines[i], "<[^>]+>", "");
+                bare = System.Text.RegularExpressions.Regex.Replace(bare, "[ ​-‍⁠﻿]", "");
+                bare = System.Text.RegularExpressions.Regex.Replace(bare, @"^[^\p{L}\p{N}「]+", "");
+                if (bare.Length == 0) { on = -1; continue; }
+                for (int k = 0; k < stages.Count; k++) if (bare.StartsWith(stages[k] + "이면")) { on = k; break; }
+                if (on < 0) continue;
+                var plain = System.Text.RegularExpressions.Regex.Replace(lines[i], "</?color[^>]*>", "");
+                lines[i] = on + 1 == cur ? $"<color=#F2CF7A>{plain}</color>" : $"<color=#6E7590>{plain}</color>";
+            }
+            return string.Join("\n", lines);
+        }
+
+        /// <summary>고유 효과 글 + 지금 단계 줄 표시(요미 위상) — 낱말 판 · 칩 풀이가 쓴다(KwText 는 바뀌지 않는 몫이라 캐시).</summary>
+        string KwTextNow(KwRt kw) => StageMark(KwText(kw), StagesOf(kw), kw.Owner != null ? b.StackOf(kw.Owner, kw.Id) : 0);
+        /// <summary>단계 이름 — 전투 고유 효과(Def)에 없으면 주인 사도 데이터의 같은 이름 고유 효과에서.</summary>
+        List<string> StagesOf(KwRt kw) => kw.Def?.Stages ?? (kw.Owner != null && data.Hero(kw.Owner)?.Keyword?.Name == kw.Id ? data.Hero(kw.Owner).Keyword.Stages : null);
+
         string KwText(KwRt kw)
         {
             CacheFor();
@@ -981,29 +1026,32 @@ namespace Bolzena.Battle
                         }
                     info.Text = string.Join("\n", lines);
                 }
+                // 단계 고유 효과(요미 달바라기 — 초승 · 반달 · 보름 · 그믐) — 「반달이면 …」 줄도 태세처럼 지금 단계만 금빛, 나머지는 흐리게(2026-10-18 사용자 「우로스 허물처럼」)
+                var hk = data.Hero(cv.Hero)?.Keyword;
+                if (hk?.Stages != null && hk.Stages.Count > 0 && info.Text != null) info.Text = StageMark(info.Text, hk.Stages, b.StackOf(cv.Hero, hk.Name));
             }
             var glow = b.GlowOf(cv.Id);
             info.Epiphany = glow != null; info.Grace = glow?.Kind == "hero";
             if (ib.Gen != null)
                 foreach (var g in ib.Gen) info.Terms.Add(new Term(g.name, "이 카드가 만드는 카드", "card") { Card = Info(g.gv, null, depth + 1) });
             // 받은 신탁 — 이름은 보이지 않는다(2026-10-07 사용자 「이름 말고 별 표시」). 별 줄만으로는 무엇인지 모르니 짧은 상자 하나
-            if (cv.Oracle != null) info.Terms.Insert(0, new Term("신탁 받은 카드", "이번 모험에서 신탁으로 바뀐 카드입니다 — 비용 아래 금빛 별 마크가 그 표시입니다.", "flash"));
+            if (cv.Oracle != null) info.Terms.Insert(0, new Term("신탁 받은 카드", "이번 모험에서 신탁으로 바뀐 카드 — 비용 아래 금빛 별이 그 표시다", "flash"));
             // 빛나는 카드 — 은총(사도 고유 카드를 손에)과 카드 신탁(바뀔 모습 고르기)은 풀이가 다르다(2026-10-07 제보: 은총이 「신탁」 으로 떴다)
             if (info.Epiphany) info.Terms.Insert(0, info.Grace
-                ? new Term("은총", "빛나는 카드 — 내면 그 사도의 고유 카드 하나를 손에 얻습니다(그 턴 비용 0)", "flash")
-                : new Term("신탁", "빛나는 카드 — 내는 순간 바뀔 모습을 고릅니다(이번에는 비용 0)", "flash"));
+                ? new Term("은총", "빛나는 카드 — 내면 그 사도의 고유 카드 하나를 손에 얻는다(그 턴 비용 0)", "flash")
+                : new Term("신탁", "빛나는 카드 — 내는 순간 바뀔 모습을 고른다(이번에는 비용 0)", "flash"));
             info.BaseCost = cv.Cost;
             info.X = cv.X;   // (2026-10-13) X 코스트 — 비용 자리에 「X」
             if (info.Cost > info.BaseCost)
             {
                 info.CostUpWhy = b.CostUpWhy(cv.Id) ?? "효과";
-                info.Terms.Insert(0, new Term("비용 +" + (info.Cost - info.BaseCost), $"원래 비용 {info.BaseCost} — {info.CostUpWhy}로 올랐습니다. 강인도는 카드에 적힌 원래 비용 기준입니다", "flash"));
+                info.Terms.Insert(0, new Term("비용 +" + (info.Cost - info.BaseCost), $"원래 비용 {info.BaseCost} — {info.CostUpWhy}로 올랐다 — 강인도는 원래 비용 기준", "flash"));
             }
             // 표식 — 얹힌 축복 · 복제본(core CardMark, 판 화면 W.Card 와 같은 것)
             var mk = b.MarkOf(cv.Id);
             info.MarkBless = mk.Bless; info.MarkBlessText = mk.BlessText; info.Copy = mk.Copy;
             if (mk.Blessed) info.Terms.Insert(info.Epiphany || cv.Oracle != null ? 1 : 0, new Term("축복", mk.BlessText, "flash"));
-            if (mk.Copy) info.Terms.Add(new Term("복제", "복제 — 이 카드는 신탁 · 축복을 받을 수 없습니다", "flash"));
+            if (mk.Copy) info.Terms.Add(new Term("복제", "복제 — 이 카드는 신탁 · 축복을 받을 수 없다", "flash"));
             return info;
         }
 
@@ -1013,6 +1061,7 @@ namespace Bolzena.Battle
         {
             ["디아나_왕년_u4"] = Motion.Attack2,   // 바위 던지기(1비용)
             ["디아나_왕년_s2"] = Motion.Attack1,   // 도끼 내려찍기(2비용)
+            ["클로에_u1"] = Motion.Skill1,          // 2026-10-18 메리 고 라운드 — 피해가 없어도 원작처럼 쁘띠 세바스티안을 타고 변신(Skill1_1, 사용자)
         };
 
         /// <summary>카드 정보의 바뀌지 않는 몫 — 전투(b) · CardView 가 같으면 늘 같다. 카드 글(text.Card)은 한 번만 짓는다(예전엔 세 번).</summary>
@@ -1041,13 +1090,17 @@ namespace Bolzena.Battle
             };
             // 사도 고유 효과는 카드 주인 사도의 것만(runui CardTerms 와 같은 규칙 — 디아나 「제자」 ↔ 밍스 「제자」 처럼 이름이 겹쳐도 잘못 잇지 않게)
             string cardOwner = cv.Def.Hero ?? cv.Owner;
-            info.Terms = Terms.ForCard(card, cv.Tags, w => b.Kw.TryGetValue(w, out var kw) && (cardOwner == null || kw.Owner == cardOwner) ? (kw.Id, KwText(kw)) : ((string, string)?)null);
+            info.Terms = Terms.ForCard(card, cv.Tags, w => b.Kw.TryGetValue(w, out var kw) && (cardOwner == null || kw.Owner == cardOwner) ? (kw.Id, KwTextNow(kw)) : ((string, string)?)null);
             // 사도 고유 효과 — 부제 + 수치가 다 든 글(CardText.Trait, 「자세히」 없음), 생성 카드 — 작은 카드(runui CardTerms: make · transform · 진화 · 결속 · 금기)
             var cterms = Bolzena.RunUI.CardTerms.Of(data, text, cv, card);
             // 위에서 못 잡은 사도 고유 효과 · 변신(성전 모드 · 맨주먹 전성기 …, 변신이 바꿔 넣은 카드 포함) — CardTerms 의 판 글 그대로
             foreach (var ct in cterms)
                 if (!ct.IsCard && ct.Hero && !info.Terms.Exists(x => x.Word == ct.Name))
-                    info.Terms.Add(new Term(ct.Name, Fmt(ct.Body), ct.Kind != null && ct.Kind.StartsWith("변신") ? "form" : "kw"));
+                {
+                    var body = Fmt(ct.Body);
+                    if (b.Kw.TryGetValue(ct.Name, out var ckw) && StagesOf(ckw) != null) body = StageMark(body, StagesOf(ckw), ckw.Owner != null ? b.StackOf(ckw.Owner, ckw.Id) : 0);   // 요미 위상 — 지금 단계 줄 금빛(10-18)
+                    info.Terms.Add(new Term(ct.Name, body, ct.Kind != null && ct.Kind.StartsWith("변신") ? "form" : "kw"));
+                }
             // 엔진 키워드 가운데 화면 낱말 표(Terms.Words)에 없는 것(「격파 상태」 · 「피해 기반 회복」 — 2026-10-07 카제나 키워드로 줄인 글) — 판 화면 W.Card 와 같은 판.
             // 그 이름 속 짧은 낱말(「격파」)이 글의 다른 곳에 따로 안 나오면 짧은 판은 뺀다
             foreach (var ct in cterms)
@@ -1109,7 +1162,7 @@ namespace Bolzena.Battle
                     var kwOwner = kw.Owner != null ? data.Hero(kw.Owner) : null;
                     string cap = kw.Def.Cap is int kc && kc > 0 ? $" / 최대 {kc}" : "";
                     string head = u.Side == CSide.Enemy && kwOwner != null ? $"<color=#A7B1CC>{kwOwner.Name}의 고유 효과 · 이 적에게 {kv.Value}겹{cap}</color>\n" : "";
-                    res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = head + KwText(kw),
+                    res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = head + KwTextNow(kw),
                         From = kw.Owner != null ? new List<string> { Look.Hero(kw.Owner).Art } : null });
                     continue;
                 }
@@ -1117,7 +1170,7 @@ namespace Bolzena.Battle
                 {   // 손패 흡수(core 수 seize) — 쥔 카드 이름 · 되찾는 길
                     var names = b.SeizedOf(u).Select(x => $"「{b.CardOf(x)?.Name ?? x}」");
                     res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "buff",
-                        Text = $"이 적이 빼앗아 쥔 카드: {string.Join(" · ", names)}\n격파하거나 · 쓰러뜨리거나 · 피해 {b.SeizeLeft(u)} 더 주면 손으로 돌아옵니다." });
+                        Text = $"이 적이 빼앗아 쥔 카드: {string.Join(" · ", names)}\n격파하거나 · 쓰러뜨리거나 · 피해 {b.SeizeLeft(u)} 더 주면 손으로 돌아온다" });
                     continue;
                 }
                 // 적의 쌓이는 수치(배고픔 · 텃밭 …) — 그 적 데이터의 counters 에서 풀이(core CardText.Counter, 「이름: 」 머리는 칸 이름과 겹쳐 뺀다)
@@ -1135,7 +1188,7 @@ namespace Bolzena.Battle
             if (hero && b.Stacks.TryGetValue(u.Key, out var bag))
                 foreach (var kv in bag)
                     if (kv.Value != 0 && b.Kw.TryGetValue(kv.Key, out var kw))
-                        res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = KwText(kw) });
+                        res.Add(new StatusChip { Id = kv.Key, Value = kv.Value.ToString(), Kind = "key", Text = KwTextNow(kw) });
             // 강화 칩(파티 버프 줄 끝) — 켜진 강화 카드마다: 카드 이름 · 겹, 풀이 = 남는 효과 글(core b.PowersOf · Docs/API.md 「강화 카드 지속 규칙」)
             if (u == b.Pool)
             {
@@ -1290,7 +1343,7 @@ namespace Bolzena.Battle
                         Key = look.Art, Id = u.Key, Name = u.Name, Tint = look.Tint, UltName = h?.Ult?.Name, UltText = hb.UltText,
                         Atk = u.Atk, Def = u.Def, Crit = u.Crit, AtkNow = b.AtkNow(u), DefNow = b.DefNow(u), CritNow = u.Crit + Mathf.RoundToInt((float)b.StatMod(u, "crit") * 100),
                         Role = u.Role, Nature = u.Nature, Slot = u.Idx, Blurb = h?.Blurb, Ult = b.Gauge, UltMax = h?.Ult != null ? b.UltCostOf(u.Key) : 999, Dead = u.Dead,
-                        KeywordName = h?.Keyword?.Name, KeywordText = hb.KeywordText,
+                        KeywordName = h?.Keyword?.Name, KeywordText = StageMark(hb.KeywordText, h?.Keyword?.Stages, h?.Keyword != null ? b.StackOf(u.Key, h.Keyword.Name) : 0),   // 요미 위상 — 지금 단계 줄 금빛
                         KeywordStacks = h?.Keyword != null ? b.StackOf(u.Key, h.Keyword.Name) : 0,
                     };
                     hs.Traits.AddRange(hb.Traits); hs.Passives.AddRange(hb.Passives);

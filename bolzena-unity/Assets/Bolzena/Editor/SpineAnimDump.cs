@@ -23,7 +23,8 @@ namespace Bolzena.EditorTools
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
                 var folder = Path.GetFileName(Path.GetDirectoryName(path));
-                if (!FOLDERS.Contains(folder)) continue;
+                var only = System.Environment.GetEnvironmentVariable("SPINE_DUMP_FOLDERS");   // (10-15) 쉼표로 고른 폴더만 — 없으면 FOLDERS
+                if (!(string.IsNullOrEmpty(only) ? FOLDERS.Contains(folder) : only.Split(',').Contains(folder))) continue;
                 var a = AssetDatabase.LoadAssetAtPath<SkeletonDataAsset>(path);
                 SkeletonData d;
                 try { d = a.GetSkeletonData(true); } catch { continue; }
@@ -36,6 +37,21 @@ namespace Bolzena.EditorTools
                     var evs = new List<string>();
                     foreach (var tl in an.Timelines) if (tl is EventTimeline et) foreach (var ev in et.Events) evs.Add($"{ev.Data.Name}@{Mathf.RoundToInt(ev.Time * 1000)}");
                     lines.Add($"{an.Name}\t{Mathf.RoundToInt(an.Duration * 1000)}ms\t{string.Join(" ", evs)}");
+                    // (10-15) SPINE_DUMP_SAMPLE=MadMax,Pirate,Gandalf — 0.5초마다 이름에 그 낱말이 든 보이는 첨부 수(에피카 고학년 단계 찾기)
+                    var smp = System.Environment.GetEnvironmentVariable("SPINE_DUMP_SAMPLE");
+                    if (!string.IsNullOrEmpty(smp))
+                    {
+                        var keys = smp.Split(',');
+                        var row = new List<string>();
+                        for (float t = 0; t <= an.Duration + 0.001f; t += 0.5f)
+                        {
+                            sk.SetToSetupPose();
+                            an.Apply(sk, 0, t, false, null, 1f, MixBlend.Setup, MixDirection.In);
+                            var c = keys.Select(k => sk.Slots.Count(sl => sl.Attachment != null && sl.A > 0.01f && sl.Attachment.Name.Contains(k)));
+                            row.Add($"{t:0.0}:{string.Join("/", c)}");
+                        }
+                        lines.Add("   표본	" + string.Join(" ", row));
+                    }
                     // 처음 · 끝 자세의 첨부
                     foreach (var (tag, t) in new[] { ("첫", 0f), ("끝", an.Duration) })
                     {

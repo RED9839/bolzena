@@ -71,6 +71,7 @@ namespace Bolzena.Core
         {
             if (u == null) return 0;
             double v = FormMod(u, stat) + PowerMod(u, stat);
+            if (ProgOf != null && u.Side == Side.Party && ProgOf.TryGetValue(u.Key, out var pm)) v += pm.StatOf(stat);   // 영구 성장(dealt · guard · heal · weak)
             foreach (var m in u.Mods) if (m.Stat == stat) v += m.V;
             if (u.Side == Side.Party && u.BodyRef != null && Always.TryGetValue(u.Key, out var al))
                 foreach (var m in al)
@@ -462,7 +463,8 @@ namespace Bolzena.Core
                         {
                             var e = foes[Rng.Int(foes.Count)];
                             int v = Math.Max(1, Num.Round(owner.Atk * p.Ratio * n));
-                            Hurt(e, v, new HurtOpts { From = owner });
+                            if (HpSrc != null) HpCtx = "@턴끝:" + kw.Id;   // 측정 전용
+                            Hurt(e, v, new HurtOpts { From = owner }); HpCtx = null;
                             Say($"{owner.Name} · {kw.Id} {n} — {e.Name}에게 {v} 피해");
                         }
                     }
@@ -474,7 +476,8 @@ namespace Bolzena.Core
                             int n = St(e, kw.Id);
                             if (n == 0 || e.Dead) continue;
                             int v = Math.Max(1, Num.Round(owner.Atk * p.Ratio * n));
-                            Hurt(e, v, new HurtOpts { From = owner });
+                            if (HpSrc != null) HpCtx = "@턴끝:" + kw.Id;   // 측정 전용
+                            Hurt(e, v, new HurtOpts { From = owner }); HpCtx = null;
                             Say($"{e.Name}: {kw.Id} {n} — {v} 피해");
                         }
                     }

@@ -11,14 +11,18 @@
 cd /c/projects/bolzena-unity
 OUT=Captures/motionlab
 ult=""
+seq=""
+[ "$1" = "-seq" ] && { seq="-motionlab-seq"; shift; }
+[ "$1" = "-video" ] && { seq="-motionlab-seq -motionlab-seqfps 30"; video=1; shift; }   # (10-15) 매 프레임 → Tools/vs_video.py 로 원작 · 우리 나란히 mp4   # (2026-10-15) 0.1초 연속 그림 → python Tools/vs_orig.py Captures/motionlab 로 원작과 나란히
 [ "$1" = "-ult" ] && { ult="-motionlab-ult"; shift; }
 heroes=""
 [ $# -gt 0 ] && heroes="-motionlab-heroes $1"
 rm -rf "$OUT"; mkdir -p "$OUT"
-timeout -k 10 3000 ./Build/Bolzena.exe -motionlab-shots "C:\\projects\\bolzena-unity\\Captures\\motionlab" $ult $heroes \
+timeout -k 10 3000 ./Build/Bolzena.exe -motionlab-shots "C:\\projects\\bolzena-unity\\Captures\\motionlab" $ult $seq $heroes \
   -screen-width 1600 -screen-height 900 -screen-fullscreen 0 -logFile "C:\\projects\\bolzena-unity-tmp\\motionlab_shots.log"
 echo "exit=$?"
-taskkill //F //IM Bolzena.exe >/dev/null 2>&1 && echo "남은 Bolzena.exe 를 지움"
+: # (2026-10-15) 다른 Bolzena 창(사용자가 켜 둔 게임)까지 닫던 정리 줄을 뺐다 — 캡처는 스스로 끈다
 echo "== $(ls $OUT/*.png 2>/dev/null | wc -l)장  $(grep -c -E 'Exception' /c/projects/bolzena-unity-tmp/motionlab_shots.log) 예외"
 grep -E "Exception|\[MotionLab\]" /c/projects/bolzena-unity-tmp/motionlab_shots.log | head -8
 python Tools/motionlab_sheet.py "C:/projects/bolzena-unity/$OUT"
+if [ -n "$video" ]; then python Tools/vs_video.py "C:/projects/bolzena-unity/$OUT"; elif [ -n "$seq" ]; then python Tools/vs_orig.py "C:/projects/bolzena-unity/$OUT"; fi

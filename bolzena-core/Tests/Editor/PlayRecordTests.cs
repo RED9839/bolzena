@@ -7,11 +7,6 @@ namespace Bolzena.Core.Tests
     /// <summary>플레이 기록 v2(RunRecord · BattleTape · RecState.Picks) — 형식 · 크기 상한 · 선택 기록 · 저장 이어가기.</summary>
     public class PlayRecordTests
     {
-        // 학년(학점제)은 2026-10-09 꺼 두었다(R.GRADE_ON) — 학년 · 학점을 보는 이 시험은 켜고 돈다
-        bool gradeOn0;
-        [SetUp] public void GradeOn() { gradeOn0 = R.GRADE_ON; R.GRADE_ON = true; }
-        [TearDown] public void GradeBack() => R.GRADE_ON = gradeOn0;
-
         static readonly List<string> PARTY = new() { "rico", "carrot", "sion" };
         const string ANON = "0123456789abcdef0123456789abcdef";
 
@@ -20,7 +15,7 @@ namespace Bolzena.Core.Tests
             Run end = null;
             new RunBot(K.Sample()).RunFull(PARTY, seed, new SimOpts { Skilled = true, OnEnd = r => end = r });
             Assert.IsNotNull(end, "봇 판이 끝나지 않았다");
-            var rec = RunRecord.Of(end, new RecordMeta { Anon = ANON, Ver = "0.1.0", Os = "web", Result = end.S.Done == "clear" ? "win" : "lose", Board = 3 }, max);
+            var rec = RunRecord.Of(end, new RecordMeta { Anon = ANON, Ver = "0.1.0", Os = "web", Result = end.S.Done == "clear" ? "win" : "lose" }, max);
             return (end, rec);
         }
 
@@ -32,7 +27,6 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("bolzena-record", rec.Kind); Assert.AreEqual(2, rec.V);
             Assert.AreEqual(run.S.Hist.Count, rec.Fights.Count);
             Assert.AreEqual(PARTY, rec.Party.Select(p => p.Id).ToList());
-            Assert.AreEqual(3, rec.Board);
             foreach (var f in rec.Fights)
             {
                 Assert.IsNotNull(f.Log, "턴 기록");
@@ -47,13 +41,25 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(0, rec.Trim);
         }
 
+        [Test] public void 난이도_단계는_있을_때만_기록에_적힌다()
+        {
+            var (run, rec) = BotRun(11);
+            Assert.AreEqual(0, rec.Tier);
+            StringAssert.DoesNotContain("\"tier\"", RunRecord.Json(rec), "단계 없음(성장 끔) — 기록 모양 그대로");
+            var r2 = Run.New(K.Sample(), PARTY, 7);
+            Assert.IsNull(r2.SetTier(3));
+            var rec2 = RunRecord.Of(r2, new RecordMeta { Anon = ANON, Result = "quit" });
+            Assert.AreEqual(3, rec2.Tier);
+            StringAssert.Contains("\"tier\":3", RunRecord.Json(rec2));
+            Assert.IsNull(RunRecord.Check(RunRecord.Json(rec2)));
+        }
+
         [Test] public void 선택_기록_제시된_것과_고른_것()
         {
             var (_, rec) = BotRun(5);
             Assert.IsTrue(rec.Picks.Any(p => p.K == "equip"), "전리품 아티팩트");
-            foreach (var p in rec.Picks.Where(p => p.Offer != null && p.Pick != null && (p.K == "equip" || p.K == "grade" || p.K == "copy" || p.K == "train")))
+            foreach (var p in rec.Picks.Where(p => p.Offer != null && p.Pick != null && (p.K == "equip" || p.K == "copy" || p.K == "train")))
                 Assert.Contains(p.Pick, p.Offer, $"{p.K} 고른 것은 제시된 것 가운데");
-            Assert.IsTrue(rec.Picks.Any(p => p.K == "grade" && p.Offer.Count >= 2 && p.Pick != null), "진급 보상");
             Assert.IsTrue(rec.Picks.All(p => p.F >= 1 && p.F <= 2));
         }
 

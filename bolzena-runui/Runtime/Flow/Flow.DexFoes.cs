@@ -218,6 +218,8 @@ namespace Bolzena.RunUI
 
         // ── 실제 전투 수치(2026-10-13) — 데이터 HP · 수에 층 · 싸움 배율(R.FoeScale)을 곱한 값. 2층 적이 도감에서 약해 보이던 착각을 막는다 ──
         /// <summary>층 · 싸움 종류마다 (머리표, 체력 배율, 피해 배율). 층 차례 → 일반 · 엘리트 · 보스. 종류가 여럿이면 머리표에 종류도. 나오는 곳이 없으면 빈 목록.</summary>
+        /// <summary>도감 적 수치에 곱할 난이도 단계 — 판 안이면 그 판 단계, 판 밖이면 성장 켬일 때 연 가장 높은 단계(꺼져 있으면 0 = 단계 없음).</summary>
+        static int DexTier => Me == null || !ProgStore.On ? 0 : Me.P.Has ? Me.P.S.Tier : ProgStore.DefaultTier;
         static List<(string label, double hp, double dmg)> FoeScales(IEnumerable<(int floor, string kind)> fights)
         {
             var fs = fights.Distinct().OrderBy(x => x.floor).ThenBy(x => x.kind == "fight" ? 0 : x.kind == "elite" ? 1 : 2).ToList();
@@ -225,6 +227,8 @@ namespace Bolzena.RunUI
             return fs.Select(x =>
             {
                 var sc = R.FoeScale(x.floor, boss: x.kind == "boss", elite: x.kind == "elite");
+                // 난이도 단계(성장 켬) — Run.FoeScaleOf 와 같은 곱(층 배율 × 단계 배율). 단계 0(성장 끔) = 그대로
+                var tx = Tiers.Scale(DexTier); sc = (sc.hp * tx.hp, sc.dmg * tx.dmg);
                 return ($"{x.floor + 1}층" + (kinds ? " " + (x.kind == "boss" ? "보스전" : x.kind == "elite" ? "엘리트전" : "일반전") : ""), sc.hp, sc.dmg);
             }).ToList();
         }
@@ -379,7 +383,7 @@ namespace Bolzena.RunUI
             bool clones = ls.Tab == "보스 클론";
             RosterHead(host, "적 도감", back);
 
-            var tr = Ui.Rect("tools", host).At(1, 1, -Theme.Gutter, -20, 1240, 52);
+            var tr = Ui.Rect("tools", host).At(1, 1, HeadToolsX, -24, 1240, 52);   // 머리 오른쪽 묶음(홈 · 설정) 왼쪽
             Ui.Row(tr, 10, TextAnchor.MiddleRight, null, false, true);
             DexTabs(tr, host, "적", back);
 
@@ -497,7 +501,7 @@ namespace Bolzena.RunUI
                 foreach (var g in kinds.GroupBy(kd => kd.Race))
                 {
                     string title = g.Key == "없음" ? "종족 없음" : g.Key == "누루링" ? "누루링 수액" : g.Key + " 종족";
-                    string note = g.Key == "누루링" ? "성격 모습 없음 — 종족 스킨마다 한 장 · 성격은 모험의 적 속성을 따릅니다" : $"{g.Count()}종";
+                    string note = g.Key == "누루링" ? "성격 모습 없음 — 종족 스킨마다 한 장 · 성격은 모험의 적 속성을 따른다" : $"{g.Count()}종";
                     var natList = new List<(FoeKind kd, string n)>();
                     foreach (var kd in g)
                         foreach (var n in kd.Natures)
@@ -527,7 +531,7 @@ namespace Bolzena.RunUI
                     if (ls.Nature != null)
                     {
                         if (!open.Contains(ls.Nature))
-                            Banner($"{v.Name}에서는 {NatTag(ls.Nature)} 판이 나오지 않습니다 — 두 층 보스 후보를 {v.Race} 종족 · {ls.Nature} 사도로 다 채우지 못합니다.");
+                            Banner($"{v.Name}에서는 {NatTag(ls.Nature)} 모험이 나오지 않는다 — 두 층 보스 후보를 {v.Race} 종족 · {ls.Nature} 사도로 다 채우지 못한다");
                         else
                         {
                             var parts = new List<string>();
@@ -537,7 +541,7 @@ namespace Bolzena.RunUI
                                 bool alt = f == 0 && Bolzena.Core.Run.CloneCandidates(P.Data, v.Id, ls.Nature, 0).Count == 0;
                                 parts.Add($"<color={Theme.GoldTag}>{f + 1}층 후보</color> {string.Join(" · ", c)}{(alt ? $" <size=80%><color={Theme.SubTag}>(1~2성이 없어 3성)</color></size>" : "")}");
                             }
-                            Banner($"{v.Name} · {NatTag(ls.Nature)} 판이면  " + string.Join("   /   ", parts));
+                            Banner($"{v.Name} · {NatTag(ls.Nature)} 모험이면  " + string.Join("   /   ", parts));
                         }
                     }
                     var shut = R.FOE_NATURES.Where(n => !open.Contains(n)).ToList();
@@ -568,7 +572,7 @@ namespace Bolzena.RunUI
                     idx++; cards++;
                 }
             }
-            if (cards == 0) { var none = Ui.Text(content, ls.Village != null && ls.Nature != null && clones ? "이 마을 · 속성 판에는 클론 후보가 없습니다" : "맞는 적이 없습니다", Theme.FsLg, Theme.Sub, TextAlignmentOptions.Center); none.Pref(-1, 80); }
+            if (cards == 0) { var none = Ui.Text(content, ls.Village != null && ls.Nature != null && clones ? "이 마을 · 속성 모험에는 클론 후보가 없다" : "맞는 적이 없다", Theme.FsLg, Theme.Sub, TextAlignmentOptions.Center); none.Pref(-1, 80); }
             ls.Drawn = true;
             if (ls.ScrollY > 0)
             {
@@ -585,15 +589,15 @@ namespace Bolzena.RunUI
             var foot = Ui.Rect("foot", host).Band(0, footH, Theme.Gutter, Theme.Gutter, 0);
             string Count(int n) => clones ? $"클론 후보 {n}명" : $"몬스터 카드 {n}장";
             string baseInfo = clones
-                ? $"{Count(cards)} · 누르면 상세  <color={Theme.SubTag}>— 보스는 모험마다 마을 종족 · 모험의 적 속성 사도 클론으로 섭니다(엘다인 제외)</color>"
-                : $"{Count(cards)} · 누르면 상세  <color={Theme.SubTag}>— 성격 모습마다 한 장 · 일반 · 엘리트는 카드 안에서 바꿉니다</color>";
+                ? $"{Count(cards)} · 누르면 상세  <color={Theme.SubTag}>— 보스는 모험마다 마을 종족 · 모험의 적 속성 사도 클론으로 선다(엘다인 제외)</color>"
+                : $"{Count(cards)} · 누르면 상세  <color={Theme.SubTag}>— 성격 모습마다 한 장 · 일반 · 엘리트는 카드 안에서 바꿀 수 있다</color>";
             var info = Ui.Text(foot, focusName != null ? $"<b>{focusName}</b>  <color={Theme.SubTag}>{focusSub}</color>" : baseInfo, Theme.FsMd, Theme.Ink, TextAlignmentOptions.MidlineLeft);
             info.rectTransform.Fill(0, 0, 280, 0); info.textWrappingMode = TextWrappingModes.NoWrap; info.overflowMode = TextOverflowModes.Ellipsis;
             var detail = Btn.Make(foot, null, BtnStyle.PillDark, () => openFocus?.Invoke(), 0, "detail");
             var drt = detail.GetComponent<RectTransform>(); drt.At(1, 0.5f, 0, 0, 250, 58);
             var dzi = Ui.Img(drt, Theme.S("ic_zoom"), Theme.Gold, "ic"); dzi.rectTransform.At(0, 0.5f, 22, 0, 24, 24); dzi.preserveAspect = true;
             var dl = Ui.Title(drt, "상세 정보", Theme.FsLg, Theme.Ink, TextAlignmentOptions.MidlineRight); dl.rectTransform.Fill(50, 0, 26, 0);
-            detail.Interactable = openFocus != null; detail.Why = "카드를 먼저 고르세요";
+            detail.Interactable = openFocus != null; detail.Why = "카드를 먼저 골라야 한다";
             Stage.Hot["list.detail"] = detail;
             FoeSearch(tr, sections, area, info, Count);
         }
@@ -605,7 +609,7 @@ namespace Bolzena.RunUI
             var input = SearchInput(row, "이름 · 초성 찾기", out var clear);
             input.transform.SetAsFirstSibling();
             DexSearchField = input;
-            var empty = Ui.Text(area, "찾는 것이 없습니다", Theme.FsLg, Theme.Sub, TextAlignmentOptions.Center, false, "nomatch");
+            var empty = Ui.Text(area, "찾는 것이 없다", Theme.FsLg, Theme.Sub, TextAlignmentOptions.Center, false, "nomatch");
             empty.rectTransform.At(0.5f, 1, 0, -60, 600, 60);
             string infoBase = info != null ? info.text : null;
             void Apply(string q)
@@ -643,7 +647,7 @@ namespace Bolzena.RunUI
         /// <summary>약점 · 우세 한 줄 — 그 성격의 적은 약점 성격에 약하고, 우세 성격(상성으로 이기는 성격)에 강하다.</summary>
         static string EdgeKo(string n, bool small = false)
         {
-            if (n == null) return $"<color={Theme.SubTag}>상성은 모험의 적 속성을 따릅니다</color>";
+            if (n == null) return $"<color={Theme.SubTag}>상성은 모험의 적 속성을 따른다</color>";
             var weak = R.WeakTo(n);
             R.BEATS.TryGetValue(n, out var beat);
             return $"<color={Theme.SubTag}>약점</color> {string.Join(" · ", weak.Select(NatTag))}" + (beat != null ? $"{(small ? " " : "  ")}<color={Theme.SubTag}>우세</color> {NatTag(beat)}" : "");
@@ -867,8 +871,8 @@ namespace Bolzena.RunUI
             W.Section(content, "강인도 회복", null, 36);
             if (noTough) { DexLine(content, $"<color={Theme.SubTag}>강인도 없음 — 격파되지 않음</color>", Theme.FsSm, Theme.Sub); return; }
             var br = BraceSkills(e);
-            if (br.Count == 0) DexLine(content, $"<color={Theme.SubTag}>회복 스킬 없음 — 격파된 다음 내 턴 시작에만 다시 가득 찹니다.</color>", Theme.FsSm, Theme.Sub);
-            else DexLine(content, string.Join("\n", br.Select(x => $"· {x.say} — 강인도 <color=#D6C2FF>+{FoeNum(x.v)}</color>")) + $"\n<color={Theme.SubTag}>그 밖에는 격파된 다음 내 턴 시작에 가득 찹니다.</color>", Theme.FsBody, Theme.Ink);
+            if (br.Count == 0) DexLine(content, $"<color={Theme.SubTag}>회복 스킬 없음 — 격파된 다음 내 턴 시작에만 다시 가득 찬다</color>", Theme.FsSm, Theme.Sub);
+            else DexLine(content, string.Join("\n", br.Select(x => $"· {x.say} — 강인도 <color=#D6C2FF>+{FoeNum(x.v)}</color>")) + $"\n<color={Theme.SubTag}>그 밖에는 격파된 다음 내 턴 시작에 가득 찬다</color>", Theme.FsBody, Theme.Ink);
         }
 
         /// <summary>보스 · 엘리트가 세우는 적 — 이름 · HP · 강인도 · 몇씩 · 최대. 보스 소환물은 강인도 없음 · 보스와 함께 쓰러짐.</summary>
@@ -876,7 +880,7 @@ namespace Bolzena.RunUI
         {
             var sums = AllIntents(e).SelectMany(Chain).Where(x => x.T == "summon" && x.Id != null).GroupBy(x => x.Id).Select(g => g.First()).ToList();
             if (sums.Count == 0) return;
-            W.Section(content, "소환", boss ? "보스가 세우는 적 — 보스가 쓰러지면 함께 쓰러집니다" : "세우는 적", 36);
+            W.Section(content, "소환", boss ? "보스가 세우는 적 — 보스가 쓰러지면 함께 쓰러진다" : "세우는 적", 36);
             foreach (var x in sums)
             {
                 var se = P.Data.Enemy(x.Id);
@@ -929,10 +933,10 @@ namespace Bolzena.RunUI
             string hpKo = FoeHpKo(e, scs);
             DexLine(content, $"HP {hpKo}" + (hpKo.Contains("층") ? "\n" : "    ") + "강인도 " + (tough > 0 ? $"<color=#D6C2FF>{FoeNum(tough)}</color> <size=80%><color={Theme.SubTag}>칸{(e.ToughTaken > 0 && e.ToughTaken != 1 ? $" · 받는 강인도 피해 ×{e.ToughTaken:0.##}" : "")}</color></size>" : $"<color={Theme.SubTag}>없음 — 격파되지 않음</color>"), Theme.FsLg, Theme.Ink);
             if (tough > 0) { var pr = Ui.Rect("pips", content); pr.Pref(-1, 16); ToughPips(pr, tough, Mathf.Min(420, 34 * (float)Math.Ceiling(tough)), 12, 2, true); }
-            DexLine(content, $"<color={Theme.SubTag}>" + (scs.Count > 0 ? "HP · 행동의 피해는 나오는 층 · 싸움(일반 · 엘리트 · 보스) 배율이 들어간 실제 전투 값입니다." : "나오는 곳이 없어 데이터 값 그대로입니다.") + "</color>", Theme.FsSm, Theme.Sub);
+            DexLine(content, $"<color={Theme.SubTag}>" + (scs.Count > 0 ? "HP · 행동의 피해는 나오는 층 · 싸움(일반 · 엘리트 · 보스) 배율이 들어간 실제 전투 값이다" : "나오는 곳이 없어 데이터 값 그대로다") + "</color>", Theme.FsSm, Theme.Sub);
             W.Section(content, "상성", n != null ? $"{n} 모습" : null, 36);
             DexLine(content, EdgeKo(n), Theme.FsLg, Theme.Ink);
-            DexLine(content, $"<color={Theme.SubTag}>" + (n != null ? $"모험의 적 속성이 {n}이면 이 모습 · 이 상성으로 나옵니다. 약점 성격으로 치면 피해와 강인도 피해가 커집니다." : "누루링 수액은 종족 스킨이 그대로이고, 성격은 모험의 적 속성을 따릅니다.") + "</color>", Theme.FsSm, Theme.Sub);
+            DexLine(content, $"<color={Theme.SubTag}>" + (n != null ? $"모험의 적 속성이 {n}이면 이 모습 · 이 상성으로 나온다. 약점 성격으로 치면 피해와 강인도 피해가 커진다" : "누루링 수액은 종족 스킨 그대로, 성격은 모험의 적 속성을 따른다") + "</color>", Theme.FsSm, Theme.Sub);
             // 성격별 모습 — 다섯 성격 그림(있는 것만). 누르면 그 성격 카드로
             if (!kd.Nuru)
             {
@@ -1000,10 +1004,10 @@ namespace Bolzena.RunUI
             DexLine(content, $"{NatTag(h.Nature)} · {h.Race}   <color={Theme.SubTag}>{r.V.Name}</color> {FloorsKo(r.Floors)} 보스 후보", Theme.FsLg, Theme.Ink);
             DexLine(content, EdgeKo(h.Nature), Theme.FsBody, Theme.Ink);
             bool alt = r.Floors.Contains(0) && h.Star >= 3;
-            DexLine(content, $"<color={Theme.SubTag}>모험의 적 속성이 {h.Nature}이고 마을이 {r.V.Name}이면 이 클론이 보스로 설 수 있습니다. 클론은 사도 성격 그대로입니다." + (alt ? $" {r.V.Race} 종족에 {h.Nature} 1~2성이 없어 3성이 1층에도 섭니다(1층 몸 · 1층 고학년 값)." : "") + "</color>", Theme.FsSm, Theme.Sub);
+            DexLine(content, $"<color={Theme.SubTag}>모험의 적 속성이 {h.Nature}이고 마을이 {r.V.Name}이면 이 클론이 보스로 설 수 있다. 클론은 사도 성격 그대로다." + (alt ? $" {r.V.Race} 종족에 {h.Nature} 1~2성이 없어 3성이 1층에도 선다(1층 몸 · 1층 고학년 값)." : "") + "</color>", Theme.FsSm, Theme.Sub);
             if (r.Floors.Count > 1) PillRow(content, r.Floors.Select(f => $"{f + 1}층 보스").ToList(), r.Floors.ToList().IndexOf(floor), i => { close(); CloneDetail(r, r.Floors.ToList()[i]); }, "zoom.floor");
             var e = CloneBody(r, floor);
-            if (e == null) { DexLine(content, $"<color={Theme.SubTag}>이 층의 보스 몸이 없습니다.</color>", Theme.FsSm, Theme.Sub); Stage.Hot["zoom.close"] = Stage.Hot["modal.x"]; return; }
+            if (e == null) { DexLine(content, $"<color={Theme.SubTag}>이 층의 보스 몸이 없다</color>", Theme.FsSm, Theme.Sub); Stage.Hot["zoom.close"] = Stage.Hot["modal.x"]; return; }
             // 보스 몸 수치
             string bodyKey = e.Id.StartsWith(GameData.CLONE_MARK, StringComparison.Ordinal) ? e.Id.Split('~')[2] : e.Id;
             var bodyDef = d.Enemy(bodyKey);

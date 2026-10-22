@@ -11,7 +11,7 @@
       "atk": 115,
       "def": 65,
       "crit": 5,
-      "blurb": "날개 없는 요정 재단사. 곰 인형 집사 세바스티안에 올라타 큰 실드를 두르고, 꿰매듯 몰아치는 연타로 바늘땀을 채워 탑승을 이어 갑니다.",
+      "blurb": "날개 없는 요정 재단사. 곰 인형 집사 세바스티안에 올라타 큰 실드를 두르고, 탄 채 휘두르는 연타로 바늘땀을 채워 탑승을 늘리다가 내려찍기로 쏟아 냅니다.",
       "keyword": {
         "name": "바늘땀",
         "desc": "세바스티안을 꿰매는 재단사의 바늘 자국",
@@ -19,18 +19,16 @@
         "cap": 9,
         "per": [
           {
-            "stat": "taken",
-            "v": -0.05,
-            "who": "allies"
+            "stat": "dealt",
+            "v": 0.05
           }
         ]
       },
       "passives": [
         {
-          "name": "한 땀 한 땀",
+          "name": "F/W 클로에록",
           "when": {
-            "on": "hit",
-            "each": true
+            "on": "blocked"
           },
           "fx": [
             {
@@ -41,33 +39,16 @@
           ]
         },
         {
-          "name": "한 바퀴 더",
+          "name": "런웨이 오프닝",
           "when": {
-            "on": "hit",
-            "each": true
+            "on": "formOn",
+            "id": "클로에_탑승"
           },
-          "conds": [
-            {
-              "c": "stack",
-              "id": "바늘땀",
-              "n": 9
-            }
-          ],
           "fx": [
             {
-              "k": "ifForm",
-              "id": "클로에_탑승"
-            },
-            {
-              "k": "spend",
-              "id": "바늘땀",
-              "v": 9
-            },
-            {
-              "k": "formExtend",
-              "id": "클로에_탑승",
-              "v": 1,
-              "max": 6
+              "k": "empower",
+              "ratio": 0.3,
+              "who": "other"
             }
           ]
         }
@@ -76,22 +57,88 @@
         {
           "id": "클로에_탑승",
           "name": "탑승",
-          "desc": "세바스티안에 올라탄 클로에 — 3턴",
+          "desc": "쁘띠 세바스티안을 탄 모습",
           "stance": true,
-          "anim": "Idle_Change",
-          "turns": 3,
+          "anim": "Idle_SebastianForm",
+          "turns": 2,
           "bonus": [
             {
-              "type": "공격",
-              "unique": true,
-              "ratio": 0.5,
-              "hits": 3
+              "card": "클로에_s1",
+              "ratio": 1.5,
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "바늘땀",
+                  "v": 1
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.6,
+                  "base": "def",
+                  "target": "allEnemies"
+                }
+              ]
+            },
+            {
+              "card": "클로에_u2",
+              "ratio": 1.5,
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "바늘땀",
+                  "v": 1
+                },
+                {
+                  "k": "dmg",
+                  "ratio": 0.6,
+                  "base": "def",
+                  "target": "allEnemies"
+                }
+              ]
             }
           ],
-          "off": [
+          "passives": [
+            {
+              "name": "한 땀 한 땀",
+              "when": {
+                "on": "hit",
+                "each": true
+              },
+              "fx": [
+                {
+                  "k": "stack",
+                  "id": "바늘땀",
+                  "v": 1
+                }
+              ]
+            },
+            {
+              "name": "한 바퀴 더",
+              "when": {
+                "on": "hit",
+                "each": true
+              },
+              "conds": [
+                {
+                  "c": "stack",
+                  "id": "바늘땀",
+                  "n": 9
+                }
+              ],
+              "fx": [
+                {
+                  "k": "formExtend",
+                  "id": "클로에_탑승",
+                  "v": 1,
+                  "max": 3
+                }
+              ]
+            }
+          ],
+          "offExpire": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.2,
               "base": "def",
               "target": "allEnemies"
             }
@@ -104,10 +151,10 @@
         "fx": [
           {
             "k": "dmg",
-            "ratio": 0.6,
+            "ratio": 1.4,
             "base": "def",
             "target": "randomEnemy",
-            "hits": 7
+            "hits": 3
           },
           {
             "k": "stack",
@@ -163,7 +210,7 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 2.4
+          "ratio": 2.6
         },
         {
           "k": "form",
@@ -176,7 +223,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 3.3
+              "ratio": 3.9
             },
             {
               "k": "form",
@@ -189,7 +236,7 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.9
+              "ratio": 2.7
             },
             {
               "k": "form",
@@ -204,32 +251,31 @@
         },
         {
           "name": "신탁 3",
+          "cost": 0,
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.2
+              "ratio": 3
             },
             {
               "k": "form",
               "id": "클로에_탑승"
-            },
-            {
-              "k": "draw",
-              "v": 1
             }
           ]
         },
         {
           "name": "신탁 4",
-          "cost": 0,
+          "type": "공격",
           "fx": [
-            {
-              "k": "shield",
-              "ratio": 1.2
-            },
             {
               "k": "form",
               "id": "클로에_탑승"
+            },
+            {
+              "k": "dmg",
+              "ratio": 2.3,
+              "base": "def",
+              "target": "oneEnemy"
             }
           ]
         },
@@ -238,16 +284,17 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.6
+              "ratio": 2.7
             },
             {
               "k": "form",
               "id": "클로에_탑승"
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "draw",
+              "v": 1,
+              "who": "self",
+              "unique": true
             }
           ]
         }
@@ -294,7 +341,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 1.8,
               "base": "def",
               "target": "oneEnemy"
             }
@@ -305,15 +352,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 1.2,
               "base": "def",
-              "target": "oneEnemy",
-              "hits": 2
+              "target": "oneEnemy"
             },
             {
               "k": "stack",
               "id": "바늘땀",
-              "v": 1
+              "v": 2
             }
           ]
         },
@@ -322,7 +368,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1,
+              "ratio": 0.9,
               "base": "def",
               "target": "allEnemies"
             }
@@ -330,28 +376,34 @@
         },
         {
           "name": "신탁 4",
-          "cost": 0,
           "fx": [
             {
               "k": "dmg",
-              "ratio": 0.8,
+              "ratio": 1.2,
               "base": "def",
               "target": "oneEnemy"
+            },
+            {
+              "k": "ifForm",
+              "id": "클로에_탑승",
+              "not": true
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
             }
           ]
         },
         {
           "name": "신탁 5",
+          "cost": 0,
+          "needForm": "클로에_탑승",
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.1,
+              "ratio": 1.3,
               "base": "def",
               "target": "oneEnemy"
-            },
-            {
-              "k": "shield",
-              "ratio": 0.8
             }
           ]
         }
@@ -386,8 +438,11 @@
       "type": "공격",
       "fx": [
         {
+          "k": "formEnd"
+        },
+        {
           "k": "dmg",
-          "ratio": 0.4,
+          "ratio": 0.5,
           "base": "def",
           "target": "allEnemies"
         },
@@ -402,7 +457,7 @@
         },
         {
           "k": "dmg",
-          "ratio": 0.3,
+          "ratio": 0.5,
           "base": "def",
           "target": "allEnemies"
         }
@@ -411,6 +466,15 @@
         {
           "name": "신탁 1",
           "fx": [
+            {
+              "k": "formEnd"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "base": "def",
+              "target": "allEnemies"
+            },
             {
               "k": "spend",
               "id": "바늘땀",
@@ -422,7 +486,7 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.4,
+              "ratio": 0.6,
               "base": "def",
               "target": "allEnemies"
             }
@@ -431,6 +495,45 @@
         {
           "name": "신탁 2",
           "fx": [
+            {
+              "k": "formEnd"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.9,
+              "base": "def",
+              "target": "oneEnemy"
+            },
+            {
+              "k": "spend",
+              "id": "바늘땀",
+              "all": true
+            },
+            {
+              "k": "perEvent",
+              "n": 1
+            },
+            {
+              "k": "dmg",
+              "ratio": 1,
+              "base": "def",
+              "target": "oneEnemy"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 1,
+          "fx": [
+            {
+              "k": "formEnd"
+            },
+            {
+              "k": "dmg",
+              "ratio": 0.6,
+              "base": "def",
+              "target": "allEnemies"
+            },
             {
               "k": "spend",
               "id": "바늘땀",
@@ -444,14 +547,39 @@
               "k": "dmg",
               "ratio": 0.7,
               "base": "def",
-              "target": "oneEnemy"
+              "target": "allEnemies"
             }
           ]
         },
         {
-          "name": "신탁 3",
-          "cost": 1,
+          "name": "신탁 4",
+          "type": "스킬",
           "fx": [
+            {
+              "k": "formEnd"
+            },
+            {
+              "k": "spend",
+              "id": "바늘땀",
+              "all": true
+            },
+            {
+              "k": "perEvent",
+              "n": 1
+            },
+            {
+              "k": "shield",
+              "ratio": 0.5
+            }
+          ]
+        },
+        {
+          "name": "신탁 5",
+          "cost": 3,
+          "fx": [
+            {
+              "k": "formEnd"
+            },
             {
               "k": "spend",
               "id": "바늘땀",
@@ -463,41 +591,13 @@
             },
             {
               "k": "dmg",
-              "ratio": 0.2,
-              "base": "def",
-              "target": "allEnemies"
-            }
-          ]
-        },
-        {
-          "name": "신탁 4",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 0.6,
               "base": "def",
               "target": "allEnemies"
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
-            }
-          ]
-        },
-        {
-          "name": "신탁 5",
-          "fx": [
-            {
-              "k": "dmg",
-              "ratio": 1,
-              "base": "def",
-              "target": "allEnemies"
-            },
-            {
-              "k": "stack",
-              "id": "바늘땀",
-              "v": 3
+              "k": "form",
+              "id": "클로에_탑승"
             }
           ]
         }
@@ -525,7 +625,7 @@
     },
     {
       "id": "클로에_u4",
-      "name": "건치 스마일",
+      "name": "인형의 의지",
       "hero": "클로에",
       "unique": true,
       "cost": 1,
@@ -533,12 +633,20 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1.4
+          "ratio": 2
         },
         {
           "k": "stack",
           "id": "바늘땀",
           "v": 2
+        },
+        {
+          "k": "ifForm",
+          "id": "클로에_탑승"
+        },
+        {
+          "k": "formKeep",
+          "turns": 1
         }
       ],
       "oracles": [
@@ -547,12 +655,20 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.9
+              "ratio": 3
             },
             {
               "k": "stack",
               "id": "바늘땀",
-              "v": 2
+              "v": 3
+            },
+            {
+              "k": "ifForm",
+              "id": "클로에_탑승"
+            },
+            {
+              "k": "formKeep",
+              "turns": 1
             }
           ]
         },
@@ -560,13 +676,21 @@
           "name": "신탁 2",
           "fx": [
             {
-              "k": "shield",
-              "ratio": 1.4
+              "k": "heal",
+              "ratio": 3.8
             },
             {
               "k": "stack",
               "id": "바늘땀",
-              "v": 4
+              "v": 2
+            },
+            {
+              "k": "ifForm",
+              "id": "클로에_탑승"
+            },
+            {
+              "k": "formKeep",
+              "turns": 1
             }
           ]
         },
@@ -576,14 +700,15 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.4
+              "ratio": 2
             },
             {
               "k": "power",
               "rules": [
                 {
                   "when": {
-                    "on": "turnStart"
+                    "on": "formOn",
+                    "who": "any"
                   },
                   "fx": [
                     {
@@ -599,34 +724,46 @@
         },
         {
           "name": "신탁 4",
-          "cost": 0,
+          "needForm": "클로에_탑승",
           "fx": [
-            {
-              "k": "shield",
-              "ratio": 1
-            },
             {
               "k": "stack",
               "id": "바늘땀",
-              "v": 1
+              "v": 3
+            },
+            {
+              "k": "formKeep",
+              "turns": 2
             }
           ]
         },
         {
           "name": "신탁 5",
+          "power": true,
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.2
+              "ratio": 2
             },
             {
-              "k": "stack",
-              "id": "바늘땀",
-              "v": 2
-            },
-            {
-              "k": "draw",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "turnStart"
+                  },
+                  "fx": [
+                    {
+                      "k": "ifForm",
+                      "id": "클로에_탑승"
+                    },
+                    {
+                      "k": "shield",
+                      "ratio": 0.6
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -638,7 +775,7 @@
         },
         {
           "name": "축복 2",
-          "kind": "draw"
+          "kind": "ap"
         },
         {
           "name": "축복 3",
@@ -654,7 +791,7 @@
     },
     {
       "id": "클로에_u5",
-      "name": "찢긴 곳 꿰매기",
+      "name": "맞춤 의상",
       "hero": "클로에",
       "unique": true,
       "cost": 1,
@@ -662,11 +799,22 @@
       "fx": [
         {
           "k": "shield",
-          "ratio": 1
+          "ratio": 1.2
         },
         {
-          "k": "heal",
-          "ratio": 0.7
+          "k": "ifStack",
+          "id": "바늘땀",
+          "n": 3
+        },
+        {
+          "k": "spend",
+          "id": "바늘땀",
+          "v": 3
+        },
+        {
+          "k": "empower",
+          "ratio": 0.6,
+          "who": "other"
         }
       ],
       "oracles": [
@@ -675,11 +823,22 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 1.2
+              "ratio": 1.8
             },
             {
-              "k": "heal",
-              "ratio": 1
+              "k": "ifStack",
+              "id": "바늘땀",
+              "n": 3
+            },
+            {
+              "k": "spend",
+              "id": "바늘땀",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.9,
+              "who": "other"
             }
           ]
         },
@@ -688,67 +847,84 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 0.7
-            },
-            {
-              "k": "heal",
-              "ratio": 0.7
-            },
-            {
-              "k": "stack",
-              "id": "바늘땀",
-              "v": 3
-            }
-          ]
-        },
-        {
-          "name": "신탁 3",
-          "fx": [
-            {
-              "k": "shield",
-              "ratio": 0.7
-            },
-            {
-              "k": "heal",
-              "ratio": 0.7
+              "ratio": 2
             },
             {
               "k": "ifForm",
               "id": "클로에_탑승"
             },
             {
-              "k": "formExtend",
-              "id": "클로에_탑승",
-              "v": 1,
-              "max": 6
+              "k": "empower",
+              "ratio": 1,
+              "who": "other"
+            }
+          ]
+        },
+        {
+          "name": "신탁 3",
+          "cost": 0,
+          "fx": [
+            {
+              "k": "shield",
+              "ratio": 1
+            },
+            {
+              "k": "ifStack",
+              "id": "바늘땀",
+              "n": 3
+            },
+            {
+              "k": "spend",
+              "id": "바늘땀",
+              "v": 3
+            },
+            {
+              "k": "empower",
+              "ratio": 0.5,
+              "who": "other"
             }
           ]
         },
         {
           "name": "신탁 4",
-          "cost": 0,
           "fx": [
             {
-              "k": "shield",
-              "ratio": 0.6
+              "k": "stack",
+              "id": "바늘땀",
+              "v": 3
             },
             {
-              "k": "heal",
-              "ratio": 0.5
+              "k": "empower",
+              "ratio": 0.4,
+              "who": "other"
             }
           ]
         },
         {
           "name": "신탁 5",
+          "power": true,
           "fx": [
             {
-              "k": "heal",
-              "ratio": 1.5
+              "k": "shield",
+              "ratio": 1.8
             },
             {
-              "k": "status",
-              "id": "피해 감소",
-              "v": 1
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "spend",
+                    "id": "바늘땀"
+                  },
+                  "fx": [
+                    {
+                      "k": "empower",
+                      "ratio": 0.4,
+                      "who": "other"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -760,7 +936,7 @@
         },
         {
           "name": "축복 2",
-          "kind": "ap"
+          "kind": "cost"
         },
         {
           "name": "축복 3",

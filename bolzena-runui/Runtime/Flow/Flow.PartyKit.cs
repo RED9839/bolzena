@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace Bolzena.RunUI
 {
-    // 팀 편성 편의(2026-10-08): 칸을 끌어 자리 바꾸기 · 프리셋 셋 + 최근 편성 · 무작위 편성 · 완주 기록 · 시작 덱 목록 · 크레파스 보드 요약 · 학년 안내.
+    // 팀 편성 편의(2026-10-08): 칸을 끌어 자리 바꾸기 · 프리셋 셋 + 최근 편성 · 무작위 편성 · 완주 기록 · 시작 덱 목록.
     //   화면 틀은 Flow.Roster.cs(BuildPartyLight)가 세우고, 여기는 조각만 둔다. 저장은 Data/PartyStore.cs(PlayerPrefs).
     public partial class Flow
     {
@@ -123,7 +123,7 @@ namespace Bolzena.RunUI
         void PartyRandom(PartyState st, RectTransform root)
         {
             var pool = Roster.Players.ToList();
-            if (pool.Count < 3) { Toast.Show("고를 수 있는 사도가 셋보다 적습니다"); return; }
+            if (pool.Count < 3) { Toast.Show("고를 수 있는 사도가 셋보다 적다"); return; }
             var pick = new List<HeroInfo>();
             while (pick.Count < 3) { var h = pool[UnityEngine.Random.Range(0, pool.Count)]; if (!pick.Contains(h)) pick.Add(h); }
             for (int i = 0; i < 3; i++) st.Slots[i] = pick[i].key;
@@ -139,19 +139,19 @@ namespace Bolzena.RunUI
 
         void PartyPresets(PartyState st, RectTransform root)
         {
-            var (body, close, _) = Stage.ModalBox("presets", 1000, 700, "편성 불러오기 · 저장", "프리셋 다섯 — 왼쪽 성격 단추로 약점 속성용 표를 붙입니다(이번 적의 약점과 같으면 강조) · 이 기기에 남습니다");
+            var (body, close, _) = Stage.ModalBox("presets", 1000, 700, "편성 불러오기 · 저장", "프리셋 다섯 — 성격 단추로 약점 속성용 표를 붙인다(이번 적의 약점과 같으면 강조) · 이 기기에 남는다");
             var list = Ui.Rect("rows", body).Fill(0, 0, 0, 0);
             Ui.Col(list, 8, TextAnchor.UpperCenter, null, true, false);
 
             void Load(string[] keys, string what)
             {
-                if (keys.All(k => k == null)) { Toast.Show("비어 있습니다"); return; }
+                if (keys.All(k => k == null)) { Toast.Show("비어 있다"); return; }
                 for (int i = 0; i < 3; i++) st.Slots[i] = keys[i];
                 Debug.Log($"[Party] {what} 불러옴 → {string.Join(" · ", st.Slots.Select(k => k ?? "-"))}");
                 st.Quiet = false;
                 close();
                 BuildPartyLight(root, st);
-                Toast.Show($"{what} 을 불러왔습니다");
+                Toast.Show($"{what} 을 불러왔다");
             }
 
             var weak = string.IsNullOrEmpty(FoeNature) ? new List<string>() : RunPort.WeakTo(FoeNature);
@@ -196,16 +196,16 @@ namespace Bolzena.RunUI
                 var ld = Btn.Make(row.transform, null, BtnStyle.PillDark, () => Load(keys, preset ? (tag != null ? tag + " 프리셋 " + n : "프리셋 " + n) : label), 0, loadKey);
                 ld.GetComponent<RectTransform>().At(1, 0.5f, -16, 0, 150, bh);
                 var lt = Ui.Title(ld.transform, "불러오기", Theme.FsBody, Theme.Ink, TextAlignmentOptions.Center); lt.rectTransform.Fill(); lt.textWrappingMode = TextWrappingModes.NoWrap;
-                ld.Interactable = names != null; ld.Why = "저장된 편성이 없습니다";
+                ld.Interactable = names != null; ld.Why = "저장된 편성이 없다";
                 Stage.Hot[loadKey] = ld;
                 if (!preset) return;
                 var sv = Btn.Make(row.transform, null, BtnStyle.PillGold, () =>
                 {
                     var cur = st.Slots.ToArray();
-                    if (cur.All(k => k == null)) { Toast.Show("먼저 사도를 편성하세요"); return; }
+                    if (cur.All(k => k == null)) { Toast.Show("먼저 사도를 편성해야 한다"); return; }
                     PartyStore.SetPreset(n, cur);
                     Debug.Log($"[Party] 프리셋 {n} 저장 → {string.Join(" · ", cur.Select(k => k ?? "-"))}");
-                    Toast.Show($"프리셋 {n} 에 저장했습니다");
+                    Toast.Show($"프리셋 {n} 에 저장했다");
                     Rebuild();
                 }, 0, "preset.save" + n);
                 sv.GetComponent<RectTransform>().At(1, 0.5f, -176, 0, 150, bh);
@@ -229,7 +229,7 @@ namespace Bolzena.RunUI
             var heroes = st.Slots.Where(k => k != null).Select(Roster.ByKey).Where(h => h != null && h.Playable).ToList();
             var decks = heroes.Select(h => (h, d: P.Data.Hero(h.CoreId))).Where(x => x.d != null)
                 .Select(x => (x.h, x.d, ids: CardOrder.Sort(x.d.Starter, P.Data, new[] { x.d.Id }))).ToList();
-            if (decks.Count == 0) { Toast.Show("사도를 먼저 편성하세요"); return; }
+            if (decks.Count == 0) { Toast.Show("사도를 먼저 편성해야 한다"); return; }
             int total = decks.Sum(x => x.ids.Count), opener = decks.Sum(x => x.ids.Count(id => P.Data.IsOpener(id)));
             float winH = Stage.Size.y - 24;
             var (body, close, _) = Stage.ModalBox("startdeck", 1500, winH, $"시작 덱 {total}장", $"사도마다 기본 카드 + 시동 카드({opener}장) — 카드를 누르면 상세");
@@ -261,73 +261,6 @@ namespace Bolzena.RunUI
                     Tw.Pop(c, 0.02f * idx, 0.88f, 0.28f);
                 }
             }
-        }
-
-        // ═════════════ 크레파스 보드 요약 · 학년 ═════════════
-        /// <summary>보드가 모험 시작에 주는 것을 한 줄 글로 — 능력치(공격 · 체력 · 방어 · 치명) · 시작 골드 · 학점 · 신탁 확률 따위. 칠한 칸이 없으면 null.</summary>
-        static string BoardSummary(out int painted, out int cells)
-        {
-            var T = CrayonStore.Table; var Sv = CrayonStore.Save; var pk = CrayonStore.Perks;
-            cells = T.Cells.Where(c => !c.Blank).Sum(c => c.Levels);
-            painted = T.Cells.Where(c => !c.Blank).Sum(c => Math.Min(c.Levels, Sv.LevelOf(c.Id)));
-            double V(string k) => pk.TryGetValue(k, out var v) ? v : 0;
-            var stat = new List<string>();
-            if (V("atk") > 0) stat.Add($"공격 +{V("atk") * 100:0.#}%");
-            if (V("hp") > 0) stat.Add($"체력 +{V("hp") * 100:0.#}%");
-            if (V("def") > 0) stat.Add($"방어 +{V("def") * 100:0.#}%");
-            if (V("crit") > 0) stat.Add($"치명 +{V("crit"):0.#}%p");
-            if (V("critDmg") > 0) stat.Add($"치명 피해 +{V("critDmg") * 100:0.#}%");
-            var perk = new List<string>();
-            if (V("gold") > 0) perk.Add($"시작 골드 +{V("gold"):0}");
-            if (V("startOracle") > 0) perk.Add(V("startOracle") < 1 ? $"시작 신탁 {V("startOracle") * 100:0}%" : $"시작 신탁 {V("startOracle"):0}장");
-            if (Core.R.GRADE_ON && V("credits") > 0) perk.Add(V("credits") < 1 ? $"시작 학점 +1 {V("credits") * 100:0}%" : $"시작 학점 +{V("credits"):0}");
-            if (V("oracleChance") > 0) perk.Add($"신탁 확률 +{V("oracleChance") * 100:0.#}%p");
-            if (V("oraclePick") > 0) perk.Add(V("oraclePick") < 1 ? $"신탁 후보 +1 {V("oraclePick") * 100:0}%" : $"신탁 후보 +{V("oraclePick"):0}");
-            if (V("removeCost") > 0) perk.Add($"빼기 -{V("removeCost"):0}골드");
-            if (V("shopDiscount") > 0) perk.Add($"상점 -{V("shopDiscount") * 100:0.#}%");
-            if (V("eliteUp") > 0) perk.Add($"엘리트 아티팩트 상향 {V("eliteUp") * 100:0}%");
-            if (stat.Count == 0 && perk.Count == 0) return null;
-            string sep = "   <color=" + Theme.GoldTag + ">|</color>   ";
-            return string.Join(" · ", stat) + (stat.Count > 0 && perk.Count > 0 ? sep : "")
-                + (perk.Count > 0 ? "<color=" + Theme.GoldTag + ">" + string.Join(" · ", perk) + "</color>" : "");
-        }
-
-        /// <summary>시작 학년 글 — 학점 보너스가 있으면 그만큼 쌓인 학년(Core.Grades.Of).</summary>
-        static string StartGradeText()
-        {
-            var pk = CrayonStore.Perks;
-            int credits = pk.TryGetValue("credits", out var c) ? (int)c : 0;
-            int g = Core.Grades.Of(credits);
-            return credits > 0 ? $"{Core.Grades.Name(g)}으로 시작 · 학점 {credits}" : $"{Core.Grades.Name(g)}으로 시작";
-        }
-
-        /// <summary>편성 아래 줄 — 왼쪽 보드 요약(누르면 보드 화면) · 오른쪽 학년 알약. w = 줄 너비.</summary>
-        void PartyBoardRow(RectTransform parent, float w, float h)
-        {
-            var summary = BoardSummary(out int painted, out int cells);
-            string gradeText = StartGradeText();
-            float gradeW = Core.R.GRADE_ON ? Theme.C(250, 230) : -10;   // 학년 꺼짐(2026-10-09) — 학년 알약 없이 보드 줄이 끝까지
-            var board = Btn.Make(parent, null, BtnStyle.PillDark, CrayonScreen, 0, "board");
-            var brt = board.GetComponent<RectTransform>();
-            brt.At(0, 0, 0, 0, w - gradeW - 10, h);
-            var ic = Ui.Img(brt, Theme.BoardIcon, Color.white, "ic"); ic.preserveAspect = true; ic.rectTransform.At(0, 0.5f, 16, 0, h - 14, h - 14);   // 「교주 보드」 대표 아이콘(Theme.BoardIcon)
-            var lab = Ui.Title(brt, "교주 보드", Theme.FsMd, Theme.Gold, TextAlignmentOptions.MidlineLeft);
-            lab.rectTransform.At(0, 0.5f, h + 6, 0, 110, h); lab.textWrappingMode = TextWrappingModes.NoWrap;
-            var tx = Ui.Text(brt, summary ?? $"<color={Theme.SubTag}>아직 칠한 칸이 없습니다 — 크레파스를 칠하면 모험 시작에 혜택이 붙습니다</color>", Theme.FsSm, Theme.Ink, TextAlignmentOptions.MidlineLeft);
-            tx.rectTransform.Fill(h + 122, 0, 150, 0); tx.textWrappingMode = TextWrappingModes.NoWrap;
-            tx.enableAutoSizing = true; tx.fontSizeMin = 11; tx.fontSizeMax = Theme.FsSm; tx.overflowMode = TextOverflowModes.Ellipsis;
-            var go = Ui.Title(brt, $"<color={Theme.SubTag}>{painted}/{cells}</color>  보드 ›", Theme.FsSm, Theme.Gold, TextAlignmentOptions.MidlineRight);
-            go.rectTransform.Fill(0, 0, 18, 0); go.textWrappingMode = TextWrappingModes.NoWrap;
-            Stage.Hot["party.board"] = board;
-
-            // 학년 안내 — 크림 알약(갈색 테), 작게
-            if (!Core.R.GRADE_ON) return;
-            var rim = Ui.Img(parent, Theme.S("pill", 46), Theme.CreamRim, "grade");
-            rim.rectTransform.At(1, 0, 0, 0, gradeW, h);
-            var inner = Ui.Img(rim.transform, Theme.S("pill", 46), Theme.Cream, "body"); inner.rectTransform.Fill(3, 3, 3, 3);
-            var gt = Ui.Title(rim.transform, gradeText, Theme.FsSm, Theme.CreamRim, TextAlignmentOptions.Center);
-            gt.rectTransform.Fill(10, 0, 10, 0); gt.textWrappingMode = TextWrappingModes.NoWrap;
-            gt.enableAutoSizing = true; gt.fontSizeMin = 11; gt.fontSizeMax = Theme.FsSm;
         }
     }
 }

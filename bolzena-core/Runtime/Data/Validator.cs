@@ -32,7 +32,7 @@ namespace Bolzena.Core
             "death", "guardBreak", "act", "afterDraw", "allyBroken" };
         static readonly HashSet<string> OUT_K = new() { "none", "gold", "hp", "maxHp", "remove", "dupe", "unique", "neutral", "equip", "flash", "shin", "noShin", "shinNow", "shinPick", "curse", "gift", "scout", "shopGift", "rewardFlash", "next", "mindBreak", "flag" };
         static readonly HashSet<string> BLESS_KIND = new() { "power", "cost", "weakSpot", "frost", "ap", "draw", "heal", "guard", "atkUp", "defUp" };
-        static readonly HashSet<string> PER_STAT = new() { "dealt", "taken", "atk", "def", "crit", "guard", "dot", "hot", "tough", "counter", "ultCost" };
+        static readonly HashSet<string> PER_STAT = new() { "dealt", "taken", "atk", "def", "crit", "guard", "dot", "hot", "tough", "counter", "ultCost", "weak" };
         static readonly HashSet<string> CARRIERS = new() { "self", "enemy", "ally", "hero" };
         static readonly HashSet<string> PILES = new() { "draw", "discard", "gone", "hand", "discarded", "token", "broken", "drawn", "discards", "morale" };
 
@@ -71,6 +71,26 @@ namespace Bolzena.Core
             foreach (var e in d.Events) { if (!ids.Add(e.Id)) E($"이벤트 {e.Id}: id 가 겹친다"); Event(e); }
             Flags();
             foreach (var e in d.Equips.Values) Equip(e);
+            if (d.Prog != null) CheckProg(d.Prog);
+        }
+
+        // ── 사도 영구 성장 표(Prog.cs) ──
+        void CheckProg(ProgTable t)
+        {
+            string at = $"성장 표{d.At("prog", "prog")}";
+            foreach (var x in Prog.Check(d, t)) E($"{at}: {x}");
+            // 잠재력 사도 칸(kind hero) — 카드 덤 조각 · 패시브 문법
+            foreach (var hk in t.Heroes)
+                foreach (var nk in hk.Value)
+                    if (nk.Value is ProgHeroNodeT hn)
+                    {
+                        string w = $"{at} 사도 칸 {hk.Key} {nk.Key}";
+                        for (int i = 0; i < hn.Rules.Count; i++) Rule($"{w}[{i}]", hn.Rules[i]);
+                        for (int i = 0; i < hn.Cards.Count; i++) { if (hn.Cards[i].Fx.Count > 0) FxList($"{w} 카드 덤[{i}] fx", hn.Cards[i].Fx); if (hn.Cards[i].Tail.Count > 0) FxList($"{w} 카드 덤[{i}] tail", hn.Cards[i].Tail); }
+                    }
+            // 측정 묶음이 그대로 서버 검사(CheckState)를 지나는가 — 모든 사도에
+            foreach (var name in t.Presets.Keys)
+                foreach (var x in Prog.CheckState(d, t, Prog.Preset(d, t, name, d.Heroes.Keys))) E($"{at} 묶음 {name}: {x}");
         }
 
         // ── 효과 조각 ──────────────────────────────────────────────────
@@ -94,6 +114,12 @@ namespace Bolzena.Core
                 // 엘다인 문법(2026-10-11, 데이터.md §22)
                 if (f.OfShield && (!(f.OfEvent > 0) || (f.K != FxK.Dmg && f.K != FxK.Shield))) E($"{w}: ofShield 는 dmg · shield 에 ofEvent 와 같이");
                 if (f.HitFx != null) { if (f.K != FxK.Dmg) E($"{w}: hitFx 는 dmg 에만"); else FxList(w + " hitFx", f.HitFx); }
+                if (f.PlusIf != null || f.Plus != 0)   // (2026-10-19 타수 합치기) 조건 몫을 친 대에 더한다
+                {
+                    if (f.K != FxK.Dmg || f.PlusIf == null || !(f.Plus > 0)) E($"{w}: plus(양수) · plusIf(조건 조각 하나)는 dmg 에 같이");
+                    else if (!FxK.Conditions.Contains(f.PlusIf.K) || f.PlusIf.K == FxK.When) E($"{w}: plusIf 는 조건 조각(if…) — {f.PlusIf.K}");
+                    else FxList(w + " plusIf", new List<Fx> { f.PlusIf });
+                }
                 if ((f.HitsPer != null || f.HitsAdd != 0) && (f.K != FxK.Dmg || f.HitsPer == null || !keywords.Contains(f.HitsPer))) E($"{w}: hitsPer(사도 고유 효과 이름) · hitsAdd 는 dmg 에 — 「{f.HitsPer}」");
                 if (f.Carry && f.K != FxK.Stack) E($"{w}: carry 는 stack 에만");
                 if (f.Set != null && f.K != FxK.Stack && f.K != FxK.CardStatus) E($"{w}: set 은 stack · cardStatus 에만");
@@ -150,7 +176,7 @@ namespace Bolzena.Core
                         if (f.V == 0 && f.Set == null && !f.Half) E($"{w}: v(또는 set · half)가 없다");
                         if (f.V < 0 && R.IsCardSt(f.Id)) E($"{w}: {f.Id} 는 음수로 걸 수 없다(비용 · 카드 값만)");
                         effects++; break;
-                    case FxK.IfKill: if (f.Id != null && f.Id != "elite" && f.Id != "boss") E($"{w}: id 는 elite(엘리트 · 보스) · boss(보스만)"); break;
+                    case FxK.IfKill: if (f.Id != null && f.Id != "elite" && f.Id != "boss" && f.Id != "orBoss") E($"{w}: id 는 elite(엘리트 · 보스) · boss(보스만) · orBoss(처치했거나 고른 적이 보스면)"); break;
                     case FxK.IfBreak: case FxK.IfAllHeroes: break;
                     // 시범 16(2026-10-08 2단계)
                     case FxK.IfPricier: break;
@@ -195,7 +221,7 @@ namespace Bolzena.Core
                     case FxK.IfPile: case FxK.PerPile: if (f.From != null && !PILES.Contains(f.From) && !(f.K == FxK.IfPile && f.From == "record")) E($"{w}: from 은 draw · discard · gone · hand"); if (f.K == FxK.IfPile && f.N <= 0) E($"{w}: n 이 없다"); break;
                     case FxK.IfNth: if (f.N <= 0) E($"{w}: n 이 없다(1 이상)"); if (f.Id != null && !f.After) E($"{w}: id(글 이름)는 after 와 같이"); break;
                     case FxK.IfStreak: if (f.N < 2) E($"{w}: n 은 2 이상(같은 사도 카드를 잇달아 n 장째)"); if (f.Type != null && f.Type != "공격" && f.Type != "스킬" && f.Type != "강화") E($"{w}: type 은 공격 · 스킬 · 강화"); break;
-                    case FxK.IfFoe: if (!(f.Id == null && (f.HpBelow > 0 || f.HitsBy != null)) && f.Id != "broken" && f.Id != "tough" && f.Id != "guarded" && f.Id != "attack" && f.Id != "hp" && f.Id != "hpMob" && f.Id != "alone" && f.Id != "anyAttack" && f.Id != "known" && !R.ALL_ST.Contains(f.Id)) E($"{w}: id 는 broken · tough · guarded · attack · anyAttack · known · hp · hpMob · alone · 상태 이름"); break;
+                    case FxK.IfFoe: if (!(f.Id == null && (f.HpBelow > 0 || f.HitsBy != null)) && f.Id != "broken" && f.Id != "tough" && f.Id != "guarded" && f.Id != "attack" && f.Id != "hp" && f.Id != "hpMob" && f.Id != "alone" && f.Id != "boss" && f.Id != "anyAttack" && f.Id != "known" && !R.ALL_ST.Contains(f.Id)) E($"{w}: id 는 broken · tough · guarded · attack · anyAttack · known · hp · hpMob · alone · boss · 상태 이름"); break;
                     case FxK.IfCardSt: case FxK.PerCardSt: if (string.IsNullOrEmpty(f.Id)) E($"{w}: id(카드 값 이름)가 없다"); if (f.From != null && (f.K != FxK.PerCardSt || f.From != "hand")) E($"{w}: from 은 perCardSt 의 hand(손의 카드 값 합)만"); break;
                     // 엘다인 문법(2026-10-11)
                     case FxK.SpendShield: if (!f.Half && !f.All && !f.Pick && f.V <= 0) E($"{w}: half · all · pick · v 가운데 하나가 필요하다"); effects++; break;
@@ -603,10 +629,11 @@ namespace Bolzena.Core
                 int dots = h.AllKeywords.Count(k => k.Per.Any(pp => pp.Stat == "dot"));
                 if (autos.Count + dots > 1) E($"{at}: 자동 피해 · 추가 공격은 사도당 1개 이하 — 지금 {autos.Count + dots}개({string.Join(" · ", rules.Where(x => HitsRule(x.r)).Select(x => x.r.Name).Distinct())}{(dots > 0 ? " · 1개당 지속 피해" : "")})");
                 // ▶E62 — 고유 능력 규칙(keyword.rules · passives)은 사도당 1개 이하(엔진은 카드가 돌린다 · tally 는 규칙이 아니다)
-                int ruleN = h.Passives.Count + h.AllKeywords.Sum(k => k.Rules.Count);
+                // (2026-10-19) 같은 이름 규칙은 한 능력(글 · 정보 창도 한 이름 아래로 묶는다 — 「사냥감이 쓰러지거나 발톱이 3겹이 되면」 처럼 계기가 둘인 능력)
+                int ruleN = h.Passives.Select(r => r.Name).Concat(h.AllKeywords.SelectMany(k => k.Rules.Select(r => r.Name))).Distinct().Count();
                 // 사용자 2026-10-11 — 엘다인 20명 모두 고유 능력(자동 규칙) 2개씩: 3개 이상이면 오류, 1개 이하면 주의(자동 피해 규칙은 따로 1개 이하)
                 if (ruleN < 2) W($"{at}: 고유 능력 규칙은 2개를 권장 — 지금 {ruleN}개");
-                if (ruleN > 2) E($"{at}: 고유 능력 규칙은 사도당 2개 이하 — 지금 {ruleN}개({string.Join(" · ", h.Passives.Select(r => r.Name).Concat(h.AllKeywords.SelectMany(k => k.Rules.Select(r => r.Name))))})");
+                if (ruleN > 2) E($"{at}: 고유 능력 규칙은 사도당 2개 이하 — 지금 {ruleN}개({string.Join(" · ", h.Passives.Select(r => r.Name).Concat(h.AllKeywords.SelectMany(k => k.Rules.Select(r => r.Name))).Distinct())})");
                 // ▶E62 — 고유 카드 글(공백 뺀) 45자 이하 · 신탁마다
                 foreach (var c in uniques)
                     for (int o = 0; o <= c.Oracles.Count; o++)
@@ -667,7 +694,7 @@ namespace Bolzena.Core
                     foreach (var (oid, on) in names)
                         if (oid != h.Id && on != h.Name && on.Length >= 2 && nm.Contains(on)) E($"{at}: 고유 효과 · 태세 「{nm}」 에 다른 사도 이름 「{on}」 이 들어 있다");
             }
-            if (allAll.Count > ALL_MAX) E($"엘다인: 「전부 써서 1개당」 사도는 {ALL_MAX}명까지(카제나 재정렬) — 지금 {allAll.Count}명({string.Join(" · ", allAll)})");
+            // 「전부 써서 1개당」 사도 수 한도(ALL_MAX) — 2026-10-18 사용자 결정으로 없앰(10-14 클로에 · 실비아 리뉴얼로 5명이 돼 콘텐츠가 빌드에 못 들어갔다). allAll 은 세기만 한다
             // 겹 자원(쌓아서 쓰기)이 주 장치인 사도 — 4명 이하(▶E62). 자동 판정은 대충이라 주의: 「쌓는 고유 효과를 고유 카드 셋 이상이 쌓고 · 쓰고 · 문턱으로 읽는다」
             if (stackMain.Count > STACK_MAIN_MAX) W($"엘다인: 겹 자원이 주 장치인 사도로 보이는 것이 {stackMain.Count}명 — {STACK_MAIN_MAX}명 이하(카제나 분포, 05 §3) — {string.Join(" · ", stackMain)}");
         }
@@ -710,6 +737,7 @@ namespace Bolzena.Core
                 if (k.Wrap && k.Cap == null) E($"{at}: wrap(순환)은 cap 이 있어야 한다");
                 if (k.Stages != null && (k.Cap == null || k.Stages.Count != k.Cap || k.Stages.Any(string.IsNullOrWhiteSpace))) E($"{at}: 「{k.Name}」 stages(단계 이름)는 cap 과 개수가 같아야 한다");
                 if (k.Weakens && k.Carrier != "enemy") E($"{at}: weakens 는 적에게 거는 표식(carrier enemy)에만");
+                if (k.WeakOwner && k.Carrier != "enemy") E($"{at}: weakOwner 는 적에게 거는 표식(carrier enemy)에만");
                 if (k.Guard && k.Carrier != "self" && k.Carrier != "hero") E($"{at}: guard(소환물)는 carrier self · hero 에만");
                 if (k.Cut > 0 && (!k.Guard || k.Cut > 1)) E($"{at}: cut 은 guard 와 같이(0~1)");
                 if (k.Uses != 0 && (!k.Guard || k.Uses < 1 || k.Uses > 5)) E($"{at}: uses 는 guard 와 같이(1~5 — 소환물 하나가 받는 대 수)");
@@ -1045,6 +1073,7 @@ namespace Bolzena.Core
                 if (r.Id == "actDebuff" && r.St != null && r.St != "취약" && r.St != "약화") E($"{at}: 희귀종 actDebuff 의 st 는 취약 · 약화");
             }
             if (e.ToughTaken < 0 || e.ToughTaken > 2) E($"{at}: toughTaken 은 0~2(받는 강인도 피해 배율)");
+            if (e.ToughOwn && e.Tough <= 0) E($"{at}: toughOwn 은 tough(그대로 쓸 강인도)와 함께");
             if (e.Clone != null) { var ch = d.CloneHero(e.Clone); if (ch == null) E($"{at}: clone 은 사도 키(heroes · cloneHeroes) — 없는 사도 {e.Clone}"); else if (e.Nature != null && ch.Nature != null && e.Nature != ch.Nature) E($"{at}: 클론 성격 {e.Nature} 이 사도 {e.Clone} 의 성격 {ch.Nature} 와 다르다"); }
             bool bigFoe = e.Boss || e.Clone != null || e.Id != null && e.Id.EndsWith("_elite", StringComparison.Ordinal);
             if (e.Tough != 0 && e.Tough < (bigFoe ? R.MIN_TOUGH_BIG : R.MIN_TOUGH_FIGHT)) W($"{at}: tough {e.Tough} — 최소 강인도({(bigFoe ? "엘리트 · 보스 · 클론 " + R.MIN_TOUGH_BIG : "일반 " + R.MIN_TOUGH_FIGHT)}) 아래라 엔진이 최소로 올린다");
@@ -1087,6 +1116,18 @@ namespace Bolzena.Core
                 if (!f.BossElite && f.Boss.Count > 0 && !f.Boss.Any(id => d.Enemy(id)?.Boss == true)) W($"{fa}: 보스 칸에 boss 적이 없다 — bossElite 를 쓰나?");
                 // 보스 전투에는 보스 하나만(사용자 2026-10-06) — 졸개를 같이 세우지 않는다. 싸움 중에 세우는 것은 수 summon(noTough)으로
                 if (f.Boss.Count > 1) E($"{fa} 보스: 보스 칸은 하나(졸개 없음 — 소환은 보스의 수 summon 으로) — 지금 {string.Join(",", f.Boss)}");
+            }
+            // 마을 장비 묶음(2026-10-21) — 대표 장비는 그 마을 판에 나오는 것, 묶음이 있으면 전설 2개 이상 · 전설이 있는 칸엔 희귀도(엘리트 · 2층 싸움이 그 칸에서 늘 전설을 주지 않게)
+            foreach (var id in v.ShowEquips ?? new List<string>())
+                if (d.Equip(id) == null) E($"{at}: showEquips 에 없는 장비 {id}");
+                else if (!GameData.EquipIn(d.Equip(id), v.Id)) E($"{at}: showEquips {id} 는 이 마을 판에 안 나온다(pool {d.Equip(id).Pool})");
+            var own = d.VillageGear(v.Id).Select(d.Equip).ToList();
+            if (own.Count > 0)
+            {
+                int leg = own.Count(e => e.Grade == "전설");
+                if (leg < 2) W($"{at}: 마을 묶음 전설이 {leg}개 — 2개 이상(대표 장비 · 보스 보상)");
+                foreach (var s in R.SLOTS)
+                    if (own.Any(e => e.Slot == s && e.Grade == "전설") && !own.Any(e => e.Slot == s && e.Grade == "희귀")) W($"{at}: {s} 칸에 전설은 있고 희귀가 없다 — 2층 엘리트 · 싸움이 그 칸에서 늘 전설");
             }
             // 판의 적 속성 다섯이 모두 열려야 한다(사용자 2026-10-06) — 보스 클론을 마을 종족 · 다른 종족의 같은 속성 사도로 채울 수 있나
             if (Bolzena.Core.Run.CloneSlots(d, v.Id).Count > 0)
@@ -1184,6 +1225,7 @@ namespace Bolzena.Core
             if (Array.IndexOf(R.SLOTS, e.Slot) < 0) E($"{at}: slot 은 무기 · 방어구 · 장신구");
             if (Array.IndexOf(R.GRADES, e.Grade) < 0) E($"{at}: grade 는 일반 · 고급 · 희귀 · 전설");
             if (e.Affinity != null && d.Hero(e.Affinity) == null) W($"{at}: 애착 사도 {e.Affinity} 가 없다");
+            if (!GameData.IsCommonEquip(e) && !d.Villages.ContainsKey(e.Pool)) E($"{at}: pool 「{e.Pool}」 — 마을 id 도 「공용」 도 아니다");
             for (int i = 0; i < e.Effect.Count; i++) Rule($"{at} 효과[{i}]", e.Effect[i]);
             for (int i = 0; i < e.AffinityEffect.Count; i++) Rule($"{at} 애착[{i}]", e.AffinityEffect[i]);
         }

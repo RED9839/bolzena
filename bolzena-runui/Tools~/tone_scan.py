@@ -1,11 +1,11 @@
-# 화면 글 어미 분포 — 시스템 문구가 합쇼체(~합니다 · ~하세요)로 모였는지 본다
+# 화면 글 어미 분포 — 시스템 문구가 ~다 체(~한다 · ~할 수 있다)로 모였는지 본다(2026-10-21 합쇼체에서 바뀜 — Docs/화면_글_규칙.md)
 #
-#   python "Tools~/tone_scan.py"              분포 + 어긋난 줄(해요 · 해라 · 음슴) 목록
+#   python "Tools~/tone_scan.py"              분포 + 어긋난 줄(합쇼 · 해요) 목록
 #   python "Tools~/tone_scan.py" --all        분포 + 갈래마다 보기 몇 줄
 #   python "Tools~/tone_scan.py" --area 코드   코드만(runui Runtime · unity Scripts) / 데이터만(content-v2 world 이벤트 지문)
 #
-# 규칙(2026-10-09):
-#   안내 · 설명 문장 · 알림(토스트)  → 합쇼체(~합니다 · ~하세요)
+# 규칙(2026-10-21):
+#   안내 · 설명 문장 · 알림(토스트)  → ~다 체(~한다 · ~할 수 있다) · 확인 물음은 ~할까?
 #   단추 · 칩 · 제목                → 명사형 · 짧은 동사(「모험 시작」 · 「고르기」)
 #   효과 글(카드 · 적의 수 풀이)     → 명사형 · 개조식(「~씀」 「~획득」 그대로 — 이 검사에서는 「효과」 로 따로 센다)
 #   사도 대사(hero_lines · 이벤트 따옴표 대사 · 클론 보스 대사)는 사도 말투 그대로 — 따옴표 안은 보지 않는다
@@ -34,7 +34,7 @@ SPEECH_FILES = re.compile(r'^(HeroLines|UltVideoFit|UltCutin|EnemyLayout)\.cs$')
 SPEECH_BLOCK = re.compile(r'string\[\]\s+\w*Lines\b')          # 대사 배열 선언 — 「};」 까지 뺀다
 SPEECH_LINE = re.compile(r'\bW\.Bubble\(|\bSay\(|HeroLines\.')     # 대사 한 줄
 
-HAPSYO = re.compile(r'(니다|니까|세요|십시오|시오|봅시다|합시다|갑시다)$')
+HAPSYO = re.compile(r'((?<!아)니다|니까|세요|십시오|시오|봅시다|합시다|갑시다)$')   # 「아니다」 는 해라체
 HAEYO = re.compile(r'(?<!세)(?<!시)요$')
 HAERA = re.compile(r'(?<![니마])(?<!합)다$')
 EUMSEUM = re.compile(r'(함|됨|없음|있음|않음|받음|남음|씀|짐|았음|었음|였음|했음|됐음|줌|봄|냄|얻음|잃음|오름|내림|모름|끝남|바뀜|사라짐|늘어남|줄어듦|듦|나감|들어감)$')
@@ -119,8 +119,8 @@ for area, c in counts.items():
     print(f'── {area}: 문장 조각 {tot}')
     print('   ' + ' · '.join(f'{k} {c[k]} ({c[k] * 100 // max(1, tot)}%)' for k in ORDER if c[k]))
 
-bad = ['해요', '해라'] + (['음슴'] if True else [])
-print('\n── 어긋난 것(해요 · 해라 · 안내 글의 음슴) — 단추 · 칩 · 제목이면 그대로 둔다')
+bad = ['합쇼', '해요']
+print('\n── 어긋난 것(합쇼 · 해요) — ~다 체로 바꾼다')
 n = 0
 for area in counts:
     if area == '데이터·단추': continue

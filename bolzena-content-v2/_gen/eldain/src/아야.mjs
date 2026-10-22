@@ -1,96 +1,94 @@
-// 아야 — 딜러 · 냉정 · 마녀. 설계: _measure/엘다인_엔진/01_사도별.md §3 (아야 6차 — 격파를 만드는 딜러, 사용자 10-11)
-// 엔진: 디버프(냉정 약점 = 동상 · 약화 · 행동 늦춤)를 걸고 → 약점 노출(아야 소유)로 파티 카드를 약점 공격으로 만들고 →
-//   「서리」(적 표식 · 1개당 그 적이 받는 강인도 피해 +5%)을 쌓아 강인도를 깎아 격파를 만든다 → 「빙설화도」 는 강인도가 낮은 적에게 크게.
-//   격파 보상(붕괴)은 네르 소유라 아야는 「격파를 만드는」 쪽 — 네르와 짝. 약화는 걸어 주기만(란 고리) · 둔화는 쓰지 않음(요미 소유 — 행동 늦춤으로). 자동 규칙 0.
-//   현자 결은 이름 · 소개에만(만년설의 현자). 「만년설의 앎」(learn · known)은 데이터에서 뺐다(엔진 기능은 남음).
-import { hero, dmg, ddmg, shield, heal, stack, spend, make, draw, discard, status, empower, ifStack, power, rule } from '../lib.mjs';
+// 아야 — 딜러 · 냉정 · 마녀. 설계: _measure/아야_약점사냥꾼_리뉴얼안.md (10-20 리워크 2판 「눈꽃 퓨어딜러」 — 사용자 10-19 밤)
+// 엔진: 적에게 「눈꽃」(아야 전용 표식 — weakOwner: 걸린 적은 아야의 타격만 약점, 동료는 아님 · 저절로 안 짐)을 피우고 →
+//   눈꽃이 핀 적을 아야가 치면 약점(피해 ×1.25 · 강인도 많이) · 「만년설」 +1(약점 공격 피해 1개당 +8%) →
+//   「얼음 결정 깨기」 가 눈꽃 1을 꺾으며 한 대 더 → 격파 → 「빙설화도」: 격파 상태면 만년설을 모두 써서 1개당 큰 한 방 → 다시 피우기.
+//   걷어 낸 것(4차 → 리워크): 키워드 「서리」 · 「약점 노출」 · 「냉정 약점」(동료도 덕 보는 장치) · 강인도 선 · 보스 덤 · 「약점 공격」 태그.
+//   사용자 수정 ①: 「눈꽃의 날개짓」 은 전투 시작 눈꽃 대신 드로우 1(설계안 갈림길 D-나) · ②: 그만큼 딜 살짝 상향(프론티어 딜러 평균 +5% 안팎 · 혼자 ≤ 78%).
+//   사용자 10-19 밤 2차: 「눈꽃의 날개짓」(전투 시작 드로우 1)을 패시브째 없앰 — 패시브는 「만년설의 현자님!」 하나(검사기는 둘까지만 본다).
+//     프론티어 딜러 평균 +5.0 → +5.3%(빙설화도는 신탁 I 로 재 그대로) · 혼자 77.0 → 70.3% 라 빙설화도 보정은 안 함.
+//   격파 덤 「격파」 는 네르(빡침) 소유 — 빙설화도 한 장의 격파 덤만 나눠 쓴다(설계안 갈림길 A-가). 자동 피해 0. 4차 판 백업: scratchpad rw20/bak
+import { hero, dmg, stack, spend, draw, status } from '../lib.mjs';
 
-const H = '아야', K = '서리';
-const frost = (v = 1, target = 'oneEnemy') => stack(K, v, { target });
+const H = '아야', M = '만년설', F = '눈꽃';
 const tough = (v, target) => ({ k: 'tough', v, ...(target ? { target } : {}) });
-const expose = (v = 1, target = 'oneEnemy') => status('약점 노출', v, { target });
-const chill = (v = 1, target = 'oneEnemy') => status('냉정 약점', v, { target });   // 원작 동상
-const weak = (v = 1, target = 'oneEnemy') => status('약화', v, { target });           // 원작 싸락나비 — 걸어 주기만(란 정산)
-const debuffed = { k: 'ifDebuffs', n: 1 };                                            // 디버프가 걸린 적이면
-const lowT = (pct = 0.5) => ({ k: 'ifFoe', id: 'tough', pct });                       // 강인도가 pct 이하인 적이면
+const bloom = (v = 1, target = 'oneEnemy') => stack(F, v, { target });            // 눈꽃 피우기
+const weak = (v = 1, target = 'oneEnemy') => status('약화', v, { target });         // 원작 싸락나비 — 걸어 주기만(란 정산)
+const marked = { k: 'ifStack', id: F, n: 1 };                                       // 고른 적에게 눈꽃이 있으면
+const hunt = (r) => [marked, dmg(r), spend(F, 1)];                                  // 눈꽃 1을 꺾으며 한 대 더(소모가 뒤라 마지막 송이도 두 대 모두 약점)
+const shatter = (per) => [{ k: 'ifFoe', id: 'broken' }, spend(M, 'all'), { k: 'perEvent' }, dmg(per)];   // 격파 상태면 만년설 모두 써서 1개당
 
 export default hero({
   id: H, name: '아야', nature: '냉정', race: '마녀', role: '딜러', star: 3,
-  blurb: '만년설의 현자, 영원살이 맏이. 서리와 동상으로 적을 얼려 약점을 드러내고, 금이 간 자리를 빙설화도로 깨뜨립니다.',
-  keyword: {
-    name: K, desc: '아야가 새긴 서리 — 강인도가 잘 깎임', carrier: 'enemy', cap: 5,
-    per: [{ stat: 'tough', v: 0.05 }],
-  },
-  // 보조 고유 효과(사용자 10-11 — 란처럼 2개씩)
-  keywords: [{ name: '만년설', desc: '현자가 쌓아 온 만년설', carrier: 'self', cap: 3 }],
-  // 사용자 10-11: 20명 모두 고유 능력 2개
+  blurb: '만년설의 현자, 영원살이 맏이. 적에게 자신만 아는 눈꽃을 피워 틈을 열고, 그 틈을 하나씩 베어 내다 얼음이 깨지는 순간 빙설화도를 내리칩니다.',
+  keyword: { name: M, desc: '눈꽃을 벨 때마다 쌓이는 현자의 눈 — 약점 공격이 더 깊어짐', carrier: 'self', cap: 5, per: [{ stat: 'weak', v: 0.08 }] },
+  // 보조 고유 효과 — 아야 전용 적 표식(엔진 weakOwner, 10-20)
+  keywords: [{ name: F, desc: '아야가 피운 눈꽃 — 아야만 아는 틈', carrier: 'enemy', cap: 5, weakOwner: true, per: [{ stat: 'taken', v: 0.04, from: 'owner' }] }],   // 10-22 아야 딜 보강(퓨어 딜러 — 표식): 1당 아야에게 받는 피해 +4%
   passives: [
-    { name: '만년설의 현자님!', when: { on: 'fightStart' }, fx: [draw(1)] },   // 현자 — 전투 시작 드로우 1
-    { name: '눈꽃의 날개짓', when: { on: 'debuff' }, fx: [frost(1)] },   // 아야가 디버프를 걸면 그 적 서리 +1
+    { name: '만년설의 현자님!', when: { on: 'hit', weak: true }, fx: [stack(M, 1)] },   // 원작 팀 버프 → 아야만: 약점으로 칠 때마다 만년설 1
   ],
-  ult: { name: '만개설화', cost: 200, fx: [dmg(1.6, 'allEnemies'), chill(1, 'allEnemies'), tough(1, 'allEnemies'), { k: 'ifFoe', id: 'alone' }, dmg(1.5, 'allEnemies')] },
+  ult: { name: '만개설화', cost: 200, fx: [dmg(1.6, 'allEnemies'), bloom(3, 'allEnemies'), tough(1, 'allEnemies'), { k: 'ifFoe', id: 'alone' }, dmg(2.5, 'allEnemies')] },   // 동상(냉정 약점) 대신 눈꽃을 크게 · 하나뿐이면 250% 더 그대로
 }, {
   basicNames: ['서리 베기', '서리 베기', '은빛 양산'], deck: 'light',
   uniques: [
-    { // 시동 — 싸락나비: 치고 약화 · 서리
+    { // 시동 — 싸락나비: 치고 눈꽃 · 약화
       name: '싸락나비', cost: 1, type: '공격',
-      fx: [dmg(0.4, 'oneEnemy', { hits: 2 }), weak(1), frost(1)],   // 10-11 사용자 「아야 너무 약함」 30→50%
+      fx: [dmg(0.4, 'oneEnemy', { hits: 2 }), bloom(2), weak(1)],
       oracles: [
-        { fx: [dmg(0.7, 'oneEnemy', { hits: 2 }), weak(1), frost(1)] },
-        { fx: [dmg(0.5, 'randomEnemy', { hits: 3, hitFx: [frost(1)] }), weak(1)] },   // 10-13 신탁 점검: 50% · 약화 되살림
-        { fx: [dmg(0.5, 'oneEnemy', { hits: 2 }), weak(1, 'allEnemies')] },
-        { fx: [dmg(0.5, 'oneEnemy', { hits: 2 }), weak(1), frost(2)] },   // 10-13 신탁 점검: 약화 되살림
-        { fx: [dmg(0.5, 'oneEnemy', { hits: 2 }), chill(1), tough(1)] },
+        { fx: [dmg(0.7, 'oneEnemy', { hits: 2 }), bloom(2), weak(1)] },
+        { fx: [dmg(0.8, 'randomEnemy', { hits: 2, hitFx: [bloom(1)] })] },
+        { fx: [dmg(0.5, 'oneEnemy', { hits: 2 }), bloom(1, 'allEnemies')] },
+        { fx: [dmg(0.5, 'oneEnemy', { hits: 2 }), bloom(3)] },
+        { fx: [dmg(0.4, 'oneEnemy', { hits: 2 }), bloom(2), stack(M, 1)] },
       ],
-      blesses: ['power', 'draw', [frost(1)]],
+      blesses: ['power', 'draw', [bloom(1)]],
     },
-    { // 원작 「차분해질 시간이야」 — 동상 · 행동 늦춤
+    { // 원작 「차분해질 시간이야」 — 동상 대신 눈꽃 · 행동 늦춤
       name: '차분해질 시간이야', cost: 0, type: '스킬',
-      fx: [chill(1), { k: 'rushDown', v: 1, target: 'oneEnemy' }, stack('만년설', 1)],
+      fx: [bloom(1), { k: 'rushDown', v: 1, target: 'oneEnemy' }, stack(M, 1)],
       oracles: [
-        { fx: [chill(2), { k: 'rushDown', v: 1, target: 'oneEnemy' }, frost(1)] },
-        { fx: [chill(1, 'allEnemies'), frost(1, 'allEnemies'), stack('만년설', 1)] },   // 10-13 신탁 점검: 만년설 되살림
-        { fx: [chill(1), frost(1), draw(1)] },
-        { fx: [{ k: 'rushDown', v: 1, target: 'allEnemies' }, frost(1), stack('만년설', 1)] },   // 10-13 신탁 점검: 만년설 되살림
-        { fx: [chill(1), { k: 'rushDown', v: 1, target: 'oneEnemy' }, draw(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」 · 10-13 신탁 점검: 신탁 3 과 같은 글이라 늦춤 · 드로우로
+        { fx: [bloom(2), { k: 'rushDown', v: 1, target: 'oneEnemy' }, stack(M, 1)] },
+        { fx: [bloom(1, 'allEnemies'), stack(M, 1)] },
+        { fx: [bloom(1), stack(M, 1), draw(1)] },
+        { fx: [{ k: 'rushDown', v: 1, target: 'allEnemies' }, bloom(1), stack(M, 1)] },
+        { fx: [bloom(1), stack(M, 2)] },
       ],
-      blesses: ['draw', 'cost', [frost(1)]],
+      blesses: ['draw', 'cost', [bloom(1)]],
     },
-    { // 약점 노출(아야 소유) — 디버프가 걸린 적이면 강인도도
+    { // 간파 — 눈꽃 · 디버프(눈꽃도 든다)가 걸린 적이면 강인도도
       name: '간파', cost: 0, type: '공격',
-      fx: [dmg(0.5), expose(1), debuffed, tough(1)],   // 10-11 30→60%
+      fx: [dmg(0.5), bloom(1), { k: 'ifDebuffs', n: 1 }, tough(1)],
       oracles: [
-        { fx: [dmg(1), expose(1), debuffed, tough(1)] },
-        { fx: [dmg(0.8), expose(2)] },
-        { fx: [dmg(0.7, 'allEnemies'), expose(1, 'allEnemies'), tough(1, 'allEnemies')] },   // 10-13 신탁 점검: 70% · 강인도 되살림
-        { fx: [dmg(0.8), expose(1), debuffed, tough(2)] },
-        { fx: [dmg(0.8), expose(1), draw(1)] },
+        { fx: [dmg(1), bloom(1), { k: 'ifDebuffs', n: 1 }, tough(1)] },
+        { fx: [dmg(0.8), bloom(2)] },
+        { fx: [dmg(0.7, 'allEnemies'), bloom(1, 'allEnemies'), tough(1, 'allEnemies')] },
+        { fx: [dmg(0.8), bloom(1), { k: 'ifDebuffs', n: 1 }, tough(2)] },
+        { fx: [dmg(0.8), bloom(1), draw(1)] },
       ],
-      blesses: ['power', 'draw', [frost(1)]],
+      blesses: ['power', 'draw', [bloom(1)]],
     },
-    { // 강인도 깎기 — 서리가 쌓인 적은 더 깎인다
-      name: '얼음 결정 깨기', cost: 1, type: '공격', tags: ['약점 공격'],
-      fx: [dmg(0.9), { k: 'perStack', id: '만년설' }, tough(1), stack('만년설', 1)],   // 10-11 60→110%   // 만년설 1당 강인도 피해 +1(10-11 사용자 0.5→1)
+    { // 사냥 — 얼음 결정 깨기: 눈꽃을 꺾으며 베기(원작 발도 2회)
+      name: '얼음 결정 깨기', cost: 1, type: '공격',
+      fx: [dmg(0.8), ...hunt(0.8)],
       oracles: [
-        { tags: ['약점 공격'], fx: [dmg(1.2), tough(1), { k: 'ifStack', id: K, n: 2 }, tough(1)] },
-        { tags: ['약점 공격'], fx: [dmg(0.6, 'allEnemies'), tough(1, 'allEnemies')] },
-        { tags: ['약점 공격'], fx: [dmg(1), tough(2)] },
-        { tags: ['약점 공격'], fx: [dmg(1), tough(1), frost(2)] },
-        { cost: 1, tags: ['약점 공격'], fx: [dmg(0.8), tough(1)] },   // 10-12 사용자 「신탁 소멸 줄여 줘」
+        { fx: [dmg(1.1), ...hunt(1.0)] },
+        { fx: [dmg(0.6), marked, spend(F, 'all'), { k: 'perEvent' }, dmg(0.6)] },
+        { cost: 0, fx: [dmg(0.5), ...hunt(0.5)] },
+        { fx: [dmg(0.5, 'allEnemies'), tough(1, 'allEnemies'), ...hunt(0.6)] },
+        { fx: [dmg(0.7), ...hunt(0.7), stack(M, 1)] },
       ],
-      blesses: ['power', 'cost', [frost(1)]],
+      blesses: ['power', 'cost', [bloom(1)]],
     },
-    { // 마무리 — 2코 · 보존: 강인도가 반 아래인 적에게 크게(붕괴 정산 대신 강인도 선)
+    { // 결정타 — 빙설화도: 격파 순간 큰 한 방(2코 · 보존)
       name: '빙설화도', cost: 2, type: '공격', tags: ['보존'],
-      fx: [dmg(1.5), tough(1), lowT(0.5), dmg(1.1)],   // 10-11 80+60 → 180+140%
+      fx: [dmg(2.2), tough(1), ...shatter(3.3)],   // 사용자 수정 ②: 1개당 300 → 330%(시작 눈꽃이 빠진 몫 — 프론티어 딜러 평균 +1 → +5%, 혼자 76.4 → 77.0%)
       oracles: [
-        { tags: ['보존'], fx: [dmg(2.8), tough(1), lowT(0.5), dmg(2.4)] },
-        { tags: ['보존'], fx: [dmg(2.4), tough(1), { k: 'ifFoe', id: '약점 노출' }, dmg(2.4)] },   // 10-13 신탁 점검: 강인도 되살림
-        { tags: ['보존'], fx: [dmg(1.4, 'allEnemies'), tough(1, 'allEnemies')] },
-        { tags: ['보존'], fx: [dmg(2.4), tough(1), { k: 'ifFoe', id: 'alone' }, dmg(2.4)] },
-        { tags: ['보존'], fx: [dmg(2.4), tough(2), lowT(0.3), dmg(1.6)] },
+        { tags: ['보존'], fx: [dmg(3.0), tough(1), ...shatter(0.7)] },
+        { tags: ['보존'], fx: [dmg(2.4), tough(2), ...shatter(0.5)] },
+        { tags: ['보존'], fx: [dmg(1.8, 'allEnemies'), ...shatter(0.3)] },
+        { tags: ['보존'], fx: [dmg(2.0), tough(1), marked, dmg(1.5)] },
+        { cost: 1, tags: ['보존'], fx: [dmg(1.2), ...shatter(1.5)] },
       ],
-      blesses: ['power', 'cost', [frost(1)]],
+      blesses: ['power', 'cost', [bloom(1)]],
     },
   ],
 });
