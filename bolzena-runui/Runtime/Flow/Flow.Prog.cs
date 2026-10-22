@@ -251,7 +251,8 @@ namespace Bolzena.RunUI
         static string HaveNeed(int have, int need) => $"<color={(have < need ? Theme.BadTag : Theme.GoodTag)}>{N0(have)}</color><color={Theme.SubTag}>/{N0(need)}</color>";
 
         // ── 사도 상세 「잠재력」 탭 — 카제나 잠재력 화면(성장_설계_카제나판.md §11) ──
-        //   왼쪽 아래 01 에서 오른쪽 위 07 로 오르는 지그재그 판(줄기 01~07 + 갈래 03-1 · 05-1 · 05-2). 뒤에 사도 스탠딩을 흐리게.
+        //   왼쪽 아래 01 에서 오른쪽 위 07 로 오르는 지그재그 판(줄기 01~07 + 갈래 03-1 · 04-1 · 05-1 · 05-2). 뒤에 사도 스탠딩을 흐리게.
+        //   04-1 「치명 감각」(10-22 — 사도 공통 치명 확률)은 04 에서 왼쪽 위 빈자리로 갈라진다(05-1 과 같은 높이, 왼쪽 끝).
         //   1단계짜리 특수 칸 = 큰 원(후광 고리), 여러 단계 칸 = 작은 원 + 아래 알약 「a/b」. 안 연 칸 = 흐린 반투명 원, 연 칸 = 짙은 원 + 금 테,
         //   지금 열 수 있는 칸 = 금 고리, 고른 칸 = 금 후광 + 위 작은 금 ▼. 칸 사이 선(연 길은 금).
         //   여는 조건 · 값은 서버가 판단(lib/prog.js potCheck) — 화면은 서버 줄(potential)을 그대로 보인다. 효과 글은 콘텐츠 성장 표(potential · heroes)로 짓는다.
@@ -260,7 +261,7 @@ namespace Bolzena.RunUI
         static readonly Dictionary<string, Vector2> POT_XY = new()
         {
             ["01"] = new Vector2(0.06f, 0.12f), ["02"] = new Vector2(0.30f, 0.04f), ["03"] = new Vector2(0.24f, 0.37f), ["03-1"] = new Vector2(0.50f, 0.28f),
-            ["04"] = new Vector2(0.14f, 0.64f), ["05"] = new Vector2(0.42f, 0.62f), ["05-1"] = new Vector2(0.30f, 0.93f), ["05-2"] = new Vector2(0.78f, 0.40f),
+            ["04"] = new Vector2(0.14f, 0.64f), ["04-1"] = new Vector2(0.03f, 0.93f), ["05"] = new Vector2(0.42f, 0.62f), ["05-1"] = new Vector2(0.30f, 0.93f), ["05-2"] = new Vector2(0.78f, 0.40f),
             ["06"] = new Vector2(0.66f, 0.68f), ["07"] = new Vector2(0.80f, 0.94f),
         };
         /// <summary>큰 원 = 1단계짜리 특수 칸(카제나 01 · 03-1 · 05-1 · 07), 작은 원 = 여러 단계 칸.</summary>
@@ -293,6 +294,7 @@ namespace Bolzena.RunUI
                 case "card": return $"{PotKindKo(n.Of)} 카드 피해 · 실드 · 치유 <color={Theme.GoldTag}>+{Pct(n.V * lv)}</color>";
                 case "stat":
                     if (n.Of == "hero") return hn == null ? n.Desc : string.Join(" · ", hn.Stat.Select(kv => StatKo(kv.Key, kv.Value * lv))) + $" <color={Theme.SubTag}>(단계마다 {string.Join(" · ", hn.Stat.Select(kv => StatKo(kv.Key, kv.Value)))})</color>";
+                    if (n.Of == "crit") return $"치명 확률 <color={Theme.GoldTag}>+{n.V * lv:0.#}%p</color> <color={Theme.SubTag}>(단계마다 +{n.V:0.#}%p · 기본 {hd.Crit}%)</color>";   // 04-1 치명 감각(사도 공통)
                     return n.Of == "role" ? $"주 능력치({role}) <color={Theme.GoldTag}>+{Pct(n.V * lv)}</color>" : n.Of == "hp" ? $"HP <color={Theme.GoldTag}>+{Pct(n.V * lv)}</color>" : $"{n.Of} +{Pct(n.V * lv)}";
                 case "shin": return $"이 사도 카드의 신탁 후보에 축복이 얹힐 확률 ×{1 + n.V * lv:0.##} <color={Theme.SubTag}>({Pct(R.ORACLE_BLESS)} → {Pct(R.ORACLE_BLESS * (1 + n.V * lv))})</color>";
                 case "hero":

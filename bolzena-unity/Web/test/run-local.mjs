@@ -144,17 +144,17 @@ async function progPhase(slotA) {
     const rules = fs.readFileSync(path.join(CORE, "Runtime", "Rules", "Rules.cs"), "utf8");
     const hp = (rules.match(/double\[\] HP\s*=\s*\{([^}]*)\}/) || [])[1]?.split(",").length;
     const pathSum = [1, 2, 3, 4, 5, 6, 6, 7, 8, 8].reduce((a, t) => a.map((x, i) => x + L.MATS[t][i]), [0, 0, 0]), tot0 = L.potTotal();
-    expect("서버 단계 표(lib/prog.js MATS) — 단계 수 = 엔진 Tiers · 상급은 단계마다 줄지 않음 · 기준 길 10판 = 사도 하나 10칸(하급 · 중급은 남음)", L.MATS.length - 1 === L.TIER_MAX && hp - 1 === L.TIER_MAX
+    expect("서버 단계 표(lib/prog.js MATS) — 단계 수 = 엔진 Tiers · 상급은 단계마다 줄지 않음 · 기준 길 10판 = 사도 하나 11칸 상급(하급 · 중급은 남음)", L.MATS.length - 1 === L.TIER_MAX && hp - 1 === L.TIER_MAX
       && L.MATS.slice(2).every((m, i) => m[2] >= L.MATS[i + 1][2]) && pathSum[2] === tot0.mm3 && pathSum[0] >= tot0.mm1 && pathSum[1] >= tot0.mm2, short({ pathSum, tot0, hp }));
     const ch = contentHeroes(CONTENT);
     expect("서버 사도 표(lib/prog.js HEROES) = 콘텐츠 사도 · 역할", JSON.stringify(Object.entries(ch).sort()) === JSON.stringify(Object.entries(L.HEROES).sort()), short({ content: Object.keys(ch).length, server: Object.keys(L.HEROES).length }));
     expect("성장 표 — 잠재력만(level · pieces 칸 없음 · 칸에 진급 문턱 promo 없음 · 측정 묶음은 pot 만)", !("level" in tblP) && !("pieces" in tblP) && tblP.potential.every((n) => !("promo" in n))
       && Object.values(tblP.presets).every((p) => Object.keys(p).every((k) => k === "desc" || k === "pot")), short(Object.keys(tblP)));
     const pt = tblP.potential.map((n) => ({ id: n.id, max: n.max ?? 1, kind: n.kind, after: n.after ?? null, tier: n.tier ?? 0 }));
-    expect("잠재력 — 서버 칸 표(lib/prog.js POTENTIAL) = 성장 표 potential(id · max · kind · after · 여는 사다리 단계 tier · 차례 — 10칸 줄기 + 갈래 셋)", pt.length === 10 && JSON.stringify(pt) === JSON.stringify(L.POTENTIAL), short({ table: pt.map((n) => n.id + ":" + n.max + ":" + n.after + ":" + n.tier) }));
+    expect("잠재력 — 서버 칸 표(lib/prog.js POTENTIAL) = 성장 표 potential(id · max · kind · after · 여는 사다리 단계 tier · 차례 — 11칸 줄기 + 갈래 넷 · 04-1 치명 감각)", pt.length === 11 && JSON.stringify(pt) === JSON.stringify(L.POTENTIAL), short({ table: pt.map((n) => n.id + ":" + n.max + ":" + n.after + ":" + n.tier) }));
     expect("잠재력 — 성장 표 사도 칸(heroes)이 서버 사도 20명 모두 · 칸 03-1 · 05 · 05-1 · 06 · 07", Object.keys(L.HEROES).every((h) => ["03-1", "05", "05-1", "06", "07"].every((n) => tblP.heroes?.[h]?.[n]?.desc)), short(Object.keys(tblP.heroes || {}).length));
     const tot = L.potTotal();
-    expect("잠재력 — 사도 하나 10칸 = 마시멜로 하급 24 · 중급 125 · 상급 440(카제나 성장석 344 + 특수 재료 몫 96) · 골드 없음", tot.mm1 === 24 && tot.mm2 === 125 && tot.mm3 === 440 && Object.keys(tot).length === 3, short(tot));
+    expect("잠재력 — 사도 하나 11칸 = 마시멜로 하급 24 · 중급 161 · 상급 464(10칸 24 · 125 · 440 + 04-1 중급 36 · 상급 24) · 골드 없음", tot.mm1 === 24 && tot.mm2 === 161 && tot.mm3 === 464 && Object.keys(tot).length === 3, short(tot));
   }
   const srv = startServer({ TEST_LOGIN: "1", ID_PEPPER: "local-pepper", VERIFY_TOKEN, PROG: "1" }, "dev-prog.log", PP);
   const rq = (method, p, o = {}) => fetch(B2 + p, { method, headers: { ...(o.bearer ? { authorization: "Bearer " + o.bearer } : {}), ...(o.cookie ? { cookie: o.cookie } : {}), ...(o.body !== undefined ? { "content-type": "application/json" } : {}), ...(o.headers || {}) }, body: o.body === undefined ? undefined : JSON.stringify(o.body), redirect: "manual" })
@@ -189,7 +189,7 @@ async function progPhase(slotA) {
     r = await rq("GET", "/api/prog", { bearer: G });
     const p0 = r.data;
     expect("성장 — 처음: 최고 단계 0 · 열린 단계 1 · 사도 20명 잠재력 없음 · 지갑 = 마시멜로 하급 · 중급 · 상급 셋 모두 0 · 레벨 · 교주 · 골드 · 왕사탕 · 성격 재료 칸 없음",
-      r.status === 200 && p0.on === true && p0.bestTier === 0 && p0.open === 1 && Object.keys(p0.heroes).length === 20 && Object.values(p0.heroes).every((h) => Object.keys(h.pot).length === 0 && h.potential.length === 10 && !("lv" in h) && !("promo" in h))
+      r.status === 200 && p0.on === true && p0.bestTier === 0 && p0.open === 1 && Object.keys(p0.heroes).length === 20 && Object.values(p0.heroes).every((h) => Object.keys(h.pot).length === 0 && h.potential.length === 11 && !("lv" in h) && !("promo" in h))
       && JSON.stringify(Object.keys(p0.wallet)) === JSON.stringify(["mm1", "mm2", "mm3"]) && Object.values(p0.wallet).every((x) => x === 0) && p0.currency.length === 3 && p0.currency.some((c) => c.key === "mm2" && c.name === "중급 마시멜로")
       && !("account" in p0) && !("candy" in p0) && !("gold" in p0.wallet), short(Object.keys(p0)));
 
@@ -219,8 +219,8 @@ async function progPhase(slotA) {
     {
       const M = (tier, result, floor = 2) => L.runMats(tier, result, floor);
       const a5 = M(5, "win"), a9 = M(9, "win"), l9 = M(9, "lose"), l2 = M(2, "lose", 1);
-      expect("모험 끝 보상 계산 — 단계 표: 5 완주 하급 3 · 중급 16 · 상급 46 · 9 완주 3 · 14 · 64 · 9 2층 쓰러짐(×0.35) 1 · 5 · 22 · 2 1층 쓰러짐(×0.15) 2 · 4 · 4(실패 판 ≈ 완주의 1/4)",
-        a5.mm1 === 3 && a5.mm2 === 16 && a5.mm3 === 46 && a9.mm1 === 3 && a9.mm2 === 14 && a9.mm3 === 64 && l9.mm1 === 1 && l9.mm2 === 5 && l9.mm3 === 22 && l2.mm1 === 2 && l2.mm2 === 4 && l2.mm3 === 4,
+      expect("모험 끝 보상 계산 — 단계 표: 5 완주 하급 3 · 중급 16 · 상급 48 · 9 완주 3 · 14 · 66 · 9 2층 쓰러짐(×0.35) 1 · 5 · 23 · 2 1층 쓰러짐(×0.15) 2 · 4 · 4(실패 판 ≈ 완주의 1/4)",
+        a5.mm1 === 3 && a5.mm2 === 16 && a5.mm3 === 48 && a9.mm1 === 3 && a9.mm2 === 14 && a9.mm3 === 66 && l9.mm1 === 1 && l9.mm2 === 5 && l9.mm3 === 23 && l2.mm1 === 2 && l2.mm2 === 4 && l2.mm3 === 4,
         short({ a5, a9, l9, l2 }));
     }
     r = await earn({ ref: ref1, tier: 1, result: "win", floor: 2, min: 25, party }); expect("모험 끝 보상 — 같은 판(같은 ref) 두 번 → 200 dup(아무것도 안 줌)", r.status === 200 && r.data.dup === true && r.data.reward === null && r.data.prog.wallet.mm3 === 24, short(r.data.prog?.wallet));
@@ -233,14 +233,14 @@ async function progPhase(slotA) {
     // 행동력이 없다 — 판을 여럿 받아도 막히지 않는다(분당 6번 상한만)
     r = await earn({ ref: nref(), tier: 2, result: "win", floor: 2, min: 30, party });
     expect("모험 끝 보상 — 행동력 없음: 넷째 판도 받는다 · 단계 2 완주 → 단계 3 열림", r.status === 200 && r.data.reward.give.items.mm3 === 24 && r.data.bestTier === 2 && r.data.opened === 3, short(r.data.reward?.give?.items));
-    // 주간 상한 — 이번 주 받은 양을 상한 바로 밑으로(D1 에 바로) 해 두고 단계 3 완주(하급 4 · 중급 34 · 상급 36)
+    // 주간 상한 — 이번 주 받은 양을 상한 바로 밑으로(D1 에 바로) 해 두고 단계 3 완주(하급 4 · 중급 34 · 상급 42)
     const wk = L.weekOf();
     sqlRun(`UPDATE prog_account SET week = ${wk}, week_got = '{"mm1":179,"mm2":510,"mm3":900}' WHERE user_id = ${uid}`);
     r = await earn({ ref: nref(), tier: 3, result: "win", floor: 2, min: 30, party });
     const cg = r.data.reward?.give;
-    expect("모험 끝 보상 — 주간 상한: 하급 남은 1 · 중급 0 · 상급 그대로(36) · 잘린 칸 둘", r.status === 200 && cg.items.mm1 === 1 && !cg.items.mm2 && cg.items.mm3 === 36
+    expect("모험 끝 보상 — 주간 상한: 하급 남은 1 · 중급 0 · 상급 그대로(42) · 잘린 칸 둘", r.status === 200 && cg.items.mm1 === 1 && !cg.items.mm2 && cg.items.mm3 === 42
       && JSON.stringify(r.data.reward.capped.sort()) === JSON.stringify(["mm1", "mm2"])
-      && r.data.prog.week.got.mm1 === 180 && r.data.prog.week.got.mm3 === 936, short(r.data.reward));
+      && r.data.prog.week.got.mm1 === 180 && r.data.prog.week.got.mm3 === 942, short(r.data.reward));
     expect("도전 사다리 — 상한에 걸려도 완주는 완주(최고 단계 3 · 단계 4 열림)", r.data.bestTier === 3 && r.data.opened === 4, short({ best: r.data.bestTier }));
     r = await earn({ ref: nref(), tier: 9, result: "win", floor: 2, min: 30, party }); expect("도전 사다리 — 단계 9 위조(열린 단계 4) → 409 tier locked", r.status === 409 && r.data.open === 4, short(r.data));
     sqlRun(`UPDATE prog_account SET week_got = '{}' WHERE user_id = ${uid}`);
@@ -251,10 +251,11 @@ async function progPhase(slotA) {
       const pot = async (hero, node) => { for (;;) { const q = await rq("POST", "/api/prog/potential", { bearer: G, body: { hero, node } }); if (q.status !== 429) return q; await new Promise((ok) => setTimeout(ok, ((q.data && q.data.retryAfter) || 5) * 1000 + 500)); } };
       let pv = (await rq("GET", "/api/prog", { bearer: G })).data;
       const ap = pv.heroes["아야"].potential, at = (id) => ap.find((n) => n.id === id);
-      expect("잠재력 — 처음: 아야 10칸 모두 0 · 01 열림(하급 8 · 골드 없음) · 02 · 03-1 잠김(앞 칸 — 진급 문턱 없음)", ap.length === 10 && ap.every((n) => n.lv === 0 && !("promo" in n)) && at("01").locked === false && at("01").next.items.mm1 === 8 && !("gold" in at("01").next)
+      expect("잠재력 — 처음: 아야 11칸 모두 0 · 01 열림(하급 8 · 골드 없음) · 02 · 03-1 잠김(앞 칸 — 진급 문턱 없음)", ap.length === 11 && ap.every((n) => n.lv === 0 && !("promo" in n)) && at("01").locked === false && at("01").next.items.mm1 === 8 && !("gold" in at("01").next)
         && at("02").locked === true && /앞 칸/.test(at("02").why) && at("03-1").locked === true && /앞 칸\(03\)/.test(at("03-1").why) && at("05-1").after === "05" && Object.keys(pv.heroes["아야"].pot).length === 0, short(ap.slice(0, 4)));
       r = await pot("아야", "02"); expect("잠재력 — 앞 칸(01)을 안 열고 02 → 409 cannot · 잠김", r.status === 409 && r.data.error === "cannot" && r.data.locked === true, short(r.data));
       expect("잠재력 — 칸 여는 사다리 단계(최고 완주 3): 05 · 06 · 07 은 「난이도 단계 5 · 7 을 완주하면 열린다」 · 04 · 03-1(단계 3)은 단계 조건 통과", /난이도 단계 5 을 완주하면/.test(at("05").why) && /난이도 단계 7/.test(at("07").why) && at("05").tier === 5 && !/난이도 단계/.test(at("04").why || "") && !/난이도 단계/.test(at("03-1").why || ""), short([at("04"), at("05"), at("07")].map((n) => n.why)));
+      expect("잠재력 — 04-1 「치명 감각」(10-22 새 칸): 04 갈래 · 최대 5 · 「난이도 단계 4 을 완주하면 열린다」 · 첫 단계 중급 10", at("04-1").after === "04" && at("04-1").max === 5 && at("04-1").tier === 4 && /난이도 단계 4 을 완주하면/.test(at("04-1").why) && at("04-1").next.items.mm2 === 10, short(at("04-1")));
       sqlRun(`UPDATE prog_account SET bag = '{"mm1":5,"mm2":100}' WHERE user_id = ${uid}`);
       r = await pot("아야", "01"); expect("잠재력 — 재료 모자람(하급 5/8 — 중급으로 대신 못 씀) → 409 · 까닭", r.status === 409 && /하급 마시멜로/.test(r.data.why) && r.data.locked === false, short(r.data));
       sqlRun(`UPDATE prog_account SET bag = '{"mm1":1000,"mm2":1000,"mm3":1000}' WHERE user_id = ${uid}`);
@@ -295,7 +296,7 @@ async function progPhase(slotA) {
     sqlRun(`DELETE FROM prog_hero WHERE user_id = ${uid} AND hero IN (${slotA.map((s) => `'${s.hero}'`).join(",")})`);
     const g0 = await startG();
     expect("성장 — 편성에 잠재력이 없으면 프론티어 시작 응답에 prog 칸 없음(성장 끔과 같은 셋업)", g0.attempt && !("prog" in g0), short(Object.keys(g0)));
-    const potA = { "01": 1, "02": 5, "03": 5, "04": 5 };
+    const potA = { "01": 1, "02": 5, "03": 5, "04": 5, "04-1": 3 };   // 04-1 치명 감각(10-22) — 검증기가 같은 치명 확률로 다시 돌리는지
     sqlRun(slotA.map((s) => `INSERT INTO prog_hero (user_id, hero, pot, updated) VALUES (${uid}, '${s.hero}', '${JSON.stringify(potA)}', 0) ON CONFLICT (user_id, hero) DO UPDATE SET pot = excluded.pot`).join(";\n"));
     const g1 = await startG(), g2 = await startG();
     expect("성장 — 프론티어 시작 응답에 떠 둔 잠재력(편성 사도 셋 · 표 차례)", g1.prog && slotA.every((s) => JSON.stringify(g1.prog.heroes[s.hero]?.pot) === JSON.stringify(potA)) && Object.keys(g1.prog).join() === "heroes", short(g1.prog));

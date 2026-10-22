@@ -311,7 +311,6 @@ namespace Bolzena
                 if (fbg != null) { bg.sprite = fbg; FitBg(); }
             }
             if (run?.Frontier != null) FrontierHud.Create(UiRoot, run.Battle, run.Frontier);   // 프론티어 — 남은 턴 · 점수 · 「성격 상성 없음」
-            else if (run?.Port?.S != null && run.Port.S.Tier > 0) TierHud.Create(UiRoot, run.Port.S.Tier);   // 판 전투 — 난이도 단계(성장 켬일 때만)
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "-artaudit") >= 0) { Look.Audit(); Application.Quit(0); return; }   // 그림 감사만 하고 끝
             var evs0 = Battle.Begin();
             pendingBegin = evs0;

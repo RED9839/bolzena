@@ -84,7 +84,7 @@ namespace Bolzena.RunUI
 
         // ── 모험 끝 마시멜로 보상(서버 Web/lib/prog.js MATS · progressOf 와 같은 표 — 화면 미리 보기용, 실제 값은 서버가 준다) ──
         /// <summary>단계별 완주 한 판의 마시멜로 [하급, 중급, 상급](편성 크기와 상관없이 판마다). 칸 0 은 안 쓴다.</summary>
-        public static readonly int[][] MATS = { null, new[] { 12, 28, 24 }, new[] { 12, 28, 24 }, new[] { 4, 34, 36 }, new[] { 4, 34, 36 }, new[] { 3, 16, 46 }, new[] { 3, 16, 50 }, new[] { 3, 14, 54 }, new[] { 3, 14, 60 }, new[] { 3, 14, 64 } };
+        public static readonly int[][] MATS = { null, new[] { 12, 28, 24 }, new[] { 12, 28, 24 }, new[] { 4, 34, 42 }, new[] { 4, 34, 42 }, new[] { 3, 16, 48 }, new[] { 3, 16, 52 }, new[] { 3, 14, 56 }, new[] { 3, 14, 62 }, new[] { 3, 14, 66 } };   // 10-22 04-1 치명 감각을 더하며 상급을 올림(서버와 같이)
         /// <summary>그 단계를 완주한 한 판의 등급 g(1~3) 마시멜로 수.</summary>
         public static int WinMat(int tier, int g) => tier >= 1 && tier < MATS.Length ? MATS[tier][g - 1] : 0;
 
@@ -99,7 +99,7 @@ namespace Bolzena.RunUI
             if (HeroOf(coreId)?["pot"] is JObject p) foreach (var kv in p) if (kv.Value?.Type == JTokenType.Integer && (int)kv.Value > 0) o[kv.Key] = (int)kv.Value;
             return o;
         }
-        /// <summary>그 사도의 잠재력 10칸 서버 줄(GET /api/prog heroes[사도].potential — 칸마다 lv · max · after · next{items} · ok · why · locked). 없으면 null.</summary>
+        /// <summary>그 사도의 잠재력 11칸 서버 줄(GET /api/prog heroes[사도].potential — 칸마다 lv · max · after · next{items} · ok · why · locked). 없으면 null.</summary>
         public static JObject PotNode(string coreId, string node)
         {
             if (!(HeroOf(coreId)?["potential"] is JArray a)) return null;

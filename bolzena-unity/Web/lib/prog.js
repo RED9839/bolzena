@@ -24,15 +24,17 @@ export const tierOpen = (best) => Math.max(1, Math.min(TIER_MAX, (best | 0) + 1)
 
 // ── 잠재력(카제나식 — 성장_설계_카제나판.md §11) ──
 /**
- * 잠재력 10칸 — id · 최대 단계 · 종류 · 앞 칸(after — 이 칸을 열려면 앞 칸이 1단계 이상) = 성장 표 potential(run-local 이 견준다).
+ * 잠재력 11칸 — id · 최대 단계 · 종류 · 앞 칸(after — 이 칸을 열려면 앞 칸이 1단계 이상) = 성장 표 potential(run-local 이 견준다).
  * 카제나 그대로: 줄기 01 → 02 → 03 → 04 → 05 → 06 → 07, 갈래 03-1(03 에서) · 05-1 · 05-2(05 에서). 단계를 올리는 데는 앞 칸 단계가 상관없다.
  * 여는 조건 = 앞 칸(after) 1단계 이상 + 도전 사다리 tier 단계 완주(그 계정의 최고 완주 단계 best_tier — 2026-10-22 사용자 결정, 예전 진급 문턱 자리:
  *   진급 0 → 없음 · 1 → 단계 1 · 2 → 단계 3 · 3 → 단계 5 · 4 → 단계 7). 성장 표 potential 의 tier 와 같다(run-local 이 견준다).
+ * 04-1 「치명 감각」(2026-10-22 사용자 「치확 잠재도」) — 사도 공통 치명 확률 +3%p × 5, 04 에서 갈라짐 · 단계 4 완주. 새 칸 id 만 더했다 — 이미 연 칸(prog_hero.pot)은 그대로.
  */
 export const POTENTIAL = [
   { id: "01", max: 1, kind: "start", after: null, tier: 0 }, { id: "02", max: 10, kind: "card", after: "01", tier: 1 },
   { id: "03", max: 10, kind: "card", after: "02", tier: 1 }, { id: "03-1", max: 1, kind: "hero", after: "03", tier: 3 },
-  { id: "04", max: 10, kind: "card", after: "03", tier: 3 }, { id: "05", max: 5, kind: "stat", after: "04", tier: 5 },
+  { id: "04", max: 10, kind: "card", after: "03", tier: 3 }, { id: "04-1", max: 5, kind: "stat", after: "04", tier: 4 },
+  { id: "05", max: 5, kind: "stat", after: "04", tier: 5 },
   { id: "05-1", max: 1, kind: "hero", after: "05", tier: 5 }, { id: "05-2", max: 1, kind: "shin", after: "05", tier: 5 },
   { id: "06", max: 5, kind: "stat", after: "05", tier: 7 }, { id: "07", max: 1, kind: "hero", after: "06", tier: 7 },
 ];
@@ -52,6 +54,7 @@ export const MM_KEYS = MM.map((m) => m.key);
  * 특수 재료를 상급 마시멜로로 바꿨다(10-22 — 가 1 = 상급 4 · 나 1 = 상급 6 · 다 1 = 상급 10: 흔할수록 싸게, 다 = 가장 드묾).
  *   칸 [L-1] = [하급, 중급, 상급]. 05-2 는 카제나 값을 못 찾아 가안(상급 10).
  *   사도 하나 10칸 전부 = 하급 24 · 중급 125 · 상급 440(카제나 성장석 344 + 특수 몫 96).
+ *   04-1(10-22 더함 — 04 의 중급 → 상급 곡선을 따라 중급 10 · 12 · 14 · 상급 10 · 14) → 사도 하나 11칸 = 하급 24 · 중급 161 · 상급 464.
  */
 const C = (m1 = 0, m2 = 0, m3 = 0) => [m1, m2, m3];
 export const POT_COST = {
@@ -60,6 +63,7 @@ export const POT_COST = {
   "03": [C(0, 4), C(0, 5), C(0, 5), C(0, 6), C(0, 6), C(0, 7), C(0, 0, 5), C(0, 0, 9), C(0, 0, 10), C(0, 0, 16)],
   "03-1": [C(0, 16)],
   "04": [C(0, 8), C(0, 8), C(0, 10), C(0, 12), C(0, 14), C(0, 0, 8), C(0, 0, 8), C(0, 0, 14), C(0, 0, 14), C(0, 0, 16)],
+  "04-1": [C(0, 10), C(0, 12), C(0, 14), C(0, 0, 10), C(0, 0, 14)],
   "05": [C(0, 0, 16), C(0, 0, 16), C(0, 0, 16), C(0, 0, 24), C(0, 0, 34)],
   "05-1": [C(0, 0, 38)],
   "05-2": [C(0, 0, 10)],
@@ -72,7 +76,7 @@ export function potCost(id, L) {
   c.forEach((n, i) => { if (n > 0) items[MM_KEYS[i]] = n; });
   return { items };
 }
-/** 사도 하나 10칸 전부 — { mm1, mm2, mm3 }(문서 · 시험). */
+/** 사도 하나 11칸 전부 — { mm1, mm2, mm3 }(문서 · 시험). */
 export const potTotal = () => Object.values(POT_COST).flat().reduce((a, c) => { c.forEach((n, i) => (a[MM_KEYS[i]] += n)); return a; }, { mm1: 0, mm2: 0, mm3: 0 });
 /** 사도 성장 줄의 잠재력 단계(없으면 0). */
 export const potOf = (h, id) => (h.pot && Number.isInteger(h.pot[id]) ? h.pot[id] : 0);
@@ -94,7 +98,7 @@ export function potCheck(acc, h, id) {
   else for (const [k, v] of Object.entries(cost.items)) if ((acc.bag[k] | 0) < v) { why = `${itemName(k)}가 모자라다(${acc.bag[k] | 0}/${v})`; break; }
   return { ok: !why, why, cost, lv, max: n.max, locked };
 }
-/** 화면에 주는 사도 하나의 잠재력 10칸 — [{ id, lv, max, after, tier, next: {items} | null, ok, why, locked }]. */
+/** 화면에 주는 사도 하나의 잠재력 11칸 — [{ id, lv, max, after, tier, next: {items} | null, ok, why, locked }]. */
 export const potView = (acc, h) => POTENTIAL.map((n) => { const c = potCheck(acc, h, n.id); return { id: n.id, lv: c.lv, max: n.max, after: n.after, tier: n.tier, next: c.cost, ok: c.ok, why: c.why, locked: c.locked }; });
 
 // ── 재화 — 마시멜로 셋뿐 ──
@@ -106,8 +110,10 @@ export const CURRENCY = MM.map((m) => ({ key: m.key, name: m.name, use: "잠재�
  *   기준 길: 그 칸을 여는 단계 근처에서 완주(01~03 = 단계 1~2 두 판 · 03-1 · 04 = 3~4 두 판 · 05 갈래 = 5~6 세 판 · 06 · 07 = 7~8 세 판) → 한 사도 10칸(하급 24 · 중급 125 · 상급 440)이 꼭 10판.
  *   낮은 단계일수록 하급 · 중급, 높을수록 상급(카제나 성장석 등급이 단계를 따라 오르는 꼴). 하급 · 중급은 기준 길에서 남는 만큼 다음 사도 몫으로 쌓인다.
  *   (예전 「배율 × 기본 + 완주 덤」 식과 엔진 Tiers.REWARD 는 이 표로 바꿨다 — 단계마다 등급이 바뀌어 배율 하나로는 못 그린다.)
+ *   2026-10-22 04-1 「치명 감각」 을 더하며 상급을 단계 3 · 4 +6(36 → 42) · 단계 5~9 +2 올렸다 — 기준 길 10판 상급 합 440 → 464 = 사도 하나 11칸 상급(그대로 10판).
+ *   중급은 그대로(기준 길 214 ≥ 11칸 161).
  */
-export const MATS = [null, [12, 28, 24], [12, 28, 24], [4, 34, 36], [4, 34, 36], [3, 16, 46], [3, 16, 50], [3, 14, 54], [3, 14, 60], [3, 14, 64]];
+export const MATS = [null, [12, 28, 24], [12, 28, 24], [4, 34, 42], [4, 34, 42], [3, 16, 48], [3, 16, 52], [3, 14, 56], [3, 14, 62], [3, 14, 66]];
 /** 못 깬 판 — 그 단계 완주 몫의 비율(1층에서 멈춤 0.15 · 2층에서 멈춤 0.35 — 평균 약 1/4). 완주 1. */
 export const progressOf = (result, floor) => (result === "win" ? 1 : floor >= 2 ? 0.35 : 0.15);
 /** 판 하나의 마시멜로(자르기 전) — 화면 미리 보기(게임 ProgStore.WinMat · RunMat)와 같은 식. */
@@ -117,7 +123,7 @@ export function runMats(tier, result, floor) {
   return o;
 }
 /** 주간 상한(판 결과를 지어낼 수 있으니 위조 이득의 상한, Docs/성장_설계_카제나판.md §12.2) — 등급마다 표의 가장 큰 한 판 몫 × 15판. */
-export const WEEK_CAP = { mm1: 180, mm2: 510, mm3: 960 };
+export const WEEK_CAP = { mm1: 180, mm2: 510, mm3: 990 };
 export const KEYS = Object.keys(WEEK_CAP);
 /** 완주로 치는 가장 짧은 판(분) — 이보다 빠른 완주는 받지 않는다(모양 검사). */
 export const MIN_CLEAR_MIN = 3;

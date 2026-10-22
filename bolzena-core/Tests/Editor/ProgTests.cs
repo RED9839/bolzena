@@ -116,6 +116,23 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(0.05, low.Mods["c"].Unique, 1e-9, "능력치가 낮아도 같다");
         }
 
+        [Test] public void 공통_치명_숙련은_치명_확률을_단계마다_고정값으로_더한다()
+        {
+            // 2026-10-22 사용자 「치확이 낮은데 치피만 높아서 — 치확 잠재도」: 04-1 「치명 숙련」(stat of crit — 사도 공통, +V%p × 단계)
+            var d = K.Data(cards: UNIQUE);
+            var c = d.Hero("c");
+            var t = GameData.FromJson<ProgTable>("{potential:[{id:'04', kind:'card', of:'unique', v:0.02, max:10}, {id:'04-1', kind:'stat', of:'crit', v:3, max:5, after:'04', tier:4}]}");
+            Assert.IsEmpty(Prog.Check(d, t), "stat 의 of crit 은 받는다");
+            var pb = Prog.Build(d, t, One("c", h => { h.Pot["04"] = 1; h.Pot["04-1"] = 4; }), new[] { "c" });
+            Assert.AreEqual(12, pb.Mods["c"].Base.Crit, "치명 +3%p × 4");
+            Assert.AreEqual(0, pb.Mods["c"].Base.Atk, "다른 능력치는 그대로");
+            Assert.AreEqual(c.Crit + 12, pb.Sum["c"].Crit);
+            var b = K.Fight(d, new[] { "c" }, new[] { "dummy" }, s => s.Prog = pb.Mods);
+            Assert.AreEqual(c.Crit + 12, b.Party[0].Crit, "전투 사도 치명 확률에 든다");
+            Assert.AreEqual(0, b.Party[0].GearAdd.Crit, "장비 몫이 아니라 기본치");
+            Assert.AreEqual(15, Prog.Build(d, t, One("c", h => { h.Pot["04"] = 1; h.Pot["04-1"] = 9; }), new[] { "c" }).Mods["c"].Base.Crit, "단계는 max 5 로 자른다");
+        }
+
         [Test] public void 판은_시작에_HP를_옮기고_첫_선물_고유_카드를_더하고_싸움마다_성장을_건다()
         {
             var d = K.Sample();

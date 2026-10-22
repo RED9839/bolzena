@@ -78,7 +78,7 @@ namespace Bolzena.RunUI
                 var up = Hot("pot.up");
                 string why = up?.Label != null ? up.Label.text : "";
                 bool off = !ProgStore.On;
-                Expect(Hot("pot.01") != null && Hot("pot.07") != null && Hot("pot.05-2") != null, "잠재력 탭 — 노드 판 10칸");
+                Expect(Hot("pot.01") != null && Hot("pot.07") != null && Hot("pot.05-2") != null && Hot("pot.04-1") != null, "잠재력 탭 — 노드 판 11칸(04-1 치명 감각)");
                 Expect(up != null && !up.Interactable && (off ? why.Contains("성장이 열리면 키울 수 있다") : why.Length > 0), $"잠재력 탭 — 열기 단추 흐림 · 까닭 「{why}」");
                 Expect(f.Stage.transform.GetComponentsInChildren<RectTransform>(true).Any(r => r.name == "mat mm1"), "잠재력 탭 — 01 에 필요한 하급 마시멜로 칸(그림)");
                 yield return Press("pot.07", 0.8f);

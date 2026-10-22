@@ -136,7 +136,10 @@ namespace Bolzena.RunUI
                     yield return Press("pot.07", 1.0f);
                     yield return Shot("prog_pot_locked");
                     Expect(Hot("pot.up") != null && !Hot("pot.up").Interactable && Hot("pot.up").Label.text.Contains("난이도 단계 7"), $"잠긴 칸(07 — 난이도 단계 7 완주 · 앞 칸 06) — 단추 꺼짐 · 「{Hot("pot.up")?.Label?.text}」");
-                    Expect(Hot("pot.05-2") != null && Hot("pot.05-1") != null, "카제나식 10칸 — 갈래 05-1 · 05-2");
+                    Expect(Hot("pot.05-2") != null && Hot("pot.05-1") != null && Hot("pot.04-1") != null, "카제나식 11칸 — 갈래 04-1 · 05-1 · 05-2");
+                    yield return Press("pot.04-1", 1.0f);
+                    yield return Shot("prog_pot_crit_locked");
+                    Expect(Hot("pot.up") != null && !Hot("pot.up").Interactable && Hot("pot.up").Label.text.Contains("난이도 단계 4"), $"04-1 치명 감각(10-22) — 난이도 단계 4 완주 전엔 잠김 · 「{Hot("pot.up")?.Label?.text}」");
 
                     // 다 연 판(카제나식 노드 판) — 사도 셋(딜러 · 탱커 · 서포터): 견본 pot_view 를 데모에서만 「다 연 사도」 로 고쳐 넣는다(서버 값 아님 — 화면 캡처용)
                     var full = (JObject)potView.DeepClone();
@@ -164,6 +167,12 @@ namespace Bolzena.RunUI
                         yield return Shot($"prog_pot_hero07_{k + 1}");
                         yield return Press("pot.03-1", 1.0f);
                         yield return Shot($"prog_pot_hero031_{k + 1}");
+                        if (k == 0)
+                        {   // 04-1 치명 감각(10-22) — 다 연 사도: 치명 확률 +15%p 가 실제 몫 · 판 글에
+                            yield return Press("pot.04-1", 1.0f);
+                            yield return Shot("prog_pot_crit_full");
+                            Expect(ProgStore.ModsOf(trio[k])?.Base.Crit >= 15 && f.Stage.transform.GetComponentsInChildren<TMP_Text>(true).Any(t => t.text.Contains("치명 확률") && t.text.Contains("15%p")), $"{trio[k]} — 04-1 다 열면 치명 확률 +15%p(몫 {ProgStore.ModsOf(trio[k])?.Base.Crit})");
+                        }
                         var m = ProgStore.ModsOf(trio[k]);
                         Expect(m?.Cards != null && m.Cards.Count >= 3, $"{trio[k]} — 사도 칸 카드 덤 {m?.Cards?.Count ?? 0}(03-1 · 05-1 · 07)");
                         Expect(ProgStore.Table.HeroNode(trio[k], "07")?.Desc?.Contains("더") == false, $"{trio[k]} — 07 효과 글에 문턱 덤 없음(10-22)");

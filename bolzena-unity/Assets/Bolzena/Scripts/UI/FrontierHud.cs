@@ -66,28 +66,4 @@ namespace Bolzena.UI
             if (pop > 0) { pop = Mathf.Max(0, pop - Time.unscaledDeltaTime * 4); score.transform.localScale = Vector3.one * (1 + 0.18f * pop); }
         }
     }
-
-    // 판 전투 머리(위 가운데) — 난이도 단계(성장 켬일 때만 — 판의 RunState.Tier > 0). 성장 끔(단계 0)이면 세우지 않는다(지금 화면 그대로).
-    public class TierHud : MonoBehaviour
-    {
-        const int O = 566;
-        public static TierHud Create(Transform parent, int tier)
-        {
-            var root = Make.Node("TierHud", parent);
-            var h = root.gameObject.AddComponent<TierHud>();
-            var (hp, _) = Tiers.Scale(tier);
-            Make.Sliced("bg", root, Res.UI("pill_dark_9s"), Vector3.zero, new Vector2(2.6f, 0.44f), O, new Color(1, 1, 1, 0.88f));
-            var t = Make.Text("t", root, $"난이도 <color=#F2CF7A>{tier}단계</color>  <size=80%>적 ×{hp:0.##}</size>", Vector3.zero, 0.17f, O + 2, Color.white);
-            Make.Outline(t, 0.22f, Tone.Outline);
-            h.Place();
-            return h;
-        }
-        void Place()
-        {
-            float k = Tone.K;
-            transform.localPosition = new Vector3(0, Tone.HalfH - 0.36f * k, 0);
-            transform.localScale = new Vector3(k, k, 1);
-        }
-        void LateUpdate() => Place();
-    }
 }

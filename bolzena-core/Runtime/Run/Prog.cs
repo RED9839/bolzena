@@ -7,6 +7,7 @@ namespace Bolzena.Core
     // ─────────────────────────────────────────────────────────────────────
     // 사도 성장(카제나판 — bolzena-unity/Docs/성장_설계_카제나판.md).
     // 2026-10-21 밤 사용자 최종 결정: 판 밖 성장은 잠재력 하나만 — 10칸(카제나식 — 줄기 01~07 + 갈래 03-1 · 05-1 · 05-2).
+    // 2026-10-22 사용자 「치확 잠재도 만들어 줘」: 사도 공통 갈래 04-1 「치명 숙련」(치명 확률 +3%p × 5) 을 더해 11칸.
     // 레벨 · 진급 · 교주 레벨 · 던전 · 추억 조각은 없앴다. 사도 능력치 = 공개판 기본치 그대로, 잠재력은 그 위에 얹는 덤.
     // 어사이드 · 에고 발현 · 뽑기는 만들지 않는다(교주 보드는 그 전에 없앴다).
     // 표(숫자)는 콘텐츠(content-v2 world/성장/*.json 의 「prog」)에 있다 — 콘텐츠 지문에 들어간다.
@@ -114,7 +115,7 @@ namespace Bolzena.Core
     /// 잠재력 칸 하나. kind:
     ///   start — 모험 시작 때 그 사도의 고유 카드 1장 더(판만, 프론티어는 저장 덱 그대로).
     ///   card — of(basic · neutral · unique) 카드의 피해 · 실드 · 치유 +V × 단계.
-    ///   stat — of(hp · atk · def · role — 역할 주 능력치) +V × 단계(% — 기본치 비율).
+    ///   stat — of(hp · atk · def · role — 역할 주 능력치) +V × 단계(% — 기본치 비율). of crit 은 치명 확률 +V%p × 단계(고정값 — 04-1 「치명 숙련」, 2026-10-22).
     ///   skill — to(카드군 basic · neutral · unique 또는 능력치 증감 dealt · guard · heal · weak · critDmg) +V × 단계(문턱형 V2 는 10-22 없앰).
     ///   stat 의 of hero — (2026-10-20 카제나식 05 · 06 「○○ 숙련」) 사도마다 다른 능력치 — heroes[사도][이 칸].stat 의 열쇠 · 단계당 값 × 단계.
     ///   shin — (05-2 「신 번뜩임 적응」) 그 사도 카드 신탁 후보의 축복 확률 ×(1 + V × 단계).
@@ -233,6 +234,7 @@ namespace Bolzena.Core
                     case "card": Add(card, n.Of, n.V * lvN); break;
                     case "stat":
                         if (n.Of == "hero") { if (t.HeroNode(h.Id, n.Id) is ProgHeroNodeT sn) foreach (var kv in sn.Stat) Put(kv.Key, kv.Value * lvN); }   // 사도마다 다른 능력치(05 · 06)
+                        else if (n.Of == "crit") Add(flat, "crit", n.V * lvN);   // (04-1 「치명 숙련」 — 2026-10-22) 사도 공통 치명 확률 +V%p × 단계
                         else Add(pct, n.Of == "role" ? RoleStat(h.Role) : n.Of, n.V * lvN);
                         break;
                     case "shin": shin += n.V * lvN; break;
@@ -324,7 +326,7 @@ namespace Bolzena.Core
                 {
                     case "start": break;
                     case "card": if (!CARD_KINDS.Contains(n.Of)) e.Add($"{at}: card 의 of 는 basic · neutral · unique"); break;
-                    case "stat": if (n.Of != "role" && n.Of != "hp" && n.Of != "atk" && n.Of != "def" && n.Of != "hero") e.Add($"{at}: stat 의 of 는 hp · atk · def · role · hero"); break;
+                    case "stat": if (n.Of != "role" && n.Of != "hp" && n.Of != "atk" && n.Of != "def" && n.Of != "crit" && n.Of != "hero") e.Add($"{at}: stat 의 of 는 hp · atk · def · crit · role · hero"); break;
                     case "shin": if (n.V <= 0) e.Add($"{at}: shin 의 v 는 0 보다 커야"); break;
                     case "skill":
                         if (n.To.Count == 0 || n.To.Any(x => !CARD_KINDS.Contains(x) && !STAT_KINDS.Contains(x))) e.Add($"{at}: skill 의 to 는 카드군 · 증감({string.Join(" · ", CARD_KINDS.Concat(STAT_KINDS))})");
