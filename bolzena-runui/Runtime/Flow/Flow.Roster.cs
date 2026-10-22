@@ -728,7 +728,7 @@ namespace Bolzena.RunUI
                 Stage.Hot["detail.list"] = gb;
             }
 
-            // 탭 목록 — 능력치 · 카드 · 저장한 덱(도감에서 연 상세만) · 잠재력(성장 켬). 고유 효과 탭은 없앴다 — 고학년 · 고유 효과 · 패시브는 카드 탭 오른쪽 판
+            // 탭 목록 — 능력치 · 잠재력 · 카드 · 저장한 덱(도감에서 연 상세만) 차례(2026-10-22 사용자). 고유 효과 탭은 없앴다 — 고학년 · 고유 효과 · 패시브는 카드 탭 오른쪽 판
             float menuX = Theme.Gutter + listW + 14, tabW = sideW - menuX + 6;   // 고른 탭 알약은 판 안쪽 끝까지
             Action openSaved = null;
             // 저장한 덱(2026-10-19) — 이 사도로 거른 사도 저장함. 판 진행 중(편성 · 지도)에는 없다 — 저장함으로 넘어가면 판 화면이 끊기니까
@@ -743,9 +743,10 @@ namespace Bolzena.RunUI
                     SlotBox(() => Dex(Lobby, () => HeroDetail(k0, keys0, back0, t0, toList0)), coreId);
                 };
             }
-            var tabs = new List<string> { "능력치", "카드" };
-            if (openSaved != null) tabs.Add("저장한 덱");
+            var tabs = new List<string> { "능력치" };
             if (ProgStore.ViewTable != null && d != null) tabs.Add("잠재력");   // 잠재력 — 성장 켬이면 키우고, 꺼짐이면 보기 전용(2026-10-22 — Flow.Prog.cs DetailPotential)
+            tabs.Add("카드");
+            if (openSaved != null) tabs.Add("저장한 덱");
             float tabH = Theme.C(52, 48), tabStep = tabH + Theme.C(10, 6);
             for (int ti = 0; ti < tabs.Count; ti++)
             {
