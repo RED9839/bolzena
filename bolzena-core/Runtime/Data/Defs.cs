@@ -823,6 +823,12 @@ namespace Bolzena.Core
         public bool StunAtZero;
         /// <summary>자기가 치는 수(공격 · 관통 · 연타 · 전체)를 한 뒤 0 으로 — 모았다가 한 방에 쏟는 「급소 노림」(2026-10-07).</summary>
         public bool ClearOnAttack;
+        /// <summary>격파되면 더하는 수(음수면 준다) — M.E.O.W 「출력」 격파 -n(2026-10-24 카제나 쥬다스 · 갈망의 시동식 「스택이 끝나는 자리는 격파」).</summary>
+        public int OnBreak;
+        /// <summary>격파되면 지금 겹의 이 비율을 덜어 낸다(0.5 = 절반, 올림). onBreak 와 함께 쓰면 둘 다 — 덜어 낸 뒤 onBreak.</summary>
+        public double BreakCut;
+        /// <summary>격파된 동안(일어설 때까지) 늘지 않는다 — 더하는 수만 막고 빼는 수는 그대로.</summary>
+        public bool BreakHold;
         public string Desc;
     }
 
@@ -885,6 +891,8 @@ namespace Bolzena.Core
         public Intent Next;
         /// <summary>격파되면 이 수가 끊긴다.</summary>
         public bool Brk;
+        /// <summary>(프론티어 방어 점수) 이 수를 방어 · 실드로 다 받아 내면(파티가 HP 를 하나도 안 잃으면) 그 수에서 막은 피해에 덤(R.FRONTIER_WARD_FULL) — 「냥냥 프레스」(2026-10-24).</summary>
+        public bool Ward;
         /// <summary>그 수와 함께 강인도를 되찾는다.</summary>
         public double Tough;
         /// <summary>buff — 적 전체.</summary>

@@ -334,7 +334,7 @@ namespace Bolzena.Core
         {
             b.Input?.Close(b);   // 입력 테이프 — 끝 지문 · 결과(BattleInput.cs)
             foreach (var id in b.GainedCards) if (!S.Deck.Contains(id) && PowerWhy(id) == null) GainCard(id);
-            foreach (var (cid, n, shin) in b.GainedFlash) { if (GameData.IsCopy(cid)) continue; var cardId = OwnInst(cid); S.Flash[cardId] = n; if (shin != null) S.Shin[cardId] = shin; }
+            foreach (var (cid, n, shin) in b.GainedFlash) { var cardId = OwnInst(cid); S.Flash[cardId] = n; if (shin != null) S.Shin[cardId] = shin; }
             // 제거 태그 — 덱에서 완전히 뺀다(전투가 갈라 낸 한 장 「#n」이면 덱의 맨 id 한 장)
             foreach (var id0 in b.Removed)
             {
@@ -535,7 +535,7 @@ namespace Bolzena.Core
         public bool FlashOk(string cardId, int n)
         {
             var c = Data.Card(cardId);
-            if (c == null || n < 1 || n > c.Oracles.Count || GameData.IsCopy(cardId)) return false;   // 복제본은 복제할 때 모습에 묶인다
+            if (c == null || n < 1 || n > c.Oracles.Count) return false;   // 복제본도 신탁을 받는다(2026-10-24 사용자 — 10-06 「복제본은 묶인다」 뒤집음)
             // IsOnly(IsPower 이거나 「유일」 태그)로 — 옛 IsPower 만 보던 것은 사도 강화 카드만 잡아, 같은 교주 카드 두 장에 power 신탁이 붙어 유일 카드가 두 장이 됐다(2026-10-18 n_apprentice)
             if (!Data.View(cardId, n).IsOnly || Data.View(cardId).IsOnly) return true;
             var k = GameData.NoInst(cardId);
@@ -559,18 +559,18 @@ namespace Bolzena.Core
             return id;
         }
 
-        /// <summary>신탁을 붙일 수 있는 카드 — 가진 고유 · 교주 카드 가운데 신탁 다섯이 있고 아직 안 붙은 것(복제본 · 금기 빼고).</summary>
+        /// <summary>신탁을 붙일 수 있는 카드 — 가진 고유 · 교주 카드(복제본 포함 — 2026-10-24) 가운데 신탁 다섯이 있고 아직 안 붙은 것(금기 빼고).</summary>
         public List<string> FlashTargets() => S.Deck.Distinct().Where(id =>
         {
             var c = Data.Card(id);
-            return c != null && !GameData.IsCopy(id) && (c.Unique || c.Neutral) && c.Oracles.Count == 5 && !S.Flash.ContainsKey(id) && !Data.View(id).IsTaboo;
+            return c != null && (c.Unique || c.Neutral) && c.Oracles.Count == 5 && !S.Flash.ContainsKey(id) && !Data.View(id).IsTaboo;
         }).ToList();
 
-        /// <summary>휴식 수련(강화) 후보 — 신탁 다섯이 있는 고유 · 교주 카드 전부(복제본 · 금기 빼고). 이미 신탁 · 축복이 붙은 카드도 골라 신탁을 다시 뽑는다(2026-10-12 사용자 「휴식에서는 기존 신탁 · 축복 카드도 리롤」).</summary>
+        /// <summary>휴식 수련(강화) 후보 — 신탁 다섯이 있는 고유 · 교주 카드 전부(복제본 포함 — 2026-10-24 · 금기 빼고). 이미 신탁 · 축복이 붙은 카드도 골라 신탁을 다시 뽑는다(2026-10-12 사용자 「휴식에서는 기존 신탁 · 축복 카드도 리롤」).</summary>
         public List<string> CampTargets() => S.Deck.Distinct().Where(id =>
         {
             var c = Data.Card(id);
-            return c != null && !GameData.IsCopy(id) && (c.Unique || c.Neutral) && c.Oracles.Count == 5 && !Data.View(id).IsTaboo;
+            return c != null && (c.Unique || c.Neutral) && c.Oracles.Count == 5 && !Data.View(id).IsTaboo;
         }).ToList();
 
         /// <summary>이 카드에 쓸모 있는 축복 — 그 카드만의 축복이 있으면 그것들, 없으면 공용 풀에서 쓸모 있는 것.</summary>
@@ -943,8 +943,8 @@ namespace Bolzena.Core
         }
 
         /// <summary>
-        /// 복제본을 덱에 — 복제한 순간 원본의 신탁 · 축복을 베낀 따로 된 카드(id + ^). 그 뒤로 복제본은 그 모습에 묶인다(2026-10-06 사용자):
-        /// 원본이 나중에 신탁 · 축복을 받아도 복제본은 그대로, 복제본은 신탁 · 축복을 받지 못한다(FlashTargets · ShinAble · FlashOk 가 뺀다).
+        /// 복제본을 덱에 — 복제한 순간 원본의 신탁 · 축복을 베낀 따로 된 카드(id + ^). 원본이 나중에 신탁 · 축복을 받아도 복제본은 따라가지 않는다.
+        /// 복제본도 그 뒤 원본처럼 신탁 · 축복을 받는다(2026-10-24 사용자 — 2026-10-06 「복제본은 신탁 · 축복을 받지 못한다」 뒤집음).
         /// 이미 덱에 같은 모습의 복제본이 있으면 같은 id 로 한 장 더, 모습이 다르면 꼬리를 늘린 새 id(x^^ …)로.
         /// </summary>
         public string AddCopy(string id)

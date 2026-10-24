@@ -7,7 +7,7 @@ namespace Bolzena.Core.Tests
     /// <summary>
     /// 처치 일격의 강인도 · 격파하며 처치(사용자 2026-10-07) — 피해 → 강인도 → 격파 판정 → 죽음.
     /// 처치 일격도 그 카드의 강인도 피해를 넣고, 그때 강인도가 0 이 되면 격파와 같은 AP +1(적마다). 근면과는 따로 받는다.
-    /// 격파 · 기절로 쉬는 적은 쌓이는 수치의 「즉시」 수 · 치는 패시브로도 움직이지 못한다(배포판 버그 — 격파된 불효자손이 심통으로 내리찍었다).
+    /// 기절로 쉬는 적은 쌓이는 수치의 「즉시」 수 · 치는 패시브로도 움직이지 못한다. 격파된 적은 움직인다(2026-10-24 — 10-07 「격파된 불효자손이 심통으로 내리찍었다」 는 이제 맞는 동작).
     /// </summary>
     public class BreakKillTests
     {
@@ -97,28 +97,41 @@ namespace Bolzena.Core.Tests
             Assert.IsTrue(p[0].Kill); Assert.IsTrue(p[0].Brk); Assert.AreEqual(1, p[0].Tough, 1e-9);
         }
 
-        [Test] public void 격파된_적은_쌓이는_수치의_즉시_수를_다음_차례로_미루고_이번_차례는_쉰다()
+        [Test] public void 격파된_적도_쌓이는_수치의_즉시_수를_바로_하고_기절이면_다음_차례로_미룬다()
         {
+            // 2026-10-24 — 격파는 행동을 막지 않는다(카제나처럼). 멈추는 것은 기절(Sealed)뿐
             var b = F(new[] { "grump" }); K.Hand(b, "h_brk", "h_skill", "h_skill");
             int hp = b.Pool.Hp;
             K.Play(b, "h_brk");
-            Assert.IsTrue(K.E(b).Broken); Assert.IsTrue(K.E(b).Sealed);
+            Assert.IsTrue(K.E(b).Broken); Assert.IsFalse(K.E(b).Sealed, "격파는 기절이 아니다");
             K.Play(b, "h_skill"); K.Play(b, "h_skill");
-            Assert.AreEqual(hp, b.Pool.Hp, "격파 중엔 심통 2 가 차도 지금 내리찍지 못한다");
-            b.EndTurn();
-            Assert.AreEqual(hp, b.Pool.Hp, "격파된 적은 그 차례를 쉰다");
-            Assert.AreEqual("쾅", K.E(b).Intent?.Say, "미룬 수가 다음 예고로");
-            b.EndTurn();
-            Assert.Less(b.Pool.Hp, hp, "그다음 차례에 친다");
+            Assert.Less(b.Pool.Hp, hp, "격파 중에도 심통 2 가 차면 바로 내리찍는다");
+
+            var s = F(new[] { "grump" }); K.Hand(s, "h_skill", "h_skill");
+            K.E(s).Sealed = true;   // 기절
+            int hp2 = s.Pool.Hp;
+            K.Play(s, "h_skill"); K.Play(s, "h_skill");
+            Assert.AreEqual(hp2, s.Pool.Hp, "기절 중엔 지금 내리찍지 못한다");
+            s.EndTurn();
+            Assert.AreEqual(hp2, s.Pool.Hp, "기절한 적은 그 차례를 쉰다");
+            Assert.AreEqual("쾅", K.E(s).Intent?.Say, "미룬 수가 다음 예고로");
+            s.EndTurn();
+            Assert.Less(s.Pool.Hp, hp2, "그다음 차례에 친다");
         }
 
-        [Test] public void 격파된_적은_카드에_치는_패시브도_못_한다()
+        [Test] public void 격파된_적도_카드에_치는_패시브를_하고_기절이면_못_한다()
         {
-            var b = F(new[] { "avenger" }); K.Hand(b, "h_brk", "h_skill");
-            K.Play(b, "h_brk");
+            var b = F(new[] { "avenger" }); K.Hand(b, "h_brk");
             int hp = b.Pool.Hp;
-            K.Play(b, "h_skill");
-            Assert.AreEqual(hp, b.Pool.Hp, "격파 중엔 앙갚음이 돌지 않는다");
+            K.Play(b, "h_brk");
+            Assert.IsTrue(K.E(b).Broken);
+            Assert.Less(b.Pool.Hp, hp, "격파한 그 카드에도 앙갚음이 돈다(격파된 적도 반응한다)");
+
+            var s = F(new[] { "avenger" }); K.Hand(s, "h_skill");
+            K.E(s).Sealed = true;
+            int hp2 = s.Pool.Hp;
+            K.Play(s, "h_skill");
+            Assert.AreEqual(hp2, s.Pool.Hp, "기절 중엔 앙갚음이 돌지 않는다");
         }
     }
 }

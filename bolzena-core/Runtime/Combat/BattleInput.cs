@@ -203,7 +203,7 @@ namespace Bolzena.Core
             foreach (var e in Enemies)
             {
                 UnitHash(h, e);
-                h.D(e.Tough); h.D(e.ToughMax); h.B(e.Broken); h.B(e.Sealed); h.I(e.Step); h.I(e.RushCnt); h.I(e.UltAt); h.I(e.ReviveIn);
+                h.D(e.Tough); h.D(e.ToughMax); h.B(e.Broken); h.B(e.BreakWait); h.B(e.Sealed); h.I(e.Step); h.I(e.RushCnt); h.I(e.UltAt); h.I(e.ReviveIn);
                 if (e.Intent != null) { h.S(e.Intent.T); h.I(e.Intent.V); h.I(e.Intent.N); h.S(e.Intent.Id); } else h.S(null);
                 h.L(e.Seized);
             }

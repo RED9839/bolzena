@@ -502,7 +502,7 @@ namespace Bolzena.RunUI
             bool can = have && svP != null && ((bool?)svP["ok"] ?? false) && plv < pn.Max;
             string pid = pn.Id;
             string label = can ? (plv == 0 ? "칸 열기" : "단계 올리기")
-                : plv >= pn.Max ? "최대 단계" : ProgStore.BestTier < pn.Tier ? $"난이도 단계 {pn.Tier} 을 완주하면 열린다" : !growOn ? "성장이 열리면 키울 수 있다" : !have ? (Online.Ready ? "계정 성장을 불러오는 중…" : "로그인하면 키울 수 있다") : svP?["why"]?.Type == JTokenType.String ? (string)svP["why"] : "열 수 없다";
+                : plv >= pn.Max ? "최대 단계" : ProgStore.BestTier < pn.Tier ? $"난이도 단계 {Ko.J(pn.Tier.ToString(), "을를")} 완주하면 열린다" : !growOn ? "성장이 열리면 키울 수 있다" : !have ? (Online.Ready ? "계정 성장을 불러오는 중…" : "로그인하면 키울 수 있다") : svP?["why"]?.Type == JTokenType.String ? (string)svP["why"] : "열 수 없다";
             var up = Btn.Make(body, null, BtnStyle.PillGold, () => ProgStore.Potential(d.Id, pid, r =>
             {
                 if (r != null && r.Ok) Toast.Show($"{h.ko} 잠재력 {pid} — 단계 {r.Json["lv"]?[1]}");

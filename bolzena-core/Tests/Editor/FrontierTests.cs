@@ -246,7 +246,8 @@ namespace Bolzena.Core.Tests
             var b = Frontier.Start(d, slots, season, 5);
             Play(d, b, season);
             Assert.AreEqual("win", Frontier.Over(b, season));
-            Assert.AreEqual(b.Enemies[0].MaxHp, Frontier.Score(b), "넘친 피해는 빼고 · 남은 턴 덤 없음");
+            Assert.AreEqual(b.Enemies[0].MaxHp, Frontier.Dealt(b), "넘친 피해는 빼고 · 남은 턴 덤 없음");
+            Assert.AreEqual(Frontier.Dealt(b) + Frontier.Ward(b), Frontier.Score(b), "점수 = 피해 + 방어(2026-10-24)");
             Assert.IsTrue(Frontier.Verify(d, FrontierTape.Parse(Frontier.Tape(b, season, slots).Json()), season, slots).Ok);
         }
 

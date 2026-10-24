@@ -22,7 +22,7 @@ export default hero({
   passives: [{ name: '신성한 품 속', when: { on: 'crit', who: 'any' }, fx: [{ k: 'spend', id: '은총', v: 1 }, grow(1)] },   // 10-11: 아군 · 자신의 치명마다 은총 −1(사용자) · 새싹 +1 — 자동 규칙 2개 한도라 한 규칙에 합침
     { name: '이른 봄의 기운', when: { on: 'lowHp', pct: 0.2 }, fx: [status('끈기', 1)] },   // 원작 3성 하위 — 파티 HP 20% 이하가 되면 끈기 1(전투당 한 번 · 10-21 밸런스 조절: 30 → 20%)
   ],
-  ult: { name: '모든 이를 굽어살피리', cost: 250, fx: [dmg(2.8, 'allEnemies'), { k: 'critDmg', v: 0.4, turns: 3, id: '신성', off: [status('취약', 1, { target: 'allEnemies' })] }, grow(1, { n: 0 })] },   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로
+  ult: { name: '모든 이를 굽어살피리', cost: 250, fx: [dmg(3.4, 'allEnemies'), { k: 'critDmg', v: 0.4, turns: 3, id: '신성', off: [status('취약', 1, { target: 'allEnemies' })] }, grow(1, { n: 0 })] },   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로
 }, {
   basicNames: ['빛구슬', '영롱한 빛구슬', '녹발의 베일'], deck: 'heavy',
   uniques: [
@@ -40,7 +40,7 @@ export default hero({
     },
     {
       name: '셋의 몫', cost: 2, type: '공격', tags: KEEP,   // 4차 2코 — 이드 천상을 깨운다
-      fx: [dmg(2.8), ifSt(3), team(0.2), stack('은총', 2)],   // 10-21 밸런스 조절: 240 → 280%(신탁도)
+      fx: [dmg(3.8), ifSt(3), team(0.2), stack('은총', 2)],   // 10-21 밸런스 조절: 240 → 280%(신탁도)
       oracles: [
         { tags: KEEP, fx: [dmg(2.8), ifSt(3), team(0.3)] },
         { tags: KEEP, fx: [stack('은총', 2), dmg(2.8), { k: 'perCardSt', id: K }, dmg(0.6)] },   // 10-13 신탁 점검: 은총 되살림
@@ -64,7 +64,7 @@ export default hero({
     },
     { // 마무리 — 새싹 3: 아군 끈기 1(쓰러짐 1번 무효 — 딜러 예외, D2)
       name: '영원한 포옹', cost: 2, type: '공격', tags: KEEP,
-      fx: [dmg(1.3, 'allEnemies'), ifSt(3), status('끈기', 1), stack('은총', 2)],
+      fx: [dmg(1.9, 'allEnemies'), ifSt(3), status('끈기', 1), stack('은총', 2)],
       oracles: [
         { power: true, fx: [stack('은총', 2), team(0.3), power([rule({ on: 'play', cardSt: K }, [status('끈기', 1)])])] },   // 10-13 신탁 점검: 은총 2 · 30%
         { tags: KEEP, fx: [dmg(1.3, 'allEnemies'), ifSt(3), team(0.3)] },
@@ -76,7 +76,7 @@ export default hero({
     },
     { // 4차 8장 — 굴리기(원작 저학년 「작은 뜻」 의 공격 쪽): 묵힌 새싹이 3 이면 다음 동료 카드 치명
       name: '녹발의 기도', cost: 1, type: '공격', tags: KEEP,
-      fx: [dmg(0.8, 'randomEnemy', { hits: 2 }), ifSt(3), crit()],   // 10-19 타수(사용자 「카드 최대 2타」): 무작위 3회 × 50% → 2회 × 80%(한 대 ×1.5 = 75% 를 10% 단위로 올림 — 합 150 → 160% · 신탁도 ×1.5)
+      fx: [dmg(1.2, 'randomEnemy', { hits: 2 }), ifSt(3), crit()],   // 10-19 타수(사용자 「카드 최대 2타」): 무작위 3회 × 50% → 2회 × 80%(한 대 ×1.5 = 75% 를 10% 단위로 올림 — 합 150 → 160% · 신탁도 ×1.5)
       oracles: [
         { tags: KEEP, fx: [dmg(0.9, 'randomEnemy', { hits: 2 }), ifSt(3), crit()] },
         { tags: KEEP, fx: [dmg(0.8, 'randomEnemy', { hits: 2 }), ifSt(3), team(0.2)] },

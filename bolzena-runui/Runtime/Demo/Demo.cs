@@ -512,6 +512,7 @@ namespace Bolzena.RunUI
 
         // 카드 표식(-demo-marks) — 신탁 · 축복 · 복제가 섞인 덱을 만들어 덱 보기 · 카드 크게 · 보스 뒤 복제 창을 찍는다
         //   첫 사도: 신탁 + 축복 → 복제 · 둘째: 축복만 + 맨 복제 · 셋째: 신탁만 → 복제 뒤 원본 신탁을 바꿈(복제본은 그대로)
+        //   (2026-10-24 복제본도 신탁) 둘째의 맨 복제본으로 휴식 수련 · 이벤트 신탁 창을 찍는다
         IEnumerator Marks_()
         {
             yield return Wait(0.5f);
@@ -526,7 +527,7 @@ namespace Bolzena.RunUI
             yield return Press("party.go");
             yield return Screen_("map", 1.0f);
             var run = f.P.Run; var S = f.P.S; var d = f.P.Data;
-            string full = null, fullCopy = null, third = null, thirdCopy = null;
+            string full = null, fullCopy = null, third = null, thirdCopy = null, bareCopy = null;
             for (int i = 0; i < S.Party.Count && i < 3; i++)
             {
                 var u = d.UniquesOf(S.Party[i]).Where(id => d.Card(id).Oracles.Count == 5 && !run.ViewOf(id).IsOnly && !run.ViewOf(id).IsTaboo).ToList();
@@ -534,14 +535,15 @@ namespace Bolzena.RunUI
                 foreach (var id in u) S.Deck.Add(id);   // 고유 카드 전부(덱 30장 넘게 — 칸 크기 · 스크롤 확인)
                 string Bless(string id) { var c = d.Card(id); if (c.Blesses.Count > 0) return "own"; var ks = Core.Run.DivineKindsFor(run.ViewOf(id)); return ks.Count > 0 ? ks[0] : "draw"; }
                 if (i == 0) { S.Flash[u[0]] = 2; S.Shin[u[0]] = Bless(u[0]); full = u[0]; fullCopy = run.AddCopy(u[0]); S.Flash[u[1]] = 4; }
-                if (i == 1) { S.Shin[u[0]] = Bless(u[0]); run.AddCopy(u[1]); }
+                if (i == 1) { S.Shin[u[0]] = Bless(u[0]); bareCopy = run.AddCopy(u[1]); }
                 if (i == 2) { S.Flash[u[0]] = 1; third = u[0]; thirdCopy = run.AddCopy(u[0]); S.Flash[u[0]] = 3; }
             }
             S.Deck.AddRange(S.Deck.Where(run.IsBasic).Take(8).ToList());   // 같은 기본 카드가 여러 장 — 한 장마다 한 칸
             Expect(S.Deck.Count >= 30, $"덱 {S.Deck.Count}장");
             Expect(fullCopy != null && run.MarkOf(fullCopy).Copy && run.MarkOf(fullCopy).Oracle != null && run.MarkOf(fullCopy).Blessed, $"복제본이 신탁 · 축복을 베꼈다 — {fullCopy}");
             if (third != null) Expect(run.MarkOf(thirdCopy).Oracle != run.MarkOf(third).Oracle, "원본 신탁을 바꿔도 복제본은 그대로");
-            Expect(!run.FlashTargets().Any(Core.GameData.IsCopy) && !run.ShinAble(null).Any(Core.GameData.IsCopy), "복제본은 신탁 · 축복 후보가 아니다");
+            if (bareCopy != null) Expect(run.FlashTargets().Contains(bareCopy) && run.CampTargets().Contains(bareCopy) && run.ShinAble("power").Contains(bareCopy), $"복제본도 신탁 · 축복 후보 — {bareCopy}");
+            if (fullCopy != null) Expect(!run.FlashTargets().Contains(fullCopy) && run.CampTargets().Contains(fullCopy), "신탁이 붙은 복제본은 신탁 후보에선 빠지고 휴식 리롤엔 든다");
             f.DeckView();
             yield return Wait(1.6f);
             yield return Shot("marks_deck");
@@ -562,7 +564,7 @@ namespace Bolzena.RunUI
             // 보스 뒤 복제 — 1층 보스 칸에서 보상을 다 챙긴 뒤(AfterReward)
             S.Floor = 0; S.Node = 3; S.CopyOffer = null;
             var offer = run.BossCopyOffer();
-            Expect(offer.Count == Mathf.Min(3, offer.Count) && offer.Count > 0 && offer.All(id => d.Card(id).Unique && !Core.GameData.IsCopy(id)), $"보스 복제 후보 {offer.Count}장 — {string.Join(", ", offer)}");
+            Expect(offer.Count > 0 && offer.All(id => d.Card(id).Unique && !Core.GameData.IsCopy(id)), $"보스 복제 후보 {offer.Count}장 — {string.Join(", ", offer)}");
             int before = S.Deck.Count;
             f.AfterReward();
             yield return Screen_("bosscopy", 1.4f);
@@ -571,6 +573,58 @@ namespace Bolzena.RunUI
             yield return Shot("marks_bosscopy_pick");
             yield return Press("copy.go", 1.0f);
             Expect(S.Deck.Count == before + 1 && S.Deck.Any(Core.GameData.IsCopy), "복제본이 한 장 더");
+            // 복제본도 신탁(2026-10-24) — 휴식 수련에서 맨 복제본을 골라 신탁을 붙이고 · 이벤트 신탁 창에 복제본이 나오는지
+            if (bareCopy != null)
+            {
+                CloseModals();
+                f.Camp("camp");
+                yield return Screen_("camp", 1.0f);
+                yield return Press("camp.trainopen", 0.1f);
+                yield return Wait(0.8f);
+                yield return Shot("marks_train_pick");
+                int ci = CardOrder.Groups(run.CampTargets(), d, S.Party).SelectMany(g => g.Ids).ToList().IndexOf(bareCopy);
+                Expect(ci >= 0, "휴식 수련 후보에 복제본");
+                if (ci >= 0)
+                {
+                    yield return Press("camp.card" + ci, 0.1f);
+                    yield return Until(() => OracleReveal.Phase == "choose", 6); yield return Wait(0.5f);
+                    Expect(S.Camp?.Train?.CardId == bareCopy, $"복제본의 신탁 셋 — {S.Camp?.Train?.CardId}");
+                    yield return Shot("marks_train_copy");
+                    yield return Press("camp.train0", 0.05f);
+                    yield return Until(() => !OracleReveal.IsOpen, 8); yield return Wait(0.6f);
+                    Expect(S.Flash.ContainsKey(bareCopy), $"복제본에 신탁이 붙었다 — {bareCopy}");
+                    Expect(!run.FlashTargets().Contains(bareCopy) && run.CampTargets().Contains(bareCopy), "신탁 붙은 복제본 — 신탁 후보에선 빠지고 휴식 리롤엔 든다");
+                    f.CardZoom(bareCopy);
+                    yield return Wait(1.0f);
+                    yield return Shot("marks_zoom_copy_oracle");
+                    CloseModals();
+                    f.DeckView();
+                    yield return Wait(1.6f);
+                    yield return Shot("marks_deck_copy_oracle");
+                    CloseModals();
+                }
+                // 이벤트 신탁 — 남은 신탁 후보에 다 신탁을 붙여 둘째 사도의 새 복제본 하나만 남긴다
+                var evCopy = run.AddCopy(d.UniquesOf(S.Party[1]).FirstOrDefault(x => S.Deck.Contains(x) && !S.Flash.ContainsKey(x) && !S.Shin.ContainsKey(x) && !run.ViewOf(x).IsOnly && !run.ViewOf(x).IsTaboo && d.Card(x).Oracles.Count == 5) ?? bareCopy);
+                foreach (var id in run.FlashTargets().Where(x => x != evCopy).ToList()) { int k = Enumerable.Range(1, 5).FirstOrDefault(n => run.FlashOk(id, n)); if (k > 0) S.Flash[id] = k; }
+                bool Fl(Core.EventOption o) => o.Hero == null && o.Race == null && o.Flag == null && o.NoFlag == null && o.When == null && o.Fight == null && o.Gamble == null && o.Judge == null && (o.Out ?? new List<Core.Outcome>()).Any(x => x.K == "flash" && !x.Swap);
+                var fev = d.Events.OrderBy(e => e.Id, System.StringComparer.Ordinal).FirstOrDefault(e => e.Options.Any(Fl));
+                Expect(run.FlashTargets().Count == 1 && run.FlashTargets()[0] == evCopy && fev != null, $"이벤트 신탁 후보 = 복제본 하나 — {string.Join(",", run.FlashTargets())} · 이벤트 {fev?.Id}");
+                if (fev != null)
+                {
+                    OpenEvent(fev.Id);
+                    yield return Screen_("event", 2.0f);
+                    int oi = f.P.Options(fev).FindIndex(o => Fl(o) && f.P.LockOf(o) == null);
+                    if (oi >= 0)
+                    {
+                        yield return Press("event.opt" + oi, 0.5f);
+                        yield return Press("event.ok", 2.0f);
+                        yield return Until(() => OracleReveal.Phase == "choose", 8); yield return Wait(0.6f);
+                        Expect(S.Event?.Pending.FirstOrDefault()?.Offer?.CardId == evCopy, $"이벤트 신탁 창에 복제본 — {S.Event?.Pending.FirstOrDefault()?.Offer?.CardId}");
+                        yield return Shot("marks_event_copy");
+                    }
+                    else Expect(false, $"이벤트 {fev.Id} 신탁 선택지가 잠겼다");
+                }
+            }
             Debug.Log($"[Demo] 표식 단언 실패 {fails}");
             Debug.Log("[Demo] 끝");
             yield return Wait(0.3f);

@@ -71,6 +71,8 @@ namespace Bolzena.Core
         public double Dmgx = 1;
         public double Tough, ToughMax;
         public bool Broken, Sealed, Phased, Phased2;
+        /// <summary>격파된 뒤 아직 제 적 차례 자리를 안 지났다 — 지나야 다음 내 턴 시작에 일어선다(강인도 회복 시점, 2026-10-08 그대로). 행동은 막지 않는다(2026-10-24).</summary>
+        public bool BreakWait;
         public int StunGuard;
         public int RushCnt;
         public bool RushedTurn;
@@ -107,6 +109,11 @@ namespace Bolzena.Core
         /// 프론티어 점수(Frontier.Score)가 읽는다. 판 규칙에는 안 쓴다(턴 지문에도 안 든다).
         /// </summary>
         public int Lost;
+        /// <summary>
+        /// 적 — 파티가 방어 · 실드로 막은 이 적의 피해 합(지속 · 고정 피해 빼고) · 그 가운데 ward 수(냥냥 프레스)를 다 받아 낸 몫.
+        /// 프론티어 방어 점수(Frontier.Ward)가 읽는다. 판 규칙에는 안 쓴다(턴 지문에도 안 든다 — 2026-10-24).
+        /// </summary>
+        public int Warded, WardFull;
         /// <summary>상태 겹마다 건 쪽 — 상태 id → 건 쪽(hero:키 · enemy:Idx · gear:키 · neutral · event) → 겹. 화면은 Battle.StatusViews 로 읽는다.</summary>
         public Dictionary<string, Dictionary<string, int>> Src = new();
 

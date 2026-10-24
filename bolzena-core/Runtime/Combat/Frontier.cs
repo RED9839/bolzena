@@ -24,7 +24,8 @@ namespace Bolzena.Core
     /// 씨앗은 받기만 한다(시도마다 서버가 무작위로 — 문서 결정 6 추천). 보스는 성격 상성 없음(BattleSetup.NoNature) — 카드 효과로 붙는 약점(약점 노출 · 「약점」 태그 · 표식 · 「성격 약점」 상태)은 그대로 통한다.
     /// 신탁 · 은총은 뜨지 않는다(덱 고정 — 결정 8 추천) · 고학년 게이지 0 · 교주 보드 없음 · 이벤트 덤 없음 · 파티 HP 는 슬롯 사도 몫(HP + 장비 HP) 합으로 가득.
     /// 끝: 보스(첫 적)가 쓰러짐(win) · 파티가 쓰러짐(lose) · 턴 제한(time — 엔진 밖에서 정한다, Battle.Over 는 null 그대로).
-    /// 점수: 보스가 실제로 잃은 HP 합(Unit.Lost — 방어 · 실드가 막은 몫 · 넘친 피해 빼고, 주인 모를 피해 · 지속 피해 · 반사 포함). 보스를 쓰러뜨리면 그때까지 잃은 HP(= 최대 HP)로 끝 — 남은 턴 덤 없음(결정 9 추천 그대로).
+    /// 점수: 피해 + 방어(2026-10-24). 피해 = 보스가 실제로 잃은 HP 합(Unit.Lost — 방어 · 실드가 막은 몫 · 넘친 피해 빼고, 주인 모를 피해 · 지속 피해 · 반사 포함). 보스를 쓰러뜨리면 그때까지 잃은 HP(= 최대 HP)로 끝 — 남은 턴 덤 없음(결정 9 추천 그대로).
+    /// 방어 = 파티가 막은 보스 피해 × R.FRONTIER_WARD% + 냥냥 프레스(ward 수)를 다 받아 낸 몫 × R.FRONTIER_WARD_FULL%(Ward).
     /// </summary>
     public static class Frontier
     {
@@ -32,6 +33,9 @@ namespace Bolzena.Core
         public static readonly FrontierSeason PRESEASON = new FrontierSeason { Id = "preseason", Boss = "frontier_meow", Turns = 10 };
         public const int PARTY_MAX = 3;
         public const string TIME = "time";
+
+        /// <summary>시즌 보스의 실제 피해 배율 = 시즌 배율 × 판 전체 적 피해 배율 R.ENEMY_DMG(2026-10-24 격파 개정 보정 — 프론티어도 같이 든다). 전투 셋업 · 입구 패턴 숫자가 같이 쓴다.</summary>
+        public static double FoeDmg(FrontierSeason season) => (season?.Dmg ?? 1) * R.ENEMY_DMG;
 
         /// <summary>
         /// 그 슬롯들로 프론티어를 열 수 없는 까닭(열 수 있으면 null) — 1~3명 · 같은 사도 둘 금지 · 슬롯마다 규칙 검사 · 시즌 보스가 데이터에 있음 · 슬롯끼리 같은 카드 id 에 다른 신탁 · 축복 · 카드 값이 없음.
@@ -96,7 +100,7 @@ namespace Bolzena.Core
             var st = new BattleSetup
             {
                 Party = slots.Select(s => s.Hero).ToList(), Enemies = new List<string> { season.Boss }, Seed = seed,
-                NoNature = true, EnemyHp = season.Hp, EnemyDmg = season.Dmg, Floor = 2,
+                NoNature = true, EnemyHp = season.Hp, EnemyDmg = FoeDmg(season), Floor = 2,
             };
             PutSlots(d, st, slots, prog);
             return st;
@@ -150,8 +154,22 @@ namespace Bolzena.Core
         /// <summary>남은 턴(지금 턴 포함) — 화면 표시.</summary>
         public static int TurnsLeft(Battle b, FrontierSeason season) => Math.Max(0, season.Turns - b.Turn + 1);
 
-        /// <summary>점수 — 보스(첫 적)가 이 전투에서 실제로 잃은 HP 합. 소환물이 잃은 HP 는 세지 않는다.</summary>
-        public static int Score(Battle b) => b.Enemies.Count > 0 ? b.Enemies[0].Lost : 0;
+        /// <summary>점수 = 피해(Dealt) + 방어(Ward) — 2026-10-24 M.E.O.W 개정. 랭킹 · 테이프 · 검증은 이 합.</summary>
+        public static int Score(Battle b) => Dealt(b) + Ward(b);
+
+        /// <summary>피해 점수 — 보스(첫 적)가 이 전투에서 실제로 잃은 HP 합. 소환물이 잃은 HP 는 세지 않는다.</summary>
+        public static int Dealt(Battle b) => b.Enemies.Count > 0 ? b.Enemies[0].Lost : 0;
+
+        /// <summary>
+        /// 방어 점수 — 파티가 방어 · 실드로 막은 보스(첫 적) 피해 × R.FRONTIER_WARD% + ward 수(냥냥 프레스)를 다 받아 낸 몫 × R.FRONTIER_WARD_FULL%(정수, 내림).
+        /// 드론 · 소환물의 피해는 세지 않는다(점수는 보스만 — 피해 점수와 같은 자리).
+        /// </summary>
+        public static int Ward(Battle b)
+        {
+            if (b.Enemies.Count == 0) return 0;
+            var e = b.Enemies[0];
+            return (int)(((long)e.Warded * R.FRONTIER_WARD + (long)e.WardFull * R.FRONTIER_WARD_FULL) / 100);
+        }
 
         /// <summary>끝난 전투의 기록(서버에 낼 것) — 입력 테이프를 닫고 시즌 · 씨앗 · 슬롯 지문 · 점수 · 끝을 함께.</summary>
         public static FrontierTape Tape(Battle b, FrontierSeason season, IList<HeroSlot> slots)

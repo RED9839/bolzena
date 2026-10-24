@@ -700,7 +700,7 @@ namespace Bolzena.Demo
         }
 
         // -breakkillshots: ① 격파하며 처치 — 강인도 칸이 깎여 0 · 「격파!」 · AP +1 이 쓰러지기 전에 보이는지(0.1초마다 bk_kill_NN)
-        //   ② 격파한 적이 그 차례를 쉬는지 — 불효자손(-foes …magicfork)이면 격파 뒤 스킬을 내 심통을 채워도 못 움직이고, 적 차례에도 쉰다(bk_foeturn_NN) · 정보 창
+        //   ② 격파한 적도 행동하는지(2026-10-24) — 불효자손(-foes …magicfork)이면 격파 뒤 스킬을 내 심통을 채우면 바로 내리찍고, 적 차례에도 행동한다(bk_foeturn_NN) · 정보 창 · 쪽지 · 칩
         IEnumerator BreakKillShots()
         {
             var cb = d.Battle as CoreBattle;
@@ -732,7 +732,7 @@ namespace Bolzena.Demo
                 yield return Tap(pb, B);
                 yield return Wait(0.9f);
                 Shot("bk_broken", 0);
-                // 공격이 아닌 카드 — 불효자손 심통(4 면 즉시 내리찍기)을 채운다. 격파 중이면 다음 차례로 미뤄져야 한다
+                // 공격이 아닌 카드 — 불효자손 심통(4 면 즉시 내리찍기)을 채운다. 격파 중에도 바로 내리찍어야 한다(2026-10-24)
                 for (int k = 0; k < 5 && !d.Over; k++)
                 {
                     yield return WaitInput();

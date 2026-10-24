@@ -82,7 +82,7 @@ namespace Bolzena.Battle
         public string CostUpWhy;         // 비용이 오른 까닭(풀이용)
         public bool X;                   // X 코스트 카드(2026-10-13 이드 「나타로 들이받기」) — 비용 자리에 「X」
         public bool CostDown;            // 신탁으로 비용이 내려간 카드(비용 숫자 연두)
-        public bool Copy;                // 복제본(core CardMark.Copy) — 오른쪽 위 복제 표 「복제 — 신탁 · 축복 불가」
+        public bool Copy;                // 복제본(core CardMark.Copy) — 오른쪽 위 복제 표 「복제 — 원본과 따로」
         public List<string> Choices;     // 두 갈래 카드 — 갈래 이름 둘(낼 때 고른다). 없으면 null
         /// <summary>카드 값(리뉴아 「시간」 · 비비(신성) 「새싹」 · 티그 「성장」) — 윗변 배지. 이름 없으면 배지 없음. Ready = 준비 글(「정각」 · 「만개」 · 「준비」) 또는 null.</summary>
         public string ValName, ValReady; public int Val, ValMax;
@@ -162,7 +162,7 @@ namespace Bolzena.Battle
         public bool Boss;
         public int Hp, MaxHp, Block;
         public float ToughV, ToughMaxV;  // 강인도 그대로(1/3 · 1/6 칸도 — core ToughView.Left · Max). ToughMaxV 0 = 강인도 없음(격파 안 됨)
-        public bool Resting;             // 다음 차례를 쉰다(core ToughView.Resting)
+        public bool Resting;             // 기절로 다음 차례를 쉰다(core ToughView.Resting = Sealed — 격파는 쉬지 않는다, 2026-10-24)
         public bool Broken, Sealed;
         public bool Dead;
         public IntentKind Intent;

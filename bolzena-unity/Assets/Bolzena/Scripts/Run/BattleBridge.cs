@@ -71,6 +71,7 @@ namespace Bolzena
                 {
                     res.Over = Bolzena.Core.Frontier.Over(fb, p.Frontier);
                     res.Score = Bolzena.Core.Frontier.Score(fb);
+                    res.Dealt = Bolzena.Core.Frontier.Dealt(fb); res.Ward = Bolzena.Core.Frontier.Ward(fb);
                     res.Played = Math.Min(fb.Turn, p.Frontier.Turns);
                     if (p.Lab && fb.HpMeter != null)
                     {
@@ -87,7 +88,7 @@ namespace Bolzena
                 }
             }
             catch (Exception e) { Debug.LogException(e); res.Error = "기록을 닫지 못했습니다 — " + e.Message; res.Tape = null; }
-            Debug.Log($"[Bridge] 프론티어 끝 — {res.Over ?? "-"} · {res.Played}턴 · 점수 {res.Score} · 테이프 {(res.Tape != null ? $"{res.Tape.Length / 1024f:0.0}KB" : "없음")}");
+            Debug.Log($"[Bridge] 프론티어 끝 — {res.Over ?? "-"} · {res.Played}턴 · 점수 {res.Score}(피해 {res.Dealt} + 방어 {res.Ward}) · 테이프 {(res.Tape != null ? $"{res.Tape.Length / 1024f:0.0}KB" : "없음")}");
             void Loaded(Scene s, LoadSceneMode m)
             {
                 SceneManager.sceneLoaded -= Loaded;

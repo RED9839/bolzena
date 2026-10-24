@@ -353,11 +353,11 @@ namespace Bolzena.UI
                     var tb = ToughBar.Create(st.T, new Vector3(Pad + tw / 2, py, 0), tw, 0.11f, tmax, OC, false);
                     tb.Set(e.ToughV, false);
                     tb.SetBroken(e.Broken, false);
-                    Tone.Text("tt", st.T, e.Broken ? "<color=#ffd65a>격파됨</color>  <size=85%>— 이번 차례를 쉰다</size>"
+                    Tone.Text("tt", st.T, e.Broken ? "<color=#ffd65a>격파됨</color>"
                         : $"강인도 <color=#d9c9ff>{EnemyHud.Thirds(e.ToughV)}</color> <color={Tone.DimTag}>/ {EnemyHud.Thirds(tmax)}</color>",
                         new Vector3(Pad + tw + 0.14f, py, 0), Tone.Sm, OC, Tone.Sub, TextAlignmentOptions.Left, true);
                     py -= 0.24f;
-                    Tone.Text("tn", st.T, e.Broken ? "다음 차례에 일어나 강인도가 다시 가득 찬다" : "격파되면 1턴 동안 행동하지 못한다 · 격파한 쪽 AP +1",
+                    Tone.Text("tn", st.T, e.Broken ? "행동은 그대로 한다 · 다음 내 턴 시작에 강인도가 다시 가득 찬다" : "격파하면 AP +1 · 「격파하면 끊김」 수를 끊는다",
                         new Vector3(Pad, py, 0), Tone.Cap, OC, Tone.Sub, TextAlignmentOptions.Left, true, Wd - Pad * 2);
                 }
                 else
@@ -371,7 +371,7 @@ namespace Bolzena.UI
                 st.Head("다음 행동");
                 float it = st.Y;
                 if (e.Dead) st.Para("쓰러졌다", Pad, Wd - Pad * 2, Tone.Body, Tone.Dim);
-                else if (e.Broken || e.Intent == IntentKind.None) st.Para(e.Broken ? "격파 — 1턴 동안 행동하지 못한다(격파한 쪽 AP +1)" : "할 일 없음", Pad, Wd - Pad * 2, Tone.Body, Tone.Sub);
+                else if (e.Intent == IntentKind.None) st.Para("할 일 없음", Pad, Wd - Pad * 2, Tone.Body, Tone.Sub);
                 else
                 {
                     var k = e.Intent;

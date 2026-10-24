@@ -6,14 +6,14 @@ using UnityEngine;
 
 namespace Bolzena.UI
 {
-    // 프론티어 전투 머리(위 가운데) — 시즌 · 남은 턴(Frontier.TurnsLeft) · 누적 점수(Frontier.Score = 보스가 잃은 HP) · 「성격 상성 없음」.
+    // 프론티어 전투 머리(위 가운데) — 시즌 · 남은 턴(Frontier.TurnsLeft) · 누적 점수(Frontier.Score = 피해 + 방어) · 아래 줄 「피해 n + 방어 m = 점수 · 성격 상성 없음」(2026-10-24).
     //   판 전투에는 없다(BattleDirector.Build 가 BattleBridge.Fight.Frontier 일 때만 세운다). 값은 매 프레임 코어 전투에서 읽는다.
     public class FrontierHud : MonoBehaviour
     {
         const int O = 566;
         IBattle battle;
         FrontierSeason season;
-        TextMeshPro turns, score;
+        TextMeshPro turns, score, split;
         Transform node;
         int lastScore = -1, lastLeft = -1;
         float pop;
@@ -37,8 +37,8 @@ namespace Bolzena.UI
             Make.Outline(turns, 0.22f, Tone.Outline);
             score = Make.Text("score", node, "", new Vector3(1.12f, 0.0f, 0), 0.24f, O + 2, new Color(1f, 0.9f, 0.6f));
             Make.Outline(score, 0.22f, Tone.Outline);
-            var nat = Make.Text("nature", node, "성격 상성 없음", new Vector3(0, -0.52f, 0), 0.16f, O + 2, new Color(0.78f, 0.84f, 0.95f));
-            Make.Outline(nat, 0.25f, Tone.Outline);
+            split = Make.Text("nature", node, "성격 상성 없음", new Vector3(0, -0.52f, 0), 0.16f, O + 2, new Color(0.78f, 0.84f, 0.95f));
+            Make.Outline(split, 0.4f, Tone.Outline);
             Place();
             Paint();
         }
@@ -56,7 +56,12 @@ namespace Bolzena.UI
             if (b == null) return;
             int left = Frontier.TurnsLeft(b, season), sc = Frontier.Score(b);
             if (left != lastLeft) { lastLeft = left; turns.text = $"남은 턴 <color=#F2CF7A>{left}</color> / {season.Turns}"; }
-            if (sc != lastScore) { if (lastScore >= 0 && sc > lastScore) pop = 1; lastScore = sc; score.text = $"점수 {sc:N0}"; }
+            if (sc != lastScore)
+            {
+                if (lastScore >= 0 && sc > lastScore) pop = 1;
+                lastScore = sc; score.text = $"점수 {sc:N0}";
+                split.text = $"피해 {Frontier.Dealt(b):N0} + 방어 <color=#F2CF7A>{Frontier.Ward(b):N0}</color> = {sc:N0}   ·   성격 상성 없음";
+            }
         }
 
         void LateUpdate()

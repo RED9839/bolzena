@@ -43,6 +43,7 @@ namespace Bolzena.Core
         void CounterAdd(Unit e, CounterDef c, int delta)
         {
             if (e == null || c == null || e.Dead || delta == 0 || Over != null) return;
+            if (delta > 0 && c.BreakHold && e.Broken) return;   // 격파된 동안은 오르지 않는다(breakHold)
             int before = St(e, c.Name);
             int after = Num.Clamp(before + delta, 0, c.Max);
             if (after == before) return;
@@ -56,7 +57,7 @@ namespace Bolzena.Core
             {
                 if (!c.Keep) SetStRaw(e, c.Name, Math.Min(c.Max, c.Start));
                 string mode = c.Mode ?? "now";
-                // 격파 · 기절로 쉬는 적은 지금 움직이지 못한다 — 「즉시」 수는 다음 차례로 미룬다(사용자 버그 2026-10-07: 격파된 불효자손이 심통으로 내리찍었다)
+                // 기절로 쉬는 적은 지금 움직이지 못한다(격파된 적은 움직인다 — 2026-10-24) — 「즉시」 수는 다음 차례로 미룬다(사용자 버그 2026-10-07: 격파된 불효자손이 심통으로 내리찍었다)
                 if (mode == "now" && e.Sealed) mode = "next";
                 Say($"{e.Name}: {c.Name} {after} — {(mode == "next" ? "다음 차례에" : mode == "replace" ? "수가 바뀐다" : "즉시")} 「{c.Act.Say ?? c.Name}」");
                 if (mode == "next") e.ForceNext = c.Act;
@@ -65,7 +66,7 @@ namespace Bolzena.Core
             }
         }
 
-        /// <summary>쌓이는 수치의 때 — hit(맞음) · card(파티가 카드를 냄, type) · turnStart · turnEnd.</summary>
+        /// <summary>쌓이는 수치의 때 — hit(맞음) · card(파티가 카드를 냄, type) · turnStart · turnEnd · attack(친 뒤) · break(격파됨).</summary>
         void CounterEvent(Unit e, string ev, string type = null)
         {
             if (e == null || e.Dead) return;
@@ -86,6 +87,15 @@ namespace Bolzena.Core
                     case "turnEnd":
                         if (c.ClearTurnEnd && St(e, c.Name) > 0) { SetStRaw(e, c.Name, 0); Say($"{e.Name}: {c.Name} — 사라진다"); }
                         if (c.OnTurnEnd != 0) CounterAdd(e, c, c.OnTurnEnd);
+                        break;
+                    case "break":   // 격파됐다 — 지금 겹의 breakCut 을 덜고 onBreak 를 더한다
+                        {
+                            int n = St(e, c.Name);
+                            int dl = c.OnBreak - (c.BreakCut > 0 ? (int)Math.Ceiling(n * c.BreakCut - 1e-9) : 0);
+                            if (dl == 0 || (dl < 0 && n == 0)) break;
+                            CounterAdd(e, c, dl);
+                            Say($"{e.Name}: 격파 — {c.Name} {n} → {St(e, c.Name)}{(c.BreakHold ? "(일어설 때까지 오르지 않는다)" : "")}");
+                        }
                         break;
                     case "attack":   // 자기가 치는 수를 한 뒤 — 모은 것을 쏟았다
                         if (c.ClearOnAttack && St(e, c.Name) > 0) { SetStRaw(e, c.Name, 0); Say($"{e.Name}: {c.Name} — 쏟아 사라진다"); StatusCue(e, $"{c.Name} 0", true); }
@@ -167,7 +177,7 @@ namespace Bolzena.Core
         {
             e.Dead = false; e.Feign = false; e.ReviveIn = 0;
             e.Hp = Math.Max(1, Math.Min(e.MaxHp, hp));
-            e.Status.Clear(); e.Mods.Clear(); e.Broken = false; e.Tough = e.ToughMax; e.Sealed = false;
+            e.Status.Clear(); e.Mods.Clear(); e.Broken = false; e.BreakWait = false; e.Tough = e.ToughMax; e.Sealed = false;
             InitCounters(e);
             RollIntent(e, true);
             Cue("revive", e, new Cue { V = e.Hp, Name = e.Name });

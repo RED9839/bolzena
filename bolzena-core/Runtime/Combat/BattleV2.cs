@@ -233,8 +233,8 @@ namespace Bolzena.Core
         public bool Copy;
         public bool Blessed => Bless != null;
         public bool Any => Oracle != null || Bless != null || Copy;
-        /// <summary>복제 표식 글 — 복제본은 복제할 때 모습에 묶인다.</summary>
-        public const string COPY_LINE = "복제 — 신탁 · 축복 불가";
+        /// <summary>복제 표식 글 — 복제본은 복제할 때 모습을 베끼고, 그 뒤로는 원본과 따로 신탁 · 축복을 받는다(2026-10-24).</summary>
+        public const string COPY_LINE = "복제 — 원본과 따로";
 
         public static CardMark Of(GameData d, string id, int flash, string shin)
         {

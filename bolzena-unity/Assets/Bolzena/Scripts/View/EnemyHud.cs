@@ -183,7 +183,6 @@ namespace Bolzena.View
         static string IntentTip(EnemyState e)
         {
             if (e == null || e.Dead) return null;
-            if (e.Broken) return Tip.Head("격파") + "\n1턴 동안 행동하지 못한다 — 격파한 쪽 AP +1";
             var s = Tip.Head("다음 수") + "\n" + e.IntentText;
             if (!string.IsNullOrEmpty(e.IntentSay)) s += "\n" + Tip.Dim("「" + e.IntentSay + "」");
             var r = InfoPanel.Rush(e, true);
@@ -332,7 +331,7 @@ namespace Bolzena.View
             State = es;
             Gem(es);
             var k = es.Intent;
-            bool show = k != IntentKind.None && !broken && !es.Dead;
+            bool show = k != IntentKind.None && !es.Dead;   // 격파돼도 다음 수를 보인다(2026-10-24)
             intentRoot.gameObject.SetActive(show);
             if (!show) return;
             string icon = k == IntentKind.Defend ? "ic_shield" : k == IntentKind.Buff ? "ic_up" : k == IntentKind.Debuff ? "ic_weak" : "ic_sword";
@@ -409,9 +408,9 @@ namespace Bolzena.View
         void Gem(EnemyState es)
         {
             int left = es.RushNeed - es.RushCnt;
-            gemText.text = es.Dead ? "" : es.Broken ? "<size=55%>격파</size>" : es.Sealed ? "-" : es.RushNeed <= 0 ? "<size=80%>∞</size>" : es.RushedTurn ? "-" : left.ToString();
+            gemText.text = es.Dead ? "" : es.Sealed ? "-" : es.RushNeed <= 0 ? "<size=80%>∞</size>" : es.RushedTurn ? "-" : left.ToString();
             var k = es.Intent;
-            gem.color = es.Broken ? new Color(0.45f, 0.42f, 0.5f) : k == IntentKind.Heavy ? new Color(0.85f, 0.38f, 0.12f) : k == IntentKind.Attack ? new Color(0.7f, 0.14f, 0.28f)
+            gem.color = k == IntentKind.Heavy ? new Color(0.85f, 0.38f, 0.12f) : k == IntentKind.Attack ? new Color(0.7f, 0.14f, 0.28f)
                 : k == IntentKind.Defend ? new Color(0.2f, 0.4f, 0.78f) : new Color(0.46f, 0.25f, 0.7f);
             gemRim.color = left == 1 && !es.RushedTurn && es.RushNeed > 0 ? new Color(1f, 0.45f, 0.35f) : new Color(1f, 0.86f, 0.62f);
         }
@@ -460,9 +459,7 @@ namespace Bolzena.View
 
         public void SetBroken(bool b)
         {
-            broken = b;
-            starRoot.gameObject.SetActive(b);
-            if (b) intentRoot.gameObject.SetActive(false);
+            broken = b;   // 격파는 행동을 막지 않는다(2026-10-24) — 기절 별 · 다음 수 숨김 없음, 격파 표시는 강인도 막대
             if (State != null) { State.Broken = b; Gem(State); }
             if (tough != null)
             {

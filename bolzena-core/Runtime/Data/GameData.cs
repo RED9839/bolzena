@@ -29,7 +29,7 @@ namespace Bolzena.Core
 
         /// <summary>전투 중 만든 카드(패시브 · 키워드의 「카드 생성」) — 신탁 · 축복이 안 붙는 맨 카드. id 뒤에 붙인다.</summary>
         public const string PLAIN = "~";
-        /// <summary>복제본 — 원본의 신탁 · 축복을 옮겨 받고 다시는 빛나지 않는다.</summary>
+        /// <summary>복제본 — 복제한 순간 원본의 신탁 · 축복을 옮겨 받는다. 그 뒤로는 원본처럼 신탁 · 축복을 받는다(2026-10-24).</summary>
         public const string COPY = "^";
 
         public static readonly JsonSerializerSettings Json = new()

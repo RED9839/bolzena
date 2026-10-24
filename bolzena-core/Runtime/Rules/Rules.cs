@@ -57,6 +57,10 @@ namespace Bolzena.Core
         /// 2026-10-11 사도 8장(고유 5) · 변신 → 태세 뒤 — 2층 2.0 → 1.95(보스 체력 · 피해 조정과 함께), 완주 38.3%(§13)
         /// 2026-10-11 고유 효과 2개씩 · 시작 덱 4장(시동 필수) 뒤 — 1.85 · 1.95 → 2.1 · 2.35(보스 피해 1층 1.05 와 함께), 완주 63.6 → 38.3%(§14)
         public static readonly Dictionary<int, double> FLOOR_DMG = new() { [1] = 2.1, [2] = 2.35 };   // 2026-10-13 사용자 — 10-12 의 1층 피해 1.9 되돌림(2.1)
+        /// <summary>모든 판 싸움의 적 피해 배율 — FLOOR_DMG · BOSS_DMG 위에 곱한다(난이도 단계 Tiers.DMG 는 그 위에 또 곱한다).
+        /// 2026-10-24 사용자 — 격파 「행동 불가」 없앤 몫을 메움(완주 68.9% → 82.2%, `sim --dmg 0.9` 와 같은 값). 프론티어도 시즌 배율 위에 곱한다(Frontier.FoeDmg — M.E.O.W 쓰러짐 36 → 30%, 점수 · 상한은 그대로).
+        /// 2026-10-25 사용자 — 0.9 → 0.92(아야 · 비비(신성) · 우로스 보정 · 복제본 신탁 뒤 완주 83.8% → 목표 81.5 근처).</summary>
+        public const double ENEMY_DMG = 0.92;
         public const double ELITE_HP = 1.5;
 
         /// <summary>층(0부터) · 보스 · 엘리트 → 적 체력 배율 · 피해 배율.</summary>
@@ -66,7 +70,7 @@ namespace Bolzena.Core
             double hp = ENEMY_HP * (FLOOR_HP.TryGetValue(k, out var a) ? a : 1)
                 * (boss ? (BOSS_HP.TryGetValue(k, out var b) ? b : 1) : 1) * (elite ? ELITE_HP : 1)
                 * (!boss && !elite && FIGHT_HP.TryGetValue(k, out var f) ? f : 1);
-            return (hp, (FLOOR_DMG.TryGetValue(k, out var d) ? d : 1) * (boss && BOSS_DMG.TryGetValue(k, out var bd) ? bd : 1));
+            return (hp, ENEMY_DMG * (FLOOR_DMG.TryGetValue(k, out var d) ? d : 1) * (boss && BOSS_DMG.TryGetValue(k, out var bd) ? bd : 1));
         }
 
         // ── 적의 손패 흡수(수 seize) ──────────────────────────────────
@@ -252,8 +256,21 @@ namespace Bolzena.Core
         // ── 강인도 · 격파 ────────────────────────────────────────────
         /// <summary>최소 강인도(사용자 2026-10-10) — 엔진이 적을 세울 때 tough = max(데이터, 최소). 일반 적 · 소환물 3, 엘리트(id …_elite) · 보스 · 보스 클론 5. 데이터가 낮으면 검사기 주의(오류 아님). TOUGH.Min · MinBoss 는 더 쓰지 않는다.</summary>
         public const double MIN_TOUGH_FIGHT = 3, MIN_TOUGH_BIG = 5;
+        /// <summary>격파 규칙 판(규칙 지문에 든다 — 엔진 동작이 바뀌어 옛 판 테이프와 갈리므로). 1 = 2026-10-08 「격파된 적은 행동 · 반응을 모두 멈춘다」(다음 차례 쉼 · 남은 타격 멈춤),
+        /// 2 = 2026-10-24 사용자 「격파됐다고 행동 불가 아니더라(카제나)」 — 격파는 AP +1 · brk 수 끊기 · 「격파되면」 규칙만, 행동 · 반응은 그대로. 값은 표시용이다(엔진은 2 만 안다).</summary>
+        public const int BREAK_RULE = 2;
         /// <summary>강인도 고정(2026-10-12 사용자) — 일반 적 MIN_TOUGH_FIGHT · 엘리트 · 보스 BOSS_TOUGH, 데이터 tough 는 안 쓴다. false 면 옛 규칙(데이터 · 최소치) — 강인도 계산 테스트가 데이터 칸으로 잰다.</summary>
         public static bool TOUGH_FIXED = true;
+
+        // ── 프론티어 점수 ────────────────────────────────────────────
+        /// <summary>
+        /// 프론티어 방어 점수(2026-10-24 M.E.O.W 개정 — 카제나 대균열 후발대 「실드로 막은 피해 300%」 · 완벽 방어 110% 를 볼제나 측정으로 줄임). 점수 = 보스가 잃은 HP + 방어 점수,
+        /// 방어 점수 = 파티가 방어 · 실드로 막은 **보스** 피해(드론 · 소환물 피해는 안 셈) × FRONTIER_WARD% + ward 수(냥냥 프레스)를 HP 하나 안 잃고 다 받아 낸 그 수의 막은 피해 × FRONTIER_WARD_FULL%(덤 — 위에 더한다). 정수 셈(내림).
+        /// 값 1000 · 1000(= 막은 피해 ×10 · 프레스를 다 막으면 그 몫 ×2): 볼제나는 보스 HP(600,000)에 비해 막는 피해가 판당 수백~수천이라 카제나 300% 로는 점수의 1~3% 뿐이었다 — 1140 조합 측정(Docs/프론티어_보스_최강덱_시험.md §10)에서
+        /// 지금 덱 상위 20 에 탱커 든 조합이 5 → 6(격파 출력만 넣으면 1 로 준다)이 되는 가장 작은 값.
+        /// 규칙 지문에 든다 — 서버 검증기가 같은 셈으로 점수를 다시 낸다. 측정 도구가 바꿔 잴 수 있게 정적 값(판 중에는 바꾸지 않는다).
+        /// </summary>
+        public static int FRONTIER_WARD = 1000, FRONTIER_WARD_FULL = 1000;
         public static class TOUGH
         {
             /// <summary>

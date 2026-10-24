@@ -140,8 +140,8 @@ namespace Bolzena.RunUI
                 var got = new List<string>();
                 if (mark.Oracle != null) got.Add($"<color={Theme.GoldTag}>신탁</color> 이번 모험에서 신탁으로 바뀐 카드 — 비용 아래 금빛 별 마크가 표시다");   // 신탁 이름은 보이지 않는다(2026-10-07)
                 if (mark.Blessed) got.Add($"<color=#D9C7FF>축복</color> {mark.BlessText} — 비용 아래 연보라 날개 마크와 본문 맨 아래 줄이 표시다");   // 받은 축복만(받을 수 있는 축복 목록은 보이지 않는다)
-                if (mark.Copy) got.Add($"<color=#C7DBFF>{Core.CardMark.COPY_LINE}</color> — 복제 — 이 카드는 신탁 · 축복을 받을 수 없고, 원본이 나중에 받는 것도 따라오지 않는다");
-                Box(new CardTerms.Term { Name = "이 카드에 얹힌 것", Kind = mark.Copy ? "복제할 때 모습 그대로" : null, Body = string.Join("\n", got) });
+                if (mark.Copy) got.Add($"<color=#C7DBFF>{Core.CardMark.COPY_LINE}</color> — 복제한 순간의 신탁 · 축복을 베꼈다. 그 뒤로는 원본과 따로 신탁 · 축복을 받는다(원본이 나중에 받는 것은 따라오지 않는다)");
+                Box(new CardTerms.Term { Name = "이 카드에 얹힌 것", Kind = mark.Copy ? "복제할 때 모습을 베낌" : null, Body = string.Join("\n", got) });
             }
             if (hasOracle)
                 Box(new CardTerms.Term { Name = "신탁", Hero = true, Kind = "오른쪽 아래 「신탁」 단추",

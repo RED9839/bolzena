@@ -369,7 +369,7 @@ namespace Bolzena.UI
             due = 0;
             if (!s.Over)
                 foreach (var e in s.Enemies)
-                    if (!e.Dead && !e.Broken && !e.Sealed && !e.IntentLater && (e.Intent == IntentKind.Attack || e.Intent == IntentKind.Heavy)) due += e.IntentValue * Mathf.Max(1, e.IntentHits);
+                    if (!e.Dead && !e.Sealed && !e.IntentLater && (e.Intent == IntentKind.Attack || e.Intent == IntentKind.Heavy)) due += e.IntentValue * Mathf.Max(1, e.IntentHits);
             // 변신 · 태세는 파티 칩 줄에도 — 「성전 3턴」(남은 턴이 바로 보이게, 2026-10-11 사용자)
             var row = new List<StatusChip>();
             foreach (var h in s.Heroes) foreach (var c in h.Chips) if (c.FormOf != null) row.Add(new StatusChip { Id = c.Id, Value = c.Value, Turns = c.Turns, Kind = "form", Text = c.Text, FormOf = c.FormOf });

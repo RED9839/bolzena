@@ -559,7 +559,7 @@ namespace Bolzena.RunUI
             desc.enableAutoSizing = true; desc.fontSizeMin = 8.5f * k; desc.fontSizeMax = 13.5f * k;   // 칸에 맞으면 13.5 그대로 · 넘치거나 한 덩이가 칸보다 넓으면 줄인다(끊지 않음)
             desc.Outline(0.2f);
             // ── 표식(신탁 · 축복 · 복제, 2026-10-06) — 겹쳐도 읽히게 자리를 나눈다:
-            //   신탁 = 장식 선의 별 줄(DecoLine, 이름은 안 보임 — 2026-10-07) + 테 바깥 금빛 · 축복 = 그 위 겨우살이(초록) 띠(후광 아이콘 + 이름) · 복제 = 오른쪽 위 셋째 줄 겹친 카드 표(「복제 — 신탁 · 축복 불가」)
+            //   신탁 = 장식 선의 별 줄(DecoLine, 이름은 안 보임 — 2026-10-07) + 테 바깥 금빛 · 축복 = 그 위 겨우살이(초록) 띠(후광 아이콘 + 이름) · 복제 = 오른쪽 위 셋째 줄 겹친 카드 표(「복제 — 원본과 따로」)
             //   view 를 준 미리보기(신탁 고르기 후보 따위)는 신탁만 view 에서 — 축복은 고르기 창이 따로 그린다
             float chipY = decoY + 8 * k;
             bool oraOn = v != null && v.Oracle != null && (name == "oraclepick" || !name.StartsWith("oracle"));   // 신탁 미리보기 후보는 받은 카드가 아니라 마크 없음
@@ -600,7 +600,7 @@ namespace Bolzena.RunUI
             if (mark.Copy)
             {
                 bool small = true;   // 복제는 작은 아이콘 하나(2026-10-09) — 문구는 카드 상세 풀이로
-                bool brief = Theme.Compact || w < 200;   // 폰 · 작은 카드는 「복제」 만 크게 — 「신탁 · 축복 불가」 는 카드 크게 · 툴팁에서
+                bool brief = Theme.Compact || w < 200;   // 폰 · 작은 카드는 「복제」 만 크게 — 「원본과 따로」 는 카드 크게 · 툴팁에서
                 string copyLine = small ? "" : brief ? "복제" : CardMark.COPY_LINE;
                 float cfs = brief ? 13f * k : 10.5f * k;
                 var cb = Ui.Img(rt, Theme.Pill, new Color(0.04f, 0.05f, 0.1f, 0.88f), "copymark");

@@ -126,8 +126,8 @@ namespace Bolzena.Core
             }
             if (Turn > 1) ReviveTick();
             // 격파된 적은 내 턴이 다시 오면 일어선다
-            // 적 차례에 격파된 적(아직 Sealed — 쉬는 차례를 안 거쳤다)은 다음 적 차례를 쉰 뒤에 일어선다(2026-10-08)
-            var risen = AliveEnemies().Where(e => e.Broken && !e.Sealed).ToList();
+            // 적 차례에 제 자리를 지난 뒤 격파된 적(BreakWait)은 다음 적 차례 자리를 지난 뒤에 일어선다(2026-10-08 시점 그대로 · 10-24 부터 그동안도 행동한다)
+            var risen = AliveEnemies().Where(e => e.Broken && !e.BreakWait).ToList();
             foreach (var e in risen)
             {
                 e.Broken = false; e.Tough = e.ToughMax;

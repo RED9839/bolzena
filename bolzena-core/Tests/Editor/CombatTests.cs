@@ -55,7 +55,7 @@ namespace Bolzena.Core.Tests
         }
 
         // ── 강인도 · 격파 ──
-        [Test] public void 강인도는_카드_한_장에_AP_1당_3분의1칸_0이면_격파_AP_1_그리고_다음_차례_행동_불가()
+        [Test] public void 강인도는_카드_한_장에_AP_1당_3분의1칸_0이면_격파_AP_1_행동은_그대로()
         {
             var d = K.Data(cards: "[{id:'smash', name:'깨기', hero:'a', cost:1, type:'공격', fx:[{k:'dmg', ratio:0.1, hits:8, target:'oneEnemy'}]}]");
             var b = K.Fight(d, new[] { "a" }, new[] { "hitter" }); K.Hand(b, "smash", "smash");
@@ -68,7 +68,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(0, K.E(b).Tough);
             Assert.AreEqual(1, b.Ap, "AP 1 을 쓰고 격파로 1 을 받았다");
             b.EndTurn();
-            Assert.AreEqual(1000, b.Pool.Hp, "격파된 적은 그 차례에 못 움직인다");
+            Assert.Less(b.Pool.Hp, 1000, "격파된 적도 그 차례에 친다(2026-10-24)");
             Assert.IsFalse(K.E(b).Broken, "다음 내 턴에 일어선다");
             Assert.AreEqual(4, K.E(b).Tough);
         }
@@ -276,8 +276,8 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(10, K.E(b).Block, "아픔 — 턴당 한 번");
             Assert.AreEqual(1, b.St(K.E(b), "취약"), "푹 꺼짐");
             K.Play(b, "smash");
-            Assert.AreEqual(0, b.St(K.E(b), "사기"), "격파 중 — 반토막도 멈춘다(2026-10-08 사용자: 격파된 적은 반응도 모두 멈춘다)");
-            Assert.AreEqual(0, K.E(b).Block, "방어 10 은 두 번째 한 방에 벗겨지고, 격파 중이라 감시 +5 도 없다");
+            Assert.AreEqual(1, b.St(K.E(b), "사기"), "격파 중에도 반토막이 돈다(2026-10-24 — 격파는 반응을 멈추지 않는다)");
+            Assert.AreEqual(5, K.E(b).Block, "방어 10 은 두 번째 한 방에 벗겨지고, 공격 둘째 장이라 감시 +5");
             b.EndTurn();
             Assert.AreEqual(1, b.St(K.E(b), "불굴"), "일어서면 성난다");
         }
@@ -554,23 +554,22 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(1, b.Breaks);
         }
 
-        [Test] public void 격파하면_AP_1_그_적은_한_차례_쉬고_다음_내_턴에_강인도가_찬다()
+        [Test] public void 격파하면_AP_1_그_적은_그대로_치고_다음_내_턴에_강인도가_찬다()
         {
             var b = F("mad2"); K.Hand(b, "h_cool", "h_cool", "h_cool");
             int hp = b.Pool.Hp;
             K.Play(b, "h_cool"); K.Play(b, "h_cool");
             Assert.IsFalse(K.E(b).Broken);
             K.Play(b, "h_cool");
-            Assert.IsTrue(K.E(b).Broken); Assert.IsTrue(K.E(b).Sealed);
+            Assert.IsTrue(K.E(b).Broken); Assert.IsFalse(K.E(b).Sealed, "격파는 기절이 아니다");
             Assert.AreEqual(3 - 3 + 1, b.Ap, "AP 3 을 쓰고 격파로 1");
             var v = b.ToughViewOf(K.E(b));
-            Assert.IsTrue(v.Broken); Assert.IsTrue(v.Resting); Assert.AreEqual(0, v.Left); Assert.AreEqual(3, v.Max); Assert.AreEqual(0, v.Fill(0));
+            Assert.IsTrue(v.Broken); Assert.IsFalse(v.Resting); Assert.AreEqual(0, v.Left); Assert.AreEqual(3, v.Max); Assert.AreEqual(0, v.Fill(0));
+            Assert.IsFalse(b.StatusViews(K.E(b)).Any(x => x.Id == R.STUN), "격파만으로는 기절 칩이 없다");
             b.EndTurn();
-            Assert.AreEqual(hp, b.Pool.Hp, "격파된 적은 그 차례를 쉰다");
+            Assert.Less(b.Pool.Hp, hp, "격파된 적도 그 차례에 친다(2026-10-24)");
             Assert.IsFalse(K.E(b).Broken, "격파 상태는 한 턴");
             Assert.AreEqual(3, K.E(b).Tough, "다음 내 턴에 강인도가 다 찬다");
-            b.EndTurn();
-            Assert.Less(b.Pool.Hp, hp, "그다음 차례엔 다시 친다");
         }
 
         [Test] public void 강인도_화면_값()

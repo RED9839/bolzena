@@ -24,7 +24,7 @@ export default hero({
     name: C, desc: '허물과 본성이 한 바퀴 돈 자취', carrier: 'self', cap: 3,
     per: [{ stat: 'atk', v: 0.05, who: 'allies' }],
   },
-  keywords: [{ name: U, desc: '우로스가 영역 위에 세운 동료', carrier: 'hero', cap: 1, hunt: true, per: [{ stat: 'dealt', v: 0.05, who: 'holder' }] }],   // 10-21 밸런스 조절 3차: +10 → +5%
+  keywords: [{ name: U, desc: '우로스가 영역 위에 세운 동료', carrier: 'hero', cap: 1, hunt: true, per: [{ stat: 'dealt', v: 0.1, who: 'holder' }] }],   // 10-21 밸런스 조절 3차: +10 → +5%
   // 자동 규칙 둘: 한 바퀴마다 순환 · AP(한 턴 1번 — 태세 한 바퀴 formLap 예외) · 순환이 다 차면 파티 사기
   passives: [
     { name: '순환', when: { on: 'formLap' }, fx: [lap(1), { k: 'ap', v: 1 }] },   // 10-11 사용자: 턴당 조건 없앰 — 「우로스는 사기인 걸로」(한 바퀴에 우로스 카드 2장이 들어 무한은 아님)
@@ -35,17 +35,17 @@ export default hero({
     { id: GOOD, name: '허물', desc: '벗어 놓은 내면(슈로) — 돕는 얼굴(우로스 카드를 내면 본성으로)', stance: true, toggle: EVIL },
     { id: EVIL, name: '본성', desc: '타락한 뱀 — 압도하는 얼굴(우로스 카드를 내면 허물로)', stance: true, toggle: GOOD },
   ],
-  ult: { name: '압도', cost: 250, fx: [dmg(0.8, 'allEnemies', { hits: 2 }), lap(1), up(), status('사기', 1)] },   // 10-21 7 · 8차: 사기 2 → 1 · 순환 3 → 1   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 사기 2 더함   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로
+  ult: { name: '압도', cost: 250, fx: [dmg(0.8, 'allEnemies', { hits: 2 }), lap(1), up(), status('사기', 2)] },   // 10-21 7 · 8차: 사기 2 → 1 · 순환 3 → 1   // 10-12 고학년 손질(「탱 · 폿 고학년은 쓰는 느낌이 안 난다」 — 비용 그대로, 효과만): 사기 2 더함   // 10-12 사용자: 비용 300 고학년은 거의 안 쓰여 모두 250 으로
 }, {
   basicNames: ['검기 날리기', '백사 일섬', '슈로의 인사'], deck: 'heavy',
   uniques: [
     { // 시동 — 영역 위 동료를 세우고 한 바퀴를 연다
       name: '지배의 영역', cost: 1, type: '스킬',
-      fx: [up(), G, shield(0.5), E, empower(0.2, { who: 'other' })],   // 10-21 밸런스 조절 6차: 실드 100 → 60% · 동료 다음 카드 +30 → +20%
+      fx: [up(), G, shield(1.5), E, empower(0.4, { who: 'other' })],   // 10-21 밸런스 조절 6차: 실드 100 → 60% · 동료 다음 카드 +30 → +20%
       oracles: [
         { fx: [up(), G, shield(1.2), E, empower(0.4, { who: 'other' })] },
-        { fx: [up(), draw(1), keep, E, empower(0.3, { who: 'other' })] },   // 10-13 신탁 점검
-        { fx: [up(), G, draw(1), E, empower(0.3, { who: 'other' })] },
+        { fx: [up(), draw(1), keep, E, empower(0.5, { who: 'other' })] },   // 10-13 신탁 점검 · 10-24 본판을 따라 30 → 50%
+        { fx: [up(), G, draw(1), E, empower(0.5, { who: 'other' })] },   // 10-24 본판을 따라 30 → 50%
         { fx: [up(), per, shield(0.4), E, { k: 'takenMod', v: 0.1, turns: 2, target: 'oneEnemy' }] },
         { cost: 0, fx: [up(), G, shield(0.6), E, empower(0.2, { who: 'other' })] },
       ],
@@ -65,7 +65,7 @@ export default hero({
     },
     { // 쌓인 순환으로 치기(쓰지 않음)
       name: '백사당의 죽도', cost: 1, type: '공격',
-      fx: [dmg(0.8, 'oneEnemy', { plus: 0.6, plusIf: E }), per, dmg(0.2)],   // 10-21 밸런스 조절 2차: 100 → 80% · 1당 30 → 20%   // 10-19 타수: 100% + 1당 30% + 본성 60% → 100%(본성 160%) + 1당 30%
+      fx: [dmg(1.0, 'oneEnemy', { plus: 0.6, plusIf: E }), per, dmg(0.2)],   // 10-21 밸런스 조절 2차: 100 → 80% · 1당 30 → 20%   // 10-19 타수: 100% + 1당 30% + 본성 60% → 100%(본성 160%) + 1당 30%
       oracles: [
         { fx: [dmg(1.2, 'oneEnemy', { plus: 0.6, plusIf: E }), per, dmg(0.4)] },
         { fx: [dmg(1), per, dmg(0.3), G, empower(0.5, { who: 'other' })] },   // 10-13 신탁 점검

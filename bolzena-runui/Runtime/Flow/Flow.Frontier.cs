@@ -23,6 +23,8 @@ namespace Bolzena.RunUI
     public sealed class FrontierResult
     {
         public int Score, Played;
+        /// <summary>점수 나눔(2026-10-24) — 피해(보스가 잃은 HP) + 방어(막은 보스 피해 몫). Score = Dealt + Ward(엔진 Frontier.Score).</summary>
+        public int Dealt, Ward;
         public string Over, Tape, Error;
         /// <summary>시험 덱 전투(lab)만 — 사도 키(주인 모름은 "") → [보스가 잃은 HP, 다른 적(드론 · 소환물)이 잃은 HP]. 엔진 Battle.HpMeter 그대로(측정 전용 — 점수 · 테이프 · 지문에 들지 않는다).</summary>
         public Dictionary<string, long[]> Meter;
@@ -173,11 +175,15 @@ namespace Bolzena.RunUI
             var all = boss.Intents.Concat(boss.Phase?.Intents ?? new List<Intent>()).Concat(boss.Phase2?.Intents ?? new List<Intent>()).ToList();
             // 쌓이는 수치 — 「출력」 처럼 1개당 피해가 붙는 것과 「심심함」 처럼 차면 한 방을 쏘는 것을 가른다
             string Pn(int v) => v >= 0 ? "+" + v : v.ToString();
+            // 치는 수의 실제 값 — 시즌 배율 × 판 전체 적 피해 배율(Frontier.FoeDmg, 2026-10-24) · 전체 공격 배율. 전투 머리 위 숫자와 같은 셈
+            var foe = new Unit { Dmgx = Frontier.FoeDmg(fs) };
+            int Hit(Intent x) => x == null ? 0 : Battle.FoeV(foe, x);
             foreach (var c in boss.Counters)
             {
                 if (c.Dealt > 0 || c.Taken != 0)
                 {
-                    marks.Add((c.Name, $"맞을 때마다 {Pn(c.OnHit)} · 1개당 피해 +{c.Dealt * 100:0}%{(c.Max < 99 ? $"(최대 {c.Max})" : "")}", "ic_up", gold));
+                    string brk = c.BreakCut > 0 || c.OnBreak != 0 ? $" · 격파하면 {(c.BreakCut > 0 ? "절반" : Pn(c.OnBreak))}{(c.BreakHold ? " · 격파 중엔 안 오른다" : "")}" : c.BreakHold ? " · 격파 중엔 안 오른다" : "";
+                    marks.Add((c.Name, $"맞을 때마다 {Pn(c.OnHit)} · 1개당 피해 +{c.Dealt * 100:0}%{(c.Max < 99 ? $"(최대 {c.Max})" : "")}{brk}", "ic_up", gold));
                     continue;
                 }
                 var how = new List<string>();
@@ -188,13 +194,13 @@ namespace Bolzena.RunUI
                 if (c.At > 0 && c.Act != null)
                 {
                     string kind = c.Act.T == "attackAll" ? "전체" : c.Act.T == "attack" ? "단일" : "행동";
-                    how.Add($"{c.At} 이면 {kind}{(c.Act.V > 0 ? " " + c.Act.V : "")}");
+                    how.Add($"{c.At} 이면 {kind}{(c.Act.V > 0 ? " " + Hit(c.Act) : "")}");
                 }
                 marks.Add((c.Name, string.Join(" · ", how), "ic_moon", purple));
             }
             if (boss.Id == "frontier_meow")
             {
-                List<int> Charged(Func<Intent, bool> ok, List<Intent> from) => (from ?? new List<Intent>()).Where(x => x.T == "charge" && x.Next != null && ok(x)).Select(x => x.Next.V).ToList();
+                List<int> Charged(Func<Intent, bool> ok, List<Intent> from) => (from ?? new List<Intent>()).Where(x => x.T == "charge" && x.Next != null && ok(x)).Select(x => Hit(x.Next)).ToList();
                 bool IsCannon(Intent x) => x.Brk && x.Next.T == "attackAll";
                 bool IsPress(Intent x) => !x.Brk && x.Next.T == "attack";
                 var cannon = Charged(IsCannon, all);
@@ -205,15 +211,16 @@ namespace Bolzena.RunUI
                 {
                     string v = press.Count > 0 ? press[0].ToString() : pressHunt[0].ToString();
                     string hunt = press.Count > 0 && pressHunt.Count > 0 ? $"(사냥 {pressHunt[0]})" : "";
-                    marks.Add(("프레스", $"다음 턴 단일 {v}{hunt} 예고 · 실드로 받기", "ic_sword", red));
+                    bool ward = all.Any(x => x.T == "charge" && x.Next != null && x.Next.Ward);
+                    marks.Add(("프레스", $"다음 턴 단일 {v}{hunt} 예고 · 실드로 받기{(ward && R.FRONTIER_WARD_FULL > 0 ? (R.FRONTIER_WARD_FULL == R.FRONTIER_WARD ? " · 다 막으면 방어 ×2" : " · 다 막으면 방어 덤") : "")}", "ic_sword", red));
                 }
                 var drone = all.FirstOrDefault(x => x.T == "summon");
                 var dd = drone != null ? P.Data.Enemy(drone.Id) : null;
-                if (dd != null) marks.Add(("드론", $"HP {dd.Hp:N0} · 보스에 실드 · 레이저 {dd.Intents.FirstOrDefault(x => x.T == "attack")?.V}", "ic_plus", gold));
+                if (dd != null) marks.Add(("드론", $"HP {dd.Hp:N0} · 보스에 실드 · 레이저 {Hit(dd.Intents.FirstOrDefault(x => x.T == "attack"))}", "ic_plus", gold));
                 var sig = all.FirstOrDefault(x => x.T == "addCard" && x.Id == "st_signal");
                 if (sig != null) marks.Add(("통제 신호", $"「{P.Data.Card(sig.Id)?.Name ?? "통제 신호"}」 {sig.N}장을 뽑을 더미에", "ic_deck", purple));
                 if (boss.Phase != null && boss.Phase2 != null) marks.Add(("사냥 · 폭주", $"HP {boss.Phase.At * 100:0}% 사냥 · {boss.Phase2.At * 100:0}% 폭주 — 공격 강화", "ic_fire", red));
-                return ("맞을수록 세지는 고양이 전투 기계", marks);
+                return (R.FRONTIER_WARD > 0 ? $"맞을수록 세지는 고양이 전투 기계 · 점수 = 피해 + 막은 보스 피해 ×{R.FRONTIER_WARD / 100.0:0.#}" : "맞을수록 세지는 고양이 전투 기계", marks);
             }
             var b = boss.Blurb ?? "";
             int dot = b.IndexOfAny(new[] { '.', '—' });
@@ -250,7 +257,7 @@ namespace Bolzena.RunUI
             float lw = Mathf.Min(480, size.x * 0.3f), rw = Mathf.Min(400, size.x * 0.25f);
             float recH = Theme.C(128, 112);
             // ── 머리 ──
-            ScreenHead(root, "프론티어", $"사도 셋 · {fs.Turns}턴 피해 랭킹", Lobby, hd =>
+            ScreenHead(root, "프론티어", $"사도 셋 · {fs.Turns}턴 점수 랭킹", Lobby, hd =>
             {
                 if (!Preseason(season)) return;
                 HeadChip(hd, SeasonLabel(season), ChipKind.Gold, "ic_spark");
@@ -863,6 +870,9 @@ namespace Bolzena.RunUI
             });
         }
 
+        /// <summary>결과 머리 — 「피해 n + 방어 m = 점수」(2026-10-24 방어 점수).</summary>
+        static string ScoreSplit(FrontierResult res) => $"피해 {res.Dealt:N0} + 방어 <color={Theme.GoldTag}>{res.Ward:N0}</color> = 점수";
+
         static string TestLine => $"<color={Theme.GoldTag}>시험 기록으로 냈다</color> <color={Theme.SubTag}>(시험 계정 — 랭킹에 오르지 않음)</color>";
         static string SkippedLine => $"기록했다 <color={Theme.SubTag}>(검증 안 함 — 내 최고보다 낮음)</color>";
         static string PendingLine => $"<color={Theme.GoldTag}>랭킹에 올랐다</color> <color={Theme.SubTag}>(검증 전)</color>";
@@ -879,13 +889,13 @@ namespace Bolzena.RunUI
             var panel = Ui.Panel(root, Theme.Panel, null, "result").rectTransform;
             panel.At(0.5f, 0.5f, 0, -10, 980, Theme.C(470, 400));
             Tw.Rise(panel, 0.2f, 30, 0.45f);
-            var sl = Ui.Text(panel, "보스가 잃은 HP — 점수", Theme.FsMd, Theme.Sub, TextAlignmentOptions.Center); sl.rectTransform.Band(1, 30, 0, 0, -26);
+            var sl = Ui.Text(panel, ScoreSplit(res), Theme.FsMd, Theme.Sub, TextAlignmentOptions.Center); sl.rectTransform.Band(1, 30, 0, 0, -26);
             var sc = Ui.Title(panel, $"{res.Score:N0}", Theme.FsDisplay, Theme.Gold, TextAlignmentOptions.Center); sc.rectTransform.Band(1, 100, 0, 0, -58); sc.Outline(0.1f);
             Tw.Pop(sc.rectTransform, 0.35f, 1.5f, 0.5f);
             var fs = att?.Season ?? Frontier.PRESEASON;
             var boss = P.Data.Enemy(fs.Boss);
             int bossHp = boss != null ? (int)Math.Round(boss.Hp * fs.Hp) : 0;
-            var meta = Ui.Text(panel, $"{boss?.Name ?? fs.Boss} · {res.Played} / {fs.Turns}턴 · 보스 HP 의 {(bossHp > 0 ? 100.0 * res.Score / bossHp : 0):0.0}%{(res.Error != null ? " · " + res.Error : "")}", Theme.FsBody, Theme.Ink, TextAlignmentOptions.Center);
+            var meta = Ui.Text(panel, $"{boss?.Name ?? fs.Boss} · {res.Played} / {fs.Turns}턴 · 보스 HP 의 {(bossHp > 0 ? 100.0 * res.Dealt / bossHp : 0):0.0}%{(res.Error != null ? " · " + res.Error : "")}", Theme.FsBody, Theme.Ink, TextAlignmentOptions.Center);
             meta.rectTransform.Band(1, 30, 0, 0, -166);
             var faces = Ui.Rect("faces", panel).Band(1, 80, 0, 0, -206);
             Ui.Row(faces, 16, TextAnchor.MiddleCenter, null, false, false);

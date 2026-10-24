@@ -656,7 +656,7 @@ namespace Bolzena.RunUI
             var sl = Ui.Text(lp, "보스가 잃은 HP — 점수", Theme.FsMd, Theme.Sub, TextAlignmentOptions.Center); sl.rectTransform.Band(1, 30, 0, 0, -60);
             var sc = Ui.Title(lp, $"{res.Score:N0}", Theme.C(Theme.FsDisplay, Theme.Fs3xl + 10), Theme.Gold, TextAlignmentOptions.Center); sc.rectTransform.Band(1, Theme.C(100, 80), 0, 0, -92); sc.Outline(0.1f);
             Tw.Pop(sc.rectTransform, 0.2f, 1.4f, 0.5f);
-            var meta = Ui.Text(lp, $"{boss?.Name ?? fs.Boss} · {res.Played} / {fs.Turns}턴 · 보스 HP 의 {(bossHp > 0 ? 100.0 * res.Score / bossHp : 0):0.0}%\n턴당 {(res.Played > 0 ? res.Score / res.Played : 0):N0}{(res.Error != null ? " · " + res.Error : "")}", Theme.FsBody, Theme.Ink, TextAlignmentOptions.Center);
+            var meta = Ui.Text(lp, $"{boss?.Name ?? fs.Boss} · {res.Played} / {fs.Turns}턴 · 보스 HP 의 {(bossHp > 0 ? 100.0 * res.Dealt / bossHp : 0):0.0}%\n{ScoreSplit(res)} · 턴당 {(res.Played > 0 ? res.Score / res.Played : 0):N0}{(res.Error != null ? " · " + res.Error : "")}", Theme.FsBody, Theme.Ink, TextAlignmentOptions.Center);
             meta.rectTransform.Band(1, 64, 10, 10, -Theme.C(200, 176));
             var sub = Ui.Text(lp, server == null ? $"<color={Theme.SubTag}>이 PC 시험 — 서버로 보내지 않았다</color>" : res.Tape == null ? $"<color={Theme.BadTag}>기록이 없어 낼 수 없다</color>" : "시험 점수를 내는 중…", Theme.FsSm, Theme.Ink, TextAlignmentOptions.Center);
             sub.rectTransform.Band(0, 60, 16, 16, 16);

@@ -198,6 +198,7 @@ namespace Bolzena.Core
             if (u.Side == Side.Party && guard > 0 && guard0 > 0 && u.Block + u.Shield == 0 && from != null && from.Side == Side.Enemy) Emit("shieldBreak", new EmitInfo { Who = u, From = from, Target = from, V = guard, By = ShieldBy, Seq = ActSeq });
             if (u.Side == Side.Enemy && o.Card && from != null && from.Side == Side.Party && (d > 0 || guard > 0)) CountHit(u, from);   // 그 적을 친 횟수(▶E71)
             if (u.Side == Side.Enemy && o.Card && from != null && from.Side == Side.Party && (d > 0 || guard > 0) && !u.Dead) Emit("hit", new EmitInfo { By = from.Key, Target = u, V = d + guard, Seq = ActSeq, Weak = IsWeakHit(from, u, o.Tags) });
+            if (foeHit && guard > 0) from.Warded += guard;   // 그 적의 피해를 막은 합(프론티어 방어 점수 — Frontier.Ward)
             if (u.Side == Side.Party && !o.Pure && !o.Dot && from != null && from.Side == Side.Enemy) { HitTakenAdd(); TakenNow += d + guard; GuardedNow += guard; SumIncoming += d + guard; SumGuarded += guard; }
             if (u.Side == Side.Party && (d > 0 || (guard > 0 && from != null && from.Side == Side.Enemy)) && !o.Pure && !o.Dot)
             {
@@ -238,8 +239,9 @@ namespace Bolzena.Core
 
         // ── 강인도 · 격파 ──────────────────────────────────────────────
         /// <summary>
-        /// 강인도를 n 깎는다. 0 이 되면 격파 — AP +1 · 그 적은 다음 차례 행동 불가 · brk 수는 끊긴다. 격파했으면 true.
-        /// dying — 이 일격에 쓰러지는 적(처치 일격, LethalKill). 강인도 · 격파 쪽지와 AP 는 같고, 쉬기 · 끊김 · 적의 「격파되면」 은 없다.
+        /// 강인도를 n 깎는다. 0 이 되면 격파 — AP +1 · brk 수는 끊긴다 · 「격파되면」 규칙이 돈다. 격파했으면 true.
+        /// 격파된 적도 제 차례에 그대로 행동하고 패시브 · 반응도 그대로 돈다(2026-10-24 — 10-08 「행동 불가」 를 없앴다, 카제나처럼).
+        /// dying — 이 일격에 쓰러지는 적(처치 일격, LethalKill). 강인도 · 격파 쪽지와 AP 는 같고, 끊김 · 적의 「격파되면」 은 없다.
         /// 「격파」 일(Emit · HandAuto)은 쓰러뜨린 뒤 LethalKill 이 낸다.
         /// </summary>
         bool ToughHit(Unit e, double n, bool dying = false)
@@ -266,10 +268,11 @@ namespace Bolzena.Core
                 HitCue(e, "break", new Cue { V = R.TOUGH.Ap });
                 return true;
             }
-            e.Sealed = true;
-            Say($"{e.Name}: 격파! (AP +{R.TOUGH.Ap} · 다음 차례 행동 불가)");
+            e.BreakWait = true;
+            Say($"{e.Name}: 격파! (AP +{R.TOUGH.Ap})");
             HitCue(e, "break", new Cue { V = R.TOUGH.Ap });
             Emit("break", new EmitInfo { Target = e, By = Acting });
+            if (!e.Dead && Over == null) CounterEvent(e, "break");   // 쌓이는 수치 onBreak · breakCut(M.E.O.W 「출력」 — 2026-10-24)
             if (e.Intent != null && e.Intent.Brk && !e.Dead) { UltCut(e, "격파"); Say($"{e.Name}: 격파 — 「{e.Intent.Say}」 를 놓쳤다"); StatusCue(e, "끊김!"); e.Intent = null; }
             if (!e.Dead) FoePassives("broken", e);
             if (Over == null) FoePassives("allyBroken", e);   // 동료가 격파되면(2026-10-07 — 조합 반응)

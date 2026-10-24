@@ -42,7 +42,7 @@ namespace Bolzena.Core
         public double Left, Max;
         /// <summary>칸 수(Max 올림).</summary>
         public int Pips;
-        /// <summary>격파 상태(이번 턴 · 적의 다음 차례를 쉬고 다음 내 턴에 강인도가 다시 찬다) · 다음 차례를 못 움직임.</summary>
+        /// <summary>격파 상태(다음 내 턴에 강인도가 다시 찬다 — 행동은 그대로) · 기절로 다음 차례를 못 움직임(Resting = Sealed).</summary>
         public bool Broken, Resting;
         /// <summary>적의 성격(판의 적 속성이면 그것) · 약점 성격.</summary>
         public string Nature;
@@ -129,7 +129,7 @@ namespace Bolzena.Core
                     else if (!counter) v.Sources = SourcesOf(u, kv.Key, kv.Value);
                     o.Add(v);
                 }
-                if (u.Sealed && !u.Broken) o.Add(new StatusView { Id = R.STUN, Stacks = 1, Layer = "enemy" });
+                if (u.Sealed) o.Add(new StatusView { Id = R.STUN, Stacks = 1, Layer = "enemy" });
                 return o;
             }
             if (u == Pool || u.BodyRef == null)

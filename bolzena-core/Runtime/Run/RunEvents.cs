@@ -249,7 +249,7 @@ namespace Bolzena.Core
                             var offer = OfferFlash();
                             if (o.Swap)
                             {
-                                var had = S.Flash.Keys.Where(id => Data.Card(id)?.Oracles.Count == 5 && !GameData.IsCopy(id)).OrderBy(x => x, StringComparer.Ordinal).ToList();
+                                var had = S.Flash.Keys.Where(id => Data.Card(id)?.Oracles.Count == 5).OrderBy(x => x, StringComparer.Ordinal).ToList();
                                 if (had.Count > 0) { var id = had[RndInt(had.Count)]; offer = OfferOf(id, S.Flash[id], swap: true); }
                             }
                             // all(다섯 중 고르기)은 없앴다(2026-10-05 신탁 통일) — 늘 무작위 셋
@@ -267,7 +267,7 @@ namespace Bolzena.Core
                         }
                     case "shinNow":
                         {
-                            var ids = S.Flash.Keys.Where(id => Data.Card(id) != null && !GameData.IsCopy(id) && S.Deck.Contains(id) && !S.Shin.ContainsKey(id)).OrderBy(x => x, StringComparer.Ordinal).ToList();
+                            var ids = S.Flash.Keys.Where(id => Data.Card(id) != null && S.Deck.Contains(id) && !S.Shin.ContainsKey(id)).OrderBy(x => x, StringComparer.Ordinal).ToList();
                             if (ids.Count > 0) { var id = ids[RndInt(ids.Count)]; S.Shin[id] = OwnRandom(Data.Card(id)) ?? "power"; E.Log.Add($"{R.DIVINE_NAME}! 「{Data.Card(id).Name}」"); }
                             else { E.ShinChance = 1; E.Log.Add("축복을 얹을 신탁이 아직 없다 — 이번에 고르는 신탁에 얹힌다"); }
                             break;
@@ -402,7 +402,6 @@ namespace Bolzena.Core
                         if (value == null) { E.Log.Add("신탁 — 받지 않았다"); break; }
                         int n = Convert.ToInt32(value);
                         if (!p.Offer.Picks.Contains(n)) return "고를 수 없는 신탁이다";
-                        if (GameData.IsCopy(p.Offer.CardId)) return "복제본은 신탁 · 축복을 받을 수 없다";
                         if (!TakeOffer(p.Offer, n)) S.Flash[p.Offer.CardId] = n;
                         var c = Data.Card(p.Offer.CardId);
                         if (withShin) { E.Log.Add($"「{c.Name}」 — 신탁 {n}도 함께"); break; }
@@ -443,11 +442,11 @@ namespace Bolzena.Core
             ApplyOutcomes(f.Win);
         }
 
-        /// <summary>축복을 얹을 수 있는 카드 — 덱의 고유 · 교주 카드 가운데 축복이 아직 없는 것(저주 · 상태 · 복제본 빼고).
+        /// <summary>축복을 얹을 수 있는 카드 — 덱의 고유 · 교주 카드 가운데 축복이 아직 없는 것(저주 · 상태 빼고 · 복제본 포함 — 2026-10-24).
         ///   2026-10-09 사용자: 기본 카드와 이미 신탁을 받은 카드는 후보에서 뺀다(블랑셰 「축복을 얻을 카드를 고르시오」 등 이벤트 축복 고르기 모두).</summary>
         public List<string> ShinAble(string kind)
         {
-            var ids = S.Deck.Distinct().Where(id => Data.Card(id) is CardDef c && !c.IsCurse && !c.IsStatusCard && !GameData.IsCopy(id) && !S.Shin.ContainsKey(id)
+            var ids = S.Deck.Distinct().Where(id => Data.Card(id) is CardDef c && !c.IsCurse && !c.IsStatusCard && !S.Shin.ContainsKey(id)
                 && (c.Unique || c.Neutral) && !S.Flash.ContainsKey(id)
                 && ((c.Oracles.Count == 5 && Enumerable.Range(1, 5).Any(n => FlashOk(id, n))) || (c.Complete && c.Oracles.Count == 0))).ToList();   // 완성형은 신탁 없이 축복만   // 신탁도 함께 붙으니 신탁 다섯이 있고 붙일 수 있는 카드만
             if (kind == "cost") return ids.Where(id => ViewOf(id).Cost >= 1).ToList();

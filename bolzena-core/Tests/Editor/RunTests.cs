@@ -58,6 +58,11 @@ namespace Bolzena.Core.Tests
             CollectionAssert.AreEqual(node.Foes, b.Enemies.Select(e => e.Key).ToList());
             Assert.AreEqual(Num.Round(run.Data.Enemy(b.Enemies[0].Key).Hp * R.FoeScale(0).hp), b.Enemies[0].MaxHp);
             Assert.AreEqual(R.FoeScale(0).dmg, b.Enemies[0].Dmgx);
+            Assert.AreEqual(R.ENEMY_DMG * R.FLOOR_DMG[1], b.Enemies[0].Dmgx, 1e-12, "판 싸움 적 피해 = ENEMY_DMG × 층 배율(2026-10-24 격파 개정 보정)");
+            var hit = b.Enemies.FirstOrDefault(e => e.Intent != null && e.Intent.T == "attack");
+            Assert.AreEqual(R.ENEMY_DMG * R.FLOOR_DMG[2] * R.BOSS_DMG[2], R.FoeScale(1, boss: true).dmg, 1e-12, "보스도 ENEMY_DMG 를 곱한다");
+            if (hit != null && b.IntentHit(hit) is int shown && hit.Status.Count == 0)
+                Assert.AreEqual(Battle.FoeV(hit, hit.Intent), shown, "머리 위 예고 피해도 새 배율");
             Assert.IsNotNull(loot);
             Assert.That(loot.Gold, Is.InRange(20, 30));
             Assert.IsTrue(b.Glow.Values.Any(g => g.Kind == "hero"), "일반 싸움도 은총 하나는 반드시");
@@ -395,7 +400,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(0, none.BossCopyOffer().Count, "고유 카드가 없으면(복제본뿐) 빈 목록 — 화면이 건너뛴다");
         }
 
-        [Test] public void 복제본은_복제한_순간_모습에_묶이고_원본이_신탁을_받아도_그대로()
+        [Test] public void 복제본은_복제한_순간_모습을_베끼고_원본이_신탁을_받아도_그대로()
         {
             var run = New();
             run.S.Deck.Add("rico_u1");
@@ -429,31 +434,41 @@ namespace Bolzena.Core.Tests
             Assert.IsFalse(r2.MarkOf(b).Oracle != null);
             Assert.AreEqual(run.MarkOf(b2).Oracle, r2.MarkOf(b2).Oracle);
             Assert.IsTrue(r2.MarkOf(b2).Copy && r2.MarkOf(b2).Blessed);
+
+            // 복제본도 제 신탁을 받는다(2026-10-24) — 원본은 그대로
+            Assert.IsNull(run.ClaimGlow(b, new Glow { Kind = "card", Picks = new List<GlowPick> { new GlowPick { N = 1 } } }, 0));
+            Assert.AreEqual(1, run.S.Flash[b]); Assert.AreEqual(3, run.S.Flash["rico_u2"], "복제본이 신탁을 받아도 원본은 그대로");
         }
 
-        [Test] public void 복제본은_빛_수련_이벤트_신탁_축복_후보에_들지_않는다()
+        [Test] public void 복제본도_빛_수련_이벤트_신탁_축복_후보에_든다()
         {
+            // 2026-10-24 사용자 「복제된 카드도 신탁 가능하게」 — 10-06 「복제본은 신탁 · 축복을 받지 못한다」 를 뒤집음
+            bool lit = false, trained = false, offered = false;
             for (long seed = 1; seed <= 80; seed++)
             {
                 var run = New(seed);
                 run.S.Deck.Add("rico_u1");
                 var cid = run.AddCopy("rico_u1");
-                run.S.Deck.Remove("rico_u1");   // 원본을 빼도 복제본은 대상이 아니다
+                run.S.Deck.Remove("rico_u1");   // 원본이 없어도 복제본 혼자 후보
                 run.S.Deck.AddRange(new[] { "carrot_u1", "sion_u1" });
-                CollectionAssert.DoesNotContain(run.FlashTargets(), cid);
+                CollectionAssert.Contains(run.FlashTargets(), cid);
+                CollectionAssert.Contains(run.CampTargets(), cid);
                 run.S.RewardFlash = true; run.S.Elite = seed % 2 == 0; run.S.Node = 1;
-                var glow = run.RollEpiphany();
-                Assert.IsFalse(glow.Keys.Any(GameData.IsCopy), $"씨앗 {seed}: 복제본이 빛났다");
-                var camp = run.EnterCamp("camp");
-                Assert.IsFalse(GameData.IsCopy(camp.Train?.CardId), "수련 후보");
-                Assert.IsFalse(GameData.IsCopy(run.OfferFlash()?.CardId), "이벤트 신탁 후보");
-                CollectionAssert.DoesNotContain(run.ShinAble(null), cid, "축복 얹기");
-                CollectionAssert.DoesNotContain(run.ShinAble("power"), cid);
-                Assert.IsFalse(run.FlashOk(cid, 1));
-                var g = new Glow { Kind = "card", Picks = new List<GlowPick> { new GlowPick { N = 1 } } };
-                Assert.IsNotNull(run.ClaimGlow(cid, g, 0), "보상 신탁도 막힌다");
-                Assert.IsFalse(run.S.Flash.ContainsKey(cid));
+                lit |= run.RollEpiphany().Keys.Contains(cid);
+                trained |= run.EnterCamp("camp").Train?.CardId == cid;
+                offered |= run.OfferFlash()?.CardId == cid;
+                CollectionAssert.Contains(run.ShinAble("power"), cid, "축복 얹기");
+                Assert.IsTrue(run.FlashOk(cid, 1));
+                var g = new Glow { Kind = "card", Picks = new List<GlowPick> { new GlowPick { N = 1, Shin = "draw" } } };
+                Assert.IsNull(run.ClaimGlow(cid, g, 0), "보상 신탁도 받는다");
+                Assert.AreEqual(1, run.S.Flash[cid]); Assert.AreEqual("draw", run.S.Shin[cid]);
+                CollectionAssert.DoesNotContain(run.FlashTargets(), cid, "신탁이 붙은 복제본은 신탁 후보에서 빠진다(원본 규칙 그대로)");
+                CollectionAssert.Contains(run.CampTargets(), cid, "휴식 리롤에는 든다");
+                Assert.IsTrue(run.MarkOf(cid).Copy && run.MarkOf(cid).Oracle != null && run.MarkOf(cid).Blessed, "복제 · 신탁 · 축복 표식이 함께");
             }
+            Assert.IsTrue(lit, "전투 번뜩임에 복제본이 빛난 판이 있다");
+            Assert.IsTrue(trained, "휴식 수련 후보로 복제본이 뜬 판이 있다");
+            Assert.IsTrue(offered, "이벤트 신탁 후보로 복제본이 뜬 판이 있다");
         }
 
         [Test] public void 유일과_강화_카드는_덱에_한_장()
@@ -678,7 +693,8 @@ namespace Bolzena.Core.Tests
             var cp = run.AddCopy(litN);
             Assert.AreEqual(nz + "^", cp);
             Assert.AreEqual(4, run.S.Flash[cp]);
-            Assert.IsFalse(run.FlashOk(cp, 1), "복제본은 신탁 불가");
+            Assert.IsTrue(run.FlashOk(cp, 1), "복제본도 신탁을 받을 수 있다(2026-10-24)");
+            CollectionAssert.DoesNotContain(run.FlashTargets(), cp, "신탁째 베낀 복제본은 신탁 후보가 아니다(이미 붙음)");
             CollectionAssert.DoesNotContain(run.FlashTargets(), litN, "신탁 받은 한 장은 다시 후보가 아니다");
             CollectionAssert.Contains(run.FlashTargets(), nz, "맨 두 장은 아직 후보");
         }

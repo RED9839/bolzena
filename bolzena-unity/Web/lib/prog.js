@@ -86,6 +86,9 @@ export const itemName = (k) => (MM.find((m) => m.key === k) || {}).name || k;
  * 그 칸을 한 단계 올릴 수 있나 — { ok, why(못 하면 화면 글), cost({items} | null — 최대면 null), lv, max, locked }.
  *   잠김(앞 칸)은 why 에 까닭 + locked, 재료 모자람도 why(이때 ok false).
  */
+/** 숫자 뒤 목적격 조사 — 읽는 소리 받침(영 · 일 · 삼 · 육 · 칠 · 팔 · 십 → 을, 이 · 사 · 오 · 구 → 를). 엔진 Ko.HasFinal 과 같다. */
+const numObj = (n) => ("013678".includes(String(n).slice(-1)) ? "을" : "를");
+
 export function potCheck(acc, h, id) {
   const n = POTENTIAL.find((x) => x.id === id);
   if (!n) return null;
@@ -93,7 +96,7 @@ export function potCheck(acc, h, id) {
   if (lv >= n.max) return { ok: false, why: "최대 단계다", cost: null, lv, max: n.max, locked: false };
   const cost = potCost(id, lv + 1);
   let why = null, locked = false;
-  if ((acc.bestTier | 0) < n.tier) { why = `난이도 단계 ${n.tier} 을 완주하면 열린다`; locked = true; }
+  if ((acc.bestTier | 0) < n.tier) { why = `난이도 단계 ${n.tier}${numObj(n.tier)} 완주하면 열린다`; locked = true; }
   else if (n.after && potOf(h, n.after) < 1) { why = `앞 칸(${n.after})을 먼저 열어야 한다`; locked = true; }
   else for (const [k, v] of Object.entries(cost.items)) if ((acc.bag[k] | 0) < v) { why = `${itemName(k)}가 모자라다(${acc.bag[k] | 0}/${v})`; break; }
   return { ok: !why, why, cost, lv, max: n.max, locked };

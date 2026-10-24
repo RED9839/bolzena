@@ -132,7 +132,7 @@ namespace Bolzena.Core
         public int DebuffKinds(Unit e)
         {
             if (e == null) return 0;
-            int n = R.BAD_ST.Count(id => St(e, id) > 0) + (St(e, "표식") > 0 ? 1 : 0) + (e.Sealed && !e.Broken ? 1 : 0);
+            int n = R.BAD_ST.Count(id => St(e, id) > 0) + (St(e, "표식") > 0 ? 1 : 0) + (e.Sealed ? 1 : 0);
             foreach (var kw in Kw.Values) if (kw.Carrier == "enemy" && St(e, kw.Id) > 0) n++;
             return n;
         }

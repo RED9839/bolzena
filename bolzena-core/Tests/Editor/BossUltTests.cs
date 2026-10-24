@@ -107,7 +107,7 @@ namespace Bolzena.Core.Tests
             Assert.IsTrue(BossUlt.IsUlt(e.Intent), "그 뒤 EVERY(4)턴마다 다시");
         }
 
-        [Test] public void 격파해도_기절해도_끊기지_않고_그_턴만_쉰다()
+        [Test] public void 격파해도_기절해도_끊기지_않고_격파면_그대로_쓰고_기절이면_그_턴만_쉰다()
         {
             var cues = new List<Cue>();
             var b = K.Fight(D(), new[] { "a" }, new[] { "cz" }, cues: cues);
@@ -120,7 +120,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(0, b.St(e, "취약"), "끊는 보상 없음");
             int hp0 = b.Pool.Hp;
             b.EndTurn();
-            Assert.IsFalse(cues.Any(c => c.K == "foeUlt")); Assert.AreEqual(hp0, b.Pool.Hp, "격파된 보스는 쉰다");
+            Assert.IsTrue(cues.Any(c => c.K == "foeUlt")); Assert.Less(b.Pool.Hp, hp0, "격파된 보스도 고학년을 그대로 쓴다(2026-10-24)");
 
             cues.Clear();
             var b2 = K.Fight(D(), new[] { "a" }, new[] { "cz" }, cues: cues);

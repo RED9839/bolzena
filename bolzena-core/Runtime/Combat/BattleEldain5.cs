@@ -261,7 +261,7 @@ namespace Bolzena.Core
         public List<string> KnownKinds(string hero) { var kw = KnownKw(hero); return kw == null ? new List<string>() : INTENT_KINDS.Where(k => Counts.ContainsKey("known|" + kw.Owner + "|" + k)).Select(k => INTENT_KIND_KO[k]).ToList(); }
 
         // ── 봇 · 화면이 보는 이번 적 차례(▶E87) ─────────────────────────
-        /// <summary>이번 적 차례에 칠 예고 피해 합(머리 위 수치 × 대 수 · 봉인 · 격파로 쉬는 적 빼고).</summary>
+        /// <summary>이번 적 차례에 칠 예고 피해 합(머리 위 수치 × 대 수 · 기절로 쉬는 적 · 즉시 행동을 한 적 빼고).</summary>
         public int FoeHitSum()
         {
             int sum = 0;
