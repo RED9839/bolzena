@@ -56,9 +56,11 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("fight", node.Type);
             var (b, loot) = run.OpenFight();
             CollectionAssert.AreEqual(node.Foes, b.Enemies.Select(e => e.Key).ToList());
-            Assert.AreEqual(Num.Round(run.Data.Enemy(b.Enemies[0].Key).Hp * R.FoeScale(0).hp), b.Enemies[0].MaxHp);
-            Assert.AreEqual(R.FoeScale(0).dmg, b.Enemies[0].Dmgx);
-            Assert.AreEqual(R.ENEMY_DMG * R.FLOOR_DMG[1], b.Enemies[0].Dmgx, 1e-12, "판 싸움 적 피해 = ENEMY_DMG × 층 배율(2026-10-24 격파 개정 보정)");
+            double pack = R.PackX(b.Enemies.Count, false) ?? 1;   // 편성 배율(2026-10-31 — 마릿수마다)
+            Assert.AreEqual(Num.Round(run.Data.Enemy(b.Enemies[0].Key).Hp * R.FoeScale(0).hp * pack), b.Enemies[0].MaxHp);
+            Assert.AreEqual(R.FoeScale(0).dmg * pack, b.Enemies[0].Dmgx, 1e-12);
+            Assert.AreEqual(R.ENEMY_DMG * R.FLOOR_DMG[1] * pack, b.Enemies[0].Dmgx, 1e-12, "판 싸움 적 피해 = ENEMY_DMG × 층 배율(2026-10-24 격파 개정 보정) × 편성 배율");
+            Assert.AreEqual(R.RAGE_TURN_FIGHT, b.RageTurn, "판 일반 싸움은 광폭화 5턴");
             var hit = b.Enemies.FirstOrDefault(e => e.Intent != null && e.Intent.T == "attack");
             Assert.AreEqual(R.ENEMY_DMG * R.FLOOR_DMG[2] * R.BOSS_DMG[2], R.FoeScale(1, boss: true).dmg, 1e-12, "보스도 ENEMY_DMG 를 곱한다");
             if (hit != null && b.IntentHit(hit) is int shown && hit.Status.Count == 0)

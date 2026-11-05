@@ -363,11 +363,18 @@ namespace Bolzena.RunUI
         /// noFace — 오른쪽 위 주인 얼굴 핀을 숨긴다(신탁 고르기 창만 — 2026-10-06 사용자). 틀 색은 그대로 주인 성격.</summary>
         /// <summary>신탁 고르기 창 후보 카드에 축복 효과 줄을 얹을 때(그 한 장 만드는 동안만) 쓴다.</summary>
         public static string BlessOverride;
+        /// <summary>카드 기준 규격 — 카드 면은 이 크기로만 배치하고 실제 크기는 균등 배율로(가로:세로 = 1:1.4).</summary>
+        public const float RefW = 200, RefH = 280;
         public static RectTransform Card(Transform parent, Flow f, string id, float w = 200, string name = "card", CardView view = null, string owner = null, bool noFace = false, CardMark markOf = null)
         {
             var P = f.P;
             var v = view ?? P.View(id);
-            float k = w / 200f, h = 280 * k;
+            // 규격 고정(2026-11-01 사용자 「카드 크기 규격 고정」) — 카드 면은 기준 규격(200×280) 하나로만 배치하고, 화면마다 다른 크기는
+            //   면 전체의 균등 배율(cardface 의 localScale)로만 만든다. 예전엔 자리 · 크기만 k 배로 줄이고 9-slice 테(테 · 둥근 모서리 · 글 판)의 두께와
+            //   글 줄 간격은 그대로라, 작은 카드에서 테 · 색 줄 · 글 판이 따로 놀아 삐져나왔다. 아래 w · h · k 는 기준 규격 값(k = 1) — 실제 폭은 dw
+            float dw = w, scale = dw / RefW;
+            w = RefW;
+            float k = 1f, h = RefH;
             string type = v?.Type ?? "스킬";
             bool status = v != null && (v.IsStatus || v.IsCurse);
             // 교주 카드 주인 = core CardView.Owner(덱 id 「카드@사도」) — 없으면 넘겨받은 owner(고르기 창 미리보기), 그것도 없으면 금빛 중립
@@ -376,10 +383,12 @@ namespace Bolzena.RunUI
             Color tint = CardTint(f, v, owner);
             var hero = v?.Def.Hero != null ? Roster.OfCore(v.Def.Hero) : null;   // 그림 · 종류의 주인(교주 카드는 주인이 있어도 교주 카드 그림)
             var bg = Ui.Img(parent, Theme.Round, Theme.NavyWell, name, true);
-            bg.pixelsPerUnitMultiplier = 1.7f;   // 모서리 둥글기 ≈ 12
-            var rt = bg.rectTransform;
-            rt.sizeDelta = new Vector2(w, h);
-            bg.Pref(w, h);
+            bg.pixelsPerUnitMultiplier = 1.7f / scale;   // 모서리 둥글기 ≈ 12(기준 규격) — 루트는 실제 크기라 배율만큼 같이 줄인다
+            var root = bg.rectTransform;
+            root.sizeDelta = new Vector2(dw, dw * RefH / RefW);
+            bg.Pref(dw, dw * RefH / RefW);
+            var rt = Ui.Rect("cardface", root).At(0.5f, 0.5f, 0, 0, w, h);   // 루트 크기를 부르는 쪽이 바꿔도 면은 가운데 같은 비율로
+            rt.localScale = new Vector3(scale, scale, 1);
 
             // ── 그림 창(테 안쪽 전체 · 둥글게 오린다) ──
             var win = Ui.Img(rt, Theme.Round, Color.white, "art");
@@ -468,7 +477,7 @@ namespace Bolzena.RunUI
             if (baseFull != null) full = OracleDiff.Mark(baseFull, full);   // 신탁으로 바뀐 부분 표시
             // 글 속 낱말(키워드 · 상태 · 사도 고유 효과 · 생성 카드) — 작은 카드(150 아래)는 글이 작아 누르기 어려우니 싣지 않는다
             List<CardTerms.Term> terms = null;
-            if (v != null && !string.IsNullOrEmpty(full) && w >= 150)
+            if (v != null && !string.IsNullOrEmpty(full) && dw >= 150)
             {
                 terms = CardTerms.Of(P.Data, P.Text, v, full);
                 full += CardTerms.Extra(full, terms);   // 글에 이름이 없는 진화 · 결속 · 금기 카드 한 줄
@@ -600,7 +609,7 @@ namespace Bolzena.RunUI
             if (mark.Copy)
             {
                 bool small = true;   // 복제는 작은 아이콘 하나(2026-10-09) — 문구는 카드 상세 풀이로
-                bool brief = Theme.Compact || w < 200;   // 폰 · 작은 카드는 「복제」 만 크게 — 「원본과 따로」 는 카드 크게 · 툴팁에서
+                bool brief = Theme.Compact || dw < 200;   // 폰 · 작은 카드는 「복제」 만 크게 — 「원본과 따로」 는 카드 크게 · 툴팁에서
                 string copyLine = small ? "" : brief ? "복제" : CardMark.COPY_LINE;
                 float cfs = brief ? 13f * k : 10.5f * k;
                 var cb = Ui.Img(rt, Theme.Pill, new Color(0.04f, 0.05f, 0.1f, 0.88f), "copymark");
@@ -618,7 +627,7 @@ namespace Bolzena.RunUI
                     cl.enableAutoSizing = true; cl.fontSizeMin = 8 * k; cl.fontSizeMax = cfs;
                 }
             }
-            return rt;
+            return root;
         }
 
         /// <summary>축복 표식 — 장식 선(높이 y, 반너비 half) 양 끝의 금빛 날개 한 쌍.</summary>

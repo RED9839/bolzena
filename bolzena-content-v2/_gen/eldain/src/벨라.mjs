@@ -3,6 +3,11 @@
 //   「존재감」(최대 7)을 쥐고 있으면 1겹당 파티 모두 피해 +5%. 고유 카드는 모두 두 갈래 — 낼 때 「채우기」(존재감 +) · 「쓰기」(존재감을 모두 써서 1개당 케어 · 한 방).
 //   쓰는 순간 파티 피해 덤도 사라진다 — 쌓아 둘까, 지금 돌볼까.
 //   없앤 것: 촛불이 동료 카드마다 저절로 타며 주던 실드 · 회복(burn) · 보조 자원 「존재의 불꽃」 · 위기 회복 「영속」. 이전 판: C:\projects\_backup\bella_before_20261013
+// 2026-11-01 다듬기(사용자 「지금대로 + 다듬기」 — _measure/실비아_벨라_우로스_설계안_20261101.md §3 · 10-13 문구는 그대로):
+//   「쓰기」 는 케어(실드 · 회복 · 끈기 · 약화)로 모은다 — 원작 A2 「존속 발동 = 아군 회복 · 받는 피해 감소」. 쥐면 공격(파티 피해 + · 비춰 줘의 쥔 만큼), 털면 돌봄.
+//   큰 털기 보상 갈래 「영속 = 끈기」(원작 영속 = 쓰러지면 HP 전부 회복): 비춰 줘 신탁 3 — 5개를 다 털면 끈기 1.
+//   바꾼 쓰기: 첫 번째 촛불 신탁 5(1개당 적 전체 피해 → 회복) · 나눠 주기 신탁 2(적 전체 피해 → 실드) · 신탁 3(3개 써서 AP → 적 전체 약화) ·
+//   비춰 줘 기본(1개당 피해 80% → 실드) · 신탁 3(3개 넘게 쓰면 강인도 2 → 5개 다 털면 끈기 1). 이전 판: C:\projects\_backup\hero_sep_20261101
 import { hero, dmg, ddmg, shield, heal, stack, spend, make, draw, discard, status, empower, ifStack, power, rule } from '../lib.mjs';
 
 const H = '벨라', K = '존재감';
@@ -36,7 +41,7 @@ export default hero({
         { fx: [...fill(lit(2), empower(0.3, { who: 'other' })), ...use(heal(0.15))] },    // 채우며 동료 다음 카드 +30%(글 45자 — 이것만 보존 뺌)
         { cost: 0, tags: ['보존'], fx: [shield(0.8), ...fill(lit(2)), ...useN(2, heal(0.3))] },                    // 0코 · 쓰기는 2개만 크게
         { tags: ['보존'], fx: [shield(1.5), ...fill(lit(3)), ...use(shield(0.4))] },                               // 쓰기 → 실드
-        { tags: ['개전', '보존'], fx: [...fill(lit(3)), ...use(ddmg(0.5, 'allEnemies'))] },   // 10-19 밸런스: 1개당 전체 30 → 50%              // 개전 · 쓰기 → 적 전체 피해
+        { tags: ['개전', '보존'], fx: [...fill(lit(3)), ...use(heal(0.4))] },   // 11-01: 쓰기 1개당 적 전체 피해 50% → 회복 50%(케어로 모음)   // 개전 · 쓰기 → 회복
       ],
       blesses: ['guard', 'draw', [lit(1)]],
     },
@@ -45,8 +50,8 @@ export default hero({
       fx: [...fill(lit(1)), ...use(heal(0.15))],   // 10-21 밸런스 조절 6차: 채우기 2 → 1
       oracles: [
         { fx: [draw(1), ...fill(lit(2)), ...use(heal(0.15))] },                                                     // 드로우
-        { fx: [...fill(lit(2)), ...use(ddmg(0.5, 'allEnemies'))] },   // 10-19 밸런스: 30 → 50%                                               // 쓰기 → 1개당 적 전체 피해
-        { tags: ['소멸'], fx: [...fill(lit(2)), { k: 'ifChoice', n: 2 }, spend(K, 3), { k: 'ifEvent', n: 3 }, { k: 'ap', v: 1 }] },  // 쓰기 → 3개 써서 AP 1(0코 AP 라 소멸)
+        { fx: [...fill(lit(2)), ...use(shield(0.3))] },   // 11-01: 쓰기 1개당 적 전체 피해 50% → 실드(케어로 모음)
+        { fx: [...fill(lit(2)), { k: 'ifChoice', n: 2 }, spend(K, 3), { k: 'ifEvent', n: 3 }, status('약화', 1, { target: 'allEnemies' })] },  // 11-01: 쓰기 → 3개 써서 AP 1(소멸) → 적 전체 약화 1
         { fx: [...fill(lit(1)), ...use(heal(0.25))] },                                                              // 쓰기 쪽으로
         { fx: [...fill(lit(2)), ...use(heal(0.1)), status('사기', 1)] },                                            // 쓰기 → 회복 + 사기 1
       ],
@@ -66,11 +71,11 @@ export default hero({
     },
     {
       name: '너의 존재를 비춰 줘', cost: 2, type: '공격', choices: CH,
-      fx: [ddmg(2), ...fill(lit(2)), ...use(ddmg(0.8))],   // 10-19 밸런스: 쓰기 1개당 60 → 80%
+      fx: [ddmg(2), ...fill(lit(2)), ...use(shield(0.4))],   // 11-01: 쓰기 1개당 피해 80% → 실드(케어로 모음 — 쥐면 공격 · 털면 돌봄)   // 10-19 밸런스: 쓰기 1개당 60 → 80%
       oracles: [
         { fx: [ddmg(1, 'allEnemies'), ...fill(lit(2)), ...use(heal(0.1))] },                                       // 적 전체 · 쓰기 → 회복
         { fx: [ddmg(2), ...fill(lit(1), { k: 'perStack', id: K }, ddmg(0.5))] },   // 10-19: 채우기 1당 30 → 50%                   // 채우기 → 쥔 만큼 더 세게(쓰지 않음)
-        { fx: [ddmg(2), ...fill(lit(2)), { k: 'ifChoice', n: 2 }, spend(K, 'all'), { k: 'ifEvent', n: 3 }, { k: 'tough', v: 2 }] },   // 쓰기 → 3개 넘게 쓰면 강인도 2
+        { fx: [ddmg(2), ...fill(lit(2)), { k: 'ifChoice', n: 2 }, spend(K, 'all'), { k: 'ifEvent', n: 5 }, status('끈기', 1)] },   // 11-01 「영속 = 끈기」 갈래: 5개를 다 털면 끈기 1(옛: 3개 넘게 쓰면 강인도 2)
         { cost: 1, fx: [ddmg(1), ...fill(lit(1)), ...use(shield(0.3))] },                                         // 1코 · 쓰기 → 실드
         { fx: [ddmg(1.5), draw(1), ...fill(lit(2)), ...use(shield(0.3))] },                                       // 드로우 · 쓰기 → 실드
       ],

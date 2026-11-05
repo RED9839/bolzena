@@ -594,6 +594,9 @@ namespace Bolzena.View
         public float Width { get; private set; }
         public float MaxW = 99f;          // 이 넓이를 넘으면 다음 줄로(Rows 까지), 마지막 줄에서 넘치면 나머지는 「+N」 하나로(적 머리 위가 이웃과 겹치지 않게)
         public int Rows = 1;
+        /// <summary>칩을 이만큼까지만 — 넘치면 마지막 자리에 「…」(툴팁에 나머지, 누르면 OnMore). 0 이면 끝없이(2026-11-01 파티 줄).</summary>
+        public int MaxCount;
+        public System.Action OnMore;
         public int Order { get => order; set => order = value; }
 
         /// <summary>그 이름의 칩 자리(월드) — 없으면 null. 데모가 강화 칩 위에 손가락을 올릴 때.</summary>
@@ -654,7 +657,8 @@ namespace Bolzena.View
             ["분산"] = 84,                                              // 죠안 — 원작 죠안 분산
             ["주교의 경전"] = 215,                                      // 죠안 — 원작 없음 · 그림으로 고름(책, 원작은 에슈르(마도) 연구 집중)
             ["눈꽃"] = 5,                                               // 아야 — 원작 아야 동상(10-20 리워크: 「서리」 칩 그림을 「눈꽃」 으로 옮김)
-            ["찻잔"] = 209,                                             // 실비아 — 원작 실비아 초청객
+            ["찻잔"] = 209,                                             // 실비아 — 원작 실비아 초청객(옛 이름, 11-01 「초청객」 으로 바뀜)
+            ["초청객"] = 209,                                           // 실비아 — 동료에게 붙는 표시(2026-11-01 안 A 「손님 고르기」)
             ["존재감"] = 117,                                           // 벨라 — 원작 벨라 영속
             // 클론(적이 된 사도) 고유 효과 · 변신 — 그 사도의 원작 상태 그림
             ["수족열증"] = 190, ["꿀범벅"] = 165, ["해적의 낙인"] = 216, ["극복의 훈장"] = 199, ["마력 증폭"] = 214,   // 델리아 · 베니(베니) · 스패럿 · 헤일리(멀쩡) · 에슈르(마도) — 원작과 같은 이름
@@ -763,6 +767,21 @@ namespace Bolzena.View
             int idx = 0, row = 0;
             foreach (var c in list)
             {
+                if (MaxCount > 0 && idx == MaxCount && list.Count > MaxCount)
+                {
+                    // 「…」 — 칩과 같은 남색 바탕, 툴팁에 나머지 이름 · 값
+                    var more = Make.Node("more", transform, new Vector3(x, y, 0));
+                    made.Add(more.gameObject);
+                    float mw = size * 1.1f;
+                    Make.Sliced("bg", more, Res.UI("bar_fill_9s"), new Vector3(mw / 2, 0, 0), new Vector2(mw, size * 1.02f), order, new Color(0.05f, 0.075f, 0.16f, 0.94f));
+                    var mt = Make.Text("m", more, "…", new Vector3(mw / 2, size * 0.08f, 0), size * 0.8f, order + 2, new Color(0.85f, 0.88f, 0.95f));
+                    Make.Outline(mt, 0.3f, Color.black);
+                    var all = new List<StatusChip>(list.GetRange(idx, list.Count - idx));
+                    TipZone.Add(more, new Vector2(mw, size * 1.1f), () => { var sb = new System.Text.StringBuilder(Tip.Head($"그 밖 {all.Count}개")); foreach (var cc in all) sb.Append('\n').Append(cc.Id).Append(string.IsNullOrEmpty(cc.Value) ? "" : " " + cc.Value); if (OnMore != null) sb.Append(Tip.Dim("\n누르면 모두 본다")); return sb.ToString(); }, 6, new Vector2(mw / 2, 0)).Button = OnMore != null;
+                    if (OnMore != null) { var mb = more.gameObject.AddComponent<Button>(); mb.Size = new Vector2(mw, size * 1.1f); mb.Offset = new Vector2(mw / 2, 0); mb.OnClick = OnMore; }
+                    x += mw + 0.05f;
+                    break;
+                }
                 if (x > MaxW - size * 1.4f && idx < list.Count && row < Rows - 1 && x > 0)
                 {
                     widest = Mathf.Max(widest, x);

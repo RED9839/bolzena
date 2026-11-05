@@ -93,15 +93,15 @@ namespace Bolzena.Core.Tests
             Assert.IsTrue(b.Party.All(u => b.St(u, "사기") == 1));
         }
 
-        [Test] public void 결의는_얻는_실드에_겹마다_20_손상은_반()
+        [Test] public void 결의는_실드_계수에_겹마다_20퍼센트_손상은_반()
         {
             var b = K.Fight(); K.Hand(b, "guard", "guard", "guard");
             b.Pool.Status["결의"] = 2;
             K.Play(b, "guard");
-            Assert.AreEqual(140, b.Pool.Block);
+            Assert.AreEqual(120, b.Pool.Block, "방어력 50 × (200% + 20%p × 2) — 사기처럼 계수에 더한다");
             b.Pool.Status["손상"] = 1;
             K.Play(b, "guard");
-            Assert.AreEqual(140 + 70, b.Pool.Block);
+            Assert.AreEqual(120 + 60, b.Pool.Block);
             Assert.AreEqual(0, b.St(b.Pool, "손상"));
         }
 
@@ -176,7 +176,7 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(1, b.St(K.E(b), "표식"));
         }
 
-        [Test] public void 잔광은_공격_카드에_강인도_1칸_더_격파된_적이면_50퍼센트()
+        [Test] public void 잔광은_공격_카드에_강인도_1칸_더_격파된_적이면_100퍼센트()
         {
             var b = K.Fight(); K.Hand(b, "hit", "hit");
             b.Pool.Status["잔광"] = 2;
@@ -184,8 +184,20 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(4 - 1.0 / 3 - 1, K.E(b).Tough, 1e-9);
             K.E(b).Broken = true;
             K.Play(b, "hit");
-            Assert.AreEqual(900 - 150, K.Hp(b));
+            Assert.AreEqual(900 - 200, K.Hp(b), "피해량 +100%");
             Assert.AreEqual(0, b.St(b.Pool, "잔광"));
+        }
+
+        [Test] public void 잔광은_강인도가_없는_적이면_격파_전에도_100퍼센트()
+        {
+            var b = K.Fight(); K.Hand(b, "hit", "hit");
+            b.Pool.Status["잔광"] = 1;
+            K.E(b).Tough = 0; K.E(b).ToughMax = 0;   // 보스 소환물(noTough)처럼 강인도 없음
+            K.Play(b, "hit");
+            Assert.AreEqual(1000 - 200, K.Hp(b));
+            Assert.IsFalse(K.E(b).Broken);
+            K.Play(b, "hit");
+            Assert.AreEqual(800 - 100, K.Hp(b), "잔광이 다 쓰이면 그대로");
         }
 
         [Test] public void 협공은_다른_아군의_공격력_100퍼센트()
@@ -242,6 +254,22 @@ namespace Bolzena.Core.Tests
             K.Play(b, "hit");
             Assert.AreEqual(900 - 160, K.Hp(b));
             Assert.AreEqual(0, b.St(K.E(b), "잔불"));
+        }
+
+        [Test] public void 잔불은_그_타격으로_격파시킬_때도_들고_쓰러뜨리기만_하면_안_든다()
+        {
+            var b = K.Fight(); K.Hand(b, "hit", "hit");
+            K.E(b).Status["잔불"] = 2;
+            K.E(b).Tough = 0.2;   // 비약점 1코 1/3칸이면 이 타격으로 격파
+            K.Play(b, "hit");
+            Assert.IsTrue(K.E(b).Broken);
+            Assert.AreEqual(1000 - 160, K.Hp(b), "격파시키는 타격 — 잔불 2 × 30%");
+            Assert.AreEqual(0, b.St(K.E(b), "잔불"));
+            var c = K.Fight(); K.Hand(c, "hit");
+            K.E(c).Status["잔불"] = 2; K.E(c).Hp = 120;   // 옛 규칙은 100 × 1.6 ≥ 120 이라 「쓰러질 타격」 으로 들었다
+            K.Play(c, "hit");
+            Assert.AreEqual(20, K.Hp(c), "격파도 아니고 격파시키지도 않으면 처치 직전이어도 안 든다");
+            Assert.AreEqual(2, c.St(K.E(c), "잔불"));
         }
 
         [Test] public void 면역은_해로운_것_하나를_막는다()

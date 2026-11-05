@@ -530,6 +530,8 @@ namespace Bolzena.Core
         public string HuntCarry;
         /// <summary>(엘다인 4차 — 벨라 「존속의 촛불」) 아군 표시(carrier hero)가 타는 꼴 — 붙은 동료가 자기 카드를 낼 때마다 1 이 타며 키워드 주인 방어력 기준 실드. 규칙이 아니다.</summary>
         public KwBurn Burn;
+        /// <summary>(2026-11-01 실비아 「초청객」) 아군 표시(carrier hero)가 주인 자신에게는 붙지 않는다 — 쌓기 · moveMark 가 주인을 가리키면 건너뛴다(burn 표시와 같은 막기). 동료에게만 주는 표시.</summary>
+        public bool NoOwner;
         /// <summary>(엘다인 4차 — 아야 「만년설의 앎」) 적의 수 종류(공격 · 방어 · 강화 · 방해)를 적어 두는 칸 — 겹 = 아는 종류 수(최대 4 · 전투 끝까지 · 쓰지 않음). learn 이 적는다.</summary>
         public bool Known;
         /// <summary>내 턴이 끝나면 이만큼 준다 · 전부 사라진다(decay 는 적의 차례가 끝난 뒤 = 다음 내 턴 시작).</summary>
@@ -714,7 +716,7 @@ namespace Bolzena.Core
         public int? MaxCost;
         /// <summary>(엘다인 4차 리뉴아) play — 낼 때의 비용(줄어든 값 · 할인 반영)이 이 값 이하인 카드만. maxCost 는 카드에 적힌 비용.</summary>
         public int? PaidMax;
-        /// <summary>play · drawn — 이 사도 표시(carrier hero 키워드)가 붙은 사도의 카드만(「지정 아군이 카드를 내면」).</summary>
+        /// <summary>play · drawn — 이 사도 표시(carrier hero 키워드)가 붙은 사도의 카드만(「지정 아군이 카드를 내면」). ult — 그 표시가 붙은 사도가 고학년을 쓰면(2026-11-01 실비아).</summary>
         public string Marked;
         /// <summary>hit — 약점으로 들어갔을 때만 · drawn — 고유 카드만 · exhaust — 시작 카드만.</summary>
         public bool Weak, Unique, Basic;
@@ -993,6 +995,8 @@ namespace Bolzena.Core
         public List<string> By;
         /// <summary>파티에 이 사도(들 가운데 하나)가 있어야 보인다.</summary>
         public List<string> Hero;
+        /// <summary>파티에 이 사도들이 모두 있어야 보인다(관계 쌍 선택지 — 2026-11-01). hero 와 함께 쓰면 둘 다 맞아야 한다(「아야 + 우이 · 우이(기억) 가운데 한 명」).</summary>
+        public List<string> HeroAll;
         public string Race;
         /// <summary>"hp30" — 파티 HP 30% 이하일 때만.</summary>
         public string When;

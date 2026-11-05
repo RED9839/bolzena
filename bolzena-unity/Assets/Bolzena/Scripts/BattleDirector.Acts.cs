@@ -1625,7 +1625,7 @@ namespace Bolzena
                         done += v;
                         res[slot + j].Add(new BattleEvent
                         {
-                            Kind = e.Kind, Actor = e.Actor, Target = e.Target, Value = v, Blocked = j == m - 1 ? e.Blocked : 0, Crit = e.Crit && j == m - 1,
+                            Kind = e.Kind, Actor = e.Actor, Target = e.Target, Value = v, Blocked = j == m - 1 ? e.Blocked : 0, Crit = e.Crit && j == m - 1, Weak = e.Weak, By = e.By,
                             HpAfter = e.HpAfter + (e.Value - done), BlockAfter = e.BlockAfter, Hit = slot + j, Hits = n, HitKind = e.HitKind, Motion = e.Motion, Text = e.Text,
                         });
                     }
@@ -1908,14 +1908,15 @@ namespace Bolzena
             // 숫자는 몸 위쪽에 — 가운데에 띄우면 큰 적(보스)의 몸을 가린다
             var numAt = Vector3.Lerp(t.Center, t.Top, 0.55f);
             float numY = Mathf.Max(at.y + 0.55f, numAt.y);
-            if (EnemyHud.OldLayout) Vfx.Number(new Vector3(at.x + 0.2f, numY, 0), e.Value, crit, e.Hit, null, false, e.Blocked);
+            string byNat = e.By >= 0 && e.By < Battle.Snapshot.Heroes.Count ? Battle.Snapshot.Heroes[e.By].Nature : null;   // 엔진이 피해를 셈한 사도의 성격(숫자 왼쪽 동그라미) — 사도가 아닌 피해면 없음
+            if (EnemyHud.OldLayout) Vfx.Number(new Vector3(at.x + 0.2f, numY, 0), e.Value, crit, e.Hit, null, false, e.Blocked, 460, e.Weak, byNat);
             else
             {
                 // 숫자는 머리 위 묶음 밑에서 떠올라 막대에 닿기 전에 사라지게(떠오르는 높이 · 연타 한 칸씩 · 글 높이만큼 아래),
                 //   그래도 닿으면 묶음 밑으로 그린다(355 — 묶음 360~ 아래, 고학년 이펙트 325 · 사도 330 위)
                 float room = hud.FieldBottom - 1.15f - (crit ? 0.2f : 0) - e.Hit * 0.32f;
                 numY = Mathf.Max(t.Center.y, Mathf.Min(numY, room));
-                Vfx.Number(new Vector3(at.x + 0.2f, numY, 0), e.Value, crit, e.Hit, null, false, e.Blocked, 355);
+                Vfx.Number(new Vector3(at.x + 0.2f, numY, 0), e.Value, crit, e.Hit, null, false, e.Blocked, 355, e.Weak, byNat);
             }
             hud.SetHp(e.HpAfter);
             hud.SetBlock(e.BlockAfter);

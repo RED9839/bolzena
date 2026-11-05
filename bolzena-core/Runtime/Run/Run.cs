@@ -322,6 +322,10 @@ namespace Bolzena.Core
                 Glow = glow, Growth = S.Growth, CardVals = S.CardVals, Prog = S.Prog,
                 Seed = (uint)(S.Seed + S.Floor * 101 + S.Node * 7 + S.Step * 13 + (S.EventFight != null ? 555 : 0)),
             };
+            // 광폭화 · 편성 배율(2026-10-31 원작 대조) — 광폭화는 판의 모든 싸움, 편성 배율은 지도의 일반 · 정예 싸움만(이벤트 싸움 · 보스는 데이터 그대로)
+            bool bossFight = IsBoss && S.EventFight == null && !BossAsElite;
+            setup.Rage = R.RageTurnOf(bossFight, setup.Elite);
+            if (S.EventFight == null && !IsBoss) setup.FoePack = R.PackX(setup.Enemies.Count, S.Elite);
             var b = Battle.Start(Data, setup, cues, onCue);
             b.Tape = new BattleTape(setup.Deck);   // 플레이 기록 — 턴별 녹화
             b.Record(setup);   // 입력 테이프 — 이 셋업 + 입력으로 다시 돌린다(BattleInput.cs)

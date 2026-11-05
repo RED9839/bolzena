@@ -159,6 +159,7 @@ namespace Bolzena.Core
             if (f.Id == null || !Kw.TryGetValue(f.Id, out var kw) || kw.Carrier != "hero") return;
             var to = Resolve(ctx, f.Target ?? "oneAlly").FirstOrDefault(u => u.Side == Side.Party);
             if (to == null) return;
+            if (kw.Def.NoOwner && to.Key == kw.Owner) { Say($"「{f.Id}」 — 주인 자신에게는 붙지 않는다"); return; }   // (2026-11-01 실비아 초청객)
             int sum = 0;
             foreach (var o in Party)
                 if (o != to && StackOf(o.Key, f.Id) > 0) { int n = StackOf(o.Key, f.Id); sum += n; AddStack(o.Key, f.Id, -n); StackChanged(kw.Owner, f.Id, n, 0, o); }

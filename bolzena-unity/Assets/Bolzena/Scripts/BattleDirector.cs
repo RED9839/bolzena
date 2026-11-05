@@ -630,10 +630,19 @@ namespace Bolzena
             return false;
         }
 
+        // 사람이 누른 턴 종료(단추 · E) — 낼 수 있는 카드가 남았으면 한 번 묻는다(EndTurnButton.Ask · 설정 「턴 종료 확인」). 자동 전투 · 데모 · 점검은 RequestEnd 를 바로 부른다
+        void AskEnd()
+        {
+            int n = 0;
+            if (EndTurnButton.NeedAsk) for (int i = 0; i < Hand.Cards.Count; i++) if (Battle.CanPlay(i, out _)) n++;
+            if (n > 0 && Modal.Open == null) { if (Hand.HasSelection) Hand.Cancel(); EndTurnButton.Ask(UiRoot, n, RequestEnd); Emit("endask"); return; }
+            RequestEnd();
+        }
+
         // ── 입력(카드 밖) — 턴 종료 · 고학년 · 더미 · 정보 · 단축키 ──
         void PollInput()
         {
-            if (Modal.Open != null) return;
+            if (Modal.Open != null || EndTurnButton.ClosedFrame == Time.frameCount) return;   // 턴 종료 확인 창의 단추를 누른 탭이 창 뒤로 새지 않게
             var p = PointerInput.Pos;
             Hud.EndHover = Hud.OverEnd(p) && !PointerInput.Touch;
 
@@ -642,7 +651,7 @@ namespace Bolzena
             if (PointerInput.Key(Key.Tab) && !(Keyboard.current.leftAltKey.isPressed || Keyboard.current.rightAltKey.isPressed)) ToggleSpeed();
             if (PointerInput.Key(Key.Q)) Hud.OnAuto?.Invoke();
             if (PointerInput.Key(Key.Escape)) { if (Hand.HasSelection) Hand.Cancel(); else if (UltSel >= 0) SetUltSel(-1); else OpenPause(); return; }
-            if (PointerInput.Key(Key.E)) { RequestEnd(); return; }
+            if (PointerInput.Key(Key.E)) { AskEnd(); return; }
             if (PointerInput.Key(Key.A)) { OpenPile(0); return; }
             if (PointerInput.Key(Key.S)) { OpenPile(1); return; }
             if (PointerInput.Key(Key.D)) { ToggleMeter(); return; }
@@ -673,7 +682,7 @@ namespace Bolzena
 
             if (!PointerInput.Tap || Hand.HasSelection || Hand.Hover >= 0) return;
             if (Meter != null && Meter.Over(p)) return;   // 전투 기록 표 위 — 탭(알약)만, 싸움터로 넘기지 않는다
-            if (Hud.OverEnd(p)) { Sfx.Play("ui_click", 0.6f); RequestEnd(); return; }
+            if (Hud.OverEnd(p)) { Sfx.Play("ui_click", 0.6f); AskEnd(); return; }
             for (int k = 0; k < Hud.Ults.Count; k++) if (Hud.Ults[k].Over(p)) { TapUlt(k); return; }
             int te = EnemyAt(p);
             if (UltSel >= 0)

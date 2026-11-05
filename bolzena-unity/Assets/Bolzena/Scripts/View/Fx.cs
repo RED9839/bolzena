@@ -240,7 +240,9 @@ namespace Bolzena.View
         }
 
         // ── 피해 숫자 ──
-        public static void Number(Vector3 pos, int value, bool crit, int hitIndex, Color? tint = null, bool hurt = false, int blocked = 0, int order = 460)
+        // weak · nature — 사도가 적을 친 숫자: 위에 「약점」 · 「치명」 꼬리표, 숫자 왼쪽에 친 사도의 성격 동그라미(2026-11-01)
+        public static void Number(Vector3 pos, int value, bool crit, int hitIndex, Color? tint = null, bool hurt = false, int blocked = 0, int order = 460,
+                                  bool weak = false, string nature = null)
         {
             var root = Make.Node("dmg", Field, pos + new Vector3(Random.Range(-0.25f, 0.25f), hitIndex * 0.32f, 0));
             float size = crit ? 0.85f : 0.62f;
@@ -251,17 +253,26 @@ namespace Bolzena.View
             t.fontStyle = FontStyles.Normal;
             t.characterSpacing = -4;
             Make.Shadow(t, new Color(0, 0, 0, 0.55f), 0.35f, 0.7f, -0.9f);     // 밝은 이펙트 위에서도 숫자가 떠 보이게
+            // 꼬리표 — 연타는 첫 대에만(다음 대 숫자와 겹치지 않게)
+            if ((crit || weak) && hitIndex == 0 && !hurt)
+            {
+                string tag = (weak ? "<color=#FF9C8A>약점</color>" : "") + (weak && crit ? "  " : "") + (crit ? "<color=#FFE27A>치명</color>" : "");
+                var label = Make.Text("tag", root, tag, new Vector3(0, size * 0.85f, 0), 0.3f, order + 1 + hitIndex, Color.white);
+                Make.Outline(label, 0.3f, new Color(0.25f, 0.04f, 0f));
+                label.characterSpacing = 4;
+            }
+            // 성격 동그라미 — 볼제나엔 성격 그림이 없어 성격 색 원(정보 창 사도 칸과 같은 꼴)
+            if (nature != null && !hurt)
+            {
+                float d = size * 0.42f, x = -t.GetPreferredValues(s).x * 0.5f - d * 0.75f;
+                Make.Box("nat_rim", root, Res.UI("circle"), new Vector3(x, size * 0.05f, 0), new Vector2(d + 0.05f, d + 0.05f), order - 1, new Color(0.08f, 0.06f, 0.12f, 0.9f));
+                Make.Box("nat", root, Res.UI("circle"), new Vector3(x, size * 0.05f, 0), new Vector2(d, d), order, Bolzena.UI.Tone.Nature(nature));
+            }
             if (crit)
             {
                 t.colorGradient = new VertexGradient(new Color(1f, 1f, 0.75f), new Color(1f, 1f, 0.75f), new Color(1f, 0.55f, 0.1f), new Color(1f, 0.55f, 0.1f));
                 Make.Outline(t, 0.22f, new Color(0.35f, 0.05f, 0.02f));
                 Make.Glow(t, Color.white, 1.12f);
-                if (hitIndex == 0)
-                {
-                var label = Make.Text("crit", root, "CRITICAL", new Vector3(0, size * 0.85f, 0), 0.26f, order + 1 + hitIndex, new Color(1f, 0.9f, 0.5f));
-                Make.Outline(label, 0.3f, new Color(0.3f, 0.05f, 0f));
-                label.characterSpacing = 6;
-                }
             }
             else if (hurt)
             {

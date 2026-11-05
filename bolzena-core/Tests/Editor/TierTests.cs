@@ -36,7 +36,8 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(fa.EnemyHpx * Tiers.HP[1], fb.EnemyHpx, 1e-12, "전투 적 체력 배율");
             Assert.AreEqual(fa.EnemyDmgx * Tiers.DMG[1], fb.EnemyDmgx, 1e-12, "전투 적 피해 배율");
             Assert.Less(fb.Enemies.Sum(e => e.MaxHp), fa.Enemies.Sum(e => e.MaxHp), "낮은 단계 — 적 체력이 준다");
-            Assert.IsTrue(fb.Enemies.All(e => e.Dmgx == fb.EnemyDmgx), "적마다 피해 배율");
+            double pack = R.PackX(fb.Enemies.Count, fb.EliteFight) ?? 1;   // 편성 배율(2026-10-31) — 처음 선 적마다
+            Assert.IsTrue(fb.Enemies.All(e => System.Math.Abs(e.Dmgx - fb.EnemyDmgx * pack) < 1e-12), "적마다 피해 배율(× 편성 배율)");
             var hi = Run.New(d, PARTY, 7); hi.SetTier(Tiers.MAX);
             Assert.Greater(hi.FoeScaleOf().hp, sa.hp, "높은 단계 — 더 세다");
         }

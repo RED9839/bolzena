@@ -83,6 +83,7 @@ namespace Bolzena.Battle
             ["영감"] = "「영감:」 — 카드 · 패시브로 뽑혔을 때",
             ["안식"] = "「안식:」 — 카드 효과로 버려질 때",
             ["전환"] = "카드 주인의 모드 고유 효과를 뒤집음",
+            ["광폭화"] = $"싸움이 길어지면 적 피해가 오른다 — 일반 {R.RAGE_TURN_FIGHT} · 정예 {R.RAGE_TURN_ELITE} · 보스 {R.RAGE_TURN_BOSS}턴 뒤 ×{R.RAGE_BASE}, 그 뒤 턴마다 ×{R.RAGE_SCALE}",   // 판 싸움만(core R.RageX)
         };
 
         /// <summary>

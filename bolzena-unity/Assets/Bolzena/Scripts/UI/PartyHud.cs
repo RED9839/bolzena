@@ -39,6 +39,9 @@ namespace Bolzena.UI
         int hp, maxHp, gauge, gaugeMax = 300, block, due, ap;
         float fillF = 1, lagF = 1, lagHold, gaugeShown;
         int shownHand = -1, shownGauge = int.MinValue;   // 글을 바뀔 때만 다시 쓰려고
+        // 광폭화 — 배속 알약 아래 한 줄(「광폭화까지 N턴」 · 켜지면 「광폭화 ×1.1」). 판 싸움만 — 광폭화 없는 싸움은 빈 글
+        TextMeshPro rageText;
+        int rageShown = int.MinValue;
         float apPop;
         // AP 를 얻은 순간(격파 · 격파하며 처치) — AP 숫자 오른쪽 위에 「+N」 이 떠올랐다 사라진다
         TextMeshPro apPlus; float apPlusT;
@@ -153,7 +156,10 @@ namespace Bolzena.UI
                 p.OnTap = () => OnHero?.Invoke(ii);
                 portraits.Add(p);
             }
-            chips = ChipRow.Create(tl, new Vector3(BarX0, 3.4f, 0), O + 3, 0.24f);
+            // 파티 상태 칩 — 원작 비율(아이콘 26px · 10칸 넘으면 「…」, 1280 기준)에 맞춰 0.24 → 0.34, 11번째부터 「…」(누르면 파티 효과 창)
+            chips = ChipRow.Create(tl, new Vector3(BarX0, 3.32f, 0), O + 3, 0.34f);
+            chips.MaxCount = 10;
+            chips.OnMore = () => OnParty?.Invoke();
 
             // ── 위 오른쪽 — 자동 전투 · 배속 · 메뉴(≡), 배속과 메뉴 사이에 얇은 선 ──
             // 배속 — 자동 전투와 같은 알약 트랙: 왼쪽 시계 아이콘 + 오른쪽 지금 배속(1× · 2×). 누를 때마다 1× ↔ 2×, 2× 면 금빛(자동 켬과 같은 빛깔)
@@ -173,12 +179,22 @@ namespace Bolzena.UI
             float[] mh = { 0.14f, 0.26f, 0.19f };
             for (int i = 0; i < 3; i++)
                 meterBars[i] = Make.Box("meter_b" + i, tr, Res.UI("white"), MeterAt + new Vector3((i - 1) * 0.1f, -0.13f + mh[i] / 2, 0), new Vector2(0.065f, mh[i]), O + 2, new Color(0.95f, 0.93f, 0.88f));
+            // 단축키 배지 — 아이콘 · 알약 오른쪽 아래 귀퉁이(아래 광폭화 줄과 겹치지 않게 조금만 내린다)
+            KeyBadge.Add(tr, MeterAt + new Vector3(0.24f, -0.19f, 0), "D", O + 6, 0.2f);
+            KeyBadge.Add(tr, AutoAt + new Vector3(PillW / 2 - 0.04f, -0.18f, 0), "Q", O + 6, 0.2f);
+            KeyBadge.Add(tr, SpeedAt + new Vector3(PillW / 2 - 0.1f, -0.18f, 0), "Tab", O + 6, 0.2f);
+            KeyBadge.Add(tr, MenuAt + new Vector3(0.2f, -0.19f, 0), "Esc", O + 6, 0.2f);
+            // 광폭화 — 배속 · 메뉴 줄 아래 오른쪽 끝에 맞춘 한 줄(2026-11-01)
+            rageText = Txt("rage", tr, "", new Vector3(MenuAt.x + 0.28f, SpeedAt.y - 0.38f, 0), Tone.Sm, O + 2, Tone.Ink, TextAlignmentOptions.Right, 0.26f);
+            TipZone.Add(rageText, new Vector2(1.9f, 0.32f), () => rageShown == int.MinValue ? null : Tip.Head("광폭화") + "\n" + Terms.WordText("광폭화"), 2, new Vector2(-0.95f, 0));
 
             // ── 왼쪽 가운데 — 뽑을 더미 ──
             deckText = PileButton(ml, "deck", DeckAt, 0, "ic_pile_up", false, "뽑을 더미 — 다음에 뽑을 카드(차례는 감춤) · 누르면 본다 · 단축키 A");
+            KeyBadge.Add(ml, DeckAt + new Vector3(0.34f, 0.4f, 0), "A", O + 6);
 
             // ── 오른쪽 가운데 — 버린 더미 ──
             discText = PileButton(mr, "disc", DiscAt, 1, "ic_pile_down", true, "버린 더미 — 낸 카드 · 버린 카드 · 덱이 바닥나면 섞여 돌아온다 · 누르면 본다 · 단축키 S");
+            KeyBadge.Add(mr, DiscAt + new Vector3(-0.34f, 0.4f, 0), "S", O + 6);
 
             // ── 왼쪽 아래 — 고학년 게이지(큰 % + 세로 칸) · 고학년 띠 셋 ──
             Make.Box("fadeBL", bl, Res.UI("hud_fade"), new Vector3(-6.4f, -3.0f, 0), new Vector2(3.6f, 3.4f), O - 6, new Color(1, 1, 1, 0.55f));
@@ -202,7 +218,10 @@ namespace Bolzena.UI
             TipZone.Add(gz, new Vector2(0.9f, GaugeAt.y + 0.3f - GBarBot), () => Tip.Head("고학년 게이지") +
                 $"  {gauge}% / {gaugeMax}%\n파티가 함께 쓰는 게이지 — 카드에 쓴 AP 1 마다 +10% · 눈금은 사도마다 고학년에 드는 값, 넘으면 그 사도 띠가 반짝인다", 2);
             for (int i = 0; i < s.Heroes.Count; i++)
+            {
                 Ults.Add(UltButton.Create(bl, s.Heroes[i], i, new Vector3(UltX, UltY0 - i * UltDy, 0)));
+                if (i < 3) KeyBadge.Add(bl, new Vector3(UltX - UltButton.SW / 2 + 0.06f, UltY0 - i * UltDy + UltButton.SH / 2 - 0.06f, 0), "ZXC".Substring(i, 1), O + 30);   // BattleDirector.PollInput Z X C
+            }
 
             // ── 아래 가운데 — 큰 AP 숫자 · 손패 수 ──
             apGlow = Make.Box("apglow", bc, Res.UI("soft"), ApAt, new Vector2(1.8f, 1.1f), OAp, new Color(1f, 0.78f, 0.4f, 0.4f), Res.SpriteMat(true, 1.3f));
@@ -220,6 +239,7 @@ namespace Bolzena.UI
             // ── 오른쪽 아래 — 턴 종료(금 테 메달 + 다음 턴 화살 + 「턴 종료」 이름표 — EndTurnButton, 점검 인자 -endturnstyle) ──
             endTurn = EndTurnButton.Create(br, EndAt, O, s.Heroes.Count > 0 ? s.Heroes[0].Nature : null, EndTurnButton.Chosen);
             TipZone.Add(endTurn.Body, new Vector2(endTurn.Half.x * 2 / endTurn.Body.transform.localScale.x, endTurn.Half.y * 2 / endTurn.Body.transform.localScale.y), () => "턴 넘기기 — 손패를 버리고 적의 차례 · 단축키 E", 2).Button = true;
+            KeyBadge.Add(br, EndAt + new Vector3(-endTurn.Half.x + 0.14f, endTurn.Half.y - 0.02f, 0), "E", O + 30);
 
             Anchor();
         }
@@ -240,14 +260,16 @@ namespace Bolzena.UI
         }
 
         // 더미 — 큰 카드 더미 아이콘 + 숫자(판 없이). right — 숫자를 아이콘 왼쪽에
-        TextMeshPro PileButton(Transform t, string name, Vector3 at, int which, string icon, bool right, string tip, float size = 0.52f)
+        //   2026-11-01 원작 비율로 키움(58×70 · 숫자 25px, 1280 기준) — 그림 안 카드 꼴이 상자의 약 55% 폭 · 82% 높이라 상자 1.0 이면 약 44×66
+        TextMeshPro PileButton(Transform t, string name, Vector3 at, int which, string icon, bool right, string tip, float size = 1.0f)
         {
             Make.Box(name + "_i", t, Res.UI(icon), at, new Vector2(size, size), O + 1, which == 2 ? new Color(0.78f, 0.75f, 0.88f) : new Color(0.95f, 0.93f, 0.88f));
-            var txt = Txt(name, t, "", at + new Vector3((right ? -1 : 1) * (size / 2 + 0.06f), -size * 0.12f, 0), size > 0.4f ? Tone.Lg : Tone.Sm, O + 3, Tone.Ink,
+            float gx = size * 0.28f + 0.08f;   // 카드 꼴 가장자리 바로 바깥
+            var txt = Txt(name, t, "", at + new Vector3((right ? -1 : 1) * gx, -size * 0.26f, 0), size > 0.8f ? Tone.Xl : size > 0.4f ? Tone.Lg : Tone.Sm, O + 3, Tone.Ink,
                 right ? TextAlignmentOptions.Right : TextAlignmentOptions.Left, 0.26f);
             var b = txt.gameObject.AddComponent<Button>();
-            b.Size = new Vector2(size + 0.5f, size + 0.1f);
-            b.Offset = new Vector2((right ? 1 : -1) * (size / 2 + 0.06f - 0.05f), size * 0.12f);
+            b.Size = new Vector2(size * 0.56f + 0.6f, size * 0.86f);
+            b.Offset = new Vector2((right ? 1 : -1) * (gx - 0.05f), size * 0.26f);
             b.OnClick = () => OnPile?.Invoke(which);
             TipZone.Add(txt, b.Size, () => tip, 2, b.Offset).Button = true;
             return txt;
@@ -401,6 +423,17 @@ namespace Bolzena.UI
             }
         }
 
+        /// <summary>광폭화(core Battle.RageTurn · RageNow) — 판 싸움에서만 true. left = 켜질 때까지 남은 턴(켜졌으면 0), x = 지금 적 피해 배율.</summary>
+        public static bool RageOf(out int left, out double x)
+        {
+            left = 0; x = 1;
+            var b = BattleDirector.I != null ? (BattleDirector.I.Battle as CoreBattle)?.Fight : null;
+            if (b == null || b.RageTurn <= 0) return false;
+            x = b.RageNow;
+            left = x > 1 ? 0 : b.RageTurn + 1 - b.Turn;   // R.RageX — RageTurn 턴이 지난 다음 턴부터 오른다
+            return true;
+        }
+
         public void SetTurn(int turn, int wave, int waves) { }   // 턴 · 웨이브 표시는 걷었다(2026-10-07) — 부르는 곳은 그대로 둔다
 
         public bool OverEnd(Vector2 p) => endTurn.Over(p);
@@ -466,6 +499,14 @@ namespace Bolzena.UI
             }
             var hand = BattleDirector.I != null ? BattleDirector.I.Hand : null;
             int hc = hand != null ? hand.Cards.Count : 0;
+            {
+                int rk = RageOf(out int rl, out double rx) ? (rl > 0 ? rl : -(int)System.Math.Round(rx * 100)) : int.MinValue;
+                if (rk != rageShown)
+                {
+                    rageShown = rk;
+                    rageText.text = rk == int.MinValue ? "" : rl > 0 ? $"광폭화까지 <color={(rl <= 1 ? Tone.BadTag : Tone.GoldTag)}>{rl}</color>턴" : $"<color={Tone.BadTag}>광폭화 ×{rx:0.##}</color>";
+                }
+            }
             if (hc != shownHand) { shownHand = hc; handText.text = $"{hc:00}<color={Tone.DimTag}>/{Bolzena.Core.R.HAND_MAX:00}</color>"; }   // 바뀔 때만(매 프레임 문자열 할당 — perf_20261009)
             // 고학년 게이지 — 큰 %(실제 값) · 부드러운 세로 채움 · 필요치 눈금
             gaugeShown = Mathf.MoveTowards(gaugeShown, gauge, Time.unscaledDeltaTime * Mathf.Max(120f, Mathf.Abs(gauge - gaugeShown) * 4f));

@@ -142,11 +142,11 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(1000 - 120, b.Pool.Hp, "100 × (1 − 0.2) × 1.5");
         }
 
-        [Test] public void 취약과_피해_감소는_곱하고_피해_감소와_불굴은_더한다()
+        [Test] public void 취약과_피해_감소는_불굴과_따로_곱한다()
         {
             var b = K.Fight("hitter"); b.Pool.Status["불굴"] = 1; b.Pool.Status["피해 감소"] = 1; b.Pool.Status["취약"] = 1;
             b.EndTurn();
-            Assert.AreEqual(1000 - Num.Round(100 * (1 - 0.15 - 0.2) * 1.5), b.Pool.Hp, "100 × (1 − 0.15 − 0.2) × 1.5(엔진과 같은 차례로 셈)");
+            Assert.AreEqual(1000 - Num.Round(100 * (1 - 0.2) * 0.85 * 1.5), b.Pool.Hp, "100 × (1 − 0.2) × 0.85 × 1.5 — 원작 피해 감소 ×0.85");
         }
 
         [Test] public void 협공은_협공을_건_사도의_공격력_100퍼센트()
@@ -318,11 +318,22 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(100 - 60, b.Pool.Block, "고정 피해 60 이 얻은 실드에 막힌다"); Assert.AreEqual(0, b.St(b.Pool, "응징"));
         }
 
-        [Test] public void 포자증식은_겹마다_10퍼센트_발동하면_사라짐()
+        [Test] public void 포자증식은_겹마다_5퍼센트_발동하면_사라짐()
         {
             var b = K.Fight(); K.Hand(b, "hit", "hit"); K.E(b).Status["포자증식"] = 2;
-            K.Play(b, "hit"); Assert.AreEqual(880, K.Hp(b)); Assert.AreEqual(0, b.St(K.E(b), "포자증식"));
-            K.Play(b, "hit"); Assert.AreEqual(780, K.Hp(b));
+            K.Play(b, "hit"); Assert.AreEqual(890, K.Hp(b)); Assert.AreEqual(0, b.St(K.E(b), "포자증식"));
+            K.Play(b, "hit"); Assert.AreEqual(790, K.Hp(b));
+        }
+
+        [Test] public void 포자증식은_최대_20겹이고_불굴과_따로_곱한다()
+        {
+            var b = K.Fight(D("[{id:'spore', name:'포자', hero:'a', cost:0, type:'스킬', fx:[{k:'status', id:'포자증식', v:25, target:'party'}]}]"), new[] { "a" }, new[] { "hitter" }); K.Hand(b, "spore");
+            K.Play(b, "spore");
+            Assert.AreEqual(20, b.St(b.Pool, "포자증식"), "원작 최대 20");
+            b.Pool.Status["불굴"] = 1;
+            b.EndTurn();
+            Assert.AreEqual(1000 - Num.Round(100 * (1 - 0.2) * (1 + 0.05 * 20)), b.Pool.Hp, "100 × (1 − 0.2) × (1 + 5% × 20)");
+            Assert.AreEqual(0, b.St(b.Pool, "포자증식"));
         }
 
         [Test] public void 죽음의_낙인은_건_카드로만_80퍼센트()

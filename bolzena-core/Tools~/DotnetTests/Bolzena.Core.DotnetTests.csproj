@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- 유니티 없이 Tests/Editor 를 .NET 8 + NUnit 으로 돌린다(2026-11-03, 포트폴리오 10주차 — CI 준비).
+       유니티는 이 폴더(Tools~)를 읽지 않는다. 실행: dotnet test "Tools~/DotnetTests" (bolzena-core 에서)
+       콘텐츠 폴더는 위로 올라가며 bolzena-content-v2 를 찾는다(TestPaths.cs). BZ_CONTENT 로 바꿀 수 있다. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <!-- 이 PC 처럼 .NET 9 만 있어도 돈다. CI 는 8 을 설치한다. -->
+    <RollForward>Major</RollForward>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <NoWarn>CS0649;CS0414;CS0618;CS0162;CS0219;CS0168</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Runtime/**/*.cs" />
+    <Compile Include="../../Tests/Editor/**/*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- 유니티 Test Framework 와 같은 NUnit 3 계열(4 는 Assert.AreEqual 이 ClassicAssert 로 옮겨져 맞지 않는다). -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+    <Reference Include="Newtonsoft.Json"><HintPath>../Dev/lib/Newtonsoft.Json.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>

@@ -70,10 +70,10 @@ namespace Bolzena.Core.Tests
         /// </summary>
         public static GameData ContentWithBenched(string heroId)
         {
-            string dir = new[] { "../bolzena-content-v2", "../../bolzena-content-v2", "C:/projects/bolzena-content-v2" }.FirstOrDefault(Directory.Exists);
+            string dir = TestPaths.Content;
             if (dir == null) Assert.Ignore("bolzena-content-v2 가 없다");
-            const string bench = "C:/projects/_backup/heroes_non_eldain_20261011/heroes";
-            string file = Directory.Exists(bench) ? Directory.GetFiles(bench, heroId + ".json", SearchOption.AllDirectories).FirstOrDefault() : null;
+            string bench = TestPaths.Outside("BZ_BENCH_HEROES", "_backup/heroes_non_eldain_20261011/heroes");
+            string file = bench != null && Directory.Exists(bench) ? Directory.GetFiles(bench, heroId + ".json", SearchOption.AllDirectories).FirstOrDefault() : null;
             if (file == null) Assert.Ignore($"{heroId} 는 콘텐츠에서 빠졌고 백업({bench})에도 없다");
             return GameData.FromFolders(new[] { dir, file });
         }
@@ -81,8 +81,8 @@ namespace Bolzena.Core.Tests
         /// <summary>샘플 콘텐츠(Data/Sample).</summary>
         public static GameData Sample()
         {
-            foreach (var p in new[] { "Packages/com.bolzena.core/Data/Sample", "../bolzena-core/Data/Sample", "../../bolzena-core/Data/Sample" })
-                if (Directory.Exists(p)) return GameData.FromFolder(p);
+            foreach (var p in new[] { "Packages/com.bolzena.core/Data/Sample", TestPaths.FindUp("bolzena-core/Data/Sample"), TestPaths.FindUp("Data/Sample") })
+                if (p != null && Directory.Exists(p)) return GameData.FromFolder(p);
             throw new DirectoryNotFoundException("Data/Sample 을 못 찾았다");
         }
     }

@@ -28,7 +28,7 @@ namespace Bolzena.RunUI
             string[] gives = { "curse", "gift", "neutral" };
             var all = f.P.Data.Events
                 .SelectMany(e => e.Options.Select((o, i) => (e, o, i)))
-                .Where(x => (x.o.Gamble == null || x.o.Gamble.Count == 0) && x.o.Fight == null && (x.o.Hero == null || x.o.Hero.Count == 0)
+                .Where(x => (x.o.Gamble == null || x.o.Gamble.Count == 0) && x.o.Fight == null && (x.o.Hero == null || x.o.Hero.Count == 0) && x.o.HeroAll == null
                     && (x.o.Out ?? new List<Core.Outcome>()).Any(c => gives.Contains(c.K))
                     && !x.o.Out.Any(c => new[] { "remove", "dupe", "card", "flash", "shinPick", "mindBreak", "gold" }.Contains(c.K)))
                 .ToList();

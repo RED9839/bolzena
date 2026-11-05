@@ -38,6 +38,7 @@ namespace Bolzena.Core
             var u = HeroUnit(TraceHero);
             if (u == null || u.Dead) return;
             TraceAdd("turns");
+            if (Turn == 1) TraceAdd("fights");   // 싸움 수(2026-11-01 — 싸움당 고학년 수를 내려고, 첫 턴을 마친 싸움만)
             if (PlayedBy.TryGetValue(TraceHero, out var pb) && pb > 0) TraceAdd("played");
             if (Ap > 0) { TraceAdd("apLeftTurns"); TraceAdd("apLeft", Ap); }   // (10-22) 남긴 AP
             var mine = Hand.Where(h => { var c = CardOf(h); return c != null && c.Hero == TraceHero && !c.IsStatus && !c.IsCurse; }).ToList();

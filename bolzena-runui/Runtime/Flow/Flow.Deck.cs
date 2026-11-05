@@ -47,7 +47,7 @@ namespace Bolzena.RunUI
             // 위 — 제목 · 정보 칸 둘 · 큰 ×
             var (cnt, avg) = DeckInfo();
             var title = Ui.Title(layer, "모든 덱", Theme.Fs2xl, Theme.Ink, TextAlignmentOptions.MidlineLeft);
-            title.rectTransform.At(0, 1, railW + 34, -20, 400, 56);
+            title.rectTransform.At(0, 1, railW + 34, -20, 180, 56);
             var x = Btn.Icon(layer, Theme.S("ic_x"), close, Theme.IconBtn, "close");
             x.GetComponent<RectTransform>().At(1, 1, -Theme.Gutter, -18, Theme.IconBtn, Theme.IconBtn);
             Stage.Hot["deck.close"] = x;
@@ -61,6 +61,12 @@ namespace Bolzena.RunUI
             Info(-Theme.Gutter - 76, "고유 카드 평균 비용", avg < 0 ? "—" : avg.ToString("0.0"));
             Info(-Theme.Gutter - 76 - 282, "카드 개수", cnt.ToString());
             var rule = Ui.Img(layer, Theme.White, Theme.Line, "rule"); rule.rectTransform.Band(1, 1, railW + 24, Theme.Gutter, -92);
+            // 정렬(2026-11-01) — 제목 오른쪽 「정렬」 + 알약 넷. 묶음(사도별 → 상태 · 저주 → 맨 끝 교주)은 그대로 두고 묶음 안 차례만 바꾼다
+            float sortW = Theme.C(96, 92), sortGap = 8, sortX = railW + 34 + 180;
+            var sortHint = Ui.Text(layer, "정렬", Theme.FsSm, Theme.Sub, TextAlignmentOptions.MidlineLeft);
+            sortHint.rectTransform.At(0, 1, sortX, -22, 56, 54);
+            var sortRow = Ui.Rect("sort", layer);
+            sortRow.At(0, 1, sortX + 56, -22, (sortW + sortGap) * DeckSorts.Length - sortGap, 54);
 
             // 묶음 목록(세로 스크롤 + 막대)
             var area = Ui.Rect("area", layer); area.anchorMin = Vector2.zero; area.anchorMax = Vector2.one;
@@ -76,39 +82,81 @@ namespace Bolzena.RunUI
             int cols = Theme.Compact ? 4 : GridCols(cardsW, 210, gap, 4, 8);   // 210 폭으로 세어 16:9 에서도 5칸(카드는 ~230 그대로)
             float cw = Mathf.Clamp((cardsW - gap * (cols - 1)) / cols, 150, 232), ch = cw * 1.4f;
             float headH = headW * 1.42f;
-            int gi = 0, ci = 0;
-            var groups = CardOrder.Groups(P.S.Deck, P.Data, P.S.Party).ToList();
-            var order = groups.SelectMany(g => g.Ids).ToList();   // 카드 상세의 이전 · 다음
-            foreach (var g in groups)
+            void Fill()
             {
-                int rows = Mathf.CeilToInt(g.Ids.Count / (float)cols);
-                float gh = Mathf.Max(headH, rows * (ch + gap) - gap);
-                var grp = Ui.Rect("group " + g.Title, content); grp.Pref(-1, gh);
-                // 장수 + 세로 눈금
-                var tick = Ui.Rect("tick", grp).At(0, 1, 0, 0, tickW, gh);
-                var di = Ui.Img(tick, Theme.S("ic_deck"), Theme.Sub, "ic"); di.rectTransform.At(0.5f, 1, 0, -4, 26, 26); di.preserveAspect = true;
-                var dn = Ui.Title(tick, g.Ids.Count.ToString("00"), Theme.FsXl, Theme.Ink, TextAlignmentOptions.Center); dn.rectTransform.At(0.5f, 1, 0, -32, tickW, 36);
-                var vl = Ui.Img(tick, Theme.White, Theme.Edge.A(0.35f), "line"); vl.rectTransform.At(0.5f, 1, 0, -74, 2, gh - 78);
-                for (float t = 0; t < gh - 90; t += 22) { var tk = Ui.Img(tick, Theme.White, Theme.Edge.A(0.35f), "t"); tk.rectTransform.At(0.5f, 1, 6, -80 - t, 10, 1); }
-                // 머리 카드(사도 · 상태 · 교주)
-                var head = GroupHead(grp, g, headW, headH);
-                head.At(0, 1, tickW + 12, 0, headW, headH);
-                // 카드
-                var holder = Ui.Rect("cards", grp).At(0, 1, tickW + headW + 24, 0, cw * cols + gap * (cols - 1), gh);
-                for (int i = 0; i < g.Ids.Count; i++)
+                Gone(content);
+                content.anchoredPosition = Vector2.zero;
+                int gi = 0, ci = 0;
+                var groups = CardOrder.Groups(P.S.Deck, P.Data, P.S.Party).ToList();
+                foreach (var g in groups) g.Ids = SortIds(g.Ids);
+                var order = groups.SelectMany(g => g.Ids).ToList();   // 카드 상세의 이전 · 다음
+                foreach (var g in groups)
                 {
-                    var id = g.Ids[i];
-                    var c = W.Card(holder, this, id, cw);
-                    c.At(0, 1, (i % cols) * (cw + gap), -(i / cols) * (ch + gap), cw, ch);
-                    var b = c.gameObject.AddComponent<Btn>();
-                    int at = ci;
-                    b.OnClick = () => CardZoom(id, order, at);
-                    Stage.Hot["deck.card" + ci] = b;
-                    if (ci < 24) Tw.Pop(c, 0.02f * ci, 0.9f, 0.25f);
-                    ci++;
+                    int rows = Mathf.CeilToInt(g.Ids.Count / (float)cols);
+                    float gh = Mathf.Max(headH, rows * (ch + gap) - gap);
+                    var grp = Ui.Rect("group " + g.Title, content); grp.Pref(-1, gh);
+                    // 장수 + 세로 눈금
+                    var tick = Ui.Rect("tick", grp).At(0, 1, 0, 0, tickW, gh);
+                    var di = Ui.Img(tick, Theme.S("ic_deck"), Theme.Sub, "ic"); di.rectTransform.At(0.5f, 1, 0, -4, 26, 26); di.preserveAspect = true;
+                    var dn = Ui.Title(tick, g.Ids.Count.ToString("00"), Theme.FsXl, Theme.Ink, TextAlignmentOptions.Center); dn.rectTransform.At(0.5f, 1, 0, -32, tickW, 36);
+                    var vl = Ui.Img(tick, Theme.White, Theme.Edge.A(0.35f), "line"); vl.rectTransform.At(0.5f, 1, 0, -74, 2, gh - 78);
+                    for (float t = 0; t < gh - 90; t += 22) { var tk = Ui.Img(tick, Theme.White, Theme.Edge.A(0.35f), "t"); tk.rectTransform.At(0.5f, 1, 6, -80 - t, 10, 1); }
+                    // 머리 카드(사도 · 상태 · 교주)
+                    var head = GroupHead(grp, g, headW, headH);
+                    head.At(0, 1, tickW + 12, 0, headW, headH);
+                    // 카드
+                    var holder = Ui.Rect("cards", grp).At(0, 1, tickW + headW + 24, 0, cw * cols + gap * (cols - 1), gh);
+                    for (int i = 0; i < g.Ids.Count; i++)
+                    {
+                        var id = g.Ids[i];
+                        var c = W.Card(holder, this, id, cw);
+                        c.At(0, 1, (i % cols) * (cw + gap), -(i / cols) * (ch + gap), cw, ch);
+                        var b = c.gameObject.AddComponent<Btn>();
+                        int at = ci;
+                        b.OnClick = () => CardZoom(id, order, at);
+                        Stage.Hot["deck.card" + ci] = b;
+                        if (ci < 24) Tw.Pop(c, 0.02f * ci, 0.9f, 0.25f);
+                        ci++;
+                    }
+                    gi++;
                 }
-                gi++;
             }
+            void Sorts()
+            {
+                Gone(sortRow);
+                for (int k = 0; k < DeckSorts.Length; k++)
+                {
+                    int kk = k;
+                    bool on = k == deckSort;
+                    var b = Btn.Make(sortRow, null, on ? BtnStyle.PillGold : BtnStyle.PillDark, () => { if (kk == deckSort) return; deckSort = kk; Sorts(); Fill(); }, 0, "sort " + DeckSorts[k]);
+                    var t = Ui.Title(b.transform, DeckSorts[k], Theme.FsSm, on ? Theme.Brown : Theme.Ink, TextAlignmentOptions.Center);
+                    t.rectTransform.Fill(6, 2, 6, 2);
+                    t.textWrappingMode = TextWrappingModes.NoWrap; t.overflowMode = TextOverflowModes.Overflow;
+                    b.Label = t;
+                    b.GetComponent<RectTransform>().At(0, 0.5f, k * (sortW + sortGap), 0, sortW, 46);
+                    Stage.Hot["deck.sort" + k] = b;
+                }
+            }
+            Sorts();
+            Fill();
+        }
+
+        // 덱 보기 정렬 — 0 사도별(CardOrder 그대로: 기본 → 고유) · 1 비용(낮은 것부터) · 2 종류(공격 · 스킬 · 강화 · 그 밖) · 3 이름(가나다). 같으면 CardOrder 차례. 이번 실행 동안 기억한다
+        static int deckSort;
+        static readonly string[] DeckSorts = { "사도별", "비용", "종류", "이름" };
+        public static int DeckSort { get => deckSort; set => deckSort = Mathf.Clamp(value, 0, DeckSorts.Length - 1); }
+        List<string> SortIds(List<string> ids)
+        {
+            if (deckSort == 0) return ids;
+            var idx = ids.Select((id, i) => (id, i, v: P.View(id))).ToList();
+            int TypeRank(string t) => t == "공격" ? 0 : t == "스킬" ? 1 : t == "강화" ? 2 : 3;
+            IOrderedEnumerable<(string id, int i, Core.CardView v)> o = deckSort switch
+            {
+                1 => idx.OrderBy(x => x.v?.Cost ?? 99),
+                2 => idx.OrderBy(x => TypeRank(x.v?.Type)),
+                _ => idx.OrderBy(x => x.v?.Name ?? x.id, StringComparer.Ordinal),
+            };
+            return o.ThenBy(x => x.i).Select(x => x.id).ToList();
         }
 
         /// <summary>묶음 머리 — 사도 카드(세로 초상 · 역할 · 성격 · 별 · 이름) · 상태/저주 · 교주.</summary>
