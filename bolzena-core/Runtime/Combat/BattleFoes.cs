@@ -552,7 +552,7 @@ namespace Bolzena.Core
             return a;
         }
 
-        /// <summary>적이 치는 값 — 층 배율 · 약화(-25%) · 사기(겹마다 +20%).</summary>
+        /// <summary>적이 치는 값 — 층 배율 · 약화(-25%) · 사기(겹마다 +20%) · 광폭화(R.RageX — 판 싸움만).</summary>
         public int Dealt(Unit from, int v)
         {
             double x = v;
@@ -560,7 +560,7 @@ namespace Bolzena.Core
             double m = 1;
             if (St(from, "약화") > 0) m *= 1 - R.SV("약화");
             double up = 1 + R.StackEff("사기", St(from, "사기"));
-            if (from.Side == Side.Enemy) up *= Math.Max(0.1, 1 + CounterMod(from, "dealt"));
+            if (from.Side == Side.Enemy) up *= Math.Max(0.1, 1 + CounterMod(from, "dealt")) * RageNow;
             return Math.Max(0, Num.Round(x * m * up));
         }
     }

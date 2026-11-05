@@ -78,22 +78,22 @@ namespace Bolzena.RunUI
             bool Out(Core.EventOption o, params string[] ks) => (o.Out ?? new List<Core.Outcome>()).Any(x => ks.Contains(x.K)) || (o.Gamble ?? new List<Core.Gamble>()).Any(g => g.Out.Any(x => ks.Contains(x.K)));
             var pick = new List<(string tag, Core.EventDef ev, System.Func<Core.EventOption, bool> opt)>();
             void Add(string tag, Core.EventDef ev, System.Func<Core.EventOption, bool> opt) { if (ev != null && pick.All(p => p.ev != ev)) pick.Add((tag, ev, opt)); }
-            Add("few", evs.Where(e => e.Options.Count <= 2).FirstOrDefault(), o => o.Hero == null);
-            Add("many", evs.OrderByDescending(e => e.Options.Count).FirstOrDefault(), o => o.Hero == null);
+            Add("few", evs.Where(e => e.Options.Count <= 2).FirstOrDefault(), o => o.Hero == null && o.HeroAll == null);
+            Add("many", evs.OrderByDescending(e => e.Options.Count).FirstOrDefault(), o => o.Hero == null && o.HeroAll == null);
             bool Free(Core.EventDef e) => pick.All(p => p.ev != e);
-            Add("special", evs.FirstOrDefault(e => e.Id == "G07"), o => o.Hero == null);
-            Add("special2", evs.FirstOrDefault(e => e.Id == "G12"), o => o.Hero == null);
-            Add("cardpick", evs.FirstOrDefault(e => Free(e) && Has(e, o => o.Hero == null && Out(o, "remove", "unique", "dupe"))), o => o.Hero == null && Out(o, "remove", "unique", "dupe"));
+            Add("special", evs.FirstOrDefault(e => e.Id == "G07"), o => o.Hero == null && o.HeroAll == null);
+            Add("special2", evs.FirstOrDefault(e => e.Id == "G12"), o => o.Hero == null && o.HeroAll == null);
+            Add("cardpick", evs.FirstOrDefault(e => Free(e) && Has(e, o => o.Hero == null && o.HeroAll == null && Out(o, "remove", "unique", "dupe"))), o => o.Hero == null && o.HeroAll == null && Out(o, "remove", "unique", "dupe"));
             // 조건 칸(종족 · 깃발 · 사도)이 없는 신탁 선택지 — 잠긴 것을 고르면 첫 선택지로 떨어져 신탁 창을 못 본다(2026-10-09)
-            bool Open_(Core.EventOption o) => o.Hero == null && o.Race == null && o.Flag == null && o.NoFlag == null && o.When == null && Out(o, "flash");
+            bool Open_(Core.EventOption o) => o.Hero == null && o.HeroAll == null && o.Race == null && o.Flag == null && o.NoFlag == null && o.When == null && Out(o, "flash");
             Add("oracle", evs.FirstOrDefault(e => Free(e) && Has(e, Open_)), Open_);
-            Add("fight", evs.FirstOrDefault(e => Free(e) && Has(e, o => o.Fight != null && o.Hero == null)), o => o.Fight != null);
-            Add("equip", evs.FirstOrDefault(e => Free(e) && Has(e, o => o.Hero == null && o.Fight == null && Out(o, "equip"))), o => o.Hero == null && o.Fight == null && Out(o, "equip"));
-            Add("gamble", evs.FirstOrDefault(e => Free(e) && Has(e, o => (o.Gamble != null || o.Judge != null) && o.Hero == null)), o => o.Gamble != null || o.Judge != null);
+            Add("fight", evs.FirstOrDefault(e => Free(e) && Has(e, o => o.Fight != null && o.Hero == null && o.HeroAll == null)), o => o.Fight != null);
+            Add("equip", evs.FirstOrDefault(e => Free(e) && Has(e, o => o.Hero == null && o.HeroAll == null && o.Fight == null && Out(o, "equip"))), o => o.Hero == null && o.HeroAll == null && o.Fight == null && Out(o, "equip"));
+            Add("gamble", evs.FirstOrDefault(e => Free(e) && Has(e, o => (o.Gamble != null || o.Judge != null) && o.Hero == null && o.HeroAll == null)), o => o.Gamble != null || o.Judge != null);
             // 카드를 주는 이벤트 · 여러 개를 주는 이벤트 — 결과 칸이 받은 것을 자르지 않는지
-            Add("gaincard", evs.FirstOrDefault(e => Free(e) && Has(e, o => o.Hero == null && o.Fight == null && o.Gamble == null && o.Judge == null && Out(o, "gift", "curse"))), o => o.Hero == null && o.Fight == null && Out(o, "gift", "curse"));
+            Add("gaincard", evs.FirstOrDefault(e => Free(e) && Has(e, o => o.Hero == null && o.HeroAll == null && o.Fight == null && o.Gamble == null && o.Judge == null && Out(o, "gift", "curse"))), o => o.Hero == null && o.HeroAll == null && o.Fight == null && Out(o, "gift", "curse"));
             int OutN(Core.EventOption o) => (o.Out ?? new List<Core.Outcome>()).Count(x => x.K != "none");
-            var multi = evs.Where(e => Free(e)).SelectMany(e => e.Options.Where(o => o.Hero == null && o.Fight == null && o.Gamble == null && o.Judge == null).Select(o => (e, o))).OrderByDescending(x => OutN(x.o)).FirstOrDefault();
+            var multi = evs.Where(e => Free(e)).SelectMany(e => e.Options.Where(o => o.Hero == null && o.HeroAll == null && o.Fight == null && o.Gamble == null && o.Judge == null).Select(o => (e, o))).OrderByDescending(x => OutN(x.o)).FirstOrDefault();
             if (multi.e != null) { var mo = multi.o; Add("multi", multi.e, o => o == mo); }
             int n = 0;
             foreach (var (tag, ev, optOf) in pick)
@@ -201,7 +201,7 @@ namespace Bolzena.RunUI
                 var ids = new List<string> { "G07", "G12" };
                 var spE = evs.Where(e => HasSpeech(e.Scene) && !ids.Contains(e.Id)).Select(e => e.Id).Take(2).ToList(); ids.AddRange(spE);
                 var narE = evs.FirstOrDefault(e => !HasSpeech(e.Scene) && !ids.Contains(e.Id)); if (narE != null) ids.Add(narE.Id);
-                var resE = evs.FirstOrDefault(e => !ids.Contains(e.Id) && e.Options.Any(o => o.Hero == null && o.Fight == null && o.Gamble == null && o.Judge == null && HasSpeech(o.Say))); if (resE != null) ids.Add(resE.Id);
+                var resE = evs.FirstOrDefault(e => !ids.Contains(e.Id) && e.Options.Any(o => o.Hero == null && o.HeroAll == null && o.Fight == null && o.Gamble == null && o.Judge == null && HasSpeech(o.Say))); if (resE != null) ids.Add(resE.Id);
                 int dlgBad = 0, dlgLines = 0, dlgTags = 0;
                 void Frame(string tag)
                 {
@@ -294,7 +294,7 @@ namespace Bolzena.RunUI
 
             // 이벤트 은총 — 실제 화면으로: 선택지 → 결과 → 사도 고르기 창 → 그 사도의 남은 고유 카드 → 가운데 띄우기
             {
-                bool Plain(Core.EventOption o) => o.Hero == null && o.Race == null && o.When == null && o.Flag == null && o.NoFlag == null && o.Fight == null && o.Gamble == null && o.Judge == null;   // 조건 칸(잠금으로 보임)은 빼고
+                bool Plain(Core.EventOption o) => o.Hero == null && o.HeroAll == null && o.Race == null && o.When == null && o.Flag == null && o.NoFlag == null && o.Fight == null && o.Gamble == null && o.Judge == null;   // 조건 칸(잠금으로 보임)은 빼고
                 var gev = evs.FirstOrDefault(e => e.Options.Any(o => Plain(o) && Out(o, "unique") && !Out(o, "remove", "dupe", "flash")));
                 if (gev == null) Expect(false, "은총: unique 를 주는 이벤트가 없다");
                 else
@@ -606,7 +606,7 @@ namespace Bolzena.RunUI
                 // 이벤트 신탁 — 남은 신탁 후보에 다 신탁을 붙여 둘째 사도의 새 복제본 하나만 남긴다
                 var evCopy = run.AddCopy(d.UniquesOf(S.Party[1]).FirstOrDefault(x => S.Deck.Contains(x) && !S.Flash.ContainsKey(x) && !S.Shin.ContainsKey(x) && !run.ViewOf(x).IsOnly && !run.ViewOf(x).IsTaboo && d.Card(x).Oracles.Count == 5) ?? bareCopy);
                 foreach (var id in run.FlashTargets().Where(x => x != evCopy).ToList()) { int k = Enumerable.Range(1, 5).FirstOrDefault(n => run.FlashOk(id, n)); if (k > 0) S.Flash[id] = k; }
-                bool Fl(Core.EventOption o) => o.Hero == null && o.Race == null && o.Flag == null && o.NoFlag == null && o.When == null && o.Fight == null && o.Gamble == null && o.Judge == null && (o.Out ?? new List<Core.Outcome>()).Any(x => x.K == "flash" && !x.Swap);
+                bool Fl(Core.EventOption o) => o.Hero == null && o.HeroAll == null && o.Race == null && o.Flag == null && o.NoFlag == null && o.When == null && o.Fight == null && o.Gamble == null && o.Judge == null && (o.Out ?? new List<Core.Outcome>()).Any(x => x.K == "flash" && !x.Swap);
                 var fev = d.Events.OrderBy(e => e.Id, System.StringComparer.Ordinal).FirstOrDefault(e => e.Options.Any(Fl));
                 Expect(run.FlashTargets().Count == 1 && run.FlashTargets()[0] == evCopy && fev != null, $"이벤트 신탁 후보 = 복제본 하나 — {string.Join(",", run.FlashTargets())} · 이벤트 {fev?.Id}");
                 if (fev != null)

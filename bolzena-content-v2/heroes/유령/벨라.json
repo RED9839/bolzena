@@ -10,7 +10,7 @@
       "hp": 900,
       "atk": 115,
       "def": 65,
-      "crit": 5,
+      "crit": 3,
       "blurb": "경계선 위를 떠도는 앳된 유령. 존재감을 쌓아 두면 파티가 힘을 얻고, 나눠 주면 파티를 감싸고 상처를 아물게 합니다.",
       "keyword": {
         "name": "존재감",
@@ -358,10 +358,8 @@
               "k": "perEvent"
             },
             {
-              "k": "dmg",
-              "ratio": 0.8,
-              "base": "def",
-              "target": "allEnemies"
+              "k": "heal",
+              "ratio": 0.8
             }
           ]
         }
@@ -485,18 +483,13 @@
               "k": "perEvent"
             },
             {
-              "k": "dmg",
-              "ratio": 0.5,
-              "base": "def",
-              "target": "allEnemies"
+              "k": "shield",
+              "ratio": 0.4
             }
           ]
         },
         {
           "name": "신탁 3",
-          "tags": [
-            "소멸"
-          ],
           "fx": [
             {
               "k": "ifChoice",
@@ -521,8 +514,10 @@
               "n": 3
             },
             {
-              "k": "ap",
-              "v": 1
+              "k": "status",
+              "id": "약화",
+              "v": 1,
+              "target": "allEnemies"
             }
           ]
         },
@@ -898,10 +893,8 @@
           "k": "perEvent"
         },
         {
-          "k": "dmg",
-          "ratio": 0.8,
-          "base": "def",
-          "target": "oneEnemy"
+          "k": "shield",
+          "ratio": 0.5
         }
       ],
       "oracles": [
@@ -1000,11 +993,12 @@
             },
             {
               "k": "ifEvent",
-              "n": 3
+              "n": 5
             },
             {
-              "k": "tough",
-              "v": 2
+              "k": "status",
+              "id": "끈기",
+              "v": 1
             }
           ]
         },

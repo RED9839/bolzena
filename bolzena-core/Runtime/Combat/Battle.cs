@@ -47,6 +47,14 @@ namespace Bolzena.Core
         /// </summary>
         [Newtonsoft.Json.JsonProperty(NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public Dictionary<string, ProgMods> Prog;
+        /// <summary>
+        /// 광폭화 턴(R.RageTurnOf — 판 싸움만). null 이면 광폭화 없음. 편성 배율(R.PackX) — 처음 선 적마다 체력 · 피해에 곱한다(소환은 빼고). null 이면 1.
+        /// 둘 다 null 이면 셋업 JSON 에 칸을 적지 않는다 — 프론티어 셋업 비교 · 옛 입력 테이프의 꼴이 그대로 맞는다(2026-10-31).
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty(NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Rage;
+        [Newtonsoft.Json.JsonProperty(NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? FoePack;
     }
 
     /// <summary>
@@ -170,6 +178,10 @@ namespace Bolzena.Core
         /// <summary>이 싸움의 적 체력 · 피해 배율 · 엘리트(소환한 적도 같은 눈금).</summary>
         public double EnemyHpx = 1, EnemyDmgx = 1;
         public bool EliteFight;
+        /// <summary>광폭화 턴(BattleSetup.Rage) — 0 이면 없음. 이 턴이 지나면 적 피해 × R.RageX.</summary>
+        public int RageTurn;
+        /// <summary>지금 턴의 광폭화 배율(1 = 없음).</summary>
+        public double RageNow => R.RageX(Turn, RageTurn);
         public int Drawn;
 
         // ── 키워드 사전(2026-10-05) ──
@@ -267,15 +279,16 @@ namespace Bolzena.Core
             foreach (var u in Party) u.BodyRef = Pool;
 
             double hpx = st.EnemyHp ?? R.ENEMY_HP, dmgx = st.EnemyDmg ?? 1;
-            EnemyHpx = hpx; EnemyDmgx = dmgx; EliteFight = st.Elite; CritDmgX = st.CritDmg;
+            EnemyHpx = hpx; EnemyDmgx = dmgx; EliteFight = st.Elite; CritDmgX = st.CritDmg; RageTurn = st.Rage ?? 0;
             EnemyNature = string.IsNullOrEmpty(st.EnemyNature) ? null : st.EnemyNature;
             Floor = st.Floor;
+            double pack = st.FoePack ?? 1;   // 편성 배율 — 처음 선 적만(소환물은 EnemyHpx · EnemyDmgx 그대로)
             for (int i = 0; i < st.Enemies.Count; i++)
             {
                 var e = Data.Enemy(st.Enemies[i]) ?? throw new ArgumentException($"없는 적: {st.Enemies[i]}");
-                int ehp = Num.Round(e.Hp * hpx);
+                int ehp = Num.Round(e.Hp * hpx * pack);
                 double tm = ToughOf(e, st.Elite);
-                var u = new Unit { Side = Side.Enemy, Key = e.Id, Name = e.Name, Idx = i, Row = e.Row ?? "front", Nature = FoeNature(e), Boss = e.Boss, Dmgx = dmgx, Tough = tm, ToughMax = tm };
+                var u = new Unit { Side = Side.Enemy, Key = e.Id, Name = e.Name, Idx = i, Row = e.Row ?? "front", Nature = FoeNature(e), Boss = e.Boss, Dmgx = dmgx * pack, Tough = tm, ToughMax = tm };
                 u.MaxHp = ehp; u.Hp = ehp;
                 Enemies.Add(u);
                 if (R.OPEN_EXPOSE > 0) u.Status[R.EXPOSED] = R.OPEN_EXPOSE;   // 첫 수 — 모든 적 약점 노출(2026-10-10 「딜러 1명만 약점이어도」)

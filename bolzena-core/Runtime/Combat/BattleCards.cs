@@ -195,6 +195,12 @@ namespace Bolzena.Core
             Gauge -= cost;
             LastUlt = heroKey;
             UltsUsed++; Tape?.Ult(this);
+            if (TraceHero != null)
+            {   // 결정 지점 측정(2026-11-01 실비아 「초청객」) — 고학년 수 · 재는 사도의 아군 표시가 붙은 동료의 고학년 · 요구 게이지가 깎인 고학년(판은 안 바꾼다)
+                TraceAdd("ult"); if (heroKey == TraceHero) TraceAdd("ultSelf");
+                if (heroKey != TraceHero && Kw.Values.Any(k => k.Owner == TraceHero && k.Carrier == "hero" && StackOf(heroKey, k.Id) > 0)) TraceAdd("ultMarked");
+                if (cost < ult.Cost) { TraceAdd("ultCut"); TraceAdd("ultCutPct", ult.Cost - cost); }
+            }
             var owner = HeroUnit(heroKey);
             Say($"{owner.Name} 고학년 스킬 — {ult.Name} (게이지 {cost}%)");
             Talk(owner, "ego");
@@ -206,7 +212,7 @@ namespace Bolzena.Core
             RunFx(ult.Fx, new FxCtx { Owner = owner, TargetIdx = targetIdx, HitTags = tags, Card = true, Cost = 2, ToughUnit = R.ToughUnitUlt(ult.Cost), StagePick = stage });
             Acting = prev; ModSrc = src0;
             if (St(Pool, "계몽") > 0 && Over == null) { Say("계몽 — 드로우 1"); DrawCards(1); }
-            Emit("ult", new EmitInfo { Hero = heroKey });
+            Emit("ult", new EmitInfo { Hero = heroKey, Who = owner });   // Who — 규칙의 「아군 1명」 = 고학년을 쓴 사도(2026-11-01 실비아 「초청객」 지우기 · 옛 ult 규칙에 아군 1명 대상은 없다)
             CheckOver();
             return new PlayResult { Ok = true };
         }

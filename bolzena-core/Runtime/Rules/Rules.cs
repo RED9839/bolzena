@@ -73,6 +73,38 @@ namespace Bolzena.Core
             return (hp, ENEMY_DMG * (FLOOR_DMG.TryGetValue(k, out var d) ? d : 1) * (boss && BOSS_DMG.TryGetValue(k, out var bd) ? bd : 1));
         }
 
+        // ── 편성 배율(마릿수) ────────────────────────────────────────
+        /// <summary>
+        /// 마릿수 → 한 마리 체력 · 피해 배율(2026-10-31 원작 대조 — 판 지도의 일반 · 정예 싸움만, 이벤트 · 보스 · 소환은 넣지 않는다).
+        /// 원작 카오스 일반전의 칸 배율을 마릿수마다 「전투 합의 중앙 ÷ 마릿수」 로 잰 값이다(1마리 0.996 · 2 1.604 · 3 1.858 · 4 1.920 · 5 2.149).
+        /// 원작에서 이 배율이 체력에만 붙는지 공격력에도 붙는지는 못 찾았다(추정 — Docs/데이터.md §편성). 볼제나는 둘 다에 곱한다 — 마릿수가 바뀌어도 전투 하나의 HP 합 · 한 턴 피해 합이 같은 결로 간다.
+        /// 일반 싸움은 PACK_FIGHT 를 더 곱한다 — 옛 편성(늘 2~3마리)의 층마다 일반전 HP 합 중앙 · 턴 피해 기댓값이 그대로 남게 맞춘 값(1층 2,346 → 2,485 · 2층 4,329 → 4,388).
+        /// </summary>
+        public static readonly Dictionary<int, double> PACK_SLOT = new() { [1] = 1.0, [2] = 0.80, [3] = 0.62, [4] = 0.48, [5] = 0.43 };
+        public const double PACK_FIGHT = 1.45;
+        /// <summary>그 싸움(마릿수 · 정예)의 한 마리 배율 — 1 이면 null(셋업 JSON 에 칸을 적지 않는다).</summary>
+        public static double? PackX(int n, bool elite)
+        {
+            if (!PACK_SLOT.TryGetValue(n, out var x)) return null;
+            x *= elite ? 1 : PACK_FIGHT;
+            return Math.Abs(x - 1) < 1e-9 ? (double?)null : x;
+        }
+
+        // ── 광폭화(턴 제한 강화) ─────────────────────────────────────
+        /// <summary>
+        /// 광폭화(2026-10-31 원작 대조) — 싸움이 오래 가면 적 피해가 오른다. 원작 값: 일반 5 · 정예 7 · 보스 10턴 · 기본 ×1.1 · 턴마다 ×1.25.
+        /// 식은 원작 데이터에 없다(추정): 그 턴 수가 지난 뒤(일반 6턴째부터) ×RAGE_BASE, 그 뒤 턴마다 ×RAGE_SCALE 를 겹쳐 곱한다.
+        /// 「N턴이 지난 뒤」 로 읽은 근거는 같은 값을 정하는 원작 효과의 글 「N턴 후 몬스터 피해량 대폭 증가」.
+        /// 판 싸움(Run.OpenFight 가 BattleSetup.Rage 를 채운다)에만 — 프론티어 · 시험 · 도구 싸움은 칸이 비어 꺼진다.
+        /// </summary>
+        public const int RAGE_TURN_FIGHT = 5, RAGE_TURN_ELITE = 7, RAGE_TURN_BOSS = 10;
+        public const double RAGE_BASE = 1.1, RAGE_SCALE = 1.25;
+        /// <summary>배율 상한 — 피해 수가 int 를 넘지 않게(놀이 값이 아니다. 일반 싸움 37턴째쯤 닿는다).</summary>
+        public const double RAGE_MAX = 1000;
+        public static int RageTurnOf(bool boss, bool elite) => boss ? RAGE_TURN_BOSS : elite ? RAGE_TURN_ELITE : RAGE_TURN_FIGHT;
+        /// <summary>그 턴의 광폭화 배율 — rageTurn 0 이면 꺼짐(1).</summary>
+        public static double RageX(int turn, int rageTurn) => rageTurn <= 0 || turn <= rageTurn ? 1 : Math.Min(RAGE_MAX, RAGE_BASE * Math.Pow(RAGE_SCALE, turn - rageTurn - 1));
+
         // ── 적의 손패 흡수(수 seize) ──────────────────────────────────
         /// <summary>빼앗긴 카드를 되찾는 피해 — 그 적의 최대 HP 의 이 % (수의 v 가 없을 때). 격파 · 처치로도 되찾는다.</summary>
         public const int SEIZE_PCT = 20;
@@ -161,24 +193,28 @@ namespace Bolzena.Core
         public const int GAUGE_MAX = 300;
         public const int GAUGE_PER_AP = 10;
 
-        public const double CRIT_MULT = 1.5;
+        /// <summary>치명 피해 배율 — 원작 전투원 공통 125%(2026-10-31 원작 대조로 1.5 → 1.25).</summary>
+        public const double CRIT_MULT = 1.25;
 
         // ── 상태(docs/18 §5) ─────────────────────────────────────────
         public static readonly Dictionary<string, double> STATUS_V = new()
         {
             ["취약"] = 0.5, ["약화"] = 0.25, ["손상"] = 0.5, ["피해 감소"] = 0.15,
             ["반격"] = 1.5, ["반격Full"] = 3.0, ["반격Max"] = 10, ["표식"] = 1.0,
-            ["사기"] = 0.2, ["불굴"] = 0.2, ["불굴Cap"] = 0.8, ["결의"] = 20, ["결정화"] = 0.2,
+            // 결의 — 겹마다 실드 계수 +20%p(원작 실드 획득량 +20%, 사기와 같은 합연산 — 2026-10-31, 옛 +20 고정값)
+            ["사기"] = 0.2, ["불굴"] = 0.2, ["불굴Cap"] = 0.8, ["결의"] = 0.2, ["결정화"] = 0.2,
             ["고동"] = 0.7,
-            ["사기Max"] = 10, ["불굴Max"] = 10, ["결의Max"] = 10, ["결정화Max"] = 10, ["고동Max"] = 10,
+            // 겹 상한(2026-10-31 원작 대조) — 사기 · 불굴 · 결의 · 결정화는 원작에 상한이 없어 Max 를 두지 않는다(옛 10). 고동은 원작 최대 4(옛 10).
+            // 불굴Cap 80% 는 원작 상한 없음 · 감소 곡선 미확인이라 유지한다 — 없애면 불굴 5겹이 무적이 된다.
+            ["고동Max"] = 4,
             ["고통"] = 0.5, ["고통Max"] = 20, ["균열"] = 0.4, ["균열Max"] = 30,
-            ["잔불"] = 0.3, ["잔불Max"] = 5, ["잔광"] = 0.5,
+            ["잔불"] = 0.3, ["잔불Max"] = 5, ["잔광"] = 1.0,   // 잔광 — 원작 피해량 +100%(옛 +50%)
             ["실드 유지"] = 0.5, ["협공"] = 1.0, ["충격"] = 0.8, ["충격Shield"] = 0.5, ["충격파"] = 3.0, ["그을림"] = 0.8, ["그을림Max"] = 10,
             ["분쇄"] = 0.2,
             ["리듬Max"] = 10,
             // 2026-10-05 키워드 사전(Docs/키워드.md) — 카제나 효과 사전 값
             ["공명"] = 0.8, ["탄환"] = 1.2, ["탄성"] = 0.5, ["탄성Max"] = 5, ["칼날 벼리기"] = 0.2, ["칼날 벼리기Max"] = 3, ["형상 강화"] = 1.0, ["형상 강화Max"] = 3,
-            ["급속Max"] = 9, ["둔화Max"] = 9, ["초재생"] = 3.0, ["집중"] = 0.5, ["탐구심"] = 0.2, ["고통 각인"] = 2, ["응징"] = 2.0, ["포자증식"] = 0.1,
+            ["급속Max"] = 9, ["둔화Max"] = 9, ["초재생"] = 3.0, ["집중"] = 0.5, ["탐구심"] = 0.2, ["고통 각인"] = 2, ["응징"] = 2.0, ["포자증식"] = 0.05, ["포자증식Max"] = 20,   // 포자증식 — 원작 겹마다 5% · 최대 20(옛 10% · 상한 없음)
             ["죽음의 낙인"] = 0.8, ["행동 둔화"] = 0.2, ["독"] = 1.0, ["부상"] = 0.3, ["흡수Max"] = 0.2, ["축복"] = 0.6, ["축복At"] = 0.3,
         };
         public static double SV(string id) => STATUS_V.TryGetValue(id, out var v) ? v : 0;
@@ -343,7 +379,7 @@ namespace Bolzena.Core
         }
 
         // ── 최종 피해 ────────────────────────────────────────────────
-        /// <summary>최종 = 스탯 × (배율 + 신탁) × 축복(×1.3) × (1 + 전역) × 치명(×1.5). 증가가 있으면 최소 1.</summary>
+        /// <summary>최종 = 스탯 × (배율 + 신탁) × 축복(×1.3) × (1 + 전역) × 치명(×CRIT_MULT 1.25). 증가가 있으면 최소 1.</summary>
         public static int FinalDamage(double stat, double ratio, double flash = 0, bool shin = false, double global = 0, bool crit = false, double critX = 0)
         {
             double v = stat * (ratio + flash);
@@ -357,8 +393,8 @@ namespace Bolzena.Core
 
         /// <summary>강화 카드의 「전투 내내」 — 화면은 이 값 이상이면 「전투 내내」 라고 적는다.</summary>
         public const int BOON_TURNS = 9999;
-        /// <summary>「전투 내내 공격력 +N%」 의 사도마다 상한 — 15% × 사기 겹 상한(10).</summary>
-        public const double MORALE_ATK = 0.15;
+        /// <summary>「전투 내내 공격력 +N%」 의 사도마다 상한 — 15% × 10(옛 사기 겹 상한 10 — 2026-10-31 사기 상한을 없애 수로 박아 둔다).</summary>
+        public const double MORALE_ATK = 0.15, MORALE_ATK_STACKS = 10;
 
         /// <summary>희귀종 덧붙임을 쓰나(사용자 2026-10-10: 끔 — 엘리트는 이름 붙은 기믹으로 대신, 콘텐츠 적 리뉴얼). 끄면 데이터의 rare 가 있어도 패시브 · 타격 · 강인도 · 글에 안 들어간다.</summary>
         public static bool FOE_RARE = false;

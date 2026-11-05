@@ -12,7 +12,7 @@ namespace Bolzena.Core.Tests
     /// </summary>
     public class ProgTests
     {
-        static readonly string CONTENT = Environment.GetEnvironmentVariable("BZ_CONTENT") is string bc && bc.Length > 0 ? bc : "C:/projects/bolzena-content-v2";   // 교차 시험처럼 성장 표를 넣은 사본으로 돌릴 수 있게
+        static readonly string CONTENT = TestPaths.Content;   // 교차 시험처럼 성장 표를 넣은 사본으로 돌릴 수 있게
         const string UNIQUE = "[{id:'uc', name:'다 고유', hero:'c', cost:2, type:'공격', unique:true, fx:[{k:'dmg', ratio:1.0, target:'oneEnemy'}]}," +
                               " {id:'uc2', name:'다 고유 작은', hero:'c', cost:1, type:'공격', unique:true, fx:[{k:'dmg', ratio:0.5, target:'oneEnemy'}]}]";
 

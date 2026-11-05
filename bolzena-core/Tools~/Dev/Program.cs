@@ -130,6 +130,13 @@ static class Program
         var sb = new System.Text.StringBuilder();
         sb.AppendLine($"결정 지점 — {data.Hero(hero)?.Name ?? hero} · 그 사도가 있는 턴 {turns}");
         sb.AppendLine($"  그 사도 카드를 낸 턴 {P(G("played"), turns)} · 쥐고 넘긴 턴 {P(G("held"), turns)} · 낼 AP 가 있는데 쥔 턴 {P(G("heldPlayable"), turns)}");
+        if (G("ult") > 0)
+        {   // (2026-11-01 실비아 「초청객」) 고학년 — 싸움당 수 · 그 사도 표시가 붙은 동료의 고학년 · 요구 게이지가 깎인 고학년(평균 깎인 %p)
+            double fpt = Math.Max(1, G("fights"));
+            sb.AppendLine($"  고학년 {G("ult")}번(싸움 {G("fights")} · 싸움당 {G("ult") / fpt:0.00}) · 그 사도 {G("ultSelf") / fpt:0.00}/싸움 · 표시 붙은 동료 {G("ultMarked") / fpt:0.00}/싸움 · 요구 게이지 깎임 {G("ultCut")}번(평균 -{(G("ultCut") > 0 ? (double)G("ultCutPct") / G("ultCut") : 0):0}%p)");
+            foreach (var (k, ko) in new[] { ("boss", "보스"), ("elite", "엘리트"), ("normal", "일반") })
+            { long fk = G(k + "|fights"); if (fk > 0) sb.AppendLine($"    [{ko}] 싸움 {fk} · 고학년 {(double)G(k + "|ult") / fk:0.00}/싸움 · 표시 붙은 동료 {(double)G(k + "|ultMarked") / fk:0.00}/싸움 · 깎임 {(double)G(k + "|ultCut") / fk:0.00}/싸움"); }
+        }
         if (G("tokenHeld") > 0) sb.AppendLine($"  생성 카드를 쥐고 넘긴 턴 {P(G("tokenHeld"), turns)}");
         if (G("shieldSpend") + G("shieldKept") > 0) sb.AppendLine($"  실드 헐기 {G("shieldSpend")}번(일부만 {G("shieldPartial")}) · 실드 소모 카드를 쥐고 넘긴 턴 {P(G("shieldKept"), turns)}");
         if (G("keepHeld") > 0)

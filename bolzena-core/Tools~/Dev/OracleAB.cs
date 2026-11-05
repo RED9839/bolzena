@@ -30,6 +30,7 @@ static class OracleAB
             Growth = S.Growth,
             CardVals = S.CardVals?.ToDictionary(kv => kv.Key, kv => new Dictionary<string, int>(kv.Value)),
             Seed = (uint)(S.Seed + S.Floor * 101 + S.Node * 7 + S.Step * 13 + (S.EventFight != null ? 555 : 0)),
+            Rage = b.RageTurn > 0 ? b.RageTurn : (int?)null, FoePack = S.EventFight == null && !run.IsBoss ? R.PackX(run.CurrentEnemies().Count, S.Elite) : null,
         };
     }
 
@@ -51,7 +52,7 @@ static class OracleAB
             Gear = s0.Gear, GearRules = s0.GearRules, Flash = flash, Shin = new Dictionary<string, string>(s0.Shin),
             EnemyHp = s0.EnemyHp, EnemyDmg = s0.EnemyDmg, Mind = s0.Mind, Gauge = s0.Gauge, Elite = s0.Elite, EnemyNature = s0.EnemyNature,
             Floor = s0.Floor, Glow = null, Growth = s0.Growth, CardVals = s0.CardVals?.ToDictionary(kv => kv.Key, kv => new Dictionary<string, int>(kv.Value)),
-            CritDmg = s0.CritDmg, Seed = s0.Seed,
+            CritDmg = s0.CritDmg, Seed = s0.Seed, Rage = s0.Rage, FoePack = s0.FoePack,
         };
         int plays = 0; bool drawn = false;
         var b = Battle.Start(d, st, null, c =>
@@ -110,7 +111,7 @@ static class OracleAB
             {
                 Party = s2.Party, Deck = s2.Deck, Enemies = s2.Enemies, PartyHp = s2.PartyHp, PartyMaxHp = s2.PartyMaxHp, Gear = s2.Gear, GearRules = s2.GearRules,
                 Flash = s2.Flash, Shin = s2.Shin, EnemyHp = s2.EnemyHp, EnemyDmg = s2.EnemyDmg, Mind = s2.Mind, Gauge = s2.Gauge, Elite = s2.Elite,
-                EnemyNature = s2.EnemyNature, Floor = s2.Floor, Glow = null, Growth = s2.Growth, CardVals = s2.CardVals, CritDmg = s2.CritDmg, Seed = s2.Seed + (uint)(r * 7919),
+                EnemyNature = s2.EnemyNature, Floor = s2.Floor, Glow = null, Growth = s2.Growth, CardVals = s2.CardVals, CritDmg = s2.CritDmg, Seed = s2.Seed + (uint)(r * 7919), Rage = s2.Rage, FoePack = s2.FoePack,
             }); })).ToList();
             int N = pick.Count, M = cards.Count * 7;
             var res = new Out[N, M];

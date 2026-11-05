@@ -394,7 +394,7 @@ namespace Bolzena.Core
 
         /// <summary>엘다인 3차(2026-10-11 카제나 재정렬) — 「전부 써서」 사도 수 · 겹 자원 주 장치 사도 수 · 고유 카드 글 길이(공백 뺀) · AP 신탁 상한 예외(AP 가 주 장치).</summary>
         public const int ALL_MAX = 3, STACK_MAIN_MAX = 4, TEXT_MAX = 45;
-        public static readonly HashSet<string> AP_ORACLE_FREE = new() { "우이", "실비아" };   // 실비아 — AP 회복 탱커(사용자 2026-10-11)
+        public static readonly HashSet<string> AP_ORACLE_FREE = new() { "우이" };   // 2026-11-01 실비아 뺌 — 안 A 「손님 고르기」 는 AP · 비용을 주지 않는다(옛: AP 회복 탱커, 사용자 2026-10-11)
         /// <summary>끈기(쓰러질 피해 1번 무효)를 줘도 되는 딜러(사용자 결정 ▶E67 — 비비(신성) 「영원한 포옹」).</summary>
         public static readonly HashSet<string> ENDURE_FREE = new() { "비비_신성" };
 
@@ -406,7 +406,7 @@ namespace Bolzena.Core
         {
             ["탄환"] = "시온더다크불릿", ["천상"] = "이드", ["실드 소모"] = "이드", ["약점 노출"] = "아야", ["연계"] = "에피카",
             ["반격"] = "비비", ["도발"] = "클로에", ["취약"] = "비비", ["넘친 회복"] = "우이", ["연쇄"] = "우이",
-            ["고학년 게이지"] = "우이_기억", ["신속"] = "리뉴아", ["협공"] = "실비아", ["치명"] = "비비_신성", ["근면"] = "에르핀_왕도", ["X"] = "에르핀_왕도",
+            ["고학년 게이지"] = "우이_기억", ["동료 고학년"] = "실비아", ["신속"] = "리뉴아", ["치명"] = "비비_신성", ["근면"] = "에르핀_왕도", ["X"] = "에르핀_왕도",   // 2026-11-01: 자기 고학년 = 우이(기억) · 동료 고학년(표시 붙은 동료) = 실비아 · 옛 「협공 = 실비아」 지움(안 A 는 협공 정산이 없다)
             ["약화"] = "란", ["연속"] = "디아나_왕년", ["축복"] = "죠안", ["피해 기반 회복"] = "죠안",
             ["처형"] = "티그_영웅", ["격파"] = "네르_빡침", ["둔화"] = "요미", ["존속"] = "벨라",
         };
@@ -438,6 +438,7 @@ namespace Bolzena.Core
         /// <summary>규칙 계기가 정산하는 소유 키워드(없으면 null).</summary>
         static string OwnedOf(When w) => w == null ? null : w.On switch
         {
+            "ult" when w.Marked != null => "동료 고학년",   // 표시 붙은 동료가 고학년을 쓰면(2026-11-01 실비아 「초청객」)
             "counter" => "반격", "overheal" => "넘친 회복", "ult" => "고학년 게이지", "crit" => "치명", "endure" => "끈기", "break" => "격파",
             "hit" when w.Marked != null => "협공",
             _ => w.Chain ? "연속" : null,
@@ -461,7 +462,7 @@ namespace Bolzena.Core
                 var k = OwnedOf(r.When); if (k != null) hits.Add((k, $"규칙 {r.Name}"));
                 Fxs($"규칙 {r.Name}", r.Fx);
             }
-            foreach (var k in h.AllKeywords) foreach (var p in k.Per) if (p.Stat == "ultCost") hits.Add(("고학년 게이지", $"「{k.Name}」 1개당"));
+            foreach (var k in h.AllKeywords) foreach (var p in k.Per) if (p.Stat == "ultCost") hits.Add((k.Carrier == "hero" ? "동료 고학년" : "고학년 게이지", $"「{k.Name}」 1개당"));   // 아군 표시면 붙은 동료의 고학년(2026-11-01 실비아)
             return hits.Where(x => OWNED_KW.TryGetValue(x.Item1, out var o) && o != h.Id).Distinct();
         }
 
@@ -777,6 +778,7 @@ namespace Bolzena.Core
                     if (p.Stat == "ultCost" && p.V >= 0) W($"{at}: per stat ultCost 는 보통 음수(1개당 고학년 요구 게이지 -비율)");
                 }
                 if (k.Reserve && !k.Decays) W($"{at}: 예약 키워드는 「적의 차례가 끝나면 N 감소」 와 같이 쓴다");
+                if (k.NoOwner && k.Carrier != "hero") E($"{at}: 「{k.Name}」 noOwner 는 아군 표시(carrier hero)에만");   // (2026-11-01 실비아 초청객)
                 if (k.Burn != null && ((k.Carrier != "hero" && k.Carrier != "self") || k.Burn.On != "play" || k.Burn.Shield < 0 || k.Burn.Heal < 0)) E($"{at}: 「{k.Name}」 burn 은 아군 표시(carrier hero) · 주인이 쥔 파티 촛불(carrier self)에 on play · shield · heal 0 이상");
                 if (k.HuntCarry != null && (k.HuntCarry != "lowEnemy" || !k.Hunt || k.Carrier != "enemy")) E($"{at}: 「{k.Name}」 huntCarry 는 적 사냥감(hunt · carrier enemy)에 lowEnemy");
                 if (k.Hunt && k.Carrier != "enemy" && k.Carrier != "hero") E($"{at}: 찍기(hunt)는 적에게 거는 표식(carrier enemy) · 아군 표시(carrier hero)에만");
@@ -1093,6 +1095,7 @@ namespace Bolzena.Core
         {
             if (ids == null || ids.Count == 0) { E($"{at}: 적이 없다"); return; }
             foreach (var id in ids) if (d.Enemy(id) == null) E($"{at}: 없는 적 {id}");
+            if (ids.Count > Battle.MAX_FOES) E($"{at}: 적은 {Battle.MAX_FOES}마리까지(동시에 설 수 있는 수 · 편성 배율 R.PACK_SLOT) — 지금 {ids.Count}");
         }
 
         void Village(VillageDef v)
@@ -1175,6 +1178,11 @@ namespace Bolzena.Core
                 if (string.IsNullOrEmpty(o.Label)) E($"{oa}: label 이 없다");
                 Outs(oa, o.Out);
                 if (o.Hero != null) foreach (var h in o.Hero) if (d.Hero(h) == null) W($"{oa}: 없는 사도 {h}");
+                if (o.HeroAll != null)
+                {
+                    foreach (var h in o.HeroAll) if (d.Hero(h) == null) W($"{oa}: heroAll 의 없는 사도 {h}");
+                    if (o.HeroAll.Distinct().Count() + ((o.Hero?.Count ?? 0) > 0 ? 1 : 0) < 2) E($"{oa}: heroAll 은 두 사도 이상(hero 와 합쳐) — 한 명이면 hero 를 쓴다");
+                }
                 if (o.Gamble != null)
                 {
                     double sum = o.Gamble.Sum(g => g.P);
@@ -1191,7 +1199,7 @@ namespace Bolzena.Core
                 if (o.Price != null) Outs(oa + " price", o.Price.Out);
                 // by — 대사별 말하는 이. "hero" 는 사도 조건(hero · price.hero)이 있는 선택지에서만
                 foreach (var b in (o.By ?? new List<string>()).Concat(o.Gamble?.SelectMany(g => g.By ?? new List<string>()) ?? Enumerable.Empty<string>()))
-                    if (b == "hero" && (o.Hero == null || o.Hero.Count == 0) && o.Price?.Hero == null) E($"{oa}: by 「hero」 는 hero · price.hero 가 있는 선택지에서만");
+                    if (b == "hero" && (o.Hero == null || o.Hero.Count == 0) && (o.HeroAll == null || o.HeroAll.Count == 0) && o.Price?.Hero == null) E($"{oa}: by 「hero」 는 hero · heroAll · price.hero 가 있는 선택지에서만");
                 if (o.When != null && o.When != "hp30") E($"{oa}: when 은 hp30 만");
                 if (o.Flag != null) flagUse[o.Flag] = oa;
                 if (o.NoFlag != null) flagUse[o.NoFlag] = oa;

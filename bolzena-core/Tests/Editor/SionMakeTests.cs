@@ -12,7 +12,7 @@ namespace Bolzena.Core.Tests
 
         static GameData Data()
         {
-            string dir = new[] { "../bolzena-content-v2", "../../bolzena-content-v2", "C:/projects/bolzena-content-v2" }.FirstOrDefault(Directory.Exists);
+            string dir = TestPaths.Content;
             if (dir == null) Assert.Ignore("bolzena-content-v2 가 없다");
             return GameData.FromFolder(dir);
         }
@@ -53,7 +53,7 @@ namespace Bolzena.Core.Tests
                     if (r.Ok && got < expect) bad.Add(line);
                 }
             }
-            UnityEngine.Debug.Log("[SION]\n" + string.Join("\n", lines));
+            TestPaths.Log("[SION]\n" + string.Join("\n", lines));
             Assert.IsEmpty(bad, string.Join("\n", bad) + "\n---\n" + string.Join("\n", lines));
         }
 
@@ -92,7 +92,7 @@ namespace Bolzena.Core.Tests
             m0 = Mag(b);
             var r = b.PlayCard(hi, 0, new PlayOpts { Discard = b.Hand.Where(x => GameData.BaseId(x) != "클로에_u2").Take(1).ToList() });
             notes.Add($"클로에가 버리게 함: {(r.Ok ? "ok" : r.Why)} +{Mag(b) - m0} (1)");
-            UnityEngine.Debug.Log("[SION] " + string.Join(" · ", notes));
+            TestPaths.Log("[SION] " + string.Join(" · ", notes));
             Assert.Pass(string.Join(" · ", notes));
         }
 

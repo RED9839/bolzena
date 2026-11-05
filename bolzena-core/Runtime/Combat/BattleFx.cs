@@ -513,7 +513,8 @@ namespace Bolzena.Core
                                     // 처치 일격도 강인도를 깎는다 — 쓰러지기 직전에 이 카드의 강인도 피해(LethalKill)
                                     var (lf0, lt0) = (lethalFor, lethalTough);
                                     if (ctx.Card && t.Side == Side.Enemy) { var ht = t; lethalFor = t; lethalTough = () => CardTough(owner, ht, ctx, dTarget, true); }
-                                    try { Hurt(t, v, new HurtOpts { From = owner, Crit = !f.Fixed && crit, Tags = ctx.HitTags, Card = ctx.Card, Fixed = f.Fixed, Attack = ctx.Type == "공격", Shot = ctx.Passive != null && !ctx.Card ? "extra" : null }); }   // 패시브 피해(네르 「심판의 벼락」 …)는 쏘는 한 대로 보인다
+                                    bool breaks = ctx.Card && t.Side == Side.Enemy && St(t, "잔불") > 0 && WillBreak(owner, t, ctx, dTarget);   // 잔불 — 이 타격으로 격파되나(강인도는 피해 뒤에 깎는다)
+                                    try { Hurt(t, v, new HurtOpts { From = owner, Crit = !f.Fixed && crit, Tags = ctx.HitTags, Card = ctx.Card, Fixed = f.Fixed, Attack = ctx.Type == "공격", Breaks = breaks, Shot = ctx.Passive != null && !ctx.Card ? "extra" : null }); }   // 패시브 피해(네르 「심판의 벼락」 …)는 쏘는 한 대로 보인다
                                     finally { (lethalFor, lethalTough) = (lf0, lt0); }
                                     if (ctx.Card && t.Side == Side.Enemy && !t.Dead)
                                     {
@@ -571,7 +572,9 @@ namespace Bolzena.Core
                             if (v0 <= 0) break;
                             foreach (var t in Once(Resolve(ctx, f.Target ?? (f.K == FxK.Block ? "self" : "party"))))
                             {
-                                int v = f.Fixed || f.OfEvent > 0 ? v0 : ShieldGain(t, v0);
+                                // 결의 — 파티는 실드 계수에 겹마다 +20%p(사기가 카드 계수에 더해지는 것과 대칭, ShieldGain 주석). 고정 실드 · 일의 값 실드는 안 탄다
+                                int vt = f.Fixed || f.OfEvent > 0 || t.Side != Side.Party || St(t, "결의") <= 0 ? v0 : GuardAmount(owner, ratio + R.StackEff("결의", St(t, "결의")), ctx.Shin);
+                                int v = f.Fixed || f.OfEvent > 0 ? v0 : ShieldGain(t, vt);
                                 if (t.Side == Side.Party && v > 0) ShieldBy = owner.Key;
                                 if (f.K == FxK.Block) t.Block += v; else t.Shield += v;
                                 if (t.Side == Side.Party) TallyShield(owner, v);   // 전투 기록 — 파티에 얹은 방어 · 실드
@@ -763,9 +766,24 @@ namespace Bolzena.Core
             if (!once) return false;
             bool weak = IsWeakHit(owner, t, ctx.HitTags);
             if (t.ToughMax > 0 && !t.Broken) { ToughHits++; if (weak) ToughWeakHits++; }
+            return ToughHit(t, CardToughOf(ctx, dTarget, weak) + (glow ? R.TOUGH.Glow : 0), dying);
+        }
+        /// <summary>카드 한 장이 그 적에게 주는 강인도 단위(잔광 · 적 쪽 보정 전).</summary>
+        static double CardToughOf(FxCtx ctx, string dTarget, bool weak)
+        {
             bool area = dTarget == "allEnemies" || dTarget != null && dTarget.StartsWith("random", StringComparison.Ordinal);   // 광역 · 논타겟 1/2
-            double td = ctx.ToughUnit > 0 ? R.ToughOf(ctx.ToughUnit, weak, area) : R.ToughDmg(ctx.Cost, weak, area);
-            return ToughHit(t, td + (glow ? R.TOUGH.Glow : 0), dying);
+            return ctx.ToughUnit > 0 ? R.ToughOf(ctx.ToughUnit, weak, area) : R.ToughDmg(ctx.Cost, weak, area);
+        }
+        /// <summary>
+        /// 이 카드 타격 뒤 CardTough 가 그 적을 격파하나 — 바꾸는 것 없이 미리 잰다(잔불 발동 조건, 2026-10-31). 이 카드가 그 적을 처음 칠 때만 강인도를 깎는다.
+        /// 공격 카드의 잔광은 첫 타격 전에 GlowUse 로 이미 쓰였으니 GlowOn 으로 본다.
+        /// </summary>
+        bool WillBreak(Unit owner, Unit t, FxCtx ctx, string dTarget)
+        {
+            if (t.Dead || t.Broken || t.ToughMax <= 0 || ctx.Toughed != null && ctx.Toughed.Contains(t)) return false;
+            double n = CardToughOf(ctx, dTarget, IsWeakHit(owner, t, ctx.HitTags)) + (ctx.Type == "공격" && GlowOn() ? R.TOUGH.Glow : 0);
+            if (!(n > 0)) return false;
+            return t.Tough - ToughIn(t, n) < 1e-6;
         }
 
         bool GlowUse()
@@ -905,7 +923,7 @@ namespace Bolzena.Core
             if (run && stat == "atk" && v > 0 && u.Side == Side.Party)
             {
                 double has = u.Mods.Where(m => m.Run && m.Stat == "atk" && m.V > 0).Sum(m => m.V);
-                v = Math.Min(v, R.MORALE_ATK * R.SV("사기Max") - has);
+                v = Math.Min(v, R.MORALE_ATK * R.MORALE_ATK_STACKS - has);
                 if (v <= 1e-9) return;
             }
             u.Mods.Add(new Mod { Stat = stat, V = v, Left = turns <= 0 ? 1 : turns, Src = src, Run = run });
@@ -1023,7 +1041,7 @@ namespace Bolzena.Core
             {   // 사도에게 붙는 사도 표시(지정 아군 · 제자 …) — 가리킨 사도마다 따로
                 foreach (var t in Resolve(ctx, f.Target ?? "self").Where(u => u.Side == Side.Party))
                 {
-                    if (kw.Def.Burn != null && t.Key == kw.Owner && f.IV > 0) { Say($"「{f.Id}」 — 주인 자신에게는 붙지 않는다"); continue; }   // 벨라 촛불은 동료에게만
+                    if ((kw.Def.Burn != null || kw.Def.NoOwner) && t.Key == kw.Owner && f.IV > 0) { Say($"「{f.Id}」 — 주인 자신에게는 붙지 않는다"); continue; }   // 벨라 촛불 · 실비아 초청객(noOwner)은 동료에게만
                     // 한 번에 한 아군(hunt) — 새 아군에게 붙이면 다른 아군의 표시는 사라진다(옮겨 간다)
                     if (kw.Def.Hunt && f.IV > 0)
                         foreach (var o in Party)
