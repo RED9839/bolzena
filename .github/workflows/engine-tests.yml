@@ -1,0 +1,28 @@
+# 엔진 테스트 — 푸시 · PR 마다 Unity 없이 규칙 엔진(bolzena-core) 테스트를 돌린다.
+#   10주차에 만든 .NET 8 테스트 프로젝트(Tools~/DotnetTests). 저장소 밖 자료(교차 테이프 · 빠진 사도 백업)를 쓰는 4개는 건너뛴다(의도).
+#   러너는 로컬에서 검증한 환경과 같은 Windows. 결과 파일(trx)은 실행마다 받아 볼 수 있게 올린다.
+name: engine-tests
+
+on:
+  push:
+    branches: [main, "w*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  dotnet-test:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: dotnet test
+        shell: pwsh
+        run: dotnet test "bolzena-core/Tools~/DotnetTests/Bolzena.Core.DotnetTests.csproj" --logger "trx;LogFileName=engine-tests.trx" --logger "console;verbosity=minimal" --results-directory test-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: engine-tests-trx
+          path: test-results
