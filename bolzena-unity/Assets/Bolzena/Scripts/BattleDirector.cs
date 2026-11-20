@@ -277,7 +277,6 @@ namespace Bolzena
             Bolzena.Fx.BolzenaFx.Parent = FieldRoot;
             Bolzena.Fx.BolzenaFx.Sound = false;
             Bolzena.Fx.BolzenaFx.UltDrop = UltDropPart;
-            mirror = null; mirrorLeft = 0; sleeping.Clear();   // 원작 방식 고학년 — 발동 때 틀 장은 시전 때 빼기
             Bolzena.Fx.BolzenaFx.Calm = System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-nofx") >= 0;   // 원작 이펙트 끄고 재 보기(점검)
             Bolzena.Fx.BolzenaFx.UltOrder = 325; Bolzena.Fx.BolzenaFx.CardOrder = 150; Bolzena.Fx.BolzenaFx.CommonOrderAdd = -150;
             fxCenter0 ??= Bolzena.Fx.BolzenaFx.ScreenCenter;
@@ -906,28 +905,18 @@ namespace Bolzena
                     int j = i + 1;
                     var group = new List<BattleEvent>();
                     while (j < evs.Count && !Boundary(evs[j].Kind)) group.Add(evs[j++]);
-                    // 처치해서 고학년을 한 번 더(란 · 키디언 cue) — cue 앞은 첫 고학년, 뒤는 두 번째 고학년으로 따로 튼다
-                    int again = e.Actor.Side == Side.Party ? group.FindIndex(x => x.Kind == EventKind.FxCue && (x.Text == "ran_again" || x.Text == "kidian_again")) : -1;
-                    if (again >= 0)
-                    {
-                        yield return HeroAct(e, group.GetRange(0, again));
-                        yield return FxCueFx(group[again]);
-                        yield return HeroAct(e, group.GetRange(again + 1, group.Count - again - 1));
-                    }
-                    else if (e.Actor.Side == Side.Party) yield return Timed("사도 수", HeroAct(e, group));
+                    if (e.Actor.Side == Side.Party) yield return Timed("사도 수", HeroAct(e, group));
                     else yield return Timed("적 수", EnemyAct(e, group));
                     i = j;
                     continue;
                 }
                 if (e.Kind == EventKind.FxCue && IsCueStrike(e.Text))
                 {
-                    // 턴 시작 발동 — 뒤따르는 피해를 묶어 그 박자에(미로 광선 V 발 · 오로라 기둥 V 대 · 키샤 · 이드(재활)는 적 전체 한 번)
+                    // 턴 시작 발동 — 뒤따르는 피해를 묶어 그 박자에(CUE2 의 Strike)
                     int j = i + 1, dmg = 0, cap = CueCap(e);
                     var group = new List<BattleEvent>();
                     while (j < evs.Count && dmg < cap && !Boundary(evs[j].Kind) && evs[j].Kind != EventKind.FxCue) { if (evs[j].Kind == EventKind.Damage && evs[j].Text != "shot") dmg++; group.Add(evs[j++]); }
-                    // 이드(재활) — 꿈이 무너지며 파티 실드(바로 뒤 방어 · 실드)
-                    if (e.Text == "ide_wake") while (j < evs.Count && (evs[j].Kind == EventKind.Block || evs[j].Kind == EventKind.Status) && evs[j].Target.Side == Side.Party) group.Add(evs[j++]);
-                    yield return e.Text == "miro_beam" ? MiroBeam(e, group) : CUE2.TryGetValue(e.Text, out var c2) ? Cue2Strike(e, group, c2) : CueStrike(e, group);
+                    yield return Cue2Strike(e, group, CUE2[e.Text]);
                     i = j;
                     continue;
                 }

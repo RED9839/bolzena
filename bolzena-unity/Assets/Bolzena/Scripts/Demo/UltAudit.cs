@@ -96,6 +96,7 @@ namespace Bolzena.Demo
             var go = new GameObject("UltAudit");
             var r = go.AddComponent<UltAudit>();
             r.d = director;
+            if (director.DemoBranchPick < 0) director.DemoBranchPick = 1;   // 단계 · 갈래 고르기 창은 첫 칸 — 요미 「지극정성의 마중」 이 창에서 멈춰 고학년이 안 나왔다(2026-11-17, DemoRunner 와 같게)
         }
 
         // 차림 — BattleDirector 가 전투를 만들 때 부른다(CoreBattle.Fixture.Override)
@@ -418,6 +419,7 @@ namespace Bolzena.Demo
             if (why == null)
             {
                 probe?.Mark();
+                Random.InitState(7 + idx);   // 갈래 · 대사 · 타격 자리도 사도마다 같게 — Fixture.Seed 는 전투 엔진에만 걸린다(2026-11-17, 11주차 ADR-003 대안 C)
                 d.RequestUlt(0);
                 t = 0;
                 while (!d.InUlt && t < 5f) { yield return null; t += Time.unscaledDeltaTime; }
