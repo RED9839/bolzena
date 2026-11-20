@@ -15,7 +15,7 @@ namespace Bolzena.Demo
     // 결과는 로그([Probe]) · Captures/probe/*.png. 싸움 하나가 끝나면(또는 180초) 나간다.
     //   Bolzena.exe -battle -inputprobe [-party a,b,c -foes x,y]      전투만
     //   Bolzena.exe -demo -humanfight -inputprobe                      판 화면은 데모가 넘기고 첫 싸움을 이 손으로
-    public class InputProbe : MonoBehaviour
+    public partial class InputProbe : MonoBehaviour
     {
         static InputProbe me;
         Mouse mouse;
@@ -45,7 +45,7 @@ namespace Bolzena.Demo
         {
             var d = BattleDirector.I;
             int n = 0;
-            if (d != null && d.Enemies.Count > 0)
+            if (d != null && d.Enemies.Count > 0 && !hideBoxes)
                 for (int i = 0; i < d.Enemies.Count; i++)
                 {
                     if (d.Enemies[i] == null || d.Battle.Snapshot.Enemies.Count <= i || d.Battle.Snapshot.Enemies[i].Dead) continue;
@@ -95,7 +95,8 @@ namespace Bolzena.Demo
             Directory.CreateDirectory(dir);
             Debug.Log("[Probe] 가상 마우스로 사람 입력을 흉내 냅니다 → " + dir);
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "-sound") < 0) AudioListener.volume = 0f;   // 점검은 음소거
-            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-holdprobe") >= 0) StartCoroutine(HoldRun());
+            if (SceneName != null) StartCoroutine(SceneRun());   // 확인 장면(-probescene — InputProbe.Scenes.cs)
+            else if (Array.IndexOf(Environment.GetCommandLineArgs(), "-holdprobe") >= 0) StartCoroutine(HoldRun());
             else StartCoroutine(Run());
             StartCoroutine(Limit());
         }

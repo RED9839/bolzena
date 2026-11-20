@@ -10,18 +10,19 @@
       "hp": 650,
       "atk": 95,
       "def": 46,
-      "crit": 5,
-      "blurb": "백사당의 수호자. 돕는 허물과 압도하는 본성이 번갈아 깨어나며 순환을 돌리고, 쌓인 순환은 파티를 북돋거나 거대한 뱀이 되어 한꺼번에 쏟아집니다.",
+      "crit": 3,
+      "blurb": "백사당의 수호자. 돕는 허물과 압도하는 본성이 번갈아 깨어나며 순환을 돌리고, 순환이 쌓일수록 영역이 넓어져 영역 위에 선 동료가 세집니다.",
       "keyword": {
         "name": "순환",
-        "desc": "허물과 본성이 한 바퀴 돈 자취",
+        "desc": "허물과 본성이 한 바퀴 돈 자취 — 쌓일수록 영역이 넓어진다(쓰지 않음)",
         "carrier": "self",
         "cap": 3,
         "per": [
           {
             "stat": "atk",
-            "v": 0.05,
-            "who": "allies"
+            "v": 0.1,
+            "who": "marked",
+            "mark": "영역 위"
           }
         ]
       },
@@ -62,10 +63,15 @@
         {
           "name": "한 바퀴의 끝",
           "when": {
-            "on": "stackReach",
-            "id": "순환",
-            "n": 3
+            "on": "formLap"
           },
+          "conds": [
+            {
+              "c": "stack",
+              "id": "순환",
+              "n": 3
+            }
+          ],
           "fx": [
             {
               "k": "status",
@@ -97,14 +103,10 @@
         "fx": [
           {
             "k": "dmg",
-            "ratio": 0.8,
+            "ratio": 0.6,
             "target": "allEnemies",
-            "hits": 2
-          },
-          {
-            "k": "stack",
-            "id": "순환",
-            "v": 1
+            "hitsPer": "순환",
+            "hitsAdd": 1
           },
           {
             "k": "stack",
@@ -115,7 +117,7 @@
           {
             "k": "status",
             "id": "사기",
-            "v": 2
+            "v": 1
           }
         ]
       },
@@ -197,9 +199,9 @@
           "id": "우로스_본성"
         },
         {
-          "k": "empower",
-          "ratio": 0.4,
-          "who": "other"
+          "k": "atkMod",
+          "v": 0.2,
+          "target": "oneAlly"
         }
       ],
       "oracles": [
@@ -218,16 +220,16 @@
             },
             {
               "k": "shield",
-              "ratio": 2.6
+              "ratio": 1.9
             },
             {
               "k": "ifForm",
               "id": "우로스_본성"
             },
             {
-              "k": "empower",
-              "ratio": 0.4,
-              "who": "other"
+              "k": "atkMod",
+              "v": 0.3,
+              "target": "oneAlly"
             }
           ]
         },
@@ -252,14 +254,16 @@
               "id": "우로스_본성"
             },
             {
-              "k": "empower",
-              "ratio": 0.5,
-              "who": "other"
+              "k": "atkMod",
+              "v": 0.3,
+              "target": "oneAlly"
             }
           ]
         },
         {
           "name": "신탁 3",
+          "type": "강화",
+          "power": true,
           "fx": [
             {
               "k": "stack",
@@ -268,21 +272,20 @@
               "target": "oneAlly"
             },
             {
-              "k": "ifForm",
-              "id": "우로스_허물"
-            },
-            {
-              "k": "draw",
-              "v": 1
-            },
-            {
-              "k": "ifForm",
-              "id": "우로스_본성"
-            },
-            {
-              "k": "empower",
-              "ratio": 0.5,
-              "who": "other"
+              "k": "power",
+              "rules": [
+                {
+                  "when": {
+                    "on": "formLap"
+                  },
+                  "fx": [
+                    {
+                      "k": "draw",
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -296,22 +299,21 @@
               "target": "oneAlly"
             },
             {
-              "k": "perStack",
-              "id": "순환"
+              "k": "ifForm",
+              "id": "우로스_허물"
             },
             {
               "k": "shield",
-              "ratio": 0.8
+              "ratio": 1.6
             },
             {
               "k": "ifForm",
               "id": "우로스_본성"
             },
             {
-              "k": "takenMod",
-              "v": 0.1,
-              "turns": 2,
-              "target": "oneEnemy"
+              "k": "atkMod",
+              "v": 0.6,
+              "target": "self"
             }
           ]
         },
@@ -338,9 +340,9 @@
               "id": "우로스_본성"
             },
             {
-              "k": "empower",
-              "ratio": 0.2,
-              "who": "other"
+              "k": "atkMod",
+              "v": 0.1,
+              "target": "oneAlly"
             }
           ]
         }
@@ -754,18 +756,12 @@
           }
         },
         {
-          "k": "ifStack",
-          "id": "순환",
-          "n": 3
-        },
-        {
-          "k": "spend",
-          "id": "순환",
-          "v": 3
+          "k": "perStack",
+          "id": "순환"
         },
         {
           "k": "dmg",
-          "ratio": 1.2,
+          "ratio": 0.3,
           "target": "allEnemies"
         }
       ],
@@ -784,18 +780,12 @@
               }
             },
             {
-              "k": "ifStack",
-              "id": "순환",
-              "n": 3
-            },
-            {
-              "k": "spend",
-              "id": "순환",
-              "v": 3
+              "k": "perStack",
+              "id": "순환"
             },
             {
               "k": "dmg",
-              "ratio": 2.3,
+              "ratio": 0.7,
               "target": "allEnemies"
             }
           ]
@@ -814,18 +804,12 @@
               }
             },
             {
-              "k": "ifStack",
-              "id": "순환",
-              "n": 3
-            },
-            {
-              "k": "spend",
-              "id": "순환",
-              "v": 3
+              "k": "perStack",
+              "id": "순환"
             },
             {
               "k": "dmg",
-              "ratio": 2.9,
+              "ratio": 0.8,
               "target": "oneEnemy"
             }
           ]
@@ -836,26 +820,15 @@
           "fx": [
             {
               "k": "shield",
-              "ratio": 2.4
+              "ratio": 3
             },
             {
-              "k": "ifStack",
-              "id": "순환",
-              "n": 3
-            },
-            {
-              "k": "spend",
-              "id": "순환",
-              "v": 3
+              "k": "perStack",
+              "id": "순환"
             },
             {
               "k": "shield",
-              "ratio": 2.9
-            },
-            {
-              "k": "status",
-              "id": "사기",
-              "v": 1
+              "ratio": 1
             }
           ]
         },
@@ -869,18 +842,12 @@
               "target": "allEnemies"
             },
             {
-              "k": "ifStack",
-              "id": "순환",
-              "n": 3
-            },
-            {
-              "k": "spend",
-              "id": "순환",
-              "v": 3
+              "k": "perStack",
+              "id": "순환"
             },
             {
               "k": "dmg",
-              "ratio": 1.5,
+              "ratio": 0.4,
               "target": "allEnemies"
             }
           ]
@@ -891,21 +858,20 @@
             {
               "k": "dmg",
               "ratio": 1,
-              "target": "allEnemies"
+              "target": "allEnemies",
+              "plus": 0.4,
+              "plusIf": {
+                "k": "ifForm",
+                "id": "우로스_본성"
+              }
             },
             {
-              "k": "ifStack",
-              "id": "순환",
-              "n": 3
-            },
-            {
-              "k": "spend",
-              "id": "순환",
-              "v": 3
+              "k": "perStack",
+              "id": "순환"
             },
             {
               "k": "dmg",
-              "ratio": 1.2,
+              "ratio": 0.3,
               "target": "allEnemies"
             },
             {

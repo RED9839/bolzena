@@ -398,5 +398,76 @@ namespace Bolzena.UI
             halo.color = g;
             oldRing.SetColors(Ready || Hover ? new Color(0.75f, 0.9f, 1f) : new Color(0.5f, 0.7f, 0.95f), new Color(0, 0, 0, 0), Ready || Hover ? 1.6f : 1.1f);
         }
+
+        // ── 턴 종료 확인 창(2026-11-01) ──
+        // 낼 수 있는 카드(지금 AP 로 낼 수 있는 카드)가 손에 남았는데 턴 종료(단추 · E)를 누르면 한 번 묻는다. 설정 「턴 종료 확인」(Settings.EndTurnConfirm, 기본 켬)이 끄면 아예 안 묻는다 ·
+        //   끄는 길은 설정 「턴 종료 확인」 하나뿐.
+        //   데모 · 프로브 · 봇 · 점검 실행(시험 인자)에서는 묻지 않는다 — 확인 장면(probe.sh scene endturn)만 ForceAsk 로 켠다.
+        static readonly string[] QuietArgs = { "-demo", "-battle", "-inputprobe", "-ultaudit", "-cutinaudit", "-artaudit", "-toughshots", "-demo-quick", "-demo-roster", "-perf", "-humanfight", "-norec", "-recdir", "-mute" };
+        public static bool ForceAsk;
+        /// <summary>확인 창이 닫힌 프레임 — 그 프레임의 탭은 싸움터 입력으로 받지 않는다.</summary>
+        public static int ClosedFrame = -1;
+
+        public static bool NeedAsk
+        {
+            get
+            {
+                if (!Bolzena.RunUI.Settings.EndTurnConfirm) return false;
+                if (ForceAsk) return true;
+                if (Bolzena.RunUI.Demo.Active || Bolzena.RunUI.TestMute.On) return false;
+                var a = Environment.GetCommandLineArgs();
+                foreach (var q in QuietArgs) if (Array.IndexOf(a, q) >= 0) return false;
+                return true;
+            }
+        }
+
+        /// <summary>확인 창을 띄운다 — 「턴 종료」(Enter · Space · E)면 yes, 「취소」 · Esc · 바깥이면 그냥 닫는다. playable = 낼 수 있는 카드 수.</summary>
+        public static Modal Ask(Transform parent, int playable, Action yes)
+        {
+            const float W = 6.8f, H = 2.5f;
+            const int OC = Modal.O + 5;
+            var m = Modal.Create(parent, "endask", new Vector2(W, H), new Vector3(0, 0.3f, 0), false, 0.55f);
+            m.OnClose += () => ClosedFrame = Time.frameCount;   // 단추를 누른 그 탭이 창 뒤 싸움터(사도 · 적)로 새지 않게 — BattleDirector.PollInput 이 본다
+            var T = m.Content;
+            Tone.Text("q", T, "아직 낼 수 있는 카드가 있다 — 턴을 끝낼까?", new Vector3(W / 2, -0.6f, 0), Tone.Lg, OC, Tone.Ink, TMPro.TextAlignmentOptions.Center, false, W - 0.4f);
+            Tone.Text("qs", T, $"지금 AP 로 낼 수 있는 카드 <color={Tone.GoldTag}>{playable}</color>장", new Vector3(W / 2, -1.05f, 0), Tone.Sm, OC, Tone.Sub, TMPro.TextAlignmentOptions.Center, true, W - 0.4f);
+            Action go = () => { if (m == null) return; m.Close(); yes?.Invoke(); };   // m == null — 이미 닫힌 창(키 · 단추가 겹친 프레임)
+            AskPill(T, "no", new Vector3(W / 2 - 1.4f, -1.75f, 0), 2.4f, "취소", false, m.Close, OC);
+            AskPill(T, "yes", new Vector3(W / 2 + 1.4f, -1.75f, 0), 2.4f, "턴 종료", true, go, OC);
+            KeyBadge.Add(T, new Vector3(W / 2 - 1.4f + 1.05f, -1.75f + 0.3f, 0), "Esc", OC + 4, 0.2f);
+            KeyBadge.Add(T, new Vector3(W / 2 + 1.4f + 1.0f, -1.75f + 0.3f, 0), "Enter", OC + 4, 0.2f);
+            m.gameObject.AddComponent<AskKeys>().Yes = go;
+            float k = Tone.K;
+            m.Fit(new Vector2(W, H) * k, new Vector3(0, 0.3f, 0), k);
+            AskOpen = m;
+            YesFn = go;
+            return m;
+        }
+
+        /// <summary>점검용 — 지금 떠 있는 확인 창 · 그 「턴 종료」 동작.</summary>
+        public static Modal AskOpen;
+        public static Action YesFn;
+
+        static void AskPill(Transform T, string name, Vector3 at, float w, string label, bool gold, Action click, int oc, float h = 0.66f)
+        {
+            var size = new Vector2(w, h);
+            var bg = Make.Sliced(name, T, Res.UI(gold ? "pill_gold_9s" : "pill_dark_9s"), at, size, oc);
+            Make.Text(name + "t", bg.transform, label, new Vector3(0, -0.01f, 0), Tone.Lg, oc + 2, gold ? Tone.Brown : Tone.Ink);
+            var b = bg.gameObject.AddComponent<Button>();
+            b.Size = size;
+            b.OnClick = click;
+        }
+
+        class AskKeys : MonoBehaviour
+        {
+            public Action Yes;
+            float at;
+            void Start() => at = Time.unscaledTime;
+            void Update()
+            {
+                if (Time.unscaledTime - at < 0.15f) return;   // 창을 연 그 키(E)가 바로 「예」 가 되지 않게
+                if (PointerInput.Key(UnityEngine.InputSystem.Key.Enter) || PointerInput.Key(UnityEngine.InputSystem.Key.NumpadEnter) || PointerInput.Key(UnityEngine.InputSystem.Key.Space) || PointerInput.Key(UnityEngine.InputSystem.Key.E)) Yes?.Invoke();
+            }
+        }
     }
 }

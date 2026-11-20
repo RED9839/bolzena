@@ -120,6 +120,15 @@ namespace Bolzena.Core.Tests
             Assert.IsTrue(new CardText(d).Chips(d.View("pw_t")).Contains("결의"), "칩에 규칙 속 상태도");
         }
 
+        [Test] public void 규칙이_둘이면_이_전투_동안은_첫_줄에만()
+        {
+            var d = K.Data(cards: @"[{id:'pw_two', name:'두 규칙', hero:'a', unique:true, cost:0, type:'강화', fx:[{k:'power', rules:[
+              {when:{on:'play', type:'공격'}, limit:{per:'turn', n:1}, fx:[{k:'gauge', v:5}]}, {when:{on:'play', type:'스킬'}, limit:{per:'turn', n:1}, fx:[{k:'gauge', v:5}]}]}]}]");
+            string t = new CardText(d).Card(d.Card("pw_two"));
+            StringAssert.StartsWith("유일.\n이 전투 동안 ", t);
+            Assert.AreEqual(1, t.Split(new[] { "이 전투 동안" }, System.StringSplitOptions.None).Length - 1, "한 강화에 한 번: " + t);
+        }
+
         [Test] public void 강화_카드의_세기형_버프는_이_전투_동안으로_읽힌다()
         {
             var d = K.Data(cards: @"[{id:'pw_s', name:'다짐', hero:'a', unique:true, cost:1, type:'강화', fx:[{k:'status', id:'결의', v:1}, {k:'status', id:'사기', v:1}, {k:'draw', v:1}]},

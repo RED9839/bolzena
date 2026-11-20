@@ -15,7 +15,7 @@ namespace Bolzena.Core.Tests
 
         static GameData Data()
         {
-            string dir = new[] { "../bolzena-content-v2", "../../bolzena-content-v2", "C:/projects/bolzena-content-v2" }.FirstOrDefault(Directory.Exists);
+            string dir = TestPaths.Content;
             if (dir == null) Assert.Ignore("bolzena-content-v2 가 없다");
             return GameData.FromFolder(dir);
         }

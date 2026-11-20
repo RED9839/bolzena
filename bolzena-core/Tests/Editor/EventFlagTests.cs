@@ -124,5 +124,30 @@ namespace Bolzena.Core.Tests
             var rep = Validator.Check(d);
             Assert.IsTrue(rep.Warnings.Any(w => w.Contains("t_none")), string.Join("\n", rep.Warnings));
         }
+
+        [Test] public void heroAll_은_두_사도가_다_있어야_열린다()
+        {
+            // 관계 쌍 선택지(2026-11-01) — heroAll 은 모두, hero 와 함께면 「모두 + 가운데 한 명」
+            var d = K.Sample(); d.Add(null, null, null, null, @"[{ ""id"": ""P1"", ""name"": ""쌍"", ""options"": [
+              { ""label"": ""둘 다"", ""heroAll"": [ ""rico"", ""carrot"" ], ""say"": ""\""좋아.\"""", ""by"": [ ""hero"" ], ""out"": [ { ""k"": ""gold"", ""v"": 1 } ] },
+              { ""label"": ""짝이 없다"", ""heroAll"": [ ""rico"", ""nobody"" ], ""out"": [] },
+              { ""label"": ""한 명 + 무리"", ""heroAll"": [ ""sion"" ], ""hero"": [ ""nobody"", ""carrot"" ], ""out"": [] },
+              { ""label"": ""무리가 없다"", ""heroAll"": [ ""sion"" ], ""hero"": [ ""nobody"" ], ""out"": [] },
+              { ""label"": ""한 명뿐"", ""heroAll"": [ ""rico"" ], ""out"": [] } ] }]", null);
+            var run = Run.New(d, PARTY, 3);
+            var opts = run.OptionsOf(run.Data.Event("P1"));
+            Assert.IsNull(run.LockOf(opts[0]));
+            StringAssert.Contains("둘 다 파티에 있어야", run.LockOf(opts[1]));
+            Assert.IsNull(run.LockOf(opts[2]), "heroAll 이 다 있고 hero 무리 가운데 한 명이 있다");
+            StringAssert.Contains("파티에 있어야", run.LockOf(opts[3]), "heroAll 은 있어도 hero 무리가 없으면 잠긴다");
+            run.S.Event = new EventState { Key = "t", Choices = new List<string> { "P1" }, Id = "P1" };
+            int g = run.S.Gold;
+            var (_, why) = run.Choose(0);
+            Assert.IsNull(why);
+            Assert.AreEqual(g + 1, run.S.Gold);
+            Assert.AreEqual(run.Data.Hero("rico").Name, run.S.Event.SayBy[0], "by hero = heroAll 의 첫 사도");
+            var rep = Validator.Check(d);
+            Assert.AreEqual(1, rep.Errors.Count(e => e.Contains("P1") && e.Contains("heroAll 은 두 사도 이상")), string.Join("\n", rep.Errors));
+        }
     }
 }

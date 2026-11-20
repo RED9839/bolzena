@@ -259,6 +259,8 @@ namespace Bolzena.Battle
         public float FAfter;             // Toughness · Recover — 남은 강인도 그대로(1/3 칸도)
         public int Hit, Hits = 1;
         public bool Crit, Boss, Up;
+        public bool Weak;                // Damage — 약점으로 쳤나(core Cue.Weak — 숫자 꼬리표 「약점」)
+        public int By = -1;              // Damage — 엔진이 피해를 셈한 사도(파티 몇 번째, core Cue.By) — 숫자 옆 성격 원. 교주 카드 · 마탄처럼 몸짓 사도와 다를 수 있다
         public Motion Motion;
         public HitKind HitKind;
         public CardInfo Card;

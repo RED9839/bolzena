@@ -101,6 +101,8 @@ namespace Bolzena.RunUI
             SetToggle(c, "컷인 건너뛰기", "고학년 컷인 없이 바로 쓴다", Settings.SkipCutin, v => Settings.SkipCutin = v, "set.cutin");
             SetToggle(c, "고학년 짧게 보기", "끄면 모험에서 처음 쓸 때만 길게 본다", Settings.UltShort, v => Settings.UltShort = v, "set.ultshort");
             SetToggle(c, "사도 말풍선", "전투 중 내 차례에 한참 가만히 있으면 사도가 한마디씩 한다", Settings.HeroTalk, v => Settings.HeroTalk = v, "set.herotalk");
+            SetToggle(c, "턴 종료 확인", "낼 수 있는 카드가 남았는데 턴을 끝내면 한 번 묻는다", Settings.EndTurnConfirm, v => Settings.EndTurnConfirm = v, "set.endconfirm");
+            SetToggle(c, "단축키 표시", "전투 단추 옆에 키 배지를 붙인다 · 터치 기기에서는 숨긴다", Settings.ShowKeys, v => Settings.ShowKeys = v, "set.showkeys");
         }
 
         // 화면 모드 한 줄 풀이 — 설명 칸에 한 줄로 들어가게 줄였다(DisplayOptions.ModeHint 는 전투 창이 쓴다)
@@ -169,7 +171,9 @@ namespace Bolzena.RunUI
             SetToggle(c, "화면 효과", low ? "저사양 모드라 꺼 둔다" : "전투의 빛 번짐 · 타격 색 효과를 그린다 · 끄면 폰 · 저사양 PC 에서 가벼워진다", DisplayOptions.PostFxOn, v => DisplayOptions.SetPostFx(v), "disp.post");
             if (low) foreach (var hk in new[] { "disp.vsync", "disp.post" }) Lock(hk);
             SetToggle(c, "글자 크게", "모험 화면 글자를 키운다 · 다음 화면부터 바뀐다", Settings.BigText, v => Settings.BigText = v, "set.big");
-            SetToggle(c, "플레이 기록 보내기(익명)", "모험이 끝나면 편성 · 카드 · 전투 결과를 익명으로 보내 밸런스에 쓴다 · 개인 정보는 없다", PlayRecord.On, v => PlayRecord.On = v, "set.rec");
+            // 보내지 않는 실행(시험 빌드 · 로컬 주소 · PC)이면 설명 자리에 그 까닭 — 설정값은 그대로 둔다
+            var recWhy = PlayRecord.NotSentWhy;
+            SetToggle(c, "플레이 기록 보내기(익명)", recWhy ?? "모험이 끝나면 편성 · 카드 · 전투 결과를 익명으로 보내 밸런스에 쓴다 · 개인 정보는 없다", PlayRecord.On, v => PlayRecord.On = v, "set.rec");
 
             void Paint()
             {

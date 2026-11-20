@@ -14,7 +14,7 @@ namespace Bolzena.RunUI
     ///
     /// - 설정 「플레이 기록 보내기(익명)」(기본 켬, PlayerPrefs bz.rec.send) — 끄면 아무것도 보내지 않는다. 처음 실행 때 로비에서 한 줄 안내(bz.rec.noticed).
     /// - 익명 id(bz.rec.anon) — 이 기기에서 처음 만든 무작위 32자. 진행 코드 · 세이브와 무관하다(진행 코드에 안 들어간다).
-    /// - 보내는 곳: 웹(WebGL) 배포판만(주소가 localhost · 127.0.0.1 · 파일이 아닐 때). 에디터 · PC 빌드 · 데모 · 시험 실행(-demo 따위 인자)은 보내지 않고
+    /// - 보내는 곳: 웹(WebGL) 배포판만(주소가 localhost · 127.0.0.1 · 파일이 아닐 때). 에디터 · 개발 빌드 · PC 빌드 · 데모 · 시험 실행(-demo 따위 인자)은 보내지 않고
     ///   대신 파일로 남긴다(-recdir 폴더, 없으면 persistentDataPath/play-records — 최근 20장).
     /// - 실패(네트워크 · 429 · 5xx)는 persistentDataPath/rec-queue 에 5장까지 두었다가 다음 실행 때 다시 보낸다. 400 · 413 은 버린다(다시 보내도 같다).
     /// - 판 세이브(bolzena-run.json) · 진행 코드와 파일을 섞지 않는다.
@@ -77,15 +77,35 @@ namespace Bolzena.RunUI
             }
         }
 
-        /// <summary>보내도 되는 곳인가 — 웹 배포판(localhost · 파일 주소 아님) · 시험 실행 아님.</summary>
-        public static bool Allowed
+        /// <summary>
+        /// 보내도 되는 곳인가 — 웹 배포판(localhost · 127.x · [::1] · *.localhost · *.local · 파일 주소 아님) · 에디터 · 개발 빌드 아님 · 시험 실행 아님.
+        /// 받는 쪽(Web/functions/api/record.js)은 규칙 지문을 보지 않는다 — 시험 규칙 판을 막는 것은 여기(2026-11-01 광폭화 시험 판이 섞이지 않게).
+        /// </summary>
+        public static bool Allowed => Application.platform == RuntimePlatform.WebGLPlayer && !TestBuild && !TestRun && !LocalHost;
+
+        /// <summary>시험 빌드 — 에디터 · 개발 빌드(Debug.isDebugBuild).</summary>
+        static bool TestBuild => Application.isEditor || Debug.isDebugBuild;
+
+        /// <summary>웹 주소가 이 기기 · 내부망 · 파일인가(http · https 가 아니면 참).</summary>
+        static bool LocalHost
         {
             get
             {
-                if (Application.isEditor || Application.platform != RuntimePlatform.WebGLPlayer || TestRun) return false;
-                if (!Uri.TryCreate(Application.absoluteURL, UriKind.Absolute, out var u) || (u.Scheme != "https" && u.Scheme != "http")) return false;
+                if (!Uri.TryCreate(Application.absoluteURL, UriKind.Absolute, out var u) || (u.Scheme != "https" && u.Scheme != "http")) return true;
                 var h = u.Host.ToLowerInvariant();
-                return h.Length > 0 && h != "localhost" && h != "127.0.0.1" && h != "[::1]" && !h.EndsWith(".local", StringComparison.Ordinal);
+                return h.Length == 0 || h == "localhost" || h.StartsWith("127.", StringComparison.Ordinal) || h == "0.0.0.0" || h == "[::1]"
+                    || h.EndsWith(".localhost", StringComparison.Ordinal) || h.EndsWith(".local", StringComparison.Ordinal);
+            }
+        }
+
+        /// <summary>설정 창 토글 아래 표시 — 이 실행이 보내지 않는 까닭(보내는 실행이면 null). 설정값(On)은 그대로 둔다.</summary>
+        public static string NotSentWhy
+        {
+            get
+            {
+                if (Allowed) return null;
+                if (TestBuild || TestRun || Application.platform == RuntimePlatform.WebGLPlayer) return "시험 빌드라 보내지 않는다";
+                return "PC 판은 보내지 않는다";
             }
         }
 

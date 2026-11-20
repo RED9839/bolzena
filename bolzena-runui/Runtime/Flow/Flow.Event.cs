@@ -240,7 +240,9 @@ namespace Bolzena.RunUI
                 // 조건부 칸 얼굴 — 파티에 실제로 있는 그 사도(없으면 조건 맨 앞 사도 = 데려와야 할 사도), price 가 먹으면 그 사도
                 string faceKey = o.Hero != null && o.Hero.Count > 0 ? (o.Hero.FirstOrDefault(k => P.S.Party.Contains(k)) ?? o.Hero[0])
                                : o.Price != null && P.S.Party.Contains(o.Price.Hero) ? o.Price.Hero : null;
-                float faceW = faceKey != null ? 44 : 0, inner = cw - 24 - 18 - faceW;
+                // 두 사도 다 있어야 하는 칸(heroAll — 관계 쌍, 2026-11-01)은 얼굴을 나란히: heroAll 사도들 + hero 무리 가운데 하나
+                var faces = (o.HeroAll ?? new List<string>()).Concat(faceKey != null ? new[] { faceKey } : new string[0]).Distinct().Take(3).ToList();
+                float faceW = faces.Count * 44, inner = cw - 24 - 18 - faceW;
                 // 이름 — 줄바꿈(말줄임 없음)
                 var nm = Ui.Title(rt, o.Label, Theme.FsLg, lockWhy != null ? Theme.Dim : Color.white, TextAlignmentOptions.TopLeft, "label");
                 nm.textWrappingMode = TextWrappingModes.Normal; nm.overflowMode = TextOverflowModes.Overflow;
@@ -274,10 +276,10 @@ namespace Bolzena.RunUI
                 else chipsH = OptionChips(chips, o, chipsW);
                 chips.sizeDelta = new Vector2(chipsW, chipsH);
                 float h = Mathf.Max(minH, 14 + labelH + 8 + chipsH + 18);
-                if (faceKey != null)
+                for (int fi = 0; fi < faces.Count; fi++)
                 {
-                    var face = W.Face(rt, Roster.OfCore(faceKey), 36); face.At(1, 1, -12, -10, 36, 36);
-                    if (lockWhy != null) { face.gameObject.AddComponent<CanvasGroup>().alpha = 0.55f; }
+                    var face = W.Face(rt, Roster.OfCore(faces[fi]), 36); face.At(1, 1, -12 - fi * 40, -10, 36, 36);
+                    if (lockWhy != null && (faces.Count == 1 || !P.S.Party.Contains(faces[fi]))) { face.gameObject.AddComponent<CanvasGroup>().alpha = 0.55f; }   // 쌍은 빠진 사도만 흐리게
                 }
                 if (on)
                 {

@@ -31,7 +31,7 @@ namespace Bolzena.Core.Tests
             var b = K.Fight(d, new[] { "k" }, new[] { "dummy" }); K.Hand(b, "aim", "shoot");
             K.Play(b, "aim");
             K.Play(b, "shoot");
-            Assert.AreEqual(1000 - 150, K.Hp(b), "치명 100% — 150%");
+            Assert.AreEqual(1000 - 125, K.Hp(b), "치명 100% — 125%");
             Assert.AreEqual(4, b.StackOf("k", "조준"));
         }
 

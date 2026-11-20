@@ -244,7 +244,7 @@ namespace Bolzena.Core.Tests
         [Test] public void 콘텐츠_죠안_꿈결_형상은_변신_카드()
         {
             // 2026-10-11 엘다인 다시 쓰기 — 꿈결 형상은 카드 바꿔치기 대신 매 턴 변신 카드(turnMake). 옛 시험(변신판 공격이 파티 회복 · 사기 2)은 옛 설계라 바꿨다
-            string dir = new[] { "../bolzena-content-v2", "../../bolzena-content-v2", "C:/projects/bolzena-content-v2" }.FirstOrDefault(Directory.Exists);
+            string dir = TestPaths.Content;
             if (dir == null) Assert.Ignore("bolzena-content-v2 가 없다");
             var d = GameData.FromFolder(dir);
             var fd = d.Hero("죠안").Forms.First();
@@ -259,7 +259,7 @@ namespace Bolzena.Core.Tests
 
         [Test] public void 콘텐츠_세_사도_변신()
         {
-            string dir = new[] { "../bolzena-content-v2", "../../bolzena-content-v2", "C:/projects/bolzena-content-v2" }.FirstOrDefault(Directory.Exists);
+            string dir = TestPaths.Content;
             if (dir == null) Assert.Ignore("bolzena-content-v2 가 없다");
             var d = GameData.FromFolder(dir);
             // 엘다인 설계 규칙(▶E29, 「엘다인 …」 오류)은 20명 다시 쓰기 동안 따로 본다(EldainTests) — 여기선 그 밖의 오류만

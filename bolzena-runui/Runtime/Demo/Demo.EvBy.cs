@@ -28,15 +28,18 @@ namespace Bolzena.RunUI
             foreach (var job in jobs)
             {
                 string id = job[0];
-                var h = Roster.ByKey(job[1]);
+                var hs = job[1].Split('+').Select(Roster.ByKey).ToList();   // 「란+디아나_왕년」 — 파티 앞자리부터 차례로(두 사도 선택지 heroAll 확인, 2026-11-01)
+                var h = hs[0];
                 var ev = f.P.Data.Events.FirstOrDefault(e => e.Id == id);
-                if (ev == null || h == null || !h.Playable) { Expect(false, $"{id} · {job[1]} 없음(코어에 없는 사도?)"); continue; }
-                f.P.S.Party[0] = h.CoreId;
+                if (ev == null || hs.Any(x => x == null || !x.Playable)) { Expect(false, $"{id} · {job[1]} 없음(코어에 없는 사도?)"); continue; }
+                for (int pi = 0; pi < hs.Count && pi < f.P.S.Party.Count; pi++) f.P.S.Party[pi] = hs[pi].CoreId;
                 f.DialogAuto = true;
                 OpenEvent(id);
                 yield return Screen_("event", 2.0f);
+                yield return Shot($"evby_{id}_choose");
                 var opts = f.P.Options(ev);
-                int idx = opts.FindIndex(o => o.By != null && f.P.LockOf(o) == null);
+                int idx = opts.FindIndex(o => o.HeroAll != null && o.By != null && f.P.LockOf(o) == null);   // 쌍 선택지가 열렸으면 그것부터
+                if (idx < 0) idx = opts.FindIndex(o => o.By != null && f.P.LockOf(o) == null);
                 Debug.Log($"[EvBy] {id} 「{ev.Name}」 · 동행 {h.ko} · by 선택지 {idx}");
                 if (idx < 0) { Expect(false, $"{id} by 선택지를 못 고름"); continue; }
                 yield return Press("event.opt" + idx, 0.5f);

@@ -22,8 +22,8 @@ namespace Bolzena.Core.Tests
 ]";
         const string CARDS = "[{id:'brk', name:'깨기', hero:'a', cost:0, type:'공격', fx:[{k:'tough', v:9, target:'oneEnemy'}]}, {id:'stun', name:'기절시키기', hero:'a', cost:0, type:'스킬', fx:[{k:'status', id:'기절', v:1, target:'oneEnemy'}]}]";
 
-        /// <summary>z 의 1층 고학년 피해(전체 공격 V × 2).</summary>
-        static int U => Num.Round(Num.Round(BossUlt.RAW[1] * BossUlt.NOW_X) / R.FOE_ALL_X) * 2;
+        /// <summary>z 의 1층 고학년 피해(적 전체 대상이어도 공격 한 대 — 2026-10-31 원작 대조, 옛 전체 공격 V × 2).</summary>
+        static int U => Num.Round(BossUlt.RAW[1] * BossUlt.NOW_X);
 
         static GameData D() => K.Data(heroes: HEROES, cards: CARDS, enemies: ENEMIES);
 
@@ -33,16 +33,17 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual("큰 일격", p.Name);
             Assert.IsNull(p.Warn, "예고 없음(2026-10-09)"); Assert.AreEqual("ult", p.Use.T); Assert.IsFalse(p.Use.Brk, "격파로 끊기지 않는다");
             var t = p.Use.Then;
-            var hit = t.Single(x => x.T == "attackAll");
-            Assert.AreEqual(Num.Round(Num.Round(BossUlt.RAW[1] * BossUlt.NOW_X) / R.FOE_ALL_X), hit.V, "1층 기준 × 비율 1(1.8/1.8) × NOW_X ÷ 전체 공격 2");
+            Assert.IsFalse(t.Any(x => x.T == "attackAll"), "전체 공격은 쓰지 않는다(원작 몬스터 피해는 모두 단일 대상)");
+            var hit = t.Single(x => x.T == "attack");
+            Assert.AreEqual(Num.Round(BossUlt.RAW[1] * BossUlt.NOW_X), hit.V, "1층 기준 × 비율 1(1.8/1.8) × NOW_X — 적 전체 대상이어도 한 대");
             Assert.AreEqual(U, p.Raw);
             Assert.IsTrue(t.Any(x => x.T == "debuff" && x.Id == "약화" && x.V == 2 + BossUlt.DEBUFF_PLUS), "적 디버프 → 파티 디버프(원작 값 + DEBUFF_PLUS)");
             Assert.IsTrue(t.Any(x => x.T == "buff" && x.Id == "사기" && x.V == 1 && x.All), "아군 버프 → 적 전체 버프");
             CollectionAssert.Contains(p.Dropped, "AP", "사도 자원은 뺀다");
-            Assert.AreEqual(Num.Round(Num.Round(BossUlt.RAW[2] * BossUlt.NOW_X) / R.FOE_ALL_X), BossUlt.Plan(D(), "z", 2).Use.Then.Single(x => x.T == "attackAll").V, "2층 기준");
+            Assert.AreEqual(Num.Round(BossUlt.RAW[2] * BossUlt.NOW_X), BossUlt.Plan(D(), "z", 2).Use.Then.Single(x => x.T == "attack").V, "2층 기준");
 
             var s = BossUlt.Plan(D(), "s", 2);
-            Assert.AreEqual(Num.Round(Num.Round(BossUlt.RAW[2] * BossUlt.SUPPORT_HIT * BossUlt.NOW_X) / R.FOE_ALL_X), s.Use.Then.Single(x => x.T == "attackAll").V, "피해 없는 고학년도 전체 공격을 붙인다");
+            Assert.AreEqual(Num.Round(BossUlt.RAW[2] * BossUlt.SUPPORT_HIT * BossUlt.NOW_X), s.Use.Then.Single(x => x.T == "attack").V, "피해 없는 고학년도 공격을 붙인다");
             Assert.IsTrue(s.Use.Then.Any(x => x.T == "block" && x.V == BossUlt.BLOCK[2]), "실드 → 보스 방어");
             Assert.IsTrue(s.Use.Then.Any(x => x.T == "buff" && x.Id == "피해 감소"), "적에게 없는 버프(반격) → 피해 감소");
             Assert.IsTrue(s.Use.Then.Any(x => x.T == "jam" && x.V == 1), "기절 → 파티 다음 턴 AP -1");

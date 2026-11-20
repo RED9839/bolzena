@@ -10,35 +10,18 @@
       "hp": 650,
       "atk": 95,
       "def": 46,
-      "crit": 5,
-      "blurb": "은빛 티파티를 여는 진은의 대공. 동료가 스킬을 쓸 때마다 찻잔이 차오르고, 찻잔이 찬 동안 파티는 덜 아프게 맞습니다. 은분수로 찻잔을 털면 파티를 감싸고 숨을 돌려 줍니다. 꼬마라고 부르면 화냅니다.",
+      "crit": 3,
+      "blurb": "은빛 티파티를 여는 진은의 대공. 동료 앞에 찻잔을 놓아 손님으로 맞으면 그 동료의 고학년이 앞당겨지고, 손님이 고학년을 펼치면 파티가 은방울로 감싸입니다. 꼬마라고 부르면 화냅니다.",
       "keyword": {
-        "name": "찻잔",
-        "desc": "초청객이 다녀갈 때마다 채워지는 찻잔 — 은분수로 털어 쓴다",
-        "carrier": "self",
-        "cap": 5,
+        "name": "초청객",
+        "desc": "실비아가 찻잔을 따라 준 동료 — 그 동료의 고학년이 앞당겨진다",
+        "carrier": "hero",
+        "cap": 2,
+        "noOwner": true,
         "per": [
           {
-            "stat": "taken",
-            "v": -0.04,
-            "who": "allies"
-          }
-        ],
-        "rules": [
-          {
-            "name": "초청객",
-            "when": {
-              "on": "play",
-              "who": "other",
-              "type": "스킬"
-            },
-            "fx": [
-              {
-                "k": "stack",
-                "id": "찻잔",
-                "v": 1
-              }
-            ]
+            "stat": "ultCost",
+            "v": -0.2
           }
         ]
       },
@@ -46,22 +29,38 @@
         {
           "name": "진은의 대공",
           "when": {
-            "on": "turnStart"
+            "on": "ult",
+            "marked": "초청객"
+          },
+          "fx": [
+            {
+              "k": "status",
+              "id": "은방울",
+              "v": 2
+            },
+            {
+              "k": "shield",
+              "ratio": 1.2
+            },
+            {
+              "k": "stack",
+              "id": "초청객",
+              "v": -2,
+              "target": "oneAlly"
+            }
+          ]
+        },
+        {
+          "name": "어머니와 딸",
+          "when": {
+            "on": "fightStart"
           },
           "fx": [
             {
               "k": "stack",
-              "id": "찻잔",
-              "v": 1
-            },
-            {
-              "k": "ifStack",
-              "id": "찻잔",
-              "n": 5
-            },
-            {
-              "k": "shield",
-              "ratio": 0.6
+              "id": "초청객",
+              "v": 1,
+              "target": "strongestAlly"
             }
           ]
         }
@@ -86,8 +85,9 @@
           },
           {
             "k": "stack",
-            "id": "찻잔",
-            "v": 5
+            "id": "초청객",
+            "v": 1,
+            "target": "otherAllies"
           }
         ]
       },
@@ -150,15 +150,13 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "costMod",
-          "v": -1,
-          "n": 1,
-          "who": "other",
-          "turns": 1
+          "k": "stack",
+          "id": "초청객",
+          "v": 1,
+          "target": "oneAlly"
         },
         {
-          "k": "stack",
-          "id": "찻잔",
+          "k": "draw",
           "v": 1
         }
       ],
@@ -167,33 +165,28 @@
           "name": "신탁 1",
           "fx": [
             {
-              "k": "costMod",
-              "v": -1,
-              "n": 1,
-              "who": "other",
-              "turns": 1
+              "k": "stack",
+              "id": "초청객",
+              "v": 2,
+              "target": "oneAlly"
             },
             {
-              "k": "stack",
-              "id": "찻잔",
-              "v": 2
+              "k": "draw",
+              "v": 1
             }
           ]
         },
         {
           "name": "신탁 2",
+          "tags": [
+            "보존"
+          ],
           "fx": [
             {
-              "k": "costMod",
-              "v": -1,
-              "n": 1,
-              "who": "other",
-              "turns": 1
-            },
-            {
               "k": "stack",
-              "id": "찻잔",
-              "v": 1
+              "id": "초청객",
+              "v": 1,
+              "target": "oneAlly"
             },
             {
               "k": "draw",
@@ -205,16 +198,15 @@
           "name": "신탁 3",
           "fx": [
             {
-              "k": "costMod",
-              "v": -1,
-              "n": 2,
-              "who": "other",
-              "turns": 1
+              "k": "moveMark",
+              "id": "초청객",
+              "target": "oneAlly"
             },
             {
               "k": "stack",
-              "id": "찻잔",
-              "v": 1
+              "id": "초청객",
+              "v": 1,
+              "target": "oneAlly"
             },
             {
               "k": "draw",
@@ -226,45 +218,30 @@
           "name": "신탁 4",
           "fx": [
             {
-              "k": "costMod",
-              "v": -1,
-              "n": 1,
-              "who": "other",
-              "turns": 1
-            },
-            {
               "k": "stack",
-              "id": "찻잔",
-              "v": 1
+              "id": "초청객",
+              "v": 1,
+              "target": "oneAlly"
             },
             {
-              "k": "empower",
-              "ratio": 0.3,
-              "who": "other"
+              "k": "shield",
+              "ratio": 1.2
             }
           ]
         },
         {
           "name": "신탁 5",
-          "tags": [
-            "보존"
-          ],
+          "cost": 1,
           "fx": [
             {
-              "k": "costMod",
-              "v": -1,
-              "n": 1,
-              "who": "other",
-              "turns": 1
-            },
-            {
               "k": "stack",
-              "id": "찻잔",
-              "v": 1
+              "id": "초청객",
+              "v": 1,
+              "target": "otherAllies"
             },
             {
-              "k": "shield",
-              "ratio": 0.7
+              "k": "draw",
+              "v": 2
             }
           ]
         }
@@ -283,8 +260,9 @@
           "fx": [
             {
               "k": "stack",
-              "id": "찻잔",
-              "v": 1
+              "id": "초청객",
+              "v": 1,
+              "target": "oneAlly"
             }
           ]
         }
@@ -305,7 +283,8 @@
         },
         {
           "k": "dealtMod",
-          "v": -0.4,
+          "v": -0.5,
+          "turns": 2,
           "target": "topEnemy"
         }
       ],
@@ -315,12 +294,13 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 2.2,
+              "ratio": 2.4,
               "target": "topEnemy"
             },
             {
               "k": "dealtMod",
-              "v": -0.4,
+              "v": -0.5,
+              "turns": 2,
               "target": "topEnemy"
             }
           ]
@@ -330,18 +310,14 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
-              "target": "topEnemy"
-            },
-            {
-              "k": "dealtMod",
-              "v": -0.4,
+              "ratio": 2.9,
               "target": "topEnemy"
             },
             {
               "k": "stack",
-              "id": "찻잔",
-              "v": 1
+              "id": "초청객",
+              "v": 1,
+              "target": "strongestAlly"
             }
           ]
         },
@@ -356,7 +332,8 @@
             },
             {
               "k": "dealtMod",
-              "v": -0.4,
+              "v": -0.5,
+              "turns": 2,
               "target": "topEnemy"
             }
           ]
@@ -366,12 +343,13 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.6,
+              "ratio": 1.8,
               "target": "topEnemy"
             },
             {
               "k": "dealtMod",
-              "v": -0.4,
+              "v": -0.5,
+              "turns": 2,
               "target": "topEnemy"
             },
             {
@@ -385,7 +363,7 @@
           "fx": [
             {
               "k": "dmg",
-              "ratio": 1.5,
+              "ratio": 2.1,
               "target": "allEnemies"
             },
             {
@@ -410,8 +388,9 @@
           "fx": [
             {
               "k": "stack",
-              "id": "찻잔",
-              "v": 1
+              "id": "초청객",
+              "v": 1,
+              "target": "strongestAlly"
             }
           ]
         }
@@ -430,15 +409,17 @@
           "rules": [
             {
               "when": {
-                "on": "play",
-                "who": "other",
-                "type": "스킬"
+                "on": "turnStart"
               },
               "fx": [
                 {
-                  "k": "dmg",
-                  "ratio": 0.5,
-                  "target": "randomEnemy"
+                  "k": "takenMod",
+                  "v": 0.15,
+                  "target": "allEnemies"
+                },
+                {
+                  "k": "heal",
+                  "ratio": 0.3
                 }
               ]
             }
@@ -458,15 +439,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "who": "other",
-                    "type": "스킬"
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.5,
-                      "target": "randomEnemy"
+                      "k": "takenMod",
+                      "v": 0.15,
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.2
                     }
                   ]
                 }
@@ -485,15 +468,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "who": "other",
-                    "type": "스킬"
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.4,
-                      "target": "randomEnemy"
+                      "k": "takenMod",
+                      "v": 0.1,
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.1
                     }
                   ]
                 }
@@ -509,22 +494,19 @@
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "who": "other",
-                    "type": "스킬"
+                    "on": "ult",
+                    "marked": "초청객"
                   },
                   "fx": [
                     {
-                      "k": "stack",
-                      "id": "찻잔",
-                      "v": 1
+                      "k": "takenMod",
+                      "v": 0.2,
+                      "turns": 2,
+                      "target": "allEnemies"
                     }
                   ]
                 }
               ]
-            },
-            {
-              "k": "gaugeLock"
             }
           ]
         },
@@ -539,15 +521,17 @@
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "who": "other",
-                    "type": "스킬"
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.5,
-                      "target": "randomEnemy"
+                      "k": "takenMod",
+                      "v": 0.15,
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "heal",
+                      "ratio": 0.2
                     }
                   ]
                 }
@@ -566,15 +550,18 @@
               "rules": [
                 {
                   "when": {
-                    "on": "play",
-                    "who": "other",
-                    "type": "공격"
+                    "on": "turnStart"
                   },
                   "fx": [
                     {
-                      "k": "dmg",
-                      "ratio": 0.8,
-                      "target": "randomEnemy"
+                      "k": "takenMod",
+                      "v": 0.15,
+                      "target": "allEnemies"
+                    },
+                    {
+                      "k": "status",
+                      "id": "은방울",
+                      "v": 1
                     }
                   ]
                 }
@@ -600,8 +587,9 @@
           "fx": [
             {
               "k": "stack",
-              "id": "찻잔",
-              "v": 1
+              "id": "초청객",
+              "v": 1,
+              "target": "strongestAlly"
             }
           ]
         }
@@ -617,12 +605,13 @@
       "fx": [
         {
           "k": "heal",
-          "ratio": 1.7
+          "ratio": 2.4
         },
         {
           "k": "stack",
-          "id": "찻잔",
-          "v": 1
+          "id": "초청객",
+          "v": 1,
+          "target": "oneAlly"
         }
       ],
       "oracles": [
@@ -631,12 +620,13 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 2.2
+              "ratio": 3.2
             },
             {
               "k": "stack",
-              "id": "찻잔",
-              "v": 1
+              "id": "초청객",
+              "v": 1,
+              "target": "oneAlly"
             }
           ]
         },
@@ -645,7 +635,7 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.5
+              "ratio": 1.3
             },
             {
               "k": "cleanse",
@@ -653,8 +643,9 @@
             },
             {
               "k": "stack",
-              "id": "찻잔",
-              "v": 1
+              "id": "초청객",
+              "v": 1,
+              "target": "oneAlly"
             }
           ]
         },
@@ -663,12 +654,13 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.7
+              "ratio": 2.4
             },
             {
               "k": "stack",
-              "id": "찻잔",
-              "v": 2
+              "id": "초청객",
+              "v": 2,
+              "target": "oneAlly"
             }
           ]
         },
@@ -678,7 +670,7 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 1.1
+              "ratio": 1.2
             }
           ]
         },
@@ -687,7 +679,7 @@
           "fx": [
             {
               "k": "heal",
-              "ratio": 1
+              "ratio": 0.9
             },
             {
               "k": "status",
@@ -711,8 +703,9 @@
           "fx": [
             {
               "k": "stack",
-              "id": "찻잔",
-              "v": 1
+              "id": "초청객",
+              "v": 1,
+              "target": "oneAlly"
             }
           ]
         }
@@ -727,24 +720,17 @@
       "type": "스킬",
       "fx": [
         {
-          "k": "spend",
-          "id": "찻잔",
-          "all": true
-        },
-        {
-          "k": "perEvent"
-        },
-        {
           "k": "shield",
-          "ratio": 0.7
+          "ratio": 1.2
         },
         {
-          "k": "ifEvent",
-          "n": 3
+          "k": "status",
+          "id": "은방울",
+          "v": 3
         },
         {
-          "k": "ap",
-          "v": 1
+          "k": "gauge",
+          "v": 10
         }
       ],
       "oracles": [
@@ -752,21 +738,17 @@
           "name": "신탁 1",
           "fx": [
             {
-              "k": "spend",
-              "id": "찻잔",
-              "all": true
-            },
-            {
-              "k": "perEvent"
-            },
-            {
               "k": "shield",
-              "ratio": 0.5
+              "ratio": 2
             },
             {
               "k": "status",
               "id": "은방울",
-              "v": 3
+              "v": 2
+            },
+            {
+              "k": "gauge",
+              "v": 20
             }
           ]
         },
@@ -774,24 +756,17 @@
           "name": "신탁 2",
           "fx": [
             {
-              "k": "spend",
-              "id": "찻잔",
-              "all": true
+              "k": "shield",
+              "ratio": 1.8
             },
             {
-              "k": "perEvent"
+              "k": "status",
+              "id": "은방울",
+              "v": 3
             },
             {
-              "k": "heal",
-              "ratio": 0.8
-            },
-            {
-              "k": "ifEvent",
-              "n": 3
-            },
-            {
-              "k": "draw",
-              "v": 2
+              "k": "gauge",
+              "v": 10
             }
           ]
         },
@@ -800,16 +775,8 @@
           "type": "공격",
           "fx": [
             {
-              "k": "spend",
-              "id": "찻잔",
-              "all": true
-            },
-            {
-              "k": "perEvent"
-            },
-            {
               "k": "dmg",
-              "ratio": 0.6,
+              "ratio": 0.9,
               "target": "allEnemies"
             },
             {
@@ -826,23 +793,12 @@
           ],
           "fx": [
             {
-              "k": "spend",
-              "id": "찻잔",
-              "all": true
-            },
-            {
-              "k": "perEvent"
-            },
-            {
               "k": "shield",
-              "ratio": 0.7
+              "ratio": 1.6
             },
             {
-              "k": "ifEvent",
-              "n": 5
-            },
-            {
-              "k": "ap",
+              "k": "status",
+              "id": "은방울",
               "v": 2
             }
           ]
@@ -852,17 +808,13 @@
           "cost": 0,
           "fx": [
             {
-              "k": "spend",
-              "id": "찻잔",
+              "k": "status",
+              "id": "은방울",
               "v": 2
-            },
-            {
-              "k": "ifEvent",
-              "n": 2
             },
             {
               "k": "draw",
-              "v": 2
+              "v": 1
             }
           ]
         }
@@ -881,8 +833,9 @@
           "fx": [
             {
               "k": "stack",
-              "id": "찻잔",
-              "v": 1
+              "id": "초청객",
+              "v": 1,
+              "target": "strongestAlly"
             }
           ]
         }

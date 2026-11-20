@@ -17,6 +17,10 @@ namespace Bolzena.RunUI
         public static bool NoShake { get => PlayerPrefs.GetInt("bz.noShake", 0) == 1; set => PlayerPrefs.SetInt("bz.noShake", value ? 1 : 0); }
         // 사도 말풍선 — 판 진행 중(휴식 · 상점 · 보상 · 이벤트 · 전투 승리 · 엘리트/보스 시작 · 위기) 사도 한마디(2026-10-09, 기본 켬)
         public static bool HeroTalk { get => PlayerPrefs.GetInt("bz.heroTalk", 1) == 1; set => PlayerPrefs.SetInt("bz.heroTalk", value ? 1 : 0); }
+        // 턴 종료 확인 — 낼 수 있는 카드가 손에 남았는데 턴을 끝내면 한 번 묻는다(원작 「턴 오버 확인 팝업」, 2026-11-01 기본 켬). 확인 창의 「다시 보지 않기」 가 끈다
+        public static bool EndTurnConfirm { get => PlayerPrefs.GetInt("bz.endConfirm", 1) == 1; set => PlayerPrefs.SetInt("bz.endConfirm", value ? 1 : 0); }
+        // 단축키 표시 — 단추 옆 작은 키 배지(2026-11-01 기본 켬). 터치 기기에서는 켜 있어도 숨긴다
+        public static bool ShowKeys { get => PlayerPrefs.GetInt("bz.showKeys", 1) == 1; set => PlayerPrefs.SetInt("bz.showKeys", value ? 1 : 0); }
         public static string LobbyHero { get => PlayerPrefs.GetString("bz.lobbyHero", "에르핀_왕도"); set => PlayerPrefs.SetString("bz.lobbyHero", value); }
         public static float TextScale => BigText ? 1.12f : 1f;
 

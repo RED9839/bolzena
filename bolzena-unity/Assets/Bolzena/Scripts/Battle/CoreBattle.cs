@@ -29,6 +29,8 @@ namespace Bolzena.Battle
             public string EnemyNature;                                 // 판의 적 속성(모든 적의 성격을 이것으로) — null 이면 데이터 그대로
             public string Bg;                                          // 싸움터 배경(마을 층의 fight 배경)
             public string Note;                                        // 무엇으로 차렸는지(로그)
+            public int? Rage;                                          // 광폭화 턴(-rage — 판 싸움의 BattleSetup.Rage 와 같은 칸). null 이면 없음
+            public double? FoePack;                                    // 편성 배율(-pack — 판 싸움의 BattleSetup.FoePack). null 이면 1
             public static System.Func<GameData, Fixture> Override;     // 점검 모드(-ultaudit)가 사도마다 차림을 넣는다
 
             // 명령줄로 차림 — -party 사도,사도,사도 -foes 적,적 (전투만 따로 띄워 볼 때 · 입력 재현). 없으면 null
@@ -58,6 +60,10 @@ namespace Bolzena.Battle
                 if (int.TryParse(Arg("-wavegauge"), out var wg)) f.WaveGauge.Add(wg);
                 // -glow: 고유 카드를 모두 빛나게(신탁 창 시험)
                 if (Array.IndexOf(a, "-glow") >= 0) f.Glow.AddRange(f.Deck.Where(id => (d.Card(id)?.Unique ?? false) && d.Card(id).Oracles.Count > 0).Distinct());
+                // -rage [fight|elite|boss]: 광폭화 · -pack: 편성 배율(일반전) — 판 싸움(Run.OpenFight)이 채우는 칸을 시험 싸움에도(확인 장면 probe.sh scene)
+                int ri = Array.IndexOf(a, "-rage");
+                if (ri >= 0) { var k = ri < a.Length - 1 ? a[ri + 1] : null; f.Rage = R.RageTurnOf(k == "boss", k == "elite"); }
+                if (Array.IndexOf(a, "-pack") >= 0) f.FoePack = R.PackX(f.Waves[0].Count, false);
                 return f;
             }
 
@@ -214,6 +220,7 @@ namespace Bolzena.Battle
                 Party = fx.Party.ToList(), Deck = fx.Deck.ToList(), Enemies = fx.Waves[w].ToList(),
                 Seed = fx.Seed + w * 101, EnemyHp = w < fx.WaveHp.Count ? fx.WaveHp[w] : (double?)null,
                 Gauge = Math.Max(gauge, w < fx.WaveGauge.Count ? fx.WaveGauge[w] : 0), Glow = glow, EnemyNature = fx.EnemyNature,
+                Rage = fx.Rage, FoePack = fx.FoePack,
             };
             if (partyHp >= 0) st.PartyHp = partyHp;
             cues.Clear();
@@ -667,14 +674,14 @@ namespace Bolzena.Battle
                             evs.Add(new BattleEvent { Kind = EventKind.Shot, Actor = UnitRef.Party(si), Target = UnitRef.Enemy(c.Idx), Text = c.Label });
                             evs.Add(new BattleEvent
                             {
-                                Kind = EventKind.Damage, Actor = UnitRef.Party(si), Target = UnitRef.Enemy(c.Idx), Value = c.V, Blocked = c.Guard, Crit = c.Crit,
+                                Kind = EventKind.Damage, Actor = UnitRef.Party(si), Target = UnitRef.Enemy(c.Idx), Value = c.V, Blocked = c.Guard, Crit = c.Crit, Weak = c.Weak, By = c.By != null ? b.Party.FindIndex(pu => pu.Key == c.By) : -1,
                                 HpAfter = (int)c.To, BlockAfter = g, Hit = 0, Hits = 1, HitKind = Look.Hero(b.Party[si].Key).Hit, Text = "shot",
                             });
                         }
                         else if (c.Side == CSide.Enemy)
                             evs.Add(new BattleEvent
                             {
-                                Kind = EventKind.Damage, Actor = actor, Target = UnitRef.Enemy(c.Idx), Value = c.V, Blocked = c.Guard, Crit = c.Crit,
+                                Kind = EventKind.Damage, Actor = actor, Target = UnitRef.Enemy(c.Idx), Value = c.V, Blocked = c.Guard, Crit = c.Crit, Weak = c.Weak, By = c.By != null ? b.Party.FindIndex(pu => pu.Key == c.By) : -1,
                                 HpAfter = (int)c.To, BlockAfter = g, Hit = n, Hits = n + 1,
                                 HitKind = actor.Side == Side.Party && actor.Index < b.Party.Count ? Look.Hero(b.Party[actor.Index].Key).Hit : HitKind.Slash,
                             });

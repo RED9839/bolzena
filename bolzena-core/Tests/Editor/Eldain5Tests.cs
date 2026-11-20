@@ -179,8 +179,8 @@ namespace Bolzena.Core.Tests
                 K.Hand(b, "bhit"); int h0 = K.Hp(b); K.Play(b, "bhit");
                 return h0 - K.Hp(b);
             }
-            Assert.AreEqual(150, Dealt(false), "치명 ×1.5");
-            Assert.AreEqual(210, Dealt(true), "치명 피해 +40% — ×1.5 × 1.4");
+            Assert.AreEqual(125, Dealt(false), "치명 ×1.25");
+            Assert.AreEqual(175, Dealt(true), "치명 피해 +40% — ×1.25 × 1.4");
             var x = F(new[] { "bs" });
             K.Hand(x, "holy"); K.Play(x, "holy");
             Assert.AreEqual((0.4, 2), x.CritDmgState);
@@ -249,11 +249,11 @@ namespace Bolzena.Core.Tests
         {
             var b = F(new[] { "ln" });
             K.Hand(b, "sure"); int h0 = K.Hp(b); K.Play(b, "sure");
-            Assert.AreEqual(150, h0 - K.Hp(b), "이 카드 치명");
+            Assert.AreEqual(125, h0 - K.Hp(b), "이 카드 치명");
             K.Hand(b, "claw"); h0 = K.Hp(b); K.Play(b, "claw");
             Assert.AreEqual(100, h0 - K.Hp(b), "표식이 없으면 치명 아님");
             K.Hand(b, "wolf", "claw"); K.Play(b, "wolf"); h0 = K.Hp(b); K.Play(b, "claw");
-            Assert.AreEqual(150, h0 - K.Hp(b), "표식 적이면 치명(카드 뒤에 둬도 처음부터)");
+            Assert.AreEqual(125, h0 - K.Hp(b), "표식 적이면 치명(카드 뒤에 둬도 처음부터)");
         }
 
         [Test] public void 요청_적이_하나뿐이면()

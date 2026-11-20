@@ -73,6 +73,8 @@ namespace Bolzena.Core
         public Dictionary<string, HeroTally> Tally;
         // 2026-10-20 사도 영구 성장(카제나판 0단계) — 패시브 몫은 GearRules 에 이미 합쳐 있다
         public Dictionary<string, ProgMods> Prog;
+        // 2026-10-31 광폭화 턴(0 = 없음 — 옛 저장)
+        public int RageTurn;
     }
     public sealed class GainedFlashRec { public string CardId; public int N; public string Shin; }
     public sealed class PlayRec { public string Hero, Type; }
@@ -106,6 +108,7 @@ namespace Bolzena.Core
             Used = Used.Count > 0 ? Used : null,
             Tally = Tally.Count > 0 ? Tally : null,
             Prog = ProgOf,
+            RageTurn = RageTurn,
         };
 
         /// <summary>저장한 전투를 되살린다.</summary>
@@ -139,6 +142,7 @@ namespace Bolzena.Core
             s.Used = x.Used ?? new();
             s.Tally = x.Tally ?? new();
             s.ProgOf = x.Prog != null && x.Prog.Count > 0 ? x.Prog : null;
+            s.RageTurn = x.RageTurn;
             s.gearRules = x.GearRules;
             s.SetupPassives(x.GearRules);   // 규칙 · 키워드 · 항상 — 데이터에서 다시
             s.Stacks = x.Stacks ?? new(); s.Fired = x.Fired ?? new(); s.Counts = x.Counts ?? new();

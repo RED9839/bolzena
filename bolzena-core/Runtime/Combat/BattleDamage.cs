@@ -15,6 +15,8 @@ namespace Bolzena.Core
         public bool Pure, Crit, Card, Counter, Pierce, Fixed, Dot, Attack, All;
         /// <summary>HP 를 값으로 치른 것(payHp) — 「HP가 N% 이하가 되면」 을 깨운다.</summary>
         public bool Pay;
+        /// <summary>이 카드 타격으로 그 적이 격파된다(강인도는 피해 뒤에 깎으니 미리 잰 것, BattleFx.WillBreak) — 잔불 발동 조건.</summary>
+        public bool Breaks;
         public HashSet<string> Tags;
         /// <summary>전투 기록에서 이 피해를 받을 사도(From 이 없을 때만 — 지속 피해 · 응징처럼 상태를 건 사도). 피해 계산에는 쓰지 않는다.</summary>
         public Unit Credit;
@@ -74,20 +76,21 @@ namespace Bolzena.Core
             return e < 0 ? 1 - R.NATURE_DEF : 1;
         }
 
-        /// <summary>맞는 쪽 — 피해 감소 -15%(횟수) · 불굴 겹마다 -20%(세기, Cap 까지) · 포자증식은 합연산, 취약 ×1.5(횟수)는 따로 곱한다.</summary>
+        /// <summary>맞는 쪽 — 불굴 겹마다 -20%(세기, Cap 까지)는 합연산, 피해 감소 ×0.85(횟수) · 포자증식 ×(1 + 5%·겹) · 취약 ×1.5(횟수)는 따로 곱한다.</summary>
         int Taken(Unit to, int v)
         {
-            // 받는 피해 증감은 합연산(카제나 — 불굴 -20%p · 피해 감소 -15%p · 포자증식 +10%p). 취약은 2026-10-10 카제나 공식대로 묶음 밖에서 ×(1 + 50%) 따로 곱한다
+            // 받는 피해 증감 — 불굴만 합연산 묶음. 2026-10-31 원작 대조: 피해 감소는 ×0.85, 포자증식은 취약과 같은 꼴이라
+            // 취약(2026-10-10)처럼 묶음 밖에서 따로 곱한다(옛: 피해 감소 -15%p · 포자증식 +10%p 를 불굴과 더함)
             double m = 1;
             bool vul = Charge(to, "취약");
-            if (Charge(to, "피해 감소")) m -= R.SV("피해 감소");
+            bool cut = Charge(to, "피해 감소");
             m -= R.StackEff("불굴", St(to, "불굴"));
-            // 포자증식 — 겹마다 받는 피해 +10%, 발동하면 모두 사라진다(그 한 번의 일 동안은 붙는다)
+            // 포자증식 — 겹마다 받는 피해 +5%(최대 20겹), 발동하면 모두 사라진다(그 한 번의 일 동안은 붙는다)
             int spore = St(to, "포자증식");
             if (spore > 0) { to.Body.StUse["포자증식"] = ActSeq; to.Body.DotU["포자증식K"] = spore; DelSt(to, "포자증식"); }
-            if (ActSeq != 0 && to.Body.StUse.TryGetValue("포자증식", out var sq) && sq == ActSeq && to.Body.DotU.TryGetValue("포자증식K", out var sk)) m += R.SV("포자증식") * sk;
+            double sporeK = ActSeq != 0 && to.Body.StUse.TryGetValue("포자증식", out var sq) && sq == ActSeq && to.Body.DotU.TryGetValue("포자증식K", out var sk) ? 1 + R.StackEff("포자증식", sk) : 1;
             if (to.Side == Side.Enemy) m += CounterMod(to, "taken");
-            return Math.Max(0, Num.Round(v * Math.Max(0, m) * (vul ? 1 + R.SV("취약") : 1)));
+            return Math.Max(0, Num.Round(v * Math.Max(0, m) * (cut ? 1 - R.SV("피해 감소") : 1) * sporeK * (vul ? 1 + R.SV("취약") : 1)));
         }
 
         /// <summary>받는 피해 증감 — 파티는 사도마다 걸린 것 가운데 가장 큰 감소 하나와 가장 큰 증가 하나.</summary>
@@ -121,28 +124,35 @@ namespace Bolzena.Core
                 if (m != 1) d = Num.Round(d * m);
             }
             // 성격 상성 — 사도 → 적은 약점이 곧 유리. 키워드 1개당 「약점 공격 피해」(stat weak — 2026-10-19 아야 「만년설」)는 약점으로 칠 때만 그 사도에게 더한다
+            bool weakHit = !plain && from != null && from.Side == Side.Party && u.Side == Side.Enemy && IsWeakHit(from, u, o.Tags);   // 화면 표시(Cue.Weak)에도 — 계산은 전과 같다
             if (!plain && from != null)
-                d = Num.Round(d * (from.Side == Side.Party && u.Side == Side.Enemy && IsWeakHit(from, u, o.Tags) ? 1 + R.WEAK_DMG + StatMod(from, "weak") : NatureMod(from, u)));
-            // 분쇄 · 잔불 · 잔광
+                d = Num.Round(d * (weakHit ? 1 + R.WEAK_DMG + StatMod(from, "weak") : NatureMod(from, u)));
+            // 분쇄(곱) · 잔불 · 잔광(아래 증감 묶음에 더한다)
+            double glowAdd = 0, emberAdd = 0;
             if (!plain && u.Side == Side.Enemy && from != null && from.Side == Side.Party && o.Card)
             {
                 double k = 1;
                 if (o.Tags != null && o.Tags.Contains(Tag.Crush) && (u.Block > 0 || u.Shield > 0)) k *= 1 + R.SV("분쇄");
-                if (u.EmberSeq == ActSeq && ActSeq != 0) k *= u.EmberK;
-                else if (St(u, "잔불") > 0 && (u.Broken || Num.Round(d * k) >= u.Hp + u.Block + u.Shield))
+                // 잔불 — 원작: 격파 상태인 대상을 치거나 이 타격으로 격파시킬 때(o.Breaks) 겹마다 +30%(합연산), 발동하면 사라진다. 그 한 번의 일 동안은 붙는다.
+                // 2026-10-31 옛 「격파 상태이거나 쓰러뜨리는 타격」 · ×(1 + 0.3n) 을 고침 — 쓰러뜨림(처치)은 조건이 아니다
+                if (u.EmberSeq == ActSeq && ActSeq != 0) emberAdd = u.EmberK;
+                else if (St(u, "잔불") > 0 && (u.Broken || o.Breaks))
                 {
                     int n = Math.Min(St(u, "잔불"), (int)R.SV("잔불Max"));
-                    u.EmberK = 1 + n * R.SV("잔불"); u.EmberSeq = ActSeq; k *= u.EmberK;
+                    u.EmberK = n * R.SV("잔불"); u.EmberSeq = ActSeq; emberAdd = u.EmberK;
                     DelSt(u, "잔불");
                     Say($"{u.Name}: 잔불 {n} — 피해 +{Num.Round(n * R.SV("잔불") * 100)}%"); StatusCue(u, "잔불!");
                 }
-                if (o.Attack && u.Broken && GlowOn()) k *= 1 + R.SV("잔광");
+                // 잔광 — 원작: 격파 상태이거나 강인도가 없는 적(보스 소환물 noTough 등 ToughMax 0)에게 피해량 +100%(합연산). 2026-10-31 옛 격파 상태만 ×1.5 를 고침
+                if (o.Attack && (u.Broken || u.ToughMax <= 0) && GlowOn()) glowAdd = R.SV("잔광");
                 if (k != 1) d = Num.Round(d * k);
             }
             // 증감 — 주는 피해(때리는 쪽) × 받는 피해(맞는 쪽). 아무리 깎여도 10%
+            // 원작에서 합연산인 잔광(때리는 파티 쪽 효과)은 주는 피해 묶음에, 잔불(맞는 적에게 걸린 효과)은 받는 피해 묶음에 더한다 — 같은 쪽의 다른 증감(dealt · taken 조각)과 합연산.
+            // 둘만 있으면 ×2 · ×(1 + 0.3n) 과 같다. 카드 계수에 더하는 사기 꼴은 카드 피해를 만들 때(HitAmount) 정해져 여기서 못 더한다
             if (!plain)
             {
-                double m = (1 + (from != null ? StatMod(from, "dealt") : 0)) * (1 + TakenMod(u) + OwnerMarkMod(from, u));
+                double m = (1 + (from != null ? StatMod(from, "dealt") : 0) + glowAdd) * (1 + TakenMod(u) + OwnerMarkMod(from, u) + emberAdd);
                 d = Math.Max(0, Num.Round(d * Math.Max(0.1, m)));
             }
             // 과보호(쌓이는 수치 flat) — 받는 피해가 그 값
@@ -186,7 +196,7 @@ namespace Bolzena.Core
             if (HpMeter != null && u.Side == Side.Enemy && d > 0 && hp0 > 0) HpMeterAdd(from ?? o.Credit, u, Math.Min(d, hp0), o);   // 측정 전용(사도별 HP 피해)
             // 전투 기록 — 적에게 실제로 깎인 HP(넘친 피해 빼고) + 벗긴 방어 · 실드. 반격 · 추가 공격 · 소환물 · 지속 피해도 From(없으면 Credit) 사도 몫
             if (u.Side == Side.Enemy) TallyDealt(from ?? o.Credit, Math.Max(0, Math.Min(d, hp0)) + guard);
-            if (d > 0 || guard > 0) Cue("hurt", u, new Cue { V = d, Guard = guard, Crit = o.Crit, From = Math.Max(0, hp0), To = Math.Max(0, u.Hp),
+            if (d > 0 || guard > 0) Cue("hurt", u, new Cue { V = d, Guard = guard, Crit = o.Crit, Weak = weakHit, By = from != null && from.Side == Side.Party ? from.Key : null, From = Math.Max(0, hp0), To = Math.Max(0, u.Hp),
                 Label = o.Shot != null && from != null && from.Side == Side.Party ? o.Shot : null, Hero = o.Shot != null && from != null && from.Side == Side.Party ? from.Key : null });
             if (u.Side == Side.Party && d > 0) Talk(u, "hit");
             if (u.Hp <= 0) { LethalKill(u); return; }
@@ -238,6 +248,16 @@ namespace Bolzena.Core
         }
 
         // ── 강인도 · 격파 ──────────────────────────────────────────────
+        /// <summary>그 적이 실제로 받는 강인도 피해 — 적 표식 · 데이터 toughTaken · 희귀종 toughGuard 를 든다(ToughHit · WillBreak 가 같이 쓴다).</summary>
+        double ToughIn(Unit e, double n)
+        {
+            foreach (var kw in Kw.Values) if (kw.Carrier == "enemy") foreach (var p in kw.Def.Per) if (p.Stat == "tough") n += St(e, kw.Id) * p.V;   // 적 표식 1개당 받는 강인도 피해 +v
+            double tt = Data.Enemy(e.Key)?.ToughTaken ?? 0;
+            if (tt > 0) n *= tt;
+            if (HasRare(e, "toughGuard", out _)) n *= 0.8;
+            return n;
+        }
+
         /// <summary>
         /// 강인도를 n 깎는다. 0 이 되면 격파 — AP +1 · brk 수는 끊긴다 · 「격파되면」 규칙이 돈다. 격파했으면 true.
         /// 격파된 적도 제 차례에 그대로 행동하고 패시브 · 반응도 그대로 돈다(2026-10-24 — 10-08 「행동 불가」 를 없앴다, 카제나처럼).
@@ -247,10 +267,7 @@ namespace Bolzena.Core
         bool ToughHit(Unit e, double n, bool dying = false)
         {
             if (e == null || e.Side != Side.Enemy || e.Dead || e.Broken || !(n > 0) || e.ToughMax <= 0) return false;
-            foreach (var kw in Kw.Values) if (kw.Carrier == "enemy") foreach (var p in kw.Def.Per) if (p.Stat == "tough") n += St(e, kw.Id) * p.V;   // 적 표식 1개당 받는 강인도 피해 +v
-            double tt = Data.Enemy(e.Key)?.ToughTaken ?? 0;
-            if (tt > 0) n *= tt;
-            if (HasRare(e, "toughGuard", out _)) n *= 0.8;
+            n = ToughIn(e, n);
             double from = e.Tough;
             double left = e.Tough - n;
             e.Tough = left < 1e-6 ? 0 : Math.Round(left * R.TOUGH.Grid) / R.TOUGH.Grid;   // 1/3 · 1/6 을 여러 번 빼면 남는 소수 찌꺼기(1e-15)가 격파를 막았다

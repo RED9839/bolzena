@@ -78,7 +78,8 @@ namespace Bolzena.Core
         public bool RushedTurn;
         public Dictionary<string, int> PUsed = new();
         public int HitSeq, EmberSeq;
-        public double EmberK = 1;
+        /// <summary>잔불이 든 한 번의 일(EmberSeq)에 더하는 받는 피해 몫(0.3 × 겹, 합연산 — 2026-10-31 옛 곱 배율 1 + 0.3n).</summary>
+        public double EmberK;
         // 적 효과 틀(2026-10-05)
         /// <summary>다음 차례에 반드시 할 수(쌓이는 수치 문턱 mode next).</summary>
         public Intent ForceNext;
@@ -157,6 +158,8 @@ namespace Bolzena.Core
         public double From, To;
         public int Guard;
         public bool Crit;
+        public bool Weak;   // hurt — 약점으로 쳤나(화면 꼬리표 「약점」만, 계산에 안 쓴다)
+        public string By;   // hurt — 친 사도 키(피해 계산의 from, 사도가 아니면 null — 화면 숫자 옆 성격 표시만)
         public string Id;
         public bool Up;
         public string Anim;

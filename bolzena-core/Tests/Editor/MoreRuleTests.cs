@@ -19,6 +19,15 @@ namespace Bolzena.Core.Tests
             Assert.AreEqual(2, b.St(b.Pool, "고동"), "세기 — 줄지 않는다");
         }
 
+        [Test] public void 고동은_최대_4겹_사기는_상한이_없다()
+        {
+            var d = K.Data(cards: "[{id:'beat6', name:'고동 6', hero:'a', cost:0, type:'스킬', fx:[{k:'status', id:'고동', v:6}]}, {id:'cheer12', name:'사기 12', hero:'a', cost:0, type:'스킬', fx:[{k:'status', id:'사기', v:12}]}]");
+            var b = K.Fight(d, new[] { "a" }, new[] { "dummy" }); K.Hand(b, "beat6", "cheer12");
+            K.Play(b, "beat6"); K.Play(b, "cheer12");
+            Assert.AreEqual(4, b.St(b.Pool, "고동"), "원작 최대 4");
+            Assert.AreEqual(12, b.St(b.Pool, "사기"), "원작 사기 · 불굴 · 결의 · 결정화는 상한 없음");
+        }
+
         [Test] public void X_코스트는_남은_AP_를_전부_쓰고_그_수만큼()
         {
             var d = K.Data(cards: "[{id:'xx', name:'몰아치기', hero:'a', cost:0, x:true, type:'공격', fx:[{k:'dmg', ratio:0.5, xHits:true, target:'oneEnemy'}]}]");

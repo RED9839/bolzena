@@ -10,8 +10,8 @@ namespace Bolzena.Core.Tests
     {
         static JObject Schema()
         {
-            foreach (var p in new[] { "Packages/com.bolzena.core/Docs/schema/bolzena.schema.json", "../bolzena-core/Docs/schema/bolzena.schema.json" })
-                if (File.Exists(p)) return JObject.Parse(File.ReadAllText(p));
+            foreach (var p in new[] { "Packages/com.bolzena.core/Docs/schema/bolzena.schema.json", TestPaths.FindUp("bolzena-core/Docs/schema") is string s1 ? Path.Combine(s1, "bolzena.schema.json") : null, TestPaths.FindUp("Docs/schema") is string s2 ? Path.Combine(s2, "bolzena.schema.json") : null })
+                if (p != null && File.Exists(p)) return JObject.Parse(File.ReadAllText(p));
             Assert.Fail("스키마를 못 찾았다");
             return null;
         }

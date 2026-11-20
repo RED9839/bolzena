@@ -105,7 +105,7 @@ namespace Bolzena.Core.Tests
         /// <summary>콘텐츠(BZ_CONTENT — 마을 장비 패치를 넣은 사본)에서 마을마다 전설 2개 이상 · 대표 장비 2개가 그 마을 전설.</summary>
         [Test] public void 콘텐츠_마을마다_전설과_대표_장비()
         {
-            string dir = Environment.GetEnvironmentVariable("BZ_CONTENT") is string bc && bc.Length > 0 ? bc : "C:/projects/bolzena-content-v2";
+            string dir = TestPaths.Content;
             if (!Directory.Exists(dir)) Assert.Ignore("콘텐츠가 없다");
             var d = GameData.FromFolder(dir);
             if (d.Equips.Values.All(GameData.IsCommonEquip)) Assert.Ignore("마을 장비 패치를 안 넣은 콘텐츠(BZ_CONTENT 에 사본)");

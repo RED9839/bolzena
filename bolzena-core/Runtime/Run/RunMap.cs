@@ -111,12 +111,14 @@ namespace Bolzena.Core
                 }
                 foreach (var n in a) n.Next = n.Next.OrderBy(id => b.First(z => z.Id == id).Col).ToList();
             }
-            // ③½ 적 — 칸마다 미리. 들어오는 칸들의 짝과 겹치지 않게
+            // ③½ 적 — 칸마다 미리. 이 칸으로 올 수 있는 앞 칸(두 줄 위까지) 전부의 짝과 겹치지 않게
             for (int r = 0; r < rows.Count; r++)
                 foreach (var n in rows[r])
                 {
                     if (n.Type != "fight" && n.Type != "elite") continue;
-                    var prev = r > 0 ? rows[r - 1].Where(p => p.Next.Contains(n.Id) && p.Foes != null).Select(p => p.Foes).ToList() : new List<List<string>>();
+                    var up1 = r > 0 ? rows[r - 1].Where(p => p.Next.Contains(n.Id)).ToList() : new List<MapNode>();
+                    var up2 = r > 1 ? rows[r - 2].Where(p => up1.Any(q => p.Next.Contains(q.Id))).ToList() : new List<MapNode>();
+                    var prev = up1.Concat(up2).Where(p => p.Foes != null).Select(p => p.Foes).ToList();
                     n.Foes = PickFoes(d, rng, village, floor, n, prev);
                 }
             // ④ 출발 칸

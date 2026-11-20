@@ -134,6 +134,11 @@ namespace Bolzena.Core
                 Say($"{e.Name}: 격파에서 일어선다 — 강인도 회복"); Cue("tough", e, new Cue { From = 0, To = e.Tough, Up = true });
             }
             foreach (var e in AliveEnemies()) { RollIntent(e, false); e.RushCnt = 0; e.RushedTurn = false; e.ActedTurn = false; }
+            if (RageNow > 1)
+            {   // 광폭화(R.RageX) — 이 턴부터 적 피해가 오른다. 머리 위 예고 피해에 이미 든다
+                Say($"광폭화 — 싸움이 길어져 적 피해 ×{RageNow:0.##}");
+                foreach (var e in AliveEnemies()) StatusCue(e, $"광폭화 ×{RageNow:0.##}", true);
+            }
             if (Turn == 1 && FirstRushDown != 0) foreach (var e in AliveEnemies()) e.RushCnt -= FirstRushDown;
             ResetFoePassives();
             foreach (var e in risen) FoePassives("recover", e);
@@ -300,10 +305,15 @@ namespace Bolzena.Core
             }
         }
 
-        /// <summary>얻는 방어 · 실드 — 결의(겹마다 +20) 를 더한 뒤 손상(-50%, 한 번의 일에 1).</summary>
+        /// <summary>
+        /// 얻는 방어 · 실드 — 결의를 든 뒤 손상(-50%, 한 번의 일에 1).
+        /// 결의(원작 「실드 획득량 +20%」, 사기와 같은 합연산 — 2026-10-31, 옛 겹마다 +20 고정값)는 사기와 대칭으로 친다:
+        /// 파티는 사기가 카드 피해 계수에 더해지듯 실드 계수에 겹마다 +20%p(FxK.Shield 가 GuardAmount 에 넣는다 — 여기선 안 더함),
+        /// 적은 사기가 ×(1 + 20%·겹)으로 곱해지듯(BattleFoes) 얻는 방어 × (1 + 20%·겹).
+        /// </summary>
         int ShieldGain(Unit u, int v)
         {
-            if (v > 0 && St(u, "결의") > 0) v += Num.Round(R.StackEff("결의", St(u, "결의")));
+            if (v > 0 && u.Side != Side.Party && St(u, "결의") > 0) v = Num.Round(v * (1 + R.StackEff("결의", St(u, "결의"))));
             if (v > 0 && Charge(u, "손상")) return Math.Max(0, Num.Round(v * (1 - R.SV("손상"))));
             return v;
         }

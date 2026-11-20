@@ -75,7 +75,7 @@ namespace Bolzena.Core
         double HpRatio => (double)S.PartyHp / Math.Max(1, S.PartyMaxHp);
 
         /// <summary>
-        /// 이 선택지의 조건(hero · race · when · flag · noFlag)이 안 맞는 까닭 — 맞으면 null.
+        /// 이 선택지의 조건(heroAll · hero · race · when · flag · noFlag)이 안 맞는 까닭 — 맞으면 null.
         /// 화면은 잠긴 칸에 이 글을 보인다(LockOf 가 맨 먼저 돌려준다).
         /// </summary>
         public string CondWhy(EventOption o)
@@ -83,6 +83,13 @@ namespace Bolzena.Core
             if (o == null || o.Leave) return null;
             if (o.Flag != null && !HasFlag(o.Flag)) return o.LockText ?? "앞선 일이 있어야 한다";
             if (o.NoFlag != null && HasFlag(o.NoFlag)) return o.LockText ?? "이미 지나간 일이다";
+            if (o.HeroAll != null && o.HeroAll.Count > 0 && (!o.HeroAll.All(HasHero) || (o.Hero != null && o.Hero.Count > 0 && !o.Hero.Any(HasHero))))
+            {
+                // 둘 다 있어야 하는 쌍 — hero(가운데 한 명)가 함께 있으면 그 무리를 「우이/우이(기억)」 한 칸으로
+                var names = o.HeroAll.Select(k => Data.Hero(k)?.Name ?? k).ToList();
+                if (o.Hero != null && o.Hero.Count > 0) names.Add(string.Join("/", o.Hero.Select(k => Data.Hero(k)?.Name ?? k).Distinct()));
+                return o.LockText ?? $"{string.Join(" · ", names)} {(names.Count == 2 ? "둘 다" : "모두")} 파티에 있어야 한다";
+            }
             if (o.Hero != null && o.Hero.Count > 0 && !o.Hero.Any(HasHero))
             {
                 var names = o.Hero.Select(k => Data.Hero(k)?.Name ?? k).Distinct().ToList();
@@ -193,7 +200,7 @@ namespace Bolzena.Core
         {
             if (by == null || by.Count == 0) return null;
             string opener = null;
-            foreach (var id in (opt.Hero ?? new List<string>()).Concat(opt.Price?.Hero != null ? new[] { opt.Price.Hero } : new string[0]))
+            foreach (var id in (opt.HeroAll ?? new List<string>()).Concat(opt.Hero ?? new List<string>()).Concat(opt.Price?.Hero != null ? new[] { opt.Price.Hero } : new string[0]))
                 if (HasHero(id)) { opener = Data.Hero(id)?.Name ?? id; break; }
             return by.Select(b => string.IsNullOrEmpty(b) ? null : b == "hero" ? opener : b).ToList();
         }

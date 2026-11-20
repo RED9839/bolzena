@@ -19,7 +19,7 @@ namespace Bolzena.Core
         /// <summary>피해 배율 — 계수 찾기용(bz sim --bossultx 0.7). 보통 1.</summary>
         public static double Scale = 1;
         public const int FIRST = 2, EVERY = 4;
-        /// <summary>층(1 · 2)마다 고학년 한 번의 기준 피해(원값 — 층 피해 배율은 전투가 따로 곱한다). 전체 공격이면 FOE_ALL_X 로 나눠 적는다.</summary>
+        /// <summary>층(1 · 2)마다 고학년 한 번의 기준 피해(원값 — 층 피해 배율은 전투가 따로 곱한다).</summary>
         /// 2026-10-06 시뮬(9000판, 같은 씨앗) — 300 · 360 이면 완주 20.8% → 15.4%(-5.4%p), × 0.75 면 -1.9%p, × 0.65 면 -0.1%p → 210 · 250.
         /// 2026-10-07 사용자 「고학년이 너무 약한 감」 — 평소 수는 무작위 · 예고는 고학년만으로 바꾸며 300 · 360 으로 올렸다(난이도는 보스 몸 HP · 평소 피해로 맞춘다).
         public static readonly int[] RAW = { 0, 300, 360 };
@@ -170,11 +170,11 @@ namespace Bolzena.Core
                 }
             }
 
-            // 피해 — 없으면(지원형) 기준의 SUPPORT_HIT 만큼 전체 공격
+            // 피해 — 없으면(지원형) 기준의 SUPPORT_HIT 만큼. 적 전체 대상 고학년 · 지원형도 한 대(attack) — 원작 몬스터 피해는 모두 단일 대상이라 전체 공격(attackAll)을 쓰지 않는다(2026-10-31, 옛 attackAll v/2 × 2 와 피해 합은 같다)
             bool support = T <= 0;
             double scale = support ? SUPPORT_HIT : Math.Max(0.8, Math.Min(1.25, Math.Sqrt(T / T_REF)));
             int raw = Num.Round(RAW[tier] * scale * (fix?.Mul ?? 1) * Scale * NOW_X);
-            string form = fix?.Hit ?? (support || all ? "attackAll" : hitsMax >= 2 ? "multi" : "attack");
+            string form = fix?.Hit ?? (!support && !all && hitsMax >= 2 ? "multi" : "attack");
             Intent hit;
             if (form == "attackAll") hit = new Intent { T = "attackAll", V = Num.Round(raw / R.FOE_ALL_X) };
             else if (form == "multi") { int n = fix != null && fix.N > 0 ? fix.N : Math.Min(MULTI_MAX, Math.Max(2, hitsMax)); hit = new Intent { T = "multi", V = Num.Round((double)raw / n), N = n }; }
@@ -182,7 +182,7 @@ namespace Bolzena.Core
             hit.Say = u.Name;
             rec.Raw = hit.T == "attackAll" ? Num.Round(hit.V * R.FOE_ALL_X) : hit.T == "multi" ? hit.V * hit.N : hit.V;
             if (hitAt >= 0) subs[hitAt] = hit; else subs.Insert(0, hit);
-            if (support) rec.Note = rec.Note ?? $"피해 없는 고학년 — 기준의 {SUPPORT_HIT * 100:0}% 전체 공격을 붙였다";
+            if (support) rec.Note = rec.Note ?? $"피해 없는 고학년 — 기준의 {SUPPORT_HIT * 100:0}% 공격을 붙였다";
 
             foreach (var kv in debuff) subs.Add(Db(kv.Key, kv.Value));
             if (jam > 0) subs.Add(new Intent { T = "jam", V = 1 });
@@ -213,8 +213,8 @@ namespace Bolzena.Core
             var sb = new System.Text.StringBuilder();
             sb.Append("# 보스 클론 고학년 변환표\n\n");
             sb.Append($"엔진 `Runtime/Combat/BossUlt.cs` 가 만든다(`bz bossult --out …`). 보스 클론이 {FIRST}턴째에 바로 쓰고, 그 뒤 {EVERY}턴마다. 예고 · 끊기 없음 — 피해는 기준 × {NOW_X:0.##}.\n");
-            sb.Append($"파티에 거는 디버프는 원작 값 + {DEBUFF_PLUS}(상한까지) · 피해 없는 고학년은 기준의 {SUPPORT_HIT * 100:0}% 전체 공격 · 방어 {BLOCK[1]} · {BLOCK[2]} · 회복 {HEAL[1]} · {HEAL[2]}(1층 · 2층).\n");
-            sb.Append($"층은 사도 성급으로 잡았다(1~2성 → 1층 · 3성 → 2층). 예고 피해는 원값(층 피해 배율 · 상태 빼고) — 1층 기준 {RAW[1]} · 2층 기준 {RAW[2]}, 전체 공격은 화면에 × {R.FOE_ALL_X} 한 값.\n");
+            sb.Append($"파티에 거는 디버프는 원작 값 + {DEBUFF_PLUS}(상한까지) · 피해 없는 고학년은 기준의 {SUPPORT_HIT * 100:0}% 공격 · 방어 {BLOCK[1]} · {BLOCK[2]} · 회복 {HEAL[1]} · {HEAL[2]}(1층 · 2층).\n");
+            sb.Append($"층은 사도 성급으로 잡았다(1~2성 → 1층 · 3성 → 2층). 예고 피해는 원값(층 피해 배율 · 상태 빼고) — 1층 기준 {RAW[1]} · 2층 기준 {RAW[2]}.\n");
             sb.Append($"손보정 {FIX.Count}명(표에 ✎).\n\n");
             sb.Append("| 사도 | 층 | 고학년 | 원래 효과 | 보스 효과 | 예고 피해 | 뺀 것 · 메모 |\n|---|---|---|---|---|---|---|\n");
             foreach (var h in d.Heroes.Values.Concat(d.CloneHeroes.Values).OrderBy(x => x.Race, StringComparer.Ordinal).ThenBy(x => x.Name, StringComparer.Ordinal))

@@ -15,7 +15,7 @@ namespace Bolzena.Core.Tests
     {
         static readonly List<string> PARTY = new() { "rico", "carrot", "sion" };
         /// <summary>콘텐츠 폴더 — 환경 변수 BZ_CONTENT(교차 테이프를 뜬 콘텐츠 사본, 예: 성장 표를 넣은 scratchpad 사본), 없으면 bolzena-content-v2.</summary>
-        static readonly string CONTENT = System.Environment.GetEnvironmentVariable("BZ_CONTENT") is string bc && bc.Length > 0 ? bc : "C:/projects/bolzena-content-v2";
+        static readonly string CONTENT = TestPaths.Content;
 
         /// <summary>봇 판 하나 — 판이 연 전투들(테이프가 달린 채).</summary>
         static List<Battle> Fights(GameData d, List<string> party, long seed, bool skilled = false)
@@ -176,7 +176,7 @@ namespace Bolzena.Core.Tests
         [Test] public void 닷넷이_남긴_테이프를_유니티에서_다시_돌려도_같다()
         {
             string dir = Environment.GetEnvironmentVariable("BZ_TAPES");
-            if (string.IsNullOrEmpty(dir)) dir = new[] { "replay-tapes", "C:/projects/bolzena-core-test/replay-tapes" }.FirstOrDefault(Directory.Exists);
+            if (string.IsNullOrEmpty(dir)) dir = new[] { "replay-tapes", TestPaths.FindUp("bolzena-core-test/replay-tapes") }.FirstOrDefault(p => p != null && Directory.Exists(p));
             if (dir == null || !Directory.Exists(dir)) Assert.Ignore("교차 테이프 폴더가 없다(bz replay --out)");
             if (!Directory.Exists(CONTENT)) Assert.Ignore("bolzena-content-v2 가 없다");
             var d = GameData.FromFolder(CONTENT);
@@ -197,7 +197,7 @@ namespace Bolzena.Core.Tests
                     if (r.Same && (cut || r.Battle.Over == tape.Over)) same++; else bad.Add($"{Path.GetFileName(f)} — {r.Why ?? $"결과 {tape.Over} → {r.Battle.Over}"}");
                 }
                 Assert.AreEqual(files.Count, same, $"테이프 {files.Count} 가운데 다름 {bad.Count}\n" + string.Join("\n", bad.Take(20)));
-                UnityEngine.Debug.Log($"[ReplayTests] .NET 8 테이프 {files.Count}개를 유니티에서 다시 돌림 — 모두 같음");
+                TestPaths.Log($"[ReplayTests] .NET 8 테이프 {files.Count}개를 유니티에서 다시 돌림 — 모두 같음");
             }
             finally { R.TOUGH_FIXED = tf; }
         }

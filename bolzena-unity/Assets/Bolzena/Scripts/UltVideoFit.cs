@@ -293,7 +293,7 @@ namespace Bolzena
                         }
                         res[slot].Add(new BattleEvent
                         {
-                            Kind = e.Kind, Actor = e.Actor, Target = e.Target, Value = e.Value, Blocked = e.Blocked, Crit = e.Crit, HpAfter = e.HpAfter, BlockAfter = e.BlockAfter,
+                            Kind = e.Kind, Actor = e.Actor, Target = e.Target, Value = e.Value, Blocked = e.Blocked, Crit = e.Crit, Weak = e.Weak, By = e.By, HpAfter = e.HpAfter, BlockAfter = e.BlockAfter,
                             FAfter = e.FAfter, Hit = slot, Hits = n, HitKind = e.HitKind, Motion = e.Motion, Text = e.Text, Card = e.Card, Boss = e.Boss, Up = e.Up, Say = e.Say, Anim = e.Anim,
                         });
                     }

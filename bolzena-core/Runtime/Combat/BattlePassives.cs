@@ -234,7 +234,9 @@ namespace Bolzena.Core
                     return !w.Mine || info.By == owner.Key;
                 case "hurt": return info.Who != null && info.Who.Side == Side.Party && (w.Pct <= 0 || info.N >= info.Who.MaxHp * w.Pct);
                 case "lowHp": return info.Who != null && info.Who.Side == Side.Party && info.Before > w.Pct && info.After <= w.Pct;
-                case "ult": return w.Who == "any" || info.Hero == owner.Key;
+                case "ult":
+                    if (w.Marked != null) return info.Hero != null && StackOf(info.Hero, w.Marked) > 0;   // 그 표시가 붙은 아군이 고학년을 쓰면(2026-11-01 실비아 「초청객」 — play · hit 의 marked 와 같은 꼴)
+                    return w.Who == "any" || info.Hero == owner.Key;
                 case "debuff": return (w.Who == "any" || (w.Who == "other" ? info.By != null && info.By != owner.Key && Party.Any(u => u.Key == info.By) : info.By == owner.Key)) && (!w.Fresh || info.Fresh) && (w.Id == null || w.Id == info.Id);   // id — 그 디버프만(2026-10-10)
                 // 넘친 회복 — pct 가 있으면 「회복 뒤 HP 가 최대 HP × pct 이상, 선을 넘은 몫이 있으면」(파티 HP 하나 — 1단계 다시 정의)
                 case "overheal": return (w.Who == "any" || info.By == owner.Key) && OverOf(w, info) > 0;

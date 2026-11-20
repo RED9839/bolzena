@@ -14,7 +14,7 @@ namespace Bolzena.Core.Tests
     {
         static readonly List<string> PARTY = new() { "rico", "carrot", "sion" };
         /// <summary>콘텐츠 폴더 — 환경 변수 BZ_CONTENT(교차 테이프를 뜬 콘텐츠 사본, 예: 성장 표를 넣은 scratchpad 사본), 없으면 bolzena-content-v2.</summary>
-        static readonly string CONTENT = System.Environment.GetEnvironmentVariable("BZ_CONTENT") is string bc && bc.Length > 0 ? bc : "C:/projects/bolzena-content-v2";
+        static readonly string CONTENT = TestPaths.Content;
 
         /// <summary>샘플 데이터로 「완주한 판」 하나 — 신탁 · 축복 · 복제본 · 카드 값 · 교주 카드 주인 · 짐(저주 · 상태) · 장비 · 성장을 손으로 얹는다.</summary>
         static Run ClearRun(GameData d)
@@ -368,7 +368,7 @@ namespace Bolzena.Core.Tests
         [Test] public void 닷넷이_남긴_프론티어_테이프를_유니티에서_다시_돌려도_같다()
         {
             string dir = Environment.GetEnvironmentVariable("BZ_FRONTIER");
-            if (string.IsNullOrEmpty(dir)) dir = new[] { "frontier", "C:/projects/bolzena-core-test/frontier" }.FirstOrDefault(Directory.Exists);
+            if (string.IsNullOrEmpty(dir)) dir = new[] { "frontier", TestPaths.FindUp("bolzena-core-test/frontier") }.FirstOrDefault(p => p != null && Directory.Exists(p));
             if (dir == null || !Directory.Exists(Path.Combine(dir, "tapes"))) Assert.Ignore("교차 테이프 폴더가 없다(bz frontier --save)");
             if (!Directory.Exists(CONTENT)) Assert.Ignore("bolzena-content-v2 가 없다");
             var d = GameData.FromFolder(CONTENT);
@@ -388,7 +388,7 @@ namespace Bolzena.Core.Tests
                     if (!chk.Ok) bad.Add($"{Path.GetFileName(f)} — {chk.Why}");
                 }
                 Assert.AreEqual(0, bad.Count, $"테이프 {files.Count} 가운데 다름 {bad.Count}\n" + string.Join("\n", bad.Take(20)));
-                UnityEngine.Debug.Log($"[FrontierTests] .NET 8 프론티어 테이프 {files.Count}개를 유니티에서 다시 돌림 — 모두 같음");
+                TestPaths.Log($"[FrontierTests] .NET 8 프론티어 테이프 {files.Count}개를 유니티에서 다시 돌림 — 모두 같음");
             }
             finally { R.TOUGH_FIXED = tf; }
         }

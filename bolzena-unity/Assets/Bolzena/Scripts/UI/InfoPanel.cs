@@ -304,7 +304,9 @@ namespace Bolzena.UI
         {
             var d = BattleDirector.I;
             Vector3? feet = d != null && i < d.Enemies.Count ? d.FieldRoot.TransformPoint(d.Enemies[i].Feet) : (Vector3?)null;
-            return Side(parent, "enemy", feet, s.Enemies[i].Boss ? 2.6f : 1.8f, (st, redraw) =>
+            var alive = new List<int>();   // ◀ ▶ 로 넘길 적 — 살아 있는 적만, 자리 차례대로
+            for (int k = 0; k < s.Enemies.Count; k++) if (!s.Enemies[k].Dead) alive.Add(k);
+            var m = Side(parent, "enemy", feet, s.Enemies[i].Boss ? 2.6f : 1.8f, (st, redraw) =>
             {
                 var e = s.Enemies[i];
                 // 머리 — (보스) 꼬리표 · 이름 크게 · 체력 구간 알약 / 성격 점 · 이름 · ⓘ 약점
@@ -392,6 +394,10 @@ namespace Bolzena.UI
                     if (!string.IsNullOrEmpty(e.IntentSay)) st.Para($"「{e.IntentSay}」", ix, iw, Tone.Sm, Tone.Dim, true, 0.04f);
                     st.Y = Mathf.Min(st.Y, it - 0.6f);
                 }
+                // 광폭화(판 싸움만) — 켜졌으면 지금 배율, 켜지기 전이면 남은 턴
+                if (!e.Dead && PartyHud.RageOf(out int rageLeft, out double rageX))
+                    st.Para(rageX > 1 ? $"<color={Tone.BadTag}>광폭화</color> — 주는 피해 ×{rageX:0.##}" : $"{rageLeft}턴 뒤 광폭화" + Tip.Dim(" — 주는 피해가 오른다"),
+                        Pad, Wd - Pad * 2, Tone.Sm, rageX > 1 ? Tone.Ink : Tone.Sub, true, 0.04f);
 
                 if (e.Chips.Count > 0) { st.Head("상태"); StatusRows(st, e.Chips, e.Id, redraw); }
                 if (e.Passives.Count > 0)
@@ -405,7 +411,73 @@ namespace Bolzena.UI
                     var b = st.Para(e.Blurb, Pad, Wd - Pad * 2, Tone.Sm, Tone.Dim, true, 0.02f);
                     b.fontStyle = FontStyles.Italic;
                 }
+                if (alive.Count > 1) st.Y -= NavH;   // 맨 아래 넘기기 줄에 가리지 않게
             });
+            if (alive.Count > 1) EnemyNav(m, alive, i);
+            return m;
+        }
+
+        // ── 적 넘기기(2026-11-01) — 판 맨 아래 고정 줄: ◀ · 「2 / 3」 · ▶, 키보드 ← →. 판 안이라 바깥 누르면 닫히는 동작은 그대로 ──
+        const float NavH = 0.86f;
+        static void EnemyNav(Modal m, List<int> alive, int i)
+        {
+            float k = Tone.K, hw = Tone.HalfW, hh = Tone.HalfH;
+            float worldW = hw * 2 * 0.38f;
+            var bar = Make.Node("nav", m.transform, new Vector3(-hw + worldW / 2, -hh + NavH * k / 2, 0));
+            bar.localScale = new Vector3(k, k, 1);
+            float w = worldW / k;
+            Make.Box("navbg", bar, Res.UI("white"), Vector3.zero, new Vector2(w, NavH), OC + 6, new Color(0.03f, 0.04f, 0.09f, 0.96f));
+            Make.Box("navline", bar, Res.UI("white"), new Vector3(0, NavH / 2, 0), new Vector2(w - Pad * 2, 0.012f), OC + 7, Tone.Line);
+            int at = alive.IndexOf(i);
+            Tone.Text("navn", bar, at >= 0 ? $"{at + 1} / {alive.Count}" : $"- / {alive.Count}", new Vector3(0, -0.01f, 0), Tone.Body, OC + 8, Tone.Sub, TextAlignmentOptions.Center, false);
+            Action<int> go = step =>
+            {
+                var d = BattleDirector.I;
+                if (d == null) return;
+                int n = alive.Count, j;
+                if (at >= 0) j = alive[(at + step + n) % n];
+                else
+                {
+                    // 쓰러진 적의 창에서 — 그 자리 다음(앞) 살아 있는 적, 없으면 처음(끝)으로 돈다
+                    int f = step > 0 ? alive.FindIndex(x => x > i) : alive.FindLastIndex(x => x < i);
+                    j = f >= 0 ? alive[f] : alive[step > 0 ? 0 : n - 1];
+                }
+                var par = m.transform.parent;
+                m.Close();
+                Enemy(par, d.Battle.Snapshot, j, default);
+                Sfx.Play("ui_click", 0.4f);
+            };
+            for (int sgn = -1; sgn <= 1; sgn += 2)
+            {
+                int step = sgn;
+                var c = new Vector3(sgn * (w / 2 - Pad - 0.4f), 0, 0);
+                var bg = Make.Sliced(sgn < 0 ? "navl" : "navr", bar, Res.UI("pill_dark_9s"), c, new Vector2(0.8f, 0.6f), OC + 7);
+                var hl = Make.Sliced((sgn < 0 ? "navl" : "navr") + "_hl", bar, Res.UI("cell_on_9s"), c, new Vector2(0.8f, 0.6f), OC + 8, new Color(1, 1, 1, 0));
+                Tone.Text("navt", bar, sgn < 0 ? "◀" : "▶", c + new Vector3(0, -0.01f, 0), Tone.Lg, OC + 9, Tone.Ink, TextAlignmentOptions.Center, false);
+                var b = bg.gameObject.AddComponent<Button>();
+                b.Size = new Vector2(0.8f, 0.6f) / bg.transform.localScale.x;
+                b.Highlight = hl;
+                b.OnClick = () => go(step);
+                KeyBadge.Add(bar, c + new Vector3(sgn * 0.52f, 0.2f, 0), sgn < 0 ? "←" : "→", OC + 10, 0.2f);
+            }
+            var keys = bar.gameObject.AddComponent<NavKeys>();
+            keys.Go = go;
+            Nav = go;
+        }
+
+        /// <summary>점검용 — 지금 열린 적 정보 창의 넘기기(1 다음 · -1 이전). 창이 없거나 적이 하나면 null.</summary>
+        public static Action<int> Nav;
+
+        class NavKeys : MonoBehaviour
+        {
+            public Action<int> Go;
+            void OnDestroy() { if (Nav == Go) Nav = null; }
+            void Update()
+            {
+                if (Modal.Open == null || !transform.IsChildOf(Modal.Open.transform)) return;
+                if (PointerInput.Key(UnityEngine.InputSystem.Key.RightArrow)) Go(1);
+                else if (PointerInput.Key(UnityEngine.InputSystem.Key.LeftArrow)) Go(-1);
+            }
         }
 
         // 즉시 행동 — 「▶1/3 · 2장 뒤 즉시」
