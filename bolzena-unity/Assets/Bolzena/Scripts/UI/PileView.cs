@@ -162,6 +162,7 @@ namespace Bolzena.UI
 
         void Draw(int t)
         {
+            long perf0 = WinPerf.Begin();
             tab = t;
             scroll = 0;
             made.Clear();
@@ -247,6 +248,7 @@ namespace Bolzena.UI
             }
             else thumb = null;
             Clip();
+            WinPerf.End(this, "pile" + t, made.Count, perf0);
         }
 
         public static bool Open;

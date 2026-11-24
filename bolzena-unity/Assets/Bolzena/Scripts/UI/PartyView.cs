@@ -58,6 +58,7 @@ namespace Bolzena.UI
 
         void Draw(int t)
         {
+            long perf0 = WinPerf.Begin();
             tab = t;
             scroll = 0; scrollMax = 0; made.Clear(); cards = null;
             CardZoom.Hide();
@@ -106,6 +107,7 @@ namespace Bolzena.UI
             if (t == 0) Members(R, areaL, areaR, top - 0.25f * k, k);
             else if (t == 1) Effects(R, areaL, areaR, top - 0.3f * k, k);
             else Deck(R, areaL, areaR, top - 0.3f * k, k);
+            WinPerf.End(this, "party" + t, made.Count, perf0);
             Emit?.Invoke("party_tab" + t);
         }
 
