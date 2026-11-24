@@ -145,7 +145,7 @@ namespace Bolzena
                     var ok = System.Array.FindAll(fc0.Pick, v => v.Anim != null && u.Has(v.Anim));
                     if (ok.Length > 0)
                     {
-                        ultPickFit = ok[Random.Range(0, ok.Length)];
+                        ultPickFit = ok[PickRng.Index("ult:" + key, ok.Length)];
                         UltPlan.Anim = ultPickFit.Anim; UltPlan.Chain.Clear(); UltPlan.Table = null;
                         Debug.Log($"[Ult] {key} 갈래 {ultPickFit.Anim} — {ultPickFit.Note}");
                     }
