@@ -60,7 +60,7 @@ namespace Bolzena.UI
         {
             long perf0 = WinPerf.Begin();
             tab = t;
-            scroll = 0; scrollMax = 0; made.Clear(); cards = null;
+            scroll = 0; scrollMax = 0; CardFill.Stop(cards); made.Clear(); cards = null;
             CardZoom.Hide();
             var R = m.Content;
             for (int i = R.childCount - 1; i >= 0; i--) Destroy(R.GetChild(i).gameObject);
@@ -107,7 +107,7 @@ namespace Bolzena.UI
             if (t == 0) Members(R, areaL, areaR, top - 0.25f * k, k);
             else if (t == 1) Effects(R, areaL, areaR, top - 0.3f * k, k);
             else Deck(R, areaL, areaR, top - 0.3f * k, k);
-            WinPerf.End(this, "party" + t, made.Count, perf0);
+            WinPerf.End(this, "party" + t, (cards != null ? cards.GetComponent<CardFill>().Pending : 0), perf0);
             Emit?.Invoke("party_tab" + t);
         }
 
@@ -361,7 +361,7 @@ namespace Bolzena.UI
             int cols = 5;
             float x0 = (l + r) / 2 - (cols * cw + (cols - 1) * gap) / 2;
             heads.Clear();
-            float bottom = PileUi.Grid(cards, PileUi.Grouped(list, s), s, x0, cw, gap, y, cols, OC, k, made, heads);
+            float bottom = PileUi.Grid(cards, PileUi.Grouped(list, s), s, x0, cw, gap, y, cols, OC, k, made, heads, Clip);
             scrollMax = Mathf.Max(0, -Tone.HalfH + 0.3f - bottom);
             top = y + 0.2f;
             Clip();

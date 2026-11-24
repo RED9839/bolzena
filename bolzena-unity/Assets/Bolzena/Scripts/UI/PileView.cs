@@ -97,8 +97,9 @@ namespace Bolzena.UI
 
         /// <summary>묶음 격자 — 머리표 + 줄마다 cols 장. 돌려주는 값은 맨 아래 y. 머리표는 heads 에 모은다(스크롤 때 자르기).</summary>
         public static float Grid(Transform parent, List<(Bolzena.RunUI.CardOrder.Group g, List<CardInfo> cards)> groups, BattleSnapshot s,
-                                 float x0, float cw, float gap, float y, int cols, int order, float k, List<CardView> made, List<Transform> heads)
+                                 float x0, float cw, float gap, float y, int cols, int order, float k, List<CardView> made, List<Transform> heads, System.Action onAdded)
         {
+            var fill = CardFill.On(parent, made, onAdded);
             float ch = cw * CardView.H / CardView.W;
             int n = 0;
             foreach (var (g, cards) in groups)
@@ -132,11 +133,7 @@ namespace Bolzena.UI
                 for (int i = 0; i < cards.Count; i++)
                 {
                     int r = i / cols, c = i % cols;
-                    var cv = CardView.Create(parent, cards[i]); cv.ShowPin = false;
-                    cv.TargetPos = new Vector3(x0 + cw / 2 + c * (cw + gap), y - ch / 2 - r * (ch + gap), 0);
-                    cv.TargetScale = cw / CardView.W; cv.TargetRot = 0; cv.Snap();
-                    cv.SetOrder(order + 10 + n * 12);
-                    made.Add(cv);
+                    fill.Add(cards[i], new Vector3(x0 + cw / 2 + c * (cw + gap), y - ch / 2 - r * (ch + gap), 0), cw / CardView.W, order + 10 + n * 12);
                     n++;
                 }
                 y -= Mathf.CeilToInt(cards.Count / (float)cols) * (ch + gap) + 0.06f * k;
@@ -165,6 +162,7 @@ namespace Bolzena.UI
             long perf0 = WinPerf.Begin();
             tab = t;
             scroll = 0;
+            CardFill.Stop(cards);
             made.Clear();
             var T = m.Content;
             for (int i = T.childCount - 1; i >= 0; i--) Destroy(T.GetChild(i).gameObject);
@@ -234,7 +232,7 @@ namespace Bolzena.UI
             heads.Clear();
             // 뽑을 더미만 사도별 묶음 · 머리표. 버린 · 소멸은 묶지 않고 들어간 순서 한 줄기(머리표 없음)
             var groups = t == 0 ? Grouped(list, snap) : new List<(Bolzena.RunUI.CardOrder.Group g, List<CardInfo> cards)> { (null, list) };
-            float bottom = Grid(cards, groups, snap, areaL, cw, gap, y, cols, OC, k, made, heads);
+            float bottom = Grid(cards, groups, snap, areaL, cw, gap, y, cols, OC, k, made, heads, Clip);
             scrollMax = Mathf.Max(0, -hh + 0.3f - bottom);
             // 오른쪽 세로 스크롤 막대(넘칠 때만)
             if (scrollMax > 0)
@@ -248,7 +246,7 @@ namespace Bolzena.UI
             }
             else thumb = null;
             Clip();
-            WinPerf.End(this, "pile" + t, made.Count, perf0);
+            WinPerf.End(this, "pile" + t, list.Count, perf0);
         }
 
         public static bool Open;
