@@ -116,7 +116,7 @@ namespace Bolzena
                 foreach (var c in all) if (c != null && c.name.StartsWith(p)) hits.Add(c);
                 if (hits.Count == 0) continue;
                 me.voice.Stop();
-                me.voice.clip = hits[Random.Range(0, hits.Count)];
+                me.voice.clip = hits[PickRng.Index("voice:" + hero + "/" + p, hits.Count)];
                 me.voice.volume = VoiceVol;
                 me.voice.Play();
                 played++;

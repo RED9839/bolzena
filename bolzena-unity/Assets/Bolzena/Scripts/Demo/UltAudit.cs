@@ -419,7 +419,7 @@ namespace Bolzena.Demo
             if (why == null)
             {
                 probe?.Mark();
-                Random.InitState(7 + idx);   // 갈래 · 대사 · 타격 자리도 사도마다 같게 — Fixture.Seed 는 전투 엔진에만 걸린다(2026-11-17, 11주차 ADR-003 대안 C)
+                PickRng.Seed(7 + idx); Random.InitState(7 + idx);   // 갈래 · 대사 · 타격 자리도 사도마다 같게 — Fixture.Seed 는 전투 엔진에만 걸린다(2026-11-17, 11주차 ADR-003 대안 C)
                 d.RequestUlt(0);
                 t = 0;
                 while (!d.InUlt && t < 5f) { yield return null; t += Time.unscaledDeltaTime; }

@@ -544,7 +544,7 @@ namespace Bolzena
             word.colorGradient = new TMPro.VertexGradient(Color.white, Color.white, new Color(1f, 0.7f, 0.2f), new Color(1f, 0.7f, 0.2f));
             EnemyHuds[i].SetBroken(true);
             t.Loop(t.Resolve("Groggy"));
-            Emit(Battle.Snapshot.Enemies[i].Boss ? "boss_break" : "break");
+            Emit(i < Battle.Snapshot.Enemies.Count && Battle.Snapshot.Enemies[i].Boss ? "boss_break" : "break");   // 격파로 웨이브가 끝나면 스냅샷이 먼저 다음 웨이브(적이 더 적을 수 있다)다
             yield return Clock.Wait(0.35f);
         }
 

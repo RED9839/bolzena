@@ -251,7 +251,7 @@ namespace Bolzena
                 string n;
                 if (alts.Length > 1)
                 {
-                    if (pick < 0) pick = Random.Range(0, alts.Length);
+                    if (pick < 0) pick = PickRng.Index("card:" + MKey(hid, m), alts.Length);
                     n = alts[Mathf.Min(pick, alts.Length - 1)];
                 }
                 else n = alts[0];
